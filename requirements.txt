@@ -1,0 +1,6 @@
+numpy
+pytest
+shapely
+rasterio
+matplotlib
+pyproj
