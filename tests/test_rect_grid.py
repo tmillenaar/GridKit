@@ -66,3 +66,39 @@ def test_cells_in_bounds():
     numpy.testing.assert_allclose(ids, expected_ids)
     assert shape == (2,3)
 
+
+@pytest.mark.parametrize(
+    "index,expected_np_id,expected_value",
+    [ # note, numpy id is in y,x
+        [(0,0), (2,1), 7],
+        [
+            [(-1,1), (1,-2)], # index
+            [( 1,4), (0, 2)], # expected_np_id in [(y0, y1), (x0,x1)]
+            [3, 14] # expected_value
+        ]
+    ]
+)
+def test_grid_id_to_numpy_id(basic_bounded_rect_grid, index, expected_np_id, expected_value):
+    grid = basic_bounded_rect_grid
+    result = grid.grid_id_to_numpy_id(index)
+
+    numpy.testing.assert_almost_equal(result, expected_np_id)
+    numpy.testing.assert_almost_equal(grid.data[result[0], result[1]], expected_value)
+
+
+@pytest.mark.parametrize(
+    "np_index,expected_grid_id",
+    [ # note, numpy id is in y,x
+        [(2,1), (0,0)],
+        [
+            [( 1,4), (0, 2)], # np_index
+            [(-1,1), (1,-2)], # expected_grid_id in [(y0, y1), (x0,x1)]
+        ]
+    ]
+)
+def test_numpy_id_to_grid_id(basic_bounded_rect_grid, np_index, expected_grid_id):
+    grid = basic_bounded_rect_grid
+    result = grid.numpy_id_to_grid_id(np_index)
+
+    numpy.testing.assert_almost_equal(result, expected_grid_id)
+    numpy.testing.assert_almost_equal(grid.data[np_index[0], np_index[1]], grid.value(result))
