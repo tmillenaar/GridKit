@@ -272,6 +272,14 @@ class BoundedGrid(metaclass=BoundedGridMeta):
     def intersecting_cells(self, other):
         pass
 
+    @abc.abstractmethod
+    def numpy_id_to_grid_id(self, index):
+        pass
+
+    @abc.abstractmethod
+    def grid_id_to_numpy_id(self, index):
+        pass
+
     def assign(self, data, *, anchor=None, bounds=None, in_place=True):
         if not any([anchor, bounds]):
             raise ValueError("Please supply either an 'anchor' or 'bounds' keyword to position the data in the grid.")
