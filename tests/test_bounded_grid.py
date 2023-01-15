@@ -13,15 +13,11 @@ def test_data_ravel_order():
 def test_data_mutability():
     data = numpy.arange(9).reshape((3,3))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
+    grid_mutable = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3), prevent_copy=True)
 
-    # make sure grid data does not point to input data array
     assert id(data) != id(grid.data)
+    assert id(data) == id(grid_mutable.data)
 
-    # make sure grid data is mutable
-    data_pointer = grid.data
-    data_pointer += 1
-
-    numpy.testing.assert_equal(grid.data, data + 1)
 
 def test_data_setter():
     data = numpy.arange(9).reshape((3,3))
@@ -66,48 +62,74 @@ def test_intersects(bounds, expected):
     [
         (2,1,5,4),
         numpy.array([
-            [ 0.,  1.,  2., numpy.nan, numpy.nan],
-            [ 3.,  4.,  5.,  1.,  2.],
-            [ 6.,  7., 11.,  4.,  5.],
-            [numpy.nan, numpy.nan,  6.,  7.,  8.]
+            [ numpy.nan, numpy.nan, 0, 1, 2],
+            [ 0,  1,  5,  4,  5],
+            [ 3,  4, 11,  7,  8],
+            [ 6,  7,  8, numpy.nan, numpy.nan]
         ])
     ]]
 ))
 def test_add_partial_overlap(bounds, expected_data):
     data = numpy.arange(9).reshape((3,3))
     grid1 = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
-    grid2 = rect_grid.BoundedRectGrid(data, bounds=bounds)
-        
-    result = grid1 + grid2
     
+    # test with nodata_value of NaN
+    grid2 = rect_grid.BoundedRectGrid(data.astype(float), bounds=bounds, nodata_value=numpy.nan)
+    result = grid1 + grid2
     numpy.testing.assert_allclose(result.data, expected_data)
 
+    # test with nodata_value of 1
+    grid3 = rect_grid.BoundedRectGrid(data, bounds=bounds, nodata_value=-1)
+    expected_data[numpy.isnan(expected_data)] = -1
+    result = grid1 + grid3
+    numpy.testing.assert_allclose(result.data, expected_data)
 
 def test_basic_operations_with_scalars():
     # initialize grid
     data = numpy.arange(4).reshape((2,2))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,2,2))
+    grid_nodata = grid.copy()
+    grid_nodata.nodata_value = 2
 
     # test addition
     result = 2 + grid
-    expected = numpy.array([[2,3], [4, 5]])
+    expected = numpy.array([[2, 3], [4, 5]])
     numpy.testing.assert_allclose(result.data, expected)
     result = grid + 2
     numpy.testing.assert_allclose(result.data, expected)
 
+    result = 2 + grid_nodata
+    expected = numpy.array([[2, 3], [2, 5]])
+    numpy.testing.assert_allclose(result.data, expected)
+    result = grid_nodata + 2
+    numpy.testing.assert_allclose(result.data, expected)
+
     # test subtraction
     result = 2 - grid
-    expected = numpy.array([[2,1], [0, -1]])
+    expected = numpy.array([[2, 1], [0, -1]])
     numpy.testing.assert_allclose(result.data, expected)
     result = grid - 2
-    expected = numpy.array([[-2,-1], [0, 1]])
+    expected = numpy.array([[-2, -1], [0, 1]])
+    numpy.testing.assert_allclose(result.data, expected)
+
+    result = 2 - grid_nodata
+    expected = numpy.array([[2, 1], [2, -1]])
+    numpy.testing.assert_allclose(result.data, expected)
+    result = grid_nodata - 2
+    expected = numpy.array([[-2, -1], [2, 1]])
     numpy.testing.assert_allclose(result.data, expected)
 
     # test multiplication
     result = 2 * grid
-    expected = numpy.array([[0,2], [4, 6]])
+    expected = numpy.array([[0, 2], [4, 6]])
     numpy.testing.assert_allclose(result.data, expected)
     result = grid * 2
+    numpy.testing.assert_allclose(result.data, expected)
+
+    result = 2 * grid_nodata
+    expected = numpy.array([[0, 2], [2, 6]])
+    numpy.testing.assert_allclose(result.data, expected)
+    result = grid_nodata * 2
     numpy.testing.assert_allclose(result.data, expected)
 
     # test division
@@ -118,6 +140,13 @@ def test_basic_operations_with_scalars():
     expected = numpy.array([[0,1/2], [1, 3/2]])
     numpy.testing.assert_allclose(result.data, expected)
 
+    result = 2 / grid_nodata
+    expected = numpy.array([[numpy.inf,2], [2, 2/3]])
+    numpy.testing.assert_allclose(result.data, expected)
+    result = grid_nodata / 2
+    expected = numpy.array([[0,1/2], [2, 3/2]])
+    numpy.testing.assert_allclose(result.data, expected)
+
     # test power
     result = 2 ** grid
     expected = numpy.array([[1,2], [4, 8]])
@@ -126,11 +155,20 @@ def test_basic_operations_with_scalars():
     expected = numpy.array([[0,1], [4, 9]])
     numpy.testing.assert_allclose(result.data, expected)
 
+    result = 2 ** grid_nodata
+    expected = numpy.array([[1,2], [2, 8]])
+    numpy.testing.assert_allclose(result.data, expected)
+    result = grid_nodata ** 2
+    expected = numpy.array([[0,1], [2, 9]])
+    numpy.testing.assert_allclose(result.data, expected)
 
-def test_comparissons_with_scalars():
+@pytest.mark.parametrize("nodata", [None, 1])
+def test_comparissons_with_scalars(nodata):
     # initialize grid
     data = numpy.arange(4).reshape((2,2))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,2,2))
+
+    grid.nodata = nodata # should not have an effect, set here to make sure
 
     # test equal
     result = grid == 1
@@ -167,30 +205,44 @@ def test_reduction_operators():
     # initialize grid
     data = numpy.arange(4).reshape((2,2))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,2,2))
+    grid_nodata = grid.copy()
+    grid_nodata.nodata_value = 3
 
     # test mean
     result = grid.mean()
     numpy.testing.assert_allclose(result.data, 1.5)
+    result = grid_nodata.mean()
+    numpy.testing.assert_allclose(result.data, 1)
 
     # test median
     result = grid.median()
     numpy.testing.assert_allclose(result.data, 1.5)
+    result = grid_nodata.median()
+    numpy.testing.assert_allclose(result.data, 1)
 
     # test std
     result = grid.std()
     numpy.testing.assert_allclose(result.data, 5**0.5/2)
+    result = grid_nodata.std()
+    numpy.testing.assert_allclose(result.data, (2/3)**0.5)
 
     # test min
     result = grid.min()
+    numpy.testing.assert_allclose(result.data, 0)
+    result = grid_nodata.min()
     numpy.testing.assert_allclose(result.data, 0)
 
     # test max
     result = grid.max()
     numpy.testing.assert_allclose(result.data, 3)
+    result = grid_nodata.max()
+    numpy.testing.assert_allclose(result.data, 2)
 
     # test sum
     result = grid.sum()
     numpy.testing.assert_allclose(result.data, 6)
+    result = grid_nodata.sum()
+    numpy.testing.assert_allclose(result.data, 3)
 
 def test_reduction_operators_arg():
     # initialize grid
@@ -209,10 +261,24 @@ def test_reduction_operators_arg():
     assert idx.shape == (2,)
     numpy.testing.assert_allclose(value, data.min())
 
+    # test argmax with ndoata value
+    grid.nodata_value = 8
+    idx = grid.argmax()
+    value = grid.value(idx)
+    assert idx.shape == (2,)
+    numpy.testing.assert_allclose(value, 7)
+
+    # test argmin with nodata value
+    grid.nodata_value = 0
+    idx = grid.argmin()
+    value = grid.value(idx)
+    assert idx.shape == (2,)
+    numpy.testing.assert_allclose(value, 1)
+
 def test_crop():
     data = numpy.arange(9).reshape((3,3))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
-    bounds = (1.6, -1, 5, 2)
+    bounds = (0.7, -1, 5, 2)
 
     expected_data = numpy.array([
         [4, 5],
@@ -227,7 +293,6 @@ def test_centroid():
     data = numpy.array([[0,1],[2,3]])
     grid = rect_grid.BoundedRectGrid(data, bounds=(-2,0,0,2))
 
-    # breakpoint()
     expected_centroids = [[-1.5, 1.5], [-0.5, 1.5], [-1.5, 0.5], [-0.5, 0.5]]
     numpy.testing.assert_equal(grid.centroid(), expected_centroids)
 

@@ -62,7 +62,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def cell_at_point(self, point: numpy.array) -> tuple:
+    def cell_at_point(self, point: numpy.array) -> tuple: 
         """Determine the ID of the cell in which `point` falls.
 
         Parameters

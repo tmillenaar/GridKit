@@ -102,3 +102,20 @@ def test_numpy_id_to_grid_id(basic_bounded_rect_grid, np_index, expected_grid_id
 
     numpy.testing.assert_almost_equal(result, expected_grid_id)
     numpy.testing.assert_almost_equal(grid.data[np_index[0], np_index[1]], grid.value(result))
+
+def test_nodata_value(basic_bounded_rect_grid):
+    grid = basic_bounded_rect_grid
+
+    # test no data are nodata
+    assert grid.nodata_value is None
+    assert grid.nodata() is None
+
+    # test only one value is nodata
+    grid.nodata_value = 6
+    numpy.testing.assert_allclose(grid.nodata(), [[-1,0]])
+
+    # test all values are nodata
+    grid = grid.update(numpy.ones((grid.height,grid.width)))
+    assert grid.nodata_value == 6 # make sure nodata is inhertied after update
+    grid.nodata_value = 1
+    numpy.testing.assert_allclose(grid.nodata(), grid.cells_in_bounds(grid.bounds)[0])

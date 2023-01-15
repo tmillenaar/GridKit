@@ -291,20 +291,29 @@ class RectGrid(BaseGrid):
 
 
     def is_aligned_with(self, other):
-        aligned = True
-        reason = "CRS, cellsize and gridsize are the same"
-        reasons = []
         if not isinstance(other, RectGrid):
             raise ValueError(f"Expected a RectGrid, got {type(other)}")
-        if not (self.crs is None and other.crs is None) and not self.crs.is_exact_same(other.crs):
+        aligned = True
+        reason = ""
+        reasons = []
+        
+        if (self.crs is None and other.crs is None):
+            pass
+        elif self.crs is None:
             aligned = False
             reasons.append("CRS")
+        elif not self.crs.is_exact_same(other.crs):
+            aligned = False
+            reasons.append("CRS")
+
         if not numpy.isclose(self.dx, other.dx) or not numpy.isclose(self.dy, other.dy):
             aligned = False
             reasons.append("cellsize")
-        if not all(numpy.isclose(self.offset, other.offset)):
+
+        if not all(numpy.isclose(self.offset, other.offset, atol=1e-7)): # FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid
             aligned = False
             reasons.append("offset")
+
         reason = f"The following attributes are not the same: {reasons}" if reasons else reason
         return aligned, reason
 
@@ -376,7 +385,6 @@ class RectGrid(BaseGrid):
 
         # translate the coordinates of the corner cells into indices
         left_top_id, right_bottom_id = self.cell_at_point([left_top, right_bottom])
-        # breakpoint()
 
         # turn minimum and maximum indices into fully arranged array
         # TODO: think about dtype. 64 is too large. Should this be exposed? Or automated based on id range?
@@ -436,7 +444,6 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :class:`numpy.ndarray`
             1D-Array of size `width`, containing the longitudinal values from left to right
         """
-        breakpoint
         return numpy.linspace(self.bounds[0] + self.dx / 2, self.bounds[2] - self.dx / 2, self.width)
 
     @property
@@ -501,35 +508,30 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise IntersectionError(f"Cannot crop grid with bounds {self.bounds} to {new_bounds} for they do not intersect.")
         new_bounds = self.shared_bounds(new_bounds)
 
-        new_bounds = self.align_bounds(new_bounds, mode="expand")
+        new_bounds = self.align_bounds(new_bounds, mode="contract")
         slice_y, slice_x = self._data_slice_from_bounds(new_bounds)
-        cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
-        # cropped_data = self._data[slice_y, slice_x]
-        return self.__class__(cropped_data, bounds=new_bounds, crs=self.crs)
+        # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
+        cropped_data = self._data[slice_y, slice_x] #Fixme: seems to be flipped?
+        # cropped_data = self._data[slice_x, slice_y]
+        return self.update(cropped_data, bounds=new_bounds)
 
     def _data_slice_from_bounds(self, bounds):
 
         if not self.are_bounds_aligned(bounds):
             raise ValueError(f"Cannot create slice from unaligned bounds {tuple(bounds)}")
 
-        new_corners = numpy.array([
-            [bounds[0] - self.dx, bounds[1] - self.dx], # left, bottom
-            [bounds[2] - self.dy, bounds[3] - self.dy], # right, top
-        ])
-        old_corners = numpy.array([
-            [self.bounds[0] - self.dx, self.bounds[1] - self.dx], # left, bottom
-            [self.bounds[2] - self.dy, self.bounds[3] - self.dy], # right, top
-        ])
-        new_corner_ids = self.cell_at_point(new_corners)
-        old_corner_ids = self.cell_at_point(old_corners)
-
+        difference_left = round(abs((self.bounds[0] - bounds[0]) / self.dx))
+        difference_right = round(abs((self.bounds[2] - bounds[2]) / self.dx))
         slice_x = slice(
-            int(new_corner_ids[0,0] - old_corner_ids[0,0]), # new left - old left
-            int(new_corner_ids[1,0] - old_corner_ids[0,0]), # new right - old left
+            difference_left,
+            self.width - difference_right, # add one for upper bound of slice is exclusive
         )
+
+        difference_bottom = round(abs((self.bounds[1] - bounds[1]) / self.dy))
+        difference_top = round(abs((self.bounds[3] - bounds[3]) / self.dy))
         slice_y = slice(
-            int(new_corner_ids[0,1] - old_corner_ids[0,1]), # new bottom - old bottom
-            int(new_corner_ids[1,1] - old_corner_ids[0,1]), # new top - old bottom
+            difference_top,
+            self.height - difference_bottom, # add one for upper bound of slice is exclusive
         )
 
         return slice_y, slice_x
@@ -567,6 +569,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             )
         else:
             bounds = self.bounds
+
         # Align using "contract" for we cannot sample outside of the original bounds
         new_bounds = alignment_grid.align_bounds(bounds, mode="contract")
 
@@ -579,16 +582,17 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             transformed_points = transformer.transform(*new_points.T)
             new_points = numpy.vstack(transformed_points).T
 
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
         if method == "nearest":
             new_ids = self.cell_at_point(new_points)
             value = self.value(new_ids)
         elif method == "bilinear":
             tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(new_points)
 
-            tl_val = self.value(tl_ids)
-            tr_val = self.value(tr_ids)
-            bl_val = self.value(bl_ids)
-            br_val = self.value(br_ids)
+            tl_val = self.value(tl_ids, oob_value=nodata_value)
+            tr_val = self.value(tr_ids, oob_value=nodata_value)
+            bl_val = self.value(bl_ids, oob_value=nodata_value)
+            br_val = self.value(br_ids, oob_value=nodata_value)
 
             # determine relative location of new point between old cell centers in x and y directions
             abs_diff = (new_points - self.centroid(bl_ids))
@@ -598,11 +602,14 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             top_val = tl_val + (tr_val - tl_val) * x_diff
             bot_val = bl_val + (br_val - bl_val) * x_diff
             value = bot_val + (top_val - bot_val) * y_diff
+
+            # TODO: remove rows and cols with nans around the edge after bilinear
         else:
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
-        return BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs)
+
+        return BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
 
     def to_crs(self, crs, resample_method="nearest"):
         new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)

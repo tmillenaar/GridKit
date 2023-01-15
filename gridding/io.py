@@ -20,14 +20,14 @@ def read_geotiff(path, bands=1):
         import numpy
         # data = numpy.flipud(raster_file.read(bands))
         data = raster_file.read(bands)
-        # crs = raster_file.read_crs() # TODO: implement CRS in grids
         # breakpoint()
         b = raster_file.bounds
         bounds = (b.left, b.bottom, b.right, b.top)
+        nodata = raster_file.nodata
     # breakpoint()
     # print("")
 
-    grid = BoundedRectGrid(data, bounds=bounds, crs=crs)
+    grid = BoundedRectGrid(data, bounds=bounds, crs=crs, nodata_value=nodata)
     return grid
 
 # path = "tests/data/do_not_commit/wildfires.tiff"
