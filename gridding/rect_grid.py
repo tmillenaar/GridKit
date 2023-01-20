@@ -355,7 +355,6 @@ class RectGrid(BaseGrid):
                 round((bounds[2] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
                 round((bounds[3] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
             )
-
         raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
 
     def cells_in_bounds(self, bounds):
@@ -425,15 +424,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
     @property
     def nr_cells(self):
-        return (self.nr_cells_x, self.nr_cells_y)
-
-    @property
-    def nr_cells_x(self):
-        return self._data.shape[0]
-
-    @property
-    def nr_cells_y(self):
-        return self._data.shape[1]
+        return (self.width, self.height)
 
     @property
     def lon(self):

@@ -310,7 +310,7 @@ class BoundedGrid(metaclass=BoundedGridMeta):
         :class:`int`
             The total number of cells in the grid
         """
-        return self.height * self.widthF
+        return self.height * self.width
 
     def intersects(self, other):
         other_bounds = other.bounds if isinstance(other, BaseGrid) else other # Allow for both grid objects and bounds

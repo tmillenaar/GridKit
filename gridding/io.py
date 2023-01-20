@@ -1,9 +1,10 @@
 from gridding.rect_grid import BoundedRectGrid
 import rasterio
 import numpy
+from pyproj import CRS, Transformer
 
 
-def read_geotiff(path, bands=1):
+def read_geotiff(path, bands=1, bounds=None, bounds_crs=None):
     """Read data from a GeoTIFF
 
     Returns
@@ -17,15 +18,24 @@ def read_geotiff(path, bands=1):
 
     with rasterio.open(path) as raster_file:
         crs = str(raster_file.crs)
-        import numpy
-        # data = numpy.flipud(raster_file.read(bands))
-        data = raster_file.read(bands)
-        # breakpoint()
-        b = raster_file.bounds
-        bounds = (b.left, b.bottom, b.right, b.top)
+
+        if bounds is not None:
+            if bounds_crs is not None:
+                bounds_crs = CRS.from_user_input(bounds_crs)
+                transformer = Transformer.from_crs(bounds_crs, crs, always_xy=True)
+                bounds = transformer.transform_bounds(*bounds)
+            ul = raster_file.index(bounds[0], bounds[3])
+            lr = raster_file.index(bounds[2], bounds[1])
+            # Create a window from the indices
+            window = rasterio.windows.Window.from_slices((ul[0], lr[0]), (ul[1], lr[1]))
+            bounds = rasterio.windows.bounds(window, raster_file.transform) # update the bounds to those of the window
+        else:
+            window = None
+            b = raster_file.bounds if bounds is None else bounds
+            bounds = (b.left, b.bottom, b.right, b.top)
+
+        data = raster_file.read(bands, window=window)        
         nodata = raster_file.nodata
-    # breakpoint()
-    # print("")
 
     grid = BoundedRectGrid(data, bounds=bounds, crs=crs, nodata_value=nodata)
     return grid
