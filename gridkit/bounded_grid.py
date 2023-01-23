@@ -4,9 +4,9 @@ import operator
 import abc
 import warnings
 
-import gridding
-from gridding.base_grid import BaseGrid
-from gridding.errors import AlignmentError
+import gridkit
+from gridkit.base_grid import BaseGrid
+from gridkit.errors import AlignmentError
 
 class _BoundedGridMeta(type):
     """metaclass of the Raster class"""
@@ -157,7 +157,7 @@ class _BoundedGridMeta(type):
             combined_grid.assign(right_data, bounds=right.bounds, in_place=True, assign_nodata=False)
             
             # overwrite shared area in combined_grid with the combined results
-            count = gridding.count([left, right])
+            count = gridkit.count([left, right])
             shared_mask = count == 2
             shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
             result = op(left.value(shared_mask), right.value(shared_mask))

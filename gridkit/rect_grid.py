@@ -1,6 +1,6 @@
-from gridding.base_grid import BaseGrid
-from gridding.bounded_grid import BoundedGrid
-from gridding.errors import IntersectionError, AlignmentError
+from gridkit.base_grid import BaseGrid
+from gridkit.bounded_grid import BoundedGrid
+from gridkit.errors import IntersectionError, AlignmentError
 
 
 import numpy

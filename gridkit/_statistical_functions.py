@@ -1,5 +1,5 @@
 import numpy
-from gridding.errors import AlignmentError
+from gridkit.errors import AlignmentError
 
 def _total_bounds(left_bounds, right_bounds):
     return (

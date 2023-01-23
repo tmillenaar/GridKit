@@ -1,4 +1,4 @@
-from gridding.rect_grid import BoundedRectGrid
+from gridkit.rect_grid import BoundedRectGrid
 import rasterio
 import numpy
 from pyproj import CRS, Transformer
@@ -69,16 +69,16 @@ if __name__ == "__main__":
     # grid_115 = read_geotiff(path_t115, bands=1)
     # grid_42 = read_geotiff(path_t42, bands=1)
 
-    grid = read_geotiff("/Users/mara/Documents/Timo/Projects/gridding/test/data/do_not_commit/wildfires.tiff")
+    grid = read_geotiff("/Users/mara/Documents/Timo/Projects/gridkit/test/data/do_not_commit/wildfires.tiff")
 
-    from gridding import plotting
-    from gridding import rect_grid
-    gridding.plot_raster(resampled, "original.png")
+    from gridkit import plotting
+    from gridkit import rect_grid
+    gridkit.plot_raster(resampled, "original.png")
     new_grid = rect_grid.RectGrid(
         dx = grid.dx*2,
         dy = grid.dy*2,
         offset = grid.offset
     )
     resampled = grid.resample(new_grid)
-    gridding.plot_raster(resampled, "resampled.png")
+    gridkit.plot_raster(resampled, "resampled.png")
     breakpoint()

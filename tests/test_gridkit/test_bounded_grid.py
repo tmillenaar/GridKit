@@ -1,4 +1,4 @@
-from gridding import bounded_grid, rect_grid
+from gridkit import bounded_grid, rect_grid
 
 import numpy
 import pytest

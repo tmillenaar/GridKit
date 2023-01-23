@@ -1,4 +1,4 @@
-from gridding.rect_grid import RectGrid
+from gridkit.rect_grid import RectGrid
 import pytest
 import numpy
 

@@ -1,7 +1,7 @@
 import pytest
 import numpy
-from gridding import rect_grid
-from gridding.io import read_geotiff
+from gridkit import rect_grid
+from gridkit.io import read_geotiff
 
 @pytest.fixture(scope="function")
 def basic_bounded_rect_grid():

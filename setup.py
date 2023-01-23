@@ -19,9 +19,14 @@ docs_require = [
 ]
 
 setup(
-    name="gridding",
+    name="gridkit",
     version=version_info["__version__"],
     author="Timo Millenaar",
+    description="Operations on, and tessellation of, regular grids",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License"
+    ],
     packages=find_packages(),
     include_package_data=True,
     python_requires=">=3.8",

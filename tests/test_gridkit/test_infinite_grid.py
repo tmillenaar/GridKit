@@ -1,7 +1,7 @@
 from unittest import result
 import numpy
 import pytest
-from gridding import rect_grid
+from gridkit import rect_grid
 
 
 @pytest.mark.parametrize("dx, dy, offset, point, expected_id",
