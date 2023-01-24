@@ -36,9 +36,9 @@ class RectGrid(BaseGrid):
         .. Warning ::
             The two values that make up an `index` are expected to be integers, and will be cast as such.
 
-        Args
-        ----
-        index (tuple of integers)
+        Parameters
+        ----------
+        index: :class:`tuple`
             Index of the cell of which the centroid is to be calculated.
             The index consists of two integers specifying the nth cell in x- and y-direction.
             Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.
@@ -52,7 +52,7 @@ class RectGrid(BaseGrid):
         Raises
         ------
         ValueError
-            No `index` was supplied while this class does not contain data
+            No `index` parameter was supplied. `index` can only be `None` in classes that contain data.
 
         Examples
         --------
@@ -111,7 +111,7 @@ class RectGrid(BaseGrid):
 
         Args
         ----
-        point (tuple of floats)
+        point: :class"`tuple`
             Coordinate of the point around which the cells are to be selected.
             The point consists of two floats specifying x- and y-coordinates, respectively.
             Mutliple poins can be specified at once in the form of a list of points or an Nx2 ndarray.
@@ -203,9 +203,9 @@ class RectGrid(BaseGrid):
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
 
-        Args
+        Parameters
         ----
-        point (tuple of floats)
+        point: :class:`tuple`
             Coordinate of the point for which the containing cell is to be found.
             The point consists of two floats specifying x- and y-coordinates, respectively.
             Mutliple poins can be specified at once in the form of a list of points or an Nx2 ndarray.

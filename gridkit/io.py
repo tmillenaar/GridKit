@@ -9,7 +9,7 @@ def read_geotiff(path, bands=1, bounds=None, bounds_crs=None):
 
     Returns
     -------
-    Raster
+    :class:`~gridkit.rect_grid.BoundedRectGrid`
         The contents of the GeoTIFF read into a Raster
 
     """

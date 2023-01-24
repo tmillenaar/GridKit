@@ -5,10 +5,6 @@ from pyproj import CRS, Transformer
 
 class BaseGrid(metaclass=abc.ABCMeta):
 
-    ## Attributes:
-    # _crs
-    # _origin
-    # _rotation_matrix
     def __init__(self, offset=(0,0), crs=None):
 
         # limit offset to be positive and max 1 cell-size
@@ -16,19 +12,23 @@ class BaseGrid(metaclass=abc.ABCMeta):
         offset_x = offset_x % self.dx
         offset_y = offset_y % self.dy
         self._offset = (offset_x, offset_y)
+
+        # set the CRS using crs.setter
         self._crs = None
         self.crs = crs
 
     @property
     def crs(self):
-        """
-        The Coordinate Reference System (CRS) represented as a ``pyproj.CRS``
-        object.
-        Returns None if the CRS is not set, and to set the value it
-        :getter: Returns a ``pyproj.CRS`` or None. When setting, the value
-        Coordinate Reference System of the geometry objects. Can be anything accepted by
-        :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
-        such as an authority string (eg "EPSG:4326") or a WKT string.
+        """The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.
+
+        Returns
+        -------
+        :class:`pyproj.CRS`
+            None if the CRS is not set, and to set the value it
+            :getter: Returns a ``pyproj.CRS`` or None. When setting, the value
+            Coordinate Reference System of the geometry objects. Can be anything accepted by
+            :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an authority string (eg "EPSG:4326") or a WKT string.
         """
         return self._crs
 
@@ -62,17 +62,17 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def cell_at_point(self, point: numpy.array) -> tuple: 
+    def cell_at_point(self, point: numpy.ndarray) -> tuple: 
         """Determine the ID of the cell in which `point` falls.
 
         Parameters
         ----------
-        point: :class:tuple
+        point: :class:`tuple`
             The coordinates of the point to which to match the cell
 
         Returns
         -------
-        :calss:`tuple`
+        :class:`tuple`
             The ID of the cell in (x,y)
         """
         pass
@@ -81,15 +81,16 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def cell_corners(self, index: numpy.ndarray, as_poly: bool = False) -> numpy.ndarray:
         """Determine the corners of the cells as specified by `index`.
 
-        Parameters:
+        Parameters
+        ----------
         index: :class:`numpy.ndarray`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
         as_poly: :class:`bool`
-            Toggle that determines whether to return a :class:`numpy.ndarray` (False) or a :class:`shapely MultiPolygon` (True).
+            Toggle that determines whether to return a :class:`numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).
 
         Returns
         -------
-        :calss:`tuple`
+        :class:`tuple`
             The ID of the cell in (x,y)
         """
         pass
@@ -111,9 +112,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
         assumed to be lines in the current projection, not geodesics.  Objects
         crossing the dateline (or other projection boundary) will have
         undesirable behavior.
-        Arguments
+        
+        Parameters
         ----------
-        crs : pyproj.CRS
+        crs :class:`pyproj.CRS`
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.

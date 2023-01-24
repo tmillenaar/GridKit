@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-with open("version.py") as file:
+with open("gridkit/version.py") as file:
     version_info = dict(line.replace(" ","").replace('"', "").split("=") for line in file)
 
 with open("requirements.txt") as file:
@@ -16,6 +16,8 @@ tests_require = [
 
 docs_require = [
     "sphinx",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-plantuml",
 ]
 
 setup(

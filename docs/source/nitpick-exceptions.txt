@@ -1,0 +1,17 @@
+# numpy
+py:class numpy.ndarray
+
+# ABC
+py:class abc.ABCMeta
+
+# pyproj
+py:class pyproj.CRS
+py:meth pyproj.crs.CRS.from_user_input
+
+# shapely
+py:class shapely.Point
+py:class shapely.LineString
+py:class shapely.Polygon
+py:class shapely.MultiPoint
+py:class shapely.MultiLineString
+py:class shapely.MultiPolygon

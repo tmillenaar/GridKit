@@ -69,8 +69,8 @@ class _BoundedGridMeta(type):
 
         Parameters
         ----------
-        op: :class:`operator`
-            A method from the `operator` package
+        op: any callable operator form either `numpy` or `operator`
+            A function from the `operator` package. Can also be a numpy or cusotm uperator.
 
         Returns
         -------
@@ -213,7 +213,7 @@ class _BoundedGridMeta(type):
         return internal
 
 class BoundedGridMeta(abc.ABCMeta, _BoundedGridMeta):
-    """Class that enables usage of the `_BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class."""
+    """Class that enables usage of the :class:`~gridkit.bounded_grid._BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class."""
     pass
 
 class BoundedGrid(metaclass=BoundedGridMeta):
