@@ -275,6 +275,12 @@ def test_reduction_operators_arg():
     assert idx.shape == (2,)
     numpy.testing.assert_allclose(value, 1)
 
+def test_dtype_after_division():
+    data = numpy.arange(9).reshape((3,3))
+    grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
+    result = grid / (grid + 1)
+    assert numpy.issubdtype(result.dtype, float), "Incorrect datatype after division operation"
+
 def test_crop():
     data = numpy.arange(9).reshape((3,3))
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))

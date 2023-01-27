@@ -161,6 +161,7 @@ class _BoundedGridMeta(type):
             shared_mask = count == 2
             shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
             result = op(left.value(shared_mask), right.value(shared_mask))
+            combined_grid = combined_grid.astype(numpy.result_type(combined_grid._data.dtype, result.dtype)) # for some operations like * and / the dtype changes
             combined_grid._data[shared_mask_np] = result # TODO: find more elegant way of updating data with grid ids as mask
 
             return combined_grid
@@ -239,7 +240,16 @@ class BoundedGrid(metaclass=BoundedGridMeta):
         self._data = data
 
     def __array__(self, dtype=None):
+        if dtype:
+            return self.data.astype(dtype)
         return self.data
+
+    @property
+    def dtype(self):
+        return self._data.dtype
+
+    def astype(self, dtype):
+        return self.update(new_data=self._data.astype(dtype))
 
     def update(self, new_data, bounds=None, crs=None, nodata_value=None):
         #TODO figure out how to update dx, dy, origin
