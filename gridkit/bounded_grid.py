@@ -149,19 +149,19 @@ class _BoundedGridMeta(type):
             if left.nodata_value is not None:
                 left_data[left._data == left.nodata_value] = nodata_value
             combined_grid.assign(left_data, bounds=left.bounds, in_place=True, assign_nodata=False)
-            
+
             # assign data of `right` to combined_grid
             right_data = right._data.astype(dtype)
             if right.nodata_value is not None:
                 right_data[right._data == right.nodata_value] = nodata_value
             combined_grid.assign(right_data, bounds=right.bounds, in_place=True, assign_nodata=False)
-            
+
             # overwrite shared area in combined_grid with the combined results
             count = gridkit.count([left, right])
             shared_mask = count == 2
             shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
             result = op(left.value(shared_mask), right.value(shared_mask))
-            combined_grid = combined_grid.astype(numpy.result_type(combined_grid._data.dtype, result.dtype)) # for some operations like * and / the dtype changes
+            combined_grid = combined_grid.astype(numpy.result_type(combined_grid._data.dtype, result.dtype)) # when dividing the dtype changes
             combined_grid._data[shared_mask_np] = result # TODO: find more elegant way of updating data with grid ids as mask
 
             return combined_grid
@@ -385,7 +385,7 @@ class BoundedGrid(metaclass=BoundedGridMeta):
 
         return self.__class__(new_data, bounds=self.bounds, crs=self.crs)
 
-    def value(self, index, oob_value = numpy.nan):
+    def value(self, index, oob_value = None):
         """Return the value at the given cell index"""
 
         # Convert grid-ids into numpy-ids
@@ -405,6 +405,13 @@ class BoundedGrid(metaclass=BoundedGridMeta):
         oob_mask += numpy.where(np_id[1] >= self._data.shape[0])
         oob_mask += numpy.where(np_id[1] < 0)
         oob_mask = numpy.hstack(oob_mask)
+
+        if numpy.any(oob_mask): # make sure we know what nodata value to set if ids are out of bounds
+            if oob_value is None and self.nodata_value is None:
+                raise ValueError("Some indices do not have data. Please remove these ids, set a 'nodata_value' or supply an 'oob_value'.")
+            oob_value = oob_value if oob_value else self.nodata_value
+        else:
+            oob_value = oob_value if oob_value else 0 # the oob_value does not matter if no ids are out of bounds
 
         # Return array's `dtype` needs to be float instead of integer if an id falls outside of bounds
         # For NaNs don't make sense as integer

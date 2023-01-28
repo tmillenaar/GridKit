@@ -13,7 +13,7 @@ github: https://github.com/tmillenaar/GridKit
    :caption: Contents:
 
    getting_started
-   examples
+   example_gallery/index.rst
    api_reference
    contributing
    release_notes

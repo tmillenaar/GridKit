@@ -19,6 +19,7 @@ author = "Timo Millenaar"
 import os
 import shutil
 import sys
+import warnings
 
 sys.path.insert(0, os.path.abspath("."))
 import generate_api_rst
@@ -44,8 +45,17 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
+    "sphinx_gallery.gen_gallery",
     "sphinxcontrib.plantuml",
 ]
+
+
+warnings.filterwarnings("ignore", category=RuntimeWarning) # Do not report warnings in gallery
+sphinx_gallery_conf = {
+    'examples_dirs': ['../../examples'],   # path to your example scripts
+    'gallery_dirs': 'example_gallery',  # path to where to save gallery generated output
+    'filename_pattern': '^((?!sgskip).)*$',
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
