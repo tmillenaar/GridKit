@@ -415,4 +415,8 @@ def test_value_negative_bounds(ids, expected_value):
 
     numpy.testing.assert_allclose(expected_value, result)
 
-    
+@pytest.mark.parametrize("percentile", (2,31,50,69,98))
+def test_percentile(percentile):
+    data = numpy.arange(9).reshape((3,3)).astype('float')
+    grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
+    numpy.testing.assert_allclose(numpy.percentile(data, percentile), grid.percentile(percentile))

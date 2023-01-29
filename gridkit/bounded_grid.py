@@ -432,4 +432,7 @@ class BoundedGrid(metaclass=BoundedGridMeta):
         if self.nodata_value is None:
             return None
         return self == self.nodata_value
+
+    def percentile(self, value):
+        return numpy.percentile(self, value)
         
