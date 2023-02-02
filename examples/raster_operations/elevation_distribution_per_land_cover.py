@@ -100,7 +100,7 @@ plt.show()
 # These are nodata values used to fill empty areas during the resampling step.
 # 
 # Relating cells between datasets
-# ===============================
+# -------------------------------
 #
 # To get the elevation distribution for a particular land cover we need to:
 #
