@@ -28,7 +28,6 @@ jobs:
     - name: Build Sphinx documentation
       run: |
         python3 setup.py build_sphinx
-        git add ${SPHINX_TARGET}/*
 
     - name: Deploy to Github Pages
       uses: peaceiris/actions-gh-pages@v3
