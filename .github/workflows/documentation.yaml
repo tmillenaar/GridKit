@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  SPHINX_TARGET: "build/sphinx/html"
+  SPHINX_TARGET: "docs"
 
 jobs:
   build-and-deploy:
