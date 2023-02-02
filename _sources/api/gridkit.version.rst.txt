@@ -1,0 +1,10 @@
+
+version
+===============
+
+.. automodule:: gridkit.version
+    :members:
+    :undoc-members:
+    :private-members:
+    :special-members:
+    :show-inheritance:

@@ -1,0 +1,64 @@
+
+
+.. _sphx_glr_example_gallery_raster_operations:
+
+.. _raster_operations:
+
+Raster operations
+=================
+
+Such nice raster examples :)
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Operation using two raster bands">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_ndvi_thumb.png
+    :alt: NDVI
+
+  :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">NDVI</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create an elevation histogram for a particular land cover">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_elevation_distribution_per_land_cover_thumb.png
+    :alt: Combining land cover and DEM
+
+  :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Combining land cover and DEM</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/raster_operations/ndvi
+   /example_gallery/raster_operations/elevation_distribution_per_land_cover
+

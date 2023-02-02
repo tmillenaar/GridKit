@@ -1,0 +1,10 @@
+
+_statistical_functions
+==============================
+
+.. automodule:: gridkit._statistical_functions
+    :members:
+    :undoc-members:
+    :private-members:
+    :special-members:
+    :show-inheritance:

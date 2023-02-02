@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>gridkit.io &mdash; GridKit 0.1.0.beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> GridKit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0.beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>gridkit.io</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for gridkit.io</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">BoundedRectGrid</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
+
+
+<div class="viewcode-block" id="read_geotiff"><a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.read_geotiff">[docs]</a><span class="k">def</span> <span class="nf">read_geotiff</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read data from a GeoTIFF</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`~gridkit.rect_grid.BoundedRectGrid`</span>
+<span class="sd">        The contents of the GeoTIFF read into a Raster</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Reading multiple bounds is not yet supported.&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">raster_file</span><span class="p">:</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">raster_file</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bounds_crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">bounds_crs</span> <span class="o">=</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">bounds_crs</span><span class="p">)</span>
+                <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="n">bounds_crs</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">)</span>
+            <span class="n">ul</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">lr</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="c1"># Create a window from the indices</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">Window</span><span class="o">.</span><span class="n">from_slices</span><span class="p">((</span><span class="n">ul</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lr</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="n">ul</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">lr</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span> <span class="c1"># update the bounds to those of the window</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">bounds</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>        
+        <span class="n">nodata</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">nodata</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span></div>
+
+<span class="c1"># path = &quot;tests/data/do_not_commit/wildfires.tiff&quot;</span>
+<span class="c1"># read_geotiff(path, bands=1)</span>
+
+<div class="viewcode-block" id="write_raster"><a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.write_raster">[docs]</a><span class="k">def</span> <span class="nf">write_raster</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="s2">&quot;w&quot;</span><span class="p">,</span>
+        <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+        <span class="n">width</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
+        <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># nr bands</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="n">crs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="c1"># Fixme: make flexible</span>
+        <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># path_t115 = &quot;/home/timo/mounts/glusterfs/tests/2020/timo/JPL/insar/t115.tiff&quot;</span>
+    <span class="c1"># path_t42 = &quot;/home/timo/mounts/glusterfs/tests/2020/timo/JPL/insar/t42.tiff&quot;</span>
+
+    <span class="c1"># grid_115 = read_geotiff(path_t115, bands=1)</span>
+    <span class="c1"># grid_42 = read_geotiff(path_t42, bands=1)</span>
+
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="s2">&quot;/Users/mara/Documents/Timo/Projects/gridkit/test/data/do_not_commit/wildfires.tiff&quot;</span><span class="p">)</span>
+
+    <span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">plotting</span>
+    <span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">rect_grid</span>
+    <span class="n">gridkit</span><span class="o">.</span><span class="n">plot_raster</span><span class="p">(</span><span class="n">resampled</span><span class="p">,</span> <span class="s2">&quot;original.png&quot;</span><span class="p">)</span>
+    <span class="n">new_grid</span> <span class="o">=</span> <span class="n">rect_grid</span><span class="o">.</span><span class="n">RectGrid</span><span class="p">(</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">dx</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">dy</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">offset</span>
+    <span class="p">)</span>
+    <span class="n">resampled</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">new_grid</span><span class="p">)</span>
+    <span class="n">gridkit</span><span class="o">.</span><span class="n">plot_raster</span><span class="p">(</span><span class="n">resampled</span><span class="p">,</span> <span class="s2">&quot;resampled.png&quot;</span><span class="p">)</span>
+    <span class="nb">breakpoint</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2023, Timo Millenaar.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
