@@ -1,7 +1,9 @@
 import abc
 import numpy
 from pyproj import CRS, Transformer
-
+import shapely
+from collections.abc import Iterable
+import warnings
 
 class BaseGrid(metaclass=abc.ABCMeta):
 
@@ -182,3 +184,31 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     def aggregate(self) -> float:
         pass
+
+    def intersect_geometries(self, geometries, suppress_point_warning=False):
+        if not isinstance(geometries, Iterable):
+            geometries = [geometries]
+        intersecting_cells = []
+        for geom in geometries:
+            if isinstance(geom, shapely.geometry.Point):
+                if not suppress_point_warning:
+                    warnings.warn("Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points")
+                    surpress_point_warning=True # Only warn once per function call
+            geom_bounds = self.align_bounds(geom.bounds, mode="expand")
+            cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
+            if len(cells_in_bounds) == 0: # happens only if point or line lies on an edge
+                geom = geom.buffer(min(self.dx, self.dy) / 10) # buffer may never reach further then a single cell size
+                geom_bounds = self.align_bounds(geom.bounds, mode="expand")
+                cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
+
+            cell_shapes = self.to_shapely(cells_in_bounds)
+            mask = [geom.intersects(cell) for cell in cell_shapes]
+            intersecting_cells.extend(cells_in_bounds[mask])
+        return numpy.unique(intersecting_cells, axis=0)
+
+
+    def to_shapely(self, index, as_multipolygon: bool = False):
+        vertices = self.cell_corners(index)
+        polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
+        return shapely.geometry.MultiPolygon(polygons) if as_multipolygon else polygons
+

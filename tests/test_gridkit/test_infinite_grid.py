@@ -2,6 +2,7 @@ from unittest import result
 import numpy
 import pytest
 from gridkit import rect_grid
+import shapely
 
 
 @pytest.mark.parametrize("dx, dy, offset, point, expected_id",
@@ -88,20 +89,33 @@ def test_crs():
     numpy.testing.assert_allclose(new_grid.dy, expected_dy)
     numpy.testing.assert_allclose(new_grid.offset, (expected_dx/2, expected_dy/2))
 
-
-
-
-
-# @pytest.mark.parametrize("method", ["linear"])
-# def test_interp_from_points(method):
-
-#     testgrid = rect_grid.RectGrid(gridsize=1)
-#     def func(x, y):
-#         return x*(1-x)*numpy.cos(4*numpy.pi*x) * numpy.sin(4*numpy.pi*y**2)**2
-
-#     # make points TODO: don't make em random
-#     rng = numpy.random.default_rng()
-#     points = 100 * rng.random((1000, 2))
-#     values = func(points[:,0], points[:,1])
-
-#     result = testgrid.interp_from_points(points, values, method=method)
+@pytest.mark.parametrize("geometries, expected_cell_ids", [
+    (shapely.geometry.Point(0.5,1.5), [[0,1]],), # point in cell
+    (shapely.geometry.Point(1,1.5), [[0,1], [1,1]],), # point on edge
+    (shapely.geometry.Point(1,0), [[0,-1],[0,0],[1,-1],[1,0]]), # point on vertex
+    (shapely.geometry.LineString([[1,-1], [1,0.5]]), [[0,-2],[0,-1],[0,0],[1,-2],[1,-1],[1,0]]), # line on edge
+    (shapely.geometry.LineString([[0.5,0.5], [1.5,0.5], [1.5,1.5]]), [[0,0], [1,0],[1,1]]), # L shaped line covering three cells
+    (shapely.geometry.Point(0.5,1.5).buffer(0.1), [[0,1]]), # Polygon in single cell
+    (shapely.geometry.LineString([[0.5,0.5], [1.5,0.5], [1.5,1.5]]).buffer(0.6), [ # L shaped polygon covering ten cells
+        [-1,  0],
+        [ 0, -1],
+        [ 0,  0],
+        [ 0,  1],
+        [ 1, -1],
+        [ 1,  0],
+        [ 1,  1],
+        [ 1,  2],
+        [ 2,  0],
+        [ 2,  1],
+    ]),
+    (# test multiple geometries. The same cell should only be mentioned once
+        [
+            shapely.geometry.LineString([[0.5,0.5], [1.5,0.5]]),
+            shapely.geometry.Point(0.5,0.4), # point in same cell as line
+            shapely.geometry.Point(0.5,2.5), # point in different cell as line
+        ], [[0,0], [0,2], [1,0]]
+    ),
+])
+def test_intersect_geometries(basic_bounded_rect_grid, geometries, expected_cell_ids):
+    cell_ids = basic_bounded_rect_grid.intersect_geometries(geometries)
+    numpy.testing.assert_allclose(cell_ids, expected_cell_ids)
