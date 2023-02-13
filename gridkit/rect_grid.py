@@ -488,7 +488,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             max(self.bounds[3], other_bounds[3]),
         )
 
-    def crop(self, new_bounds, bounds_crs=None):
+    def crop(self, new_bounds, bounds_crs=None, buffer_cells=0):
 
         if bounds_crs is not None:
             bounds_crs = CRS.from_user_input(bounds_crs)
@@ -501,6 +501,15 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         new_bounds = self.align_bounds(new_bounds, mode="contract")
         slice_y, slice_x = self._data_slice_from_bounds(new_bounds)
+        if buffer_cells:
+            slice_x = slice(slice_x.start - buffer_cells, slice_x.stop + buffer_cells)
+            slice_y = slice(slice_y.start - buffer_cells, slice_y.stop + buffer_cells)
+            new_bounds = (
+                new_bounds[0] - buffer_cells * self.dx,
+                new_bounds[1] - buffer_cells * self.dy,
+                new_bounds[2] + buffer_cells * self.dx,
+                new_bounds[3] + buffer_cells * self.dy,
+            )
         # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
         cropped_data = self._data[slice_y, slice_x] #Fixme: seems to be flipped?
         # cropped_data = self._data[slice_x, slice_y]
@@ -599,8 +608,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
+        new_grid = BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
 
-        return BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
+        return new_grid
 
     def to_crs(self, crs, resample_method="nearest"):
         new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)

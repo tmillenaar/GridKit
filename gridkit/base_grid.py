@@ -141,9 +141,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
         transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
 
         new_offset = transformer.transform(*self.offset)
-        new_dx, new_dy = transformer.transform(self.dx, self.dy)
-        
-        return self.parent_grid_class(dx=new_dx, dy=new_dy, offset=new_offset, crs=crs)
+        point_start = transformer.transform(0, 0)
+        point_end = transformer.transform(self.dx, self.dy)
+        new_dx, new_dy = [end - start for (end, start) in zip(point_end, point_start)]
+
+        return self.parent_grid_class(dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs)
 
     @property
     def parent_grid(self):
@@ -189,11 +191,21 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if not isinstance(geometries, Iterable):
             geometries = [geometries]
         intersecting_cells = []
-        for geom in geometries:
+
+        def _geom_iterator():
+            """Unpack `Multi` geometries, improving performance if the geometries are far apart."""
+            for geometry in geometries:
+                try:
+                    for geom in geometry.geoms:
+                        yield geom
+                except:
+                    yield geometry
+
+        for geom in _geom_iterator():
             if isinstance(geom, shapely.geometry.Point):
                 if not suppress_point_warning:
                     warnings.warn("Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points")
-                    surpress_point_warning=True # Only warn once per function call
+                    suppress_point_warning=True # Only warn once per function call
             geom_bounds = self.align_bounds(geom.bounds, mode="expand")
             cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
             if len(cells_in_bounds) == 0: # happens only if point or line lies on an edge

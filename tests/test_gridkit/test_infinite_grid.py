@@ -3,6 +3,7 @@ import numpy
 import pytest
 from gridkit import rect_grid
 import shapely
+from geopandas import GeoSeries
 
 
 @pytest.mark.parametrize("dx, dy, offset, point, expected_id",
@@ -89,7 +90,7 @@ def test_crs():
     numpy.testing.assert_allclose(new_grid.dy, expected_dy)
     numpy.testing.assert_allclose(new_grid.offset, (expected_dx/2, expected_dy/2))
 
-@pytest.mark.parametrize("geometries, expected_cell_ids", [
+@pytest.mark.parametrize("shapely_geoms, expected_cell_ids", [
     (shapely.geometry.Point(0.5,1.5), [[0,1]],), # point in cell
     (shapely.geometry.Point(1,1.5), [[0,1], [1,1]],), # point on edge
     (shapely.geometry.Point(1,0), [[0,-1],[0,0],[1,-1],[1,0]]), # point on vertex
@@ -111,11 +112,20 @@ def test_crs():
     (# test multiple geometries. The same cell should only be mentioned once
         [
             shapely.geometry.LineString([[0.5,0.5], [1.5,0.5]]),
-            shapely.geometry.Point(0.5,0.4), # point in same cell as line
-            shapely.geometry.Point(0.5,2.5), # point in different cell as line
+            shapely.geometry.MultiPoint([
+                shapely.geometry.Point(0.5,0.4), # point in same cell as line
+                shapely.geometry.Point(0.5,2.5), # point in different cell as line
+            ]),
         ], [[0,0], [0,2], [1,0]]
     ),
 ])
-def test_intersect_geometries(basic_bounded_rect_grid, geometries, expected_cell_ids):
-    cell_ids = basic_bounded_rect_grid.intersect_geometries(geometries)
+def test_intersect_geometries(basic_bounded_rect_grid, shapely_geoms, expected_cell_ids):
+
+    # test shapely geometries
+    cell_ids = basic_bounded_rect_grid.intersect_geometries(shapely_geoms)
+    numpy.testing.assert_allclose(cell_ids, expected_cell_ids)
+
+    # test geopandas geoseries
+    gpd_geoms = GeoSeries(shapely_geoms)
+    cell_ids = basic_bounded_rect_grid.intersect_geometries(gpd_geoms)
     numpy.testing.assert_allclose(cell_ids, expected_cell_ids)

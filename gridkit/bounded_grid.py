@@ -109,7 +109,7 @@ class _BoundedGridMeta(type):
                     nodata_value = nodata_values[0]
                 elif all([val is not None for val in nodata_values]):
                     nodata_value = nodata_values[0]
-                    warnings.warn(f"Two grids have different `nodata_value`s: {nodata_values}. Using {nodata_value}.")
+                    warnings.warn(f"Two grids have different `nodata_value`s: {nodata_values}. Using {nodata_value} for the resulting grid.")
                 elif all([val is None for val in nodata_values]):
                     nodata_value = None
                     warnings.warn(f"No `nodata_value` was set on any of the grids. Any potential nodata gaps are filled with `{dtype.type(0)}`. Set a nodata_value by assigning a value to grid.nodata_value.")
@@ -169,7 +169,7 @@ class _BoundedGridMeta(type):
         def normal_op(left, right):
             if not isinstance(right, BoundedGrid):
                 data = op(left._data, right)
-                if left.nodata_value is not None:
+                if left.nodata_value is not None and not left.nodata_value == right:
                     nodata_np_id = numpy.where(left._data == left.nodata_value)
                     data[nodata_np_id] = left.nodata_value
                 grid = left.update(data)
@@ -274,6 +274,18 @@ class BoundedGrid(metaclass=BoundedGridMeta):
             The bounds of the data in (left, bottom, right, top) or equivalently (min-x, min-y, max-x, max-y)
         """
         return self._bounds
+
+    @property
+    def mpl_extent(self) -> tuple:
+        """Raster Bounds
+
+        Returns
+        -------
+        :class:`tuple`
+            The extent of the data as defined expected by matplotlib in (left, right, bottom, top) or equivalently (min-x, max-x, min-y, max-y)
+        """
+        b = self._bounds
+        return (b[0], b[2], b[1], b[3])
 
     @property
     def corners(self):
