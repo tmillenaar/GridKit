@@ -20,6 +20,7 @@ docs_require = [
     "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
+    "geopandas",
 ]
 
 setup(
