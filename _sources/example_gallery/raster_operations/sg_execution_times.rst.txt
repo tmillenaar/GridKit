@@ -5,10 +5,10 @@
 
 Computation times
 =================
-**00:10.178** total execution time for **example_gallery_raster_operations** files:
+**00:09.138** total execution time for **example_gallery_raster_operations** files:
 
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``ndvi.py``)                                                                   | 00:07.007 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``ndvi.py``)                                                                   | 00:06.271 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``elevation_distribution_per_land_cover.py``) | 00:03.171 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``elevation_distribution_per_land_cover.py``) | 00:02.867 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+

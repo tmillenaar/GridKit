@@ -72,11 +72,47 @@ Such nice raster examples :)
     </div>
 
 
+Shape interactions
+==================
+
+Such nice shape examples :)
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries.">
+
+.. only:: html
+
+  .. image:: /example_gallery/shape_interactions/images/thumb/sphx_glr_intersect_geometries_thumb.png
+    :alt: Geometry intersections
+
+  :ref:`sphx_glr_example_gallery_shape_interactions_intersect_geometries.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
 .. toctree::
    :hidden:
    :includehidden:
 
    /example_gallery/raster_operations/index.rst
+   /example_gallery/shape_interactions/index.rst
 
 
 .. only:: html

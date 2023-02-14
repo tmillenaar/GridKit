@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.errors &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>Shape interactions &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -20,7 +21,9 @@
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" /> 
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Geometry intersections" href="intersect_geometries.html" />
+    <link rel="prev" title="Combining land cover and DEM" href="../raster_operations/elevation_distribution_per_land_cover.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -46,9 +49,23 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#shape-interactions">Shape interactions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../raster_operations/index.html">Raster operations</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Shape interactions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
+<li class="toctree-l4"><a class="reference internal" href="intersect_geometries.html#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="intersect_geometries.html#reading-and-preparing-the-data">Reading and preparing the data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="intersect_geometries.html#visualization">Visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
@@ -68,9 +85,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">gridkit.errors</li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Shape interactions</li>
       <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/example_gallery/shape_interactions/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -78,19 +96,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for gridkit.errors</h1><div class="highlight"><pre>
-<div class="viewcode-block" id="AlignmentError"><a class="viewcode-back" href="../../api/gridkit.errors.html#gridkit.errors.AlignmentError">[docs]</a><span></span><span class="k">class</span> <span class="nc">AlignmentError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Grids are not aligned&quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
+  <section id="shape-interactions">
+<span id="raster-operations"></span><span id="sphx-glr-example-gallery-shape-interactions"></span><h1>Shape interactions<a class="headerlink" href="#shape-interactions" title="Permalink to this heading"></a></h1>
+<p>Such nice shape examples :)</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries."><img alt="Geometry intersections" src="../../_images/sphx_glr_intersect_geometries_thumb.png" />
+<p><a class="reference internal" href="intersect_geometries.html#sphx-glr-example-gallery-shape-interactions-intersect-geometries-py"><span class="std std-ref">Geometry intersections</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
+</div></div><div class="toctree-wrapper compound">
+</div>
+</section>
 
-<div class="viewcode-block" id="IntersectionError"><a class="viewcode-back" href="../../api/gridkit.errors.html#gridkit.errors.IntersectionError">[docs]</a><span class="k">class</span> <span class="nc">IntersectionError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Grids do not intersect&quot;&quot;&quot;</span>
-    <span class="k">pass</span></div>
-</pre></div>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../raster_operations/elevation_distribution_per_land_cover.html" class="btn btn-neutral float-left" title="Combining land cover and DEM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="intersect_geometries.html" class="btn btn-neutral float-right" title="Geometry intersections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
