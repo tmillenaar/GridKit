@@ -119,3 +119,14 @@ def test_nodata_value(basic_bounded_rect_grid):
     assert grid.nodata_value == 6 # make sure nodata is inhertied after update
     grid.nodata_value = 1
     numpy.testing.assert_allclose(grid.nodata(), grid.cells_in_bounds(grid.bounds)[0])
+
+@pytest.mark.parametrize("method", ["nearest", "linear", "cubic"])
+def test_interp_nodata(basic_bounded_rect_grid, method):
+    grid = basic_bounded_rect_grid.copy()
+    grid.data[1:4,0:4] = grid.nodata_value
+    result_grid = grid.interp_nodata(method=method)
+
+    if method=="nearest":
+        numpy.testing.assert_allclose(result_grid, numpy.vstack([3*[[0,1,2]], 2*[[12,13,14]]]))
+    else:
+        numpy.testing.assert_allclose(result_grid, basic_bounded_rect_grid)

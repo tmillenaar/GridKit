@@ -2,7 +2,7 @@ from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import IntersectionError, AlignmentError
 
-
+import scipy
 import numpy
 import warnings
 from pyproj import CRS, Transformer
@@ -625,3 +625,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft[1] - index[1], index[0] - index_topleft[0])
+
+    def interp_nodata(self, *args, **kwargs):
+        """Please refer to `meth`:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
+        # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
+        return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
+

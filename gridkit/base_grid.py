@@ -155,23 +155,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def parent_grid_class(self):
         pass
 
-    # def interp_from_points(self, points, values, method="linear", sparse=False):
-
-    #     if sparse:
-    #         raise NotImplementedError("Sparse grids are not yet implemented")
-
-    #     # left, bottom = numpy.min(points, axis=0)
-    #     # right, top = numpy.max(points, axis=0)
-    #     bounds = [*numpy.min(points, axis=0), *numpy.max(points, axis=0)]
-    #     breakpoint()
-    #     ids = self.cell_at_point(points)
-
-    #     from scipy.interpolate import LinearNDInterpolator
-    #     # LinearNDInterpolator(points,values)(self.center(self.cell_at_point(points)))
-    #     cell_centers = self.cells_in_bounds(bounds, as_coordinate=True)
-    #     interpolator = LinearNDInterpolator(points,values)
-    #     values = interpolator(cell_centers)
-
     def rotate(self) -> float:
         raise NotImplementedError()
 

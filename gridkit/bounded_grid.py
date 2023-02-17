@@ -1,8 +1,10 @@
 from multiprocessing.sharedctypes import Value
 import numpy
+import scipy
 import operator
 import abc
 import warnings
+import functools
 
 import gridkit
 from gridkit.base_grid import BaseGrid
@@ -447,4 +449,48 @@ class BoundedGrid(metaclass=BoundedGridMeta):
 
     def percentile(self, value):
         return numpy.percentile(self, value)
+
+    def interp_nodata(self, method="linear", in_place=False):
+        """Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.
+
+        Parameters
+        ----------
+        method: :class:`str`
+            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".
+        in_place: :class:`bool`
+            Boolean flag determining whether to fill the nodata values in-place.
+            In-memory values are modified if in_place is Ture.
+            A copy of the grid is made where nodata values are filled if in_place is False.
+
+        Returns
+        -------
+        :class:`tuple`
+            A copy of the grid with interpolated values.
+        """
+        method_lut = dict(
+            nearest = scipy.interpolate.NearestNDInterpolator,
+            linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=self.nodata_value),
+            cubic = scipy.interpolate.CloughTocher2DInterpolator,
+        )
+
+        if self.nodata_value is None:
+            raise ValueError(f"Cannot interpolate nodata values if attribute 'nodata_value' is not set.")
+
+        if method not in method_lut:
+            raise ValueError(f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}")
+
+        if not in_place:
+            self = self.copy()
+
+        interp_func = method_lut[method]
+        values = self.data.ravel()
+        nodata_mask = values == self.nodata_value
+        points = self.centroid()
+        interpolator = interp_func(
+            points[~nodata_mask],
+            values[~nodata_mask],
+        )
+        filled_values = interpolator(points[nodata_mask])
+        self.data.ravel()[nodata_mask] = filled_values
+        return self
         
