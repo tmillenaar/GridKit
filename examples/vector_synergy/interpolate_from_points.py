@@ -7,7 +7,7 @@ Fill a BoundedGrid based on point data
 Introduction
 ============
 
-In this example a BoundedGrid is created from a set of points by interpolating over locations between the points.
+In this example a BoundedGrid is created from a set of points by interpolating between the points.
 For this operation we need:
 
 #. locations of the points
@@ -43,7 +43,6 @@ plt.show()
 # %%
 # 
 # Now we can create a grid and interpolate onto that grid.
-# That may look like so:
 
 from gridkit import rect_grid
 
@@ -53,7 +52,7 @@ data_grid = rect_grid.BoundedRectGrid.interp_from_points(points, values, empty_g
 # %%
 # 
 # Currently the interpolation methods "nearest", "linear" and "cubic" are supported,
-# based on scpiy's `NearestNDInterpolator`, `LinearNDInterpolator` and `CloughTocher2DInterpolator`, respectively.
+# based on scpiy's ``NearestNDInterpolator``, ``LinearNDInterpolator`` and ``CloughTocher2DInterpolator``, respectively.
 # Here we try each method and plot them next to each other to compare.
 fig, axes = plt.subplots(1, 3, sharey=True, figsize=(12, 5))
 
@@ -74,8 +73,8 @@ plt.show()
 
 # %%
 #
-# In this example, the `cubic` interpolation represented the original function the best, but this will differ per usecase.
-# Note how the BoundedGrid has nodata values at the border in the `linear` and `cubic` cases.
+# In this example, the `cubic` interpolation represents the original function the best, but this will differ per usecase.
+# Note how the BoundedGrid has nodata values at the border in the "linear" and "cubic" cases.
 # The bounds of the grid are automatically chosen to align with the supplied grid and accommodate all points.
-# Cells of which the center does not lie in the convex hull of the data,
-# but are within the selected bounds, are `nodata_value` as specified in `interp_from_points` (default numpy.nan)
+# Cells of which the center is not within the convex hull of the data,
+# but are within the selected bounds, get a `nodata_value` as specified in ``interp_from_points`` (default numpy.nan).
