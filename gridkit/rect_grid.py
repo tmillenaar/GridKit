@@ -26,6 +26,10 @@ class RectGrid(BaseGrid):
         """
         return self.__dy
 
+    def interp_from_points(self, points, values, dx, dy, method="linear") -> float:
+        breakpoint()
+        scipy.interp.interpn(points, values, self.centroid(), fill_value=self.nodata_value, bounds_error=False)
+
     def neighbours(self, as_indeces=True):
         # return ids or centroids
         raise NotImplementedError()
@@ -627,7 +631,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         return (index_topleft[1] - index[1], index[0] - index_topleft[0])
 
     def interp_nodata(self, *args, **kwargs):
-        """Please refer to `meth`:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
+        """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
         return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
 

@@ -55,6 +55,7 @@ sphinx_gallery_conf = {
     'examples_dirs': ['../../examples'],   # path to your example scripts
     'gallery_dirs': 'example_gallery',  # path to where to save gallery generated output
     'filename_pattern': '^((?!sgskip).)*$',
+    'remove_config_comments': True, # remove comments like: # sphinx_gallery_thumbnail_number = -1
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -103,3 +104,12 @@ autodoc_default_options = {
     "private-members": True,  # Display private objects (eg. _foo)
     "special-members": False,  # Display special objects (eg. __foo__)
 }
+
+
+# need to assign the names here, otherwise autodoc won't document these classes,
+# and will instead just say 'alias of ...'
+# after https://github.com/slundberg/shap/blob/6af9e1008702fb0fab939bf2154bbf93dfe84a16/docs/conf.py#L380-L394
+import gridkit.rect_grid
+import gridkit.bounded_grid
+gridkit.rect_grid.BoundedRectGrid.__name__ = "BoundedRectGrid"
+gridkit.bounded_grid.BoundedGrid.__name__ = "BoundedGrid"

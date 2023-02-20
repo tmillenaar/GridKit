@@ -1,4 +1,4 @@
-.. _raster_operations:
+.. _shape_interactions:
 
 Shape interactions
 ==================

@@ -420,3 +420,24 @@ def test_percentile(percentile):
     data = numpy.arange(9).reshape((3,3)).astype('float')
     grid = rect_grid.BoundedRectGrid(data, bounds=(0,0,3,3))
     numpy.testing.assert_allclose(numpy.percentile(data, percentile), grid.percentile(percentile))
+
+
+def test_interp_from_points():
+    numpy.random.seed(0)
+    x = 100 * numpy.random.rand(100)
+    numpy.random.seed(1)
+    y = 100 * numpy.random.rand(100)    
+    value = numpy.sin(x/(10*numpy.pi)) * numpy.sin(y/(10*numpy.pi))
+
+    empty_grid = rect_grid.RectGrid(dx=5, dy=5)
+    data_grid = rect_grid.BoundedRectGrid.interp_from_points(
+        numpy.array([x,y]).T, 
+        value, 
+        empty_grid, 
+        method="cubic", 
+        nodata_value=-9999, # Fixme: _statistical_functions don't work with nan: numpy.nan != numpy.nan
+    )
+
+    numpy.testing.assert_allclose(data_grid.max(), 0.9697422513409796)
+    numpy.testing.assert_allclose(data_grid.min(), 0.011254918521840882)
+    assert len(data_grid.nodata()) == 30

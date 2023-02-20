@@ -120,6 +120,7 @@ def test_nodata_value(basic_bounded_rect_grid):
     grid.nodata_value = 1
     numpy.testing.assert_allclose(grid.nodata(), grid.cells_in_bounds(grid.bounds)[0])
 
+
 @pytest.mark.parametrize("method", ["nearest", "linear", "cubic"])
 def test_interp_nodata(basic_bounded_rect_grid, method):
     grid = basic_bounded_rect_grid.copy()
