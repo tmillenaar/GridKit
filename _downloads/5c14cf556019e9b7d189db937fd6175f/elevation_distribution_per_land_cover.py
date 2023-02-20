@@ -104,9 +104,9 @@ plt.show()
 #
 # To get the elevation distribution for a particular land cover we need to:
 #
-#  - 1) determine what cells hava a particular land cover
-#  - 2) obtain the elevation values for these cells
-#  - 3) plot the histogram
+#  #. determine what cells hava a particular land cover
+#  #. obtain the elevation values for these cells
+#  #. plot the histogram
 #
 # The first step is as simple as using a comparison operation on the grid.
 # ``landuse == 1`` will return the IDs of all cells where the land cover value is equal to 1.

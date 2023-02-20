@@ -236,23 +236,6 @@
     <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
-    <span class="c1"># def interp_from_points(self, points, values, method=&quot;linear&quot;, sparse=False):</span>
-
-    <span class="c1">#     if sparse:</span>
-    <span class="c1">#         raise NotImplementedError(&quot;Sparse grids are not yet implemented&quot;)</span>
-
-    <span class="c1">#     # left, bottom = numpy.min(points, axis=0)</span>
-    <span class="c1">#     # right, top = numpy.max(points, axis=0)</span>
-    <span class="c1">#     bounds = [*numpy.min(points, axis=0), *numpy.max(points, axis=0)]</span>
-    <span class="c1">#     breakpoint()</span>
-    <span class="c1">#     ids = self.cell_at_point(points)</span>
-
-    <span class="c1">#     from scipy.interpolate import LinearNDInterpolator</span>
-    <span class="c1">#     # LinearNDInterpolator(points,values)(self.center(self.cell_at_point(points)))</span>
-    <span class="c1">#     cell_centers = self.cells_in_bounds(bounds, as_coordinate=True)</span>
-    <span class="c1">#     interpolator = LinearNDInterpolator(points,values)</span>
-    <span class="c1">#     values = interpolator(cell_centers)</span>
-
 <div class="viewcode-block" id="BaseGrid.rotate"><a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 

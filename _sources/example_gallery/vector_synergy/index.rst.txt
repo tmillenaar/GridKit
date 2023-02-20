@@ -1,0 +1,64 @@
+
+
+.. _sphx_glr_example_gallery_vector_synergy:
+
+.. _shape_interactions:
+
+Shape interactions
+==================
+
+Such nice shape examples :)
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
+    :alt: Interpolate from points
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries.">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_intersect_geometries_thumb.png
+    :alt: Geometry intersections
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/vector_synergy/interpolate_from_points
+   /example_gallery/vector_synergy/intersect_geometries
+

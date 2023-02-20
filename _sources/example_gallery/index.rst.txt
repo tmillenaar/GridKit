@@ -87,14 +87,31 @@ Such nice shape examples :)
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
+    :alt: Interpolate from points
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries.">
 
 .. only:: html
 
-  .. image:: /example_gallery/shape_interactions/images/thumb/sphx_glr_intersect_geometries_thumb.png
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_intersect_geometries_thumb.png
     :alt: Geometry intersections
 
-  :ref:`sphx_glr_example_gallery_shape_interactions_intersect_geometries.py`
+  :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py`
 
 .. raw:: html
 
@@ -112,7 +129,7 @@ Such nice shape examples :)
    :includehidden:
 
    /example_gallery/raster_operations/index.rst
-   /example_gallery/shape_interactions/index.rst
+   /example_gallery/vector_synergy/index.rst
 
 
 .. only:: html

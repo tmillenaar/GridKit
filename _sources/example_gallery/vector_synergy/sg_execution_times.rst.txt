@@ -1,0 +1,14 @@
+
+:orphan:
+
+.. _sphx_glr_example_gallery_vector_synergy_sg_execution_times:
+
+Computation times
+=================
+**00:07.071** total execution time for **example_gallery_vector_synergy** files:
+
++------------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py` (``intersect_geometries.py``)       | 00:06.580 | 0.0 MB |
++------------------------------------------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py` (``interpolate_from_points.py``) | 00:00.492 | 0.0 MB |
++------------------------------------------------------------------------------------------------------------+-----------+--------+

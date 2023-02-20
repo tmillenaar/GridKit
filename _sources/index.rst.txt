@@ -6,7 +6,7 @@
 Welcome to GridKit's documentation!
 ===================================
 
-github: https://github.com/tmillenaar/GridKit
+Source: https://github.com/tmillenaar/GridKit
 
 .. toctree::
    :maxdepth: 2

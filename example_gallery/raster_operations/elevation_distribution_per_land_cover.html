@@ -22,7 +22,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Shape interactions" href="../shape_interactions/index.html" />
+    <link rel="next" title="Shape interactions" href="../vector_synergy/index.html" />
     <link rel="prev" title="NDVI" href="ndvi.html" /> 
 </head>
 
@@ -59,7 +59,7 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Combining land cover and DEM</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../shape_interactions/index.html">Shape interactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vector_synergy/index.html">Shape interactions</a></li>
 </ul>
 </li>
 </ul>
@@ -192,20 +192,11 @@ These are nodata values used to fill empty areas during the resampling step.</p>
 <h2>Relating cells between datasets<a class="headerlink" href="#relating-cells-between-datasets" title="Permalink to this heading"></a></h2>
 <p>To get the elevation distribution for a particular land cover we need to:</p>
 <blockquote>
-<div><ul class="simple">
-<li><ol class="arabic simple">
+<div><ol class="arabic simple">
 <li><p>determine what cells hava a particular land cover</p></li>
-</ol>
-</li>
-<li><ol class="arabic simple" start="2">
 <li><p>obtain the elevation values for these cells</p></li>
-</ol>
-</li>
-<li><ol class="arabic simple" start="3">
 <li><p>plot the histogram</p></li>
 </ol>
-</li>
-</ul>
 </div></blockquote>
 <p>The first step is as simple as using a comparison operation on the grid.
 <code class="docutils literal notranslate"><span class="pre">landuse</span> <span class="pre">==</span> <span class="pre">1</span></code> will return the IDs of all cells where the land cover value is equal to 1.
@@ -242,7 +233,7 @@ When these two steps are combined in one line, it looks like this:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" alt="Alpine land cover histogram" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.867 seconds)</p>
+<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" alt="Alpine land cover histogram" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  2.909 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-elevation-distribution-per-land-cover-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/5c14cf556019e9b7d189db937fd6175f/elevation_distribution_per_land_cover.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">elevation_distribution_per_land_cover.py</span></code></a></p>
@@ -260,7 +251,7 @@ When these two steps are combined in one line, it looks like this:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="ndvi.html" class="btn btn-neutral float-left" title="NDVI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../shape_interactions/index.html" class="btn btn-neutral float-right" title="Shape interactions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../vector_synergy/index.html" class="btn btn-neutral float-right" title="Shape interactions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
