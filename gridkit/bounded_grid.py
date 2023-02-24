@@ -22,8 +22,6 @@ class _BoundedGridMeta(type):
             (operator.floordiv, False),
             (operator.pow, False),
             (operator.mod, False),
-            (operator.eq, True),
-            (operator.ne, True),
             (operator.ge, True),
             (operator.le, True),
             (operator.gt, True),
@@ -34,6 +32,17 @@ class _BoundedGridMeta(type):
             normal_op, reverse_op = cls._gen_operator(op, base_value=numpy.nan, as_idx=as_idx)
             namespace[opname] = normal_op
             namespace[opname_reversed] = reverse_op
+
+        # treat equals and not-equals as special cases to acommodate NaNs
+        op = functools.partial(numpy.isclose, equal_nan=True)
+        normal_op, reverse_op = cls._gen_operator(op, base_value=numpy.nan, as_idx=True)
+        namespace["__eq__"] = normal_op
+        namespace["__req__"] = reverse_op
+
+        op = lambda left, right: ~numpy.isclose(left, right, equal_nan=True)
+        normal_op, reverse_op = cls._gen_operator(op, base_value=numpy.nan, as_idx=True)
+        namespace["__ne__"] = normal_op
+        namespace["__rne__"] = reverse_op
 
         # operators with a zero-base
         for op, name in (
@@ -171,7 +180,7 @@ class _BoundedGridMeta(type):
         def normal_op(left, right):
             if not isinstance(right, BoundedGrid):
                 data = op(left._data, right)
-                if left.nodata_value is not None and not left.nodata_value == right:
+                if left.nodata_value is not None:
                     nodata_np_id = numpy.where(left._data == left.nodata_value)
                     data[nodata_np_id] = left.nodata_value
                 grid = left.update(data)
@@ -198,7 +207,7 @@ class _BoundedGridMeta(type):
 
             data = self._data
             if not self.nodata_value is None:
-                data = numpy.ma.masked_array(data, data==self.nodata_value)
+                data = numpy.ma.masked_array(data, numpy.isclose(data, self.nodata_value, equal_nan=True))
             result = op(data, *args, **kwargs)
 
             if not as_idx:
@@ -517,7 +526,7 @@ class BoundedGrid(metaclass=BoundedGridMeta):
         method_lut = dict(
             nearest = scipy.interpolate.NearestNDInterpolator,
             linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value),
-            cubic = scipy.interpolate.CloughTocher2DInterpolator,
+            cubic = functools.partial(scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value),
         )
 
         if method not in method_lut:

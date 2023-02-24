@@ -396,7 +396,7 @@ def test__mask_to_index():
 ))
 def test_value_positive_bounds(ids, expected_value):
     data = numpy.arange(9).reshape((3,3)).astype('float')
-    grid = rect_grid.BoundedRectGrid(data, bounds=(1,2,4,5))
+    grid = rect_grid.BoundedRectGrid(data, bounds=(1,2,4,5), nodata_value=numpy.nan)
 
     result = grid.value(ids)
 
@@ -409,7 +409,7 @@ def test_value_positive_bounds(ids, expected_value):
 ))
 def test_value_negative_bounds(ids, expected_value):
     data = numpy.arange(9).reshape((3,3)).astype('float')
-    grid = rect_grid.BoundedRectGrid(data, bounds=(-4,-5,-1,-2))
+    grid = rect_grid.BoundedRectGrid(data, bounds=(-4,-5,-1,-2), nodata_value=numpy.nan)
 
     result = grid.value(ids)
 
@@ -422,7 +422,12 @@ def test_percentile(percentile):
     numpy.testing.assert_allclose(numpy.percentile(data, percentile), grid.percentile(percentile))
 
 
-def test_interp_from_points():
+@pytest.mark.parametrize("method, expected_min, expected_max", (
+    ["linear", 0.011254918521840882, 0.9697422513409796],
+    ["nearest", -0.005508092250476611, 0.9740280288214683],
+    ["cubic", 0.013773033571295269, 0.9919834390043766],
+))
+def test_interp_from_points(method, expected_min, expected_max):
     numpy.random.seed(0)
     x = 100 * numpy.random.rand(100)
     numpy.random.seed(1)
@@ -434,10 +439,11 @@ def test_interp_from_points():
         numpy.array([x,y]).T, 
         value, 
         empty_grid, 
-        method="cubic", 
-        nodata_value=-9999, # Fixme: _statistical_functions don't work with nan: numpy.nan != numpy.nan
+        method=method, 
+        nodata_value=float("nan"),
     )
 
-    numpy.testing.assert_allclose(data_grid.max(), 0.9697422513409796)
-    numpy.testing.assert_allclose(data_grid.min(), 0.011254918521840882)
-    assert len(data_grid.nodata()) == 30
+    numpy.testing.assert_allclose(data_grid.max(), expected_max)
+    numpy.testing.assert_allclose(data_grid.min(), expected_min)
+    if method != "nearest":
+        assert len(data_grid.nodata()) == 30

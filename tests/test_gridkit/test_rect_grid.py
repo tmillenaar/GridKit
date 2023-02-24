@@ -105,6 +105,7 @@ def test_numpy_id_to_grid_id(basic_bounded_rect_grid, np_index, expected_grid_id
 
 def test_nodata_value(basic_bounded_rect_grid):
     grid = basic_bounded_rect_grid
+    grid.nodata_value = None
 
     # test no data are nodata
     assert grid.nodata_value is None

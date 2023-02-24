@@ -39,7 +39,10 @@ def count(grids):
     empty_grid = _empty_combined_grid(grids, value=0)
     combined_grid = empty_grid.copy()
     for grid in grids:
-        value_ids = grid != grid.nodata_value
+        if grid.nodata_value is None:
+            value_ids = combined_grid.cells_in_bounds(grid.bounds)[0]
+        else:
+            value_ids = grid != grid.nodata_value
         numpy_ids = combined_grid.grid_id_to_numpy_id(value_ids.T)
         combined_grid._data[numpy_ids] += 1
     return combined_grid
@@ -50,13 +53,6 @@ def sum(grids):
     for grid in grids: # add zero instead of NaN where there is coverage to allow adding
         combined_grid.assign(0, bounds=grid.bounds, in_place=True)
     empty_grid = _empty_combined_grid(grids, value=0) # TODO: add `replace` function
-
-    
-    # breakpoint()
-    # normal, reverse = _BoundedGridMeta._gen_operator(lambda left, right: np.nansum([left, right], axis=0))
-
-
-
     for grid in grids: # add the values
         combined_grid += empty_grid.assign(grid.data, bounds=grid.bounds, in_place=False)
     return combined_grid
