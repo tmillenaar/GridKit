@@ -224,7 +224,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        :class:`BoundedGrid`
+        :class:`~gridkit.bounded_grid.BoundedGrid`
             A Bounded version of the supplied grid where the data is interpolated between the supplied points.
         """
         method_lut = dict(
