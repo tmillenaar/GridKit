@@ -5,6 +5,5 @@ io
 .. automodule:: gridkit.io
     :members:
     :undoc-members:
-    :private-members:
     :special-members:
     :show-inheritance:

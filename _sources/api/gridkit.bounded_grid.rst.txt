@@ -5,6 +5,5 @@ bounded_grid
 .. automodule:: gridkit.bounded_grid
     :members:
     :undoc-members:
-    :private-members:
     :special-members:
     :show-inheritance:

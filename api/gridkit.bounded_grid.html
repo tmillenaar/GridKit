@@ -57,8 +57,6 @@
 <li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">bounded_grid</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#gridkit.bounded_grid._BoundedGridMeta"><code class="docutils literal notranslate"><span class="pre">_BoundedGridMeta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#gridkit.bounded_grid.BoundedGridMeta"><code class="docutils literal notranslate"><span class="pre">BoundedGridMeta</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gridkit.bounded_grid.BoundedGrid"><code class="docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a></li>
 </ul>
 </li>
@@ -102,45 +100,6 @@
              
   <section id="module-gridkit.bounded_grid">
 <span id="bounded-grid"></span><h1>bounded_grid<a class="headerlink" href="#module-gridkit.bounded_grid" title="Permalink to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="gridkit.bounded_grid._BoundedGridMeta">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.bounded_grid.</span></span><span class="sig-name descname"><span class="pre">_BoundedGridMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#_BoundedGridMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid._BoundedGridMeta" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
-<p>metaclass of the Raster class</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.bounded_grid._BoundedGridMeta._gen_operator">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_gen_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#_BoundedGridMeta._gen_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid._BoundedGridMeta._gen_operator" title="Permalink to this definition"></a></dt>
-<dd><p>Generate operators</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>op</strong> (any callable operator form either <cite>numpy</cite> or <cite>operator</cite>) – A function from the <cite>operator</cite> package. Can also be a numpy or cusotm uperator.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A function that takes in a left and right object to apply the supplied operation (<cite>op</cite>) to.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>tuple: (<cite>leif.core.raster._RasterMeta.&lt;locals&gt;.normal_op</cite>, <cite>leif.core.raster._RasterMeta.&lt;locals&gt;.reverse_op</cite>)</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>NotImplementedError</strong> – For grids of different sizes</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.bounded_grid._BoundedGridMeta._gen_reduce_operator">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_gen_reduce_operator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#_BoundedGridMeta._gen_reduce_operator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid._BoundedGridMeta._gen_reduce_operator" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGridMeta">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.bounded_grid.</span></span><span class="sig-name descname"><span class="pre">BoundedGridMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGridMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGridMeta" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABCMeta</span></code>, <a class="reference internal" href="#gridkit.bounded_grid._BoundedGridMeta" title="gridkit.bounded_grid._BoundedGridMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">_BoundedGridMeta</span></code></a></p>
-<p>Class that enables usage of the <a class="reference internal" href="#gridkit.bounded_grid._BoundedGridMeta" title="gridkit.bounded_grid._BoundedGridMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">_BoundedGridMeta</span></code></a> metaclass despite using ABCMeta as metaclass for the parent class.</p>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.bounded_grid.</span></span><span class="sig-name descname"><span class="pre">BoundedGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prevent_copy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid" title="Permalink to this definition"></a></dt>
@@ -250,11 +209,6 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid._mask_to_index">
-<span class="sig-name descname"><span class="pre">_mask_to_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid._mask_to_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid._mask_to_index" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.shared_bounds">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.shared_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.shared_bounds" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -303,11 +257,6 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.percentile">
 <span class="sig-name descname"><span class="pre">percentile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.percentile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.percentile" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid._abc_impl">
-<span class="sig-name descname"><span class="pre">_abc_impl</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_abc_data</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid._abc_impl" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

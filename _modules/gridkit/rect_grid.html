@@ -597,7 +597,7 @@
         <span class="c1"># cropped_data = self._data[slice_x, slice_y]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cropped_data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BoundedRectGrid._data_slice_from_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid._data_slice_from_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">_data_slice_from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_data_slice_from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot create slice from unaligned bounds </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -616,7 +616,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">difference_bottom</span><span class="p">,</span> <span class="c1"># add one for upper bound of slice is exclusive</span>
         <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span></div>
+        <span class="k">return</span> <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span>
 
 <div class="viewcode-block" id="BoundedRectGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.cell_corners">[docs]</a>    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
