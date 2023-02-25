@@ -101,7 +101,7 @@ for line in open('nitpick-exceptions.txt'):
 
 autodoc_default_options = {
     "member-order": "bysource",  # Options: alphabetical, groupwise, bysource
-    "private-members": True,  # Display private objects (eg. _foo)
+    "private-members": False,  # Display private objects (eg. _foo)
     "special-members": False,  # Display special objects (eg. __foo__)
 }
 

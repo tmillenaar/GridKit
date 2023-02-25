@@ -224,11 +224,11 @@ class _BoundedGridMeta(type):
 
         return internal
 
-class BoundedGridMeta(abc.ABCMeta, _BoundedGridMeta):
+class _AbstractBoundedGridMeta(abc.ABCMeta, _BoundedGridMeta):
     """Class that enables usage of the :class:`~gridkit.bounded_grid._BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class."""
     pass
 
-class BoundedGrid(metaclass=BoundedGridMeta):
+class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     def __init__(self, data: numpy.ndarray, *args, bounds: tuple, nodata_value=None, prevent_copy: bool=False, **kwargs) -> None:
 

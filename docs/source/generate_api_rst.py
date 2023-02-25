@@ -51,7 +51,6 @@ def gen_module_rst(module, all_modules, output_dir):
         p_rst(".. automodule:: {}".format(module))
         p_rst("    :members:")
         p_rst("    :undoc-members:")
-        p_rst("    :private-members:")
         p_rst("    :special-members:")
         p_rst("    :show-inheritance:")
 
