@@ -435,10 +435,9 @@ def test_interp_from_points(method, expected_min, expected_max):
     value = numpy.sin(x/(10*numpy.pi)) * numpy.sin(y/(10*numpy.pi))
 
     empty_grid = rect_grid.RectGrid(dx=5, dy=5)
-    data_grid = rect_grid.BoundedRectGrid.interp_from_points(
+    data_grid = empty_grid.interp_from_points(
         numpy.array([x,y]).T, 
         value, 
-        empty_grid, 
         method=method, 
         nodata_value=float("nan"),
     )

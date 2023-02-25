@@ -1,5 +1,7 @@
 import abc
+import scipy
 import numpy
+import functools
 from pyproj import CRS, Transformer
 import shapely
 from collections.abc import Iterable
@@ -206,4 +208,53 @@ class BaseGrid(metaclass=abc.ABCMeta):
         vertices = self.cell_corners(index)
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
         return shapely.geometry.MultiPolygon(polygons) if as_multipolygon else polygons
+
+
+    def interp_from_points(self, points, values, method="linear", nodata_value=numpy.nan):
+        """Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.
+
+        Parameters
+        ----------
+        point: :class:`numpy.ndarray`
+            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]
+        values: :class:`numpy.ndarray`
+            The values corresponding to the supplied `points`, used as input for interpolation
+        method: :class:`str`
+            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".
+
+        Returns
+        -------
+        :class:`BoundedGrid`
+            A Bounded version of the supplied grid where the data is interpolated between the supplied points.
+        """
+        method_lut = dict(
+            nearest = scipy.interpolate.NearestNDInterpolator,
+            linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value),
+            cubic = functools.partial(scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value),
+        )
+
+        if method not in method_lut:
+            raise ValueError(f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}")
+
+        coords = points.T
+        bounds = (
+            min(coords[0]),
+            min(coords[1]),
+            max(coords[0]),
+            max(coords[1]),
+        )
+        aligned_bounds = self.align_bounds(bounds, mode="expand")
+        ids, shape = self.cells_in_bounds(aligned_bounds)
+        interp_values = numpy.full(shape=shape, fill_value = nodata_value, dtype=values.dtype)
+
+        interp_func = method_lut[method]
+        nodata_mask = values == nodata_value
+        interpolator = interp_func(
+            points[~nodata_mask],
+            values[~nodata_mask],
+        )
+        centroids = self.centroid(ids)
+        interp_values.ravel()[:] = interpolator(centroids)
+
+        return self.bounded_cls(data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value)
 

@@ -12,6 +12,7 @@ class RectGrid(BaseGrid):
     def __init__(self, *args, dx, dy, **kwargs):
         self.__dx = dx
         self.__dy = dy
+        self.bounded_cls = BoundedRectGrid
         super(RectGrid, self).__init__(*args, **kwargs)
 
     @property
@@ -25,10 +26,6 @@ class RectGrid(BaseGrid):
         """The cellsize in y-direction
         """
         return self.__dy
-
-    def interp_from_points(self, points, values, dx, dy, method="linear") -> float:
-        breakpoint()
-        scipy.interp.interpn(points, values, self.centroid(), fill_value=self.nodata_value, bounds_error=False)
 
     def neighbours(self, as_indeces=True):
         # return ids or centroids
