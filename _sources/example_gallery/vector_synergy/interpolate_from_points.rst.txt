@@ -97,7 +97,7 @@ Now we can create a grid and interpolate onto that grid.
     from gridkit import rect_grid
 
     empty_grid = rect_grid.RectGrid(dx=5, dy=5)
-    data_grid = rect_grid.BoundedRectGrid.interp_from_points(points, values, empty_grid)
+    data_grid = empty_grid.interp_from_points(points, values)
 
 
 
@@ -112,7 +112,7 @@ Currently the interpolation methods "nearest", "linear" and "cubic" are supporte
 based on scpiy's ``NearestNDInterpolator``, ``LinearNDInterpolator`` and ``CloughTocher2DInterpolator``, respectively.
 Here we try each method and plot them next to each other to compare.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-74
+.. GENERATED FROM PYTHON SOURCE LINES 57-73
 
 .. code-block:: default
 
@@ -120,10 +120,9 @@ Here we try each method and plot them next to each other to compare.
 
     for ax, method in zip(axes, ("nearest", "linear", "cubic")):
         import matplotlib.pyplot as plt
-        data_grid = rect_grid.BoundedRectGrid.interp_from_points(
+        data_grid = empty_grid.interp_from_points(
             points,
             values,
-            empty_grid,
             method=method,
         )
         ax.imshow(data_grid, extent=data_grid.mpl_extent)
@@ -145,7 +144,7 @@ Here we try each method and plot them next to each other to compare.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-80
+.. GENERATED FROM PYTHON SOURCE LINES 74-79
 
 In this example, the `cubic` interpolation represents the original function the best, but this will differ per usecase.
 Note how the BoundedGrid has nodata values at the border in the "linear" and "cubic" cases.
@@ -156,7 +155,7 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.475 seconds)
+   **Total running time of the script:** ( 0 minutes  0.566 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_interpolate_from_points.py:

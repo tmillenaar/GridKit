@@ -47,7 +47,7 @@ plt.show()
 from gridkit import rect_grid
 
 empty_grid = rect_grid.RectGrid(dx=5, dy=5)
-data_grid = rect_grid.BoundedRectGrid.interp_from_points(points, values, empty_grid)
+data_grid = empty_grid.interp_from_points(points, values)
 
 # %%
 # 
@@ -58,10 +58,9 @@ fig, axes = plt.subplots(1, 3, sharey=True, figsize=(12, 5))
 
 for ax, method in zip(axes, ("nearest", "linear", "cubic")):
     import matplotlib.pyplot as plt
-    data_grid = rect_grid.BoundedRectGrid.interp_from_points(
+    data_grid = empty_grid.interp_from_points(
         points,
         values,
-        empty_grid,
         method=method,
     )
     ax.imshow(data_grid, extent=data_grid.mpl_extent)

@@ -582,58 +582,8 @@
         <span class="p">)</span>
         <span class="n">filled_values</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">nodata_mask</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">nodata_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">filled_values</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
 
-<div class="viewcode-block" id="BoundedGrid.interp_from_points"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interp_from_points">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">interp_from_points</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        point: :class:`numpy.ndarray`</span>
-<span class="sd">            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</span>
-<span class="sd">        values: :class:`numpy.ndarray`</span>
-<span class="sd">            The values corresponding to the supplied `points`, used as input for interpolation</span>
-<span class="sd">        grid: :class:`~gridkit.base_grid.BaseGrid`</span>
-<span class="sd">            The grid that will be used to interpolate onto.</span>
-<span class="sd">        method: :class:`str`</span>
-<span class="sd">            The interpolation method to be used. Options are (&quot;nearest&quot;, &quot;linear&quot;, &quot;cubic&quot;). Default: &quot;linear&quot;.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        :class:`BoundedGrid`</span>
-<span class="sd">            A Bounded version of the supplied grid where the data is interpolated between the supplied points.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">method_lut</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-            <span class="n">nearest</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">NearestNDInterpolator</span><span class="p">,</span>
-            <span class="n">linear</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">),</span>
-            <span class="n">cubic</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">CloughTocher2DInterpolator</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">),</span>
-        <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method_lut</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">coords</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-        <span class="p">)</span>
-        <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
-        <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">)</span>
-        <span class="n">interp_values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span> <span class="o">=</span> <span class="n">nodata_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-
-        <span class="n">interp_func</span> <span class="o">=</span> <span class="n">method_lut</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
-        <span class="n">nodata_mask</span> <span class="o">=</span> <span class="n">values</span> <span class="o">==</span> <span class="n">nodata_value</span>
-        <span class="n">interpolator</span> <span class="o">=</span> <span class="n">interp_func</span><span class="p">(</span>
-            <span class="n">points</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
-            <span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="n">centroids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-        <span class="n">interp_values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">interp_values</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">aligned_bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
