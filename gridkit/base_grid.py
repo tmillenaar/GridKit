@@ -62,7 +62,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def neighbours(self) -> float:
+    def neighbours(self, index, connect_corners=False, include_selected=False) -> float:
         pass
 
     @abc.abstractmethod

@@ -27,9 +27,33 @@ class RectGrid(BaseGrid):
         """
         return self.__dy
 
-    def neighbours(self, as_indeces=True):
-        # return ids or centroids
-        raise NotImplementedError()
+    def neighbours(self, index, connect_corners=False, include_selected=False):
+        """
+        """
+        if not isinstance(index, numpy.ndarray):
+            index = numpy.array(index)
+
+        relative_neighbors = numpy.vstack([
+            numpy.array([[-1,0,1]] * 3).ravel(),
+            numpy.array([[1,0,-1]] * 3).T.ravel()
+        ]).T
+
+        relative_neighbor_indices = {1,3,5,7}
+        if connect_corners:
+            relative_neighbor_indices.update({0,2,6,8})
+        if include_selected:
+            center_id = int(numpy.mean(list(relative_neighbor_indices)))
+            relative_neighbor_indices.add(center_id)
+        relative_neighbors = relative_neighbors[list(relative_neighbor_indices)]
+    
+        neighbors = numpy.expand_dims(index, 1) #numpy.empty(shape=(relative_neighbors.shape[-1], *index.shape), dtype=int)
+        neighbors = numpy.repeat(neighbors, len(relative_neighbors), axis=1)
+
+        if index.ndim == 1: # make sure 'neighbors' is in the desired shape if index contains only one ID
+            neighbors = neighbors.T
+
+        return neighbors + relative_neighbors
+
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
