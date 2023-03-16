@@ -33,7 +33,7 @@ class RectGrid(BaseGrid):
         if not isinstance(index, numpy.ndarray):
             index = numpy.array(index)
 
-        relative_neighbors = numpy.vstack([
+        relative_neighbours = numpy.vstack([
             numpy.array([[-1,0,1]] * 3).ravel(),
             numpy.array([[1,0,-1]] * 3).T.ravel()
         ]).T
@@ -44,15 +44,15 @@ class RectGrid(BaseGrid):
         if include_selected:
             center_id = int(numpy.mean(list(relative_neighbor_indices)))
             relative_neighbor_indices.add(center_id)
-        relative_neighbors = relative_neighbors[list(relative_neighbor_indices)]
+        relative_neighbours = relative_neighbours[list(relative_neighbor_indices)]
     
-        neighbors = numpy.expand_dims(index, 1) #numpy.empty(shape=(relative_neighbors.shape[-1], *index.shape), dtype=int)
-        neighbors = numpy.repeat(neighbors, len(relative_neighbors), axis=1)
+        neighbours = numpy.expand_dims(index, 1)
+        neighbours = numpy.repeat(neighbours, len(relative_neighbours), axis=1)
 
-        if index.ndim == 1: # make sure 'neighbors' is in the desired shape if index contains only one ID
-            neighbors = neighbors.T
+        if index.ndim == 1: # make sure 'neighbours' is in the desired shape if index contains only one ID
+            neighbours = neighbours.T
 
-        return neighbors + relative_neighbors
+        return neighbours + relative_neighbours
 
 
     def centroid(self, index=None):
@@ -131,7 +131,7 @@ class RectGrid(BaseGrid):
     def cells_near_point(self, point):
         """Nearest 4 cells around a point.
         This includes the cell the point is contained within,
-        as well as two direct neighbors of this cell and one diagonal neighbor.
+        as well as two direct neighbours of this cell and one diagonal neighbor.
         What neigbors of the containing are slected, depends on where in the cell the point is located.
 
         Args
