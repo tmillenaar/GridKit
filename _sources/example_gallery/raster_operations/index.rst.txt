@@ -24,7 +24,7 @@ Such nice raster examples :)
 .. only:: html
 
   .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_ndvi_thumb.png
-    :alt: NDVI
+    :alt:
 
   :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py`
 
@@ -41,7 +41,7 @@ Such nice raster examples :)
 .. only:: html
 
   .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_elevation_distribution_per_land_cover_thumb.png
-    :alt: Combining land cover and DEM
+    :alt:
 
   :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py`
 

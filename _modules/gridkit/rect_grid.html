@@ -14,7 +14,6 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -114,7 +113,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
 
-        <span class="n">relative_neighbors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
+        <span class="n">relative_neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="p">])</span><span class="o">.</span><span class="n">T</span>
@@ -125,15 +124,15 @@
         <span class="k">if</span> <span class="n">include_selected</span><span class="p">:</span>
             <span class="n">center_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">relative_neighbor_indices</span><span class="p">)))</span>
             <span class="n">relative_neighbor_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">center_id</span><span class="p">)</span>
-        <span class="n">relative_neighbors</span> <span class="o">=</span> <span class="n">relative_neighbors</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">relative_neighbor_indices</span><span class="p">)]</span>
+        <span class="n">relative_neighbours</span> <span class="o">=</span> <span class="n">relative_neighbours</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">relative_neighbor_indices</span><span class="p">)]</span>
     
-        <span class="n">neighbors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="c1">#numpy.empty(shape=(relative_neighbors.shape[-1], *index.shape), dtype=int)</span>
-        <span class="n">neighbors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">neighbors</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">relative_neighbors</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">relative_neighbours</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># make sure &#39;neighbors&#39; is in the desired shape if index contains only one ID</span>
-            <span class="n">neighbors</span> <span class="o">=</span> <span class="n">neighbors</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># make sure &#39;neighbours&#39; is in the desired shape if index contains only one ID</span>
+            <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span><span class="o">.</span><span class="n">T</span>
 
-        <span class="k">return</span> <span class="n">neighbors</span> <span class="o">+</span> <span class="n">relative_neighbors</span></div>
+        <span class="k">return</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">relative_neighbours</span></div>
 
 
 <div class="viewcode-block" id="RectGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -212,7 +211,7 @@
 <div class="viewcode-block" id="RectGrid.cells_near_point"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_near_point">[docs]</a>    <span class="k">def</span> <span class="nf">cells_near_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Nearest 4 cells around a point.</span>
 <span class="sd">        This includes the cell the point is contained within,</span>
-<span class="sd">        as well as two direct neighbors of this cell and one diagonal neighbor.</span>
+<span class="sd">        as well as two direct neighbours of this cell and one diagonal neighbor.</span>
 <span class="sd">        What neigbors of the containing are slected, depends on where in the cell the point is located.</span>
 
 <span class="sd">        Args</span>

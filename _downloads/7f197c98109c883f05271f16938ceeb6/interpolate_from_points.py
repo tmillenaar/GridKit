@@ -48,6 +48,7 @@ from gridkit import rect_grid
 
 empty_grid = rect_grid.RectGrid(dx=5, dy=5)
 data_grid = empty_grid.interp_from_points(points, values)
+print(data_grid)
 
 # %%
 # 

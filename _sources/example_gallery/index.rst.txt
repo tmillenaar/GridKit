@@ -40,7 +40,7 @@ Such nice raster examples :)
 .. only:: html
 
   .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_ndvi_thumb.png
-    :alt: NDVI
+    :alt:
 
   :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py`
 
@@ -57,7 +57,7 @@ Such nice raster examples :)
 .. only:: html
 
   .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_elevation_distribution_per_land_cover_thumb.png
-    :alt: Combining land cover and DEM
+    :alt:
 
   :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py`
 
@@ -92,7 +92,7 @@ Such nice shape examples :)
 .. only:: html
 
   .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
-    :alt: Interpolate from points
+    :alt:
 
   :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
 
@@ -109,7 +109,7 @@ Such nice shape examples :)
 .. only:: html
 
   .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_intersect_geometries_thumb.png
-    :alt: Geometry intersections
+    :alt:
 
   :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py`
 
@@ -127,6 +127,7 @@ Such nice shape examples :)
 .. toctree::
    :hidden:
    :includehidden:
+
 
    /example_gallery/raster_operations/index.rst
    /example_gallery/vector_synergy/index.rst
