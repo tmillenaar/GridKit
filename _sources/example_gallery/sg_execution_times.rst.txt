@@ -6,8 +6,8 @@
 
 Computation times
 =================
-**00:01.943** total execution time for **example_gallery** files:
+**00:02.004** total execution time for **example_gallery** files:
 
 +---------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_downslope_path.py` (``downslope_path.py``) | 00:01.943 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_downslope_path.py` (``downslope_path.py``) | 00:02.004 | 0.0 MB |
 +---------------------------------------------------------------------------+-----------+--------+
