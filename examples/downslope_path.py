@@ -42,7 +42,7 @@ dem = read_geotiff("../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 
 
 # %%
 # 
-# Set up the function and the required empty lists.
+# Next, set up the recursive function and the required empty lists.
 # 
 # .. Warning ::
 #    Python's recursion limit can be reached with this approach for paths longer than shown here.
@@ -63,9 +63,11 @@ def downslope_path(cell_id):
             all_neighbours.append(cell)
             neighbour_values.append(value)
 
+    # stop when we encounter nodata values, assuming these only occur byound the bounds of the DEM crop
     if dem.nodata_value in neighbour_values:
         return
 
+    # determine the next cell and remove it from the neighbour-lists
     min_id = numpy.argmin(neighbour_values)
     next_cell = all_neighbours[min_id]
     all_neighbours.pop(min_id)
