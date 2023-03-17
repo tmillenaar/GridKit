@@ -1,0 +1,13 @@
+
+:orphan:
+
+.. _sphx_glr_example_gallery_sg_execution_times:
+
+
+Computation times
+=================
+**00:01.851** total execution time for **example_gallery** files:
+
++---------------------------------------------------------------------------+-----------+--------+
+| :ref:`sphx_glr_example_gallery_downslope_path.py` (``downslope_path.py``) | 00:01.851 | 0.0 MB |
++---------------------------------------------------------------------------+-----------+--------+
