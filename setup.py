@@ -30,7 +30,7 @@ setup(
     description="Operations on, and tessellation of, regular grids",
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License"
+        "License :: OSI Approved :: MIT",
     ],
     packages=find_packages(),
     include_package_data=True,
