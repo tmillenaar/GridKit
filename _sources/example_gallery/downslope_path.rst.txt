@@ -70,13 +70,13 @@ First let's import the dependencies and read in the DEM.
 
 .. GENERATED FROM PYTHON SOURCE LINES 44-49
 
-Set up the function and the required empty lists.
+Next, set up the recursive function and the required empty lists.
 
 .. Warning ::
    Python's recursion limit can be reached with this approach for paths longer than shown here.
    While you can raise this limit using `sys.setrecursionlimit`, you may want to reconsider the approach and use a while-loop instead of recursion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-76
+.. GENERATED FROM PYTHON SOURCE LINES 50-78
 
 .. code-block:: default
 
@@ -96,9 +96,11 @@ Set up the function and the required empty lists.
                 all_neighbours.append(cell)
                 neighbour_values.append(value)
 
+        # stop when we encounter nodata values, assuming these only occur byound the bounds of the DEM crop
         if dem.nodata_value in neighbour_values:
             return
 
+        # determine the next cell and remove it from the neighbour-lists
         min_id = numpy.argmin(neighbour_values)
         next_cell = all_neighbours[min_id]
         all_neighbours.pop(min_id)
@@ -113,11 +115,11 @@ Set up the function and the required empty lists.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Determine the starting cell and call the function
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 80-84
 
 .. code-block:: default
 
@@ -132,7 +134,7 @@ Determine the starting cell and call the function
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-90
 
 Results
 ------------- 
@@ -140,7 +142,7 @@ Let's plot the path on the DEM
 
 For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-107
+.. GENERATED FROM PYTHON SOURCE LINES 91-109
 
 .. code-block:: default
 
@@ -174,7 +176,7 @@ For each cell along the path we plot the polygon as a square. This looks better 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-111
+.. GENERATED FROM PYTHON SOURCE LINES 110-113
 
 While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
@@ -183,7 +185,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.851 seconds)
+   **Total running time of the script:** ( 0 minutes  1.943 seconds)
 
 
 .. _sphx_glr_download_example_gallery_downslope_path.py:
