@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+from pathlib import Path
 
 with open("gridkit/version.py") as file:
     version_info = dict(line.replace(" ","").replace('"', "").split("=") for line in file)
@@ -28,9 +29,11 @@ setup(
     version=version_info["__version__"],
     author="Timo Millenaar",
     description="Operations on, and tessellation of, regular grids",
+    long_description=(Path(__file__).parent / "README.md").read_text(),
+    long_description_content_type='text/markdown'
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT",
+        "License :: OSI Approved :: MIT License",
     ],
     packages=find_packages(),
     include_package_data=True,
