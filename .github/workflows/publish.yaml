@@ -1,0 +1,36 @@
+name: Publish to PyPI
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: pip install --upgrade setuptools wheel twine
+
+      - name: Set the gridkit version to that of the tag
+        env:
+          TAG_NAME: ${{GITHUB_REF/refs\/tags\//}}
+        run: sed -i -r "s|[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|$TAG_NAME|" ./gridkit/version.py; cat ./gridkit/version.py
+
+      - name: Build distribution packages
+        run: python setup.py sdist bdist_wheel
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@v1.8.1
+        with:
+          user: __token__
+          password: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
+          packages: dist/*
