@@ -21,9 +21,7 @@ jobs:
         run: pip install --upgrade setuptools wheel twine
 
       - name: Set the gridkit version to that of the tag
-        env:
-          TAG_NAME: ${{ env.GITHUB_REF#refs/tags/ }}
-        run: sed -i -r "s|[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|$TAG_NAME|" ./gridkit/version.py; cat ./gridkit/version.py
+        run: sed -i -r "s|[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|${GITHUB_REF/refs\/tags\//}|" ./gridkit/version.py; cat ./gridkit/version.py
 
       - name: Build distribution packages
         run: python setup.py sdist bdist_wheel
