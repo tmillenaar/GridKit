@@ -22,7 +22,7 @@ jobs:
 
       - name: Set the gridkit version to that of the tag
         env:
-          TAG_NAME: ${{GITHUB_REF/refs\/tags\//}}
+          TAG_NAME: ${{ env.GITHUB_REF#refs/tags/ }}
         run: sed -i -r "s|[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|$TAG_NAME|" ./gridkit/version.py; cat ./gridkit/version.py
 
       - name: Build distribution packages
