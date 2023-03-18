@@ -51,6 +51,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#what-is-gridkit">What is GridKit?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-gridkit-is-not">What GridKit is not</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#basic-examples">Basic examples</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#raster-sampling">Raster sampling</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#aggregation">Aggregation</a></li>
@@ -95,21 +96,85 @@
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
 <section id="what-is-gridkit">
 <h2>What is GridKit?<a class="headerlink" href="#what-is-gridkit" title="Permalink to this heading"></a></h2>
-<p>GridKit is an open source Python library that provides a high-level API to work with regular grids.</p>
-<p>Some of the core features are:</p>
+<p>GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids.</p>
+<p><strong>Core features:</strong></p>
+<blockquote>
+<div><ul>
+<li><p>tessellation of an infinite surface <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></li>
+<li><p>working with geospatial data</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>tessellation of an infinite surface</p></li>
-<li><p>working with geospatial data</p></li>
-<li><dl class="simple">
-<dt>bridging the gap between raster and vector data</dt><dd><ul>
-<li><p>aggregation</p></li>
+<li><p>geocoded grids</p></li>
+<li><p>resampling</p></li>
+<li><p>coordinate transformations (akin to geopanda’s <cite>to_crs</cite>)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>bridging the gap between raster and vector data</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>gridcell-vector intersections</p></li>
 <li><p>sampling</p></li>
 <li><p>interpolation</p></li>
+<li><p>aggregation statistics (planned)</p></li>
 </ul>
+</div></blockquote>
+</li>
+<li><p>grids of various shapes</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>rectangular</p></li>
+<li><p>hexahonal (planned)</p></li>
+<li><p>triangular (planned)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>In practice the “<em>infinite surface</em>” is bounded by machine precision. No grid cell can be referenced of which the index does not fit in a 64 byte integer.</p>
+</aside>
+</aside>
+</section>
+<section id="what-gridkit-is-not">
+<h2>What GridKit is not<a class="headerlink" href="#what-gridkit-is-not" title="Permalink to this heading"></a></h2>
+<p>Many common operations are done on grids or rasters.
+Restrictions therefore keep clarity around what features we want to add, and what we want to leave to other packages.</p>
+<p>Most notably, there are many software solutions out there that focuss on Rasters, or bounded rectangular grids (some of these are mentioned below).
+Often, these software packages focuss around operations on raster bands.
+Instead, GridKit is build around infinite grids and works with indices reprecenting individual grid cells.
+Here, the grid cell is the fundamental unit instead of the Raster band.</p>
+<p>Some features will overlap, such as cropping and resampling.
+Other features that are prevelent in these types of software might be missing in GridKit, such as stacking raster bands or slope and aspect calculations.</p>
+<p><strong>GridKit is not:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>GDAL</dt><dd><p>GDAL is a versitile toolbox of everything geospatial, for both vector and raster operations.
+It’s raster operations are specifically tuned to work with bounded geospatial rectangular grids, often with multiple data bands.
+The great advantage of GDAl is that the amount and veriety raster operations that is supported out of the box, is unmatched.
+In GridKit, no attempt will be made to match GDAL in this regard.
+However, while python bindings for GDAL are available, the use is not very Pythonic.
+One example of this is that for every raster operation, GDAl expects a path to a raster file as input and writes a new raster file as output.
+While the rasters can be written to memory as a workaround to save the IO, this is not a style of programming most python developers are comfortable with.
+In GridKit, the grids are python classes which allows for a more pythonic style of programming and easier chaining of operations.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="simple">
+<dt>Rasterio</dt><dd><p>Rasterio, as the name suggest, is a package that focusses on the reading and writing of raster files.
+Besides reading and writing, Rasterio provides functionality for warping, cropping and interpolating data.
+Some of this functionality overlaps with that of GridKit.
+Most notably rasterio uses affine transforms to represent the position of a raster, whereas gridkit uses the bounding box.
+We have no intention of re-inventing the wheel, and happily use Rasterio for the reading and writing of geotiffs.</p>
+</dd>
+</dl>
+</li>
+<li><p>RioXarray</p></li>
+<li><p>Scikit-image (Skimage)</p></li>
 </ul>
 </div></blockquote>
 </section>
