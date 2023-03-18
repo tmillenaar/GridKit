@@ -28,7 +28,7 @@ setup(
     name="gridkit",
     version=version_info["__version__"],
     author="Timo Millenaar",
-    description="Operations on, and tessellation of, regular grids",
+    description="Powerful abstractions of infinite grids for grid-vector interactions, tesselation, resampling and interactions between related grids.",
     long_description=(Path(__file__).parent / "README.md").read_text(),
     long_description_content_type='text/markdown',
     classifiers=[
