@@ -15,6 +15,7 @@ Source: https://github.com/tmillenaar/GridKit
    getting_started
    example_gallery/index.rst
    api_reference
+   roadmap
    contributing
    release_notes
 
