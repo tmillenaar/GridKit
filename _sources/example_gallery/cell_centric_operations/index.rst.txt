@@ -1,0 +1,46 @@
+
+
+.. _sphx_glr_example_gallery_cell_centric_operations:
+
+.. _cell_centric_operations:
+
+Cell centric
+============
+
+These examples highlight operations where specific cells are targeted.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use a DEM to determine the downslope path from a point on the DEM to the edge.">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_downslope_path_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Downslope path</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/cell_centric_operations/downslope_path
+

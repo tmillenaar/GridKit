@@ -5,7 +5,24 @@
 Example Gallery
 ---------------
 
-Such nice examples :)
+The examples listed here are intended to familiarize the reader with the workflow of GridKit,
+and to serve as inspiration regarding the types of problems that can be solved using GridKit.
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    </div>
+
+
+Cell centric
+============
+
+These examples highlight operations where specific cells are targeted.
 
 
 
@@ -21,10 +38,10 @@ Such nice examples :)
 
 .. only:: html
 
-  .. image:: /example_gallery/images/thumb/sphx_glr_downslope_path_thumb.png
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_downslope_path_thumb.png
     :alt:
 
-  :ref:`sphx_glr_example_gallery_downslope_path.py`
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py`
 
 .. raw:: html
 
@@ -37,16 +54,10 @@ Such nice examples :)
     </div>
 
 
-.. toctree::
-   :hidden:
-
-   /example_gallery/downslope_path
-
-
 Raster operations
 =================
 
-Such nice raster examples :)
+These examples show how traditional raster data can be analysed and modified using GridKit.
 
 
 
@@ -98,7 +109,7 @@ Such nice raster examples :)
 Shape interactions
 ==================
 
-Such nice shape examples :)
+The following examples highlight the interactions between vector data and regular grids.
 
 
 
@@ -152,6 +163,7 @@ Such nice shape examples :)
    :includehidden:
 
 
+   /example_gallery/cell_centric_operations/index.rst
    /example_gallery/raster_operations/index.rst
    /example_gallery/vector_synergy/index.rst
 

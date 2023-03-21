@@ -5,24 +5,24 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Downslope path &mdash; GridKit 0.1.0.beta documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/sg_gallery-rendered-html.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Raster operations" href="raster_operations/index.html" />
-    <link rel="prev" title="Example Gallery" href="index.html" /> 
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Raster operations" href="../raster_operations/index.html" />
+    <link rel="prev" title="Cell centric" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -33,14 +33,14 @@
 
           
           
-          <a href="../index.html" class="icon icon-home">
+          <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
               <div class="version">
                 0.1.0.beta
               </div>
 <div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
@@ -49,22 +49,25 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Example Gallery</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Downslope path</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#introduction">Introduction</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#method">Method</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#results">Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#shape-interactions">Shape interactions</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Cell centric</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Downslope path</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#raster-operations">Raster operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="index.html#shape-interactions">Shape interactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../raster_operations/index.html">Raster operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../vector_synergy/index.html">Shape interactions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../api_reference.html">API reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../release_notes.html">Release notes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
 </ul>
 
         </div>
@@ -73,18 +76,19 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">GridKit</a>
+          <a href="../../index.html">GridKit</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">Example Gallery</a></li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Cell centric</a></li>
       <li class="breadcrumb-item active">Downslope path</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/example_gallery/downslope_path.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/example_gallery/cell_centric_operations/downslope_path.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -94,11 +98,11 @@
              
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p><a class="reference internal" href="#sphx-glr-download-example-gallery-downslope-path-py"><span class="std std-ref">Go to the end</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="downslope-path">
-<span id="sphx-glr-example-gallery-downslope-path-py"></span><h1>Downslope path<a class="headerlink" href="#downslope-path" title="Permalink to this heading"></a></h1>
+<span id="sphx-glr-example-gallery-cell-centric-operations-downslope-path-py"></span><h1>Downslope path<a class="headerlink" href="#downslope-path" title="Permalink to this heading"></a></h1>
 <p>Use a DEM to determine the downslope path from a point on the DEM to the edge.</p>
 <p>DEM data source: <a class="reference external" href="https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem">https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem</a></p>
 <section id="introduction">
@@ -127,7 +131,7 @@ This is of course assuming there are no nodata_values in the DEM.</p>
 <span class="kn">from</span> <span class="nn">gridkit.io</span> <span class="kn">import</span> <span class="n">read_geotiff</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="n">dem</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="s2">&quot;../tests/data/alps_dem.tiff&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">29200</span><span class="p">,</span> <span class="mi">167700</span><span class="p">,</span> <span class="mi">29800</span><span class="p">,</span> <span class="mi">168100</span><span class="p">))</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">29200</span><span class="p">,</span> <span class="mi">167700</span><span class="p">,</span> <span class="mi">29800</span><span class="p">,</span> <span class="mi">168100</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Next, set up the recursive function and the required empty lists.</p>
@@ -192,16 +196,16 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_downslope_path_001.png" srcset="../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
+<img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
 or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.274 seconds)</p>
-<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-downslope-path-py">
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.928 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/84b481e3357578d336d3b02c55329f57/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/df89e8dce4f564036c6eab559331be35/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
-<p><a class="reference download internal" download="" href="../_downloads/735412d2b32d25539782965082725b2d/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>
+<p><a class="reference download internal" download="" href="../../_downloads/a495658098a2a10d0a6d919a5b81ba21/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -212,8 +216,8 @@ or intersected with a polygon to determine if the path crosses a particular zone
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Example Gallery" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="raster_operations/index.html" class="btn btn-neutral float-right" title="Raster operations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Cell centric" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../raster_operations/index.html" class="btn btn-neutral float-right" title="Raster operations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
