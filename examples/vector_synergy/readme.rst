@@ -3,5 +3,5 @@
 Shape interactions
 ==================
 
-Such nice shape examples :)
+The following examples highlight the interactions between vector data and regular grids.
 

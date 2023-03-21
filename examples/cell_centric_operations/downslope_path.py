@@ -38,7 +38,7 @@ import numpy
 from gridkit.io import read_geotiff
 import matplotlib.pyplot as plt
 
-dem = read_geotiff("../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100))
+dem = read_geotiff("../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100))
 
 # %%
 # 

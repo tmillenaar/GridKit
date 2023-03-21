@@ -3,5 +3,5 @@
 Raster operations
 =================
 
-Such nice raster examples :)
+These examples show how traditional raster data can be analysed and modified using GridKit.
 
