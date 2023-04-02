@@ -38,13 +38,13 @@ class RectGrid(BaseGrid):
             numpy.array([[1,0,-1]] * 3).T.ravel()
         ]).T
 
-        relative_neighbor_indices = {1,3,5,7}
+        relative_neighbour_indices = {1,3,5,7}
         if connect_corners:
-            relative_neighbor_indices.update({0,2,6,8})
+            relative_neighbour_indices.update({0,2,6,8})
         if include_selected:
-            center_id = int(numpy.mean(list(relative_neighbor_indices)))
-            relative_neighbor_indices.add(center_id)
-        relative_neighbours = relative_neighbours[list(relative_neighbor_indices)]
+            center_id = int(numpy.mean(list(relative_neighbour_indices)))
+            relative_neighbour_indices.add(center_id)
+        relative_neighbours = relative_neighbours[list(relative_neighbour_indices)]
     
         neighbours = numpy.expand_dims(index, 1)
         neighbours = numpy.repeat(neighbours, len(relative_neighbours), axis=1)

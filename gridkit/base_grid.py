@@ -205,6 +205,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
 
     def to_shapely(self, index, as_multipolygon: bool = False):
+        index = numpy.array(index)
+        if len(index.shape) == 1:
+            index = numpy.expand_dims(index, 0)
         vertices = self.cell_corners(index)
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
         return shapely.geometry.MultiPolygon(polygons) if as_multipolygon else polygons
