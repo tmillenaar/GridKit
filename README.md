@@ -3,6 +3,8 @@ GridKit
 
 GridKit is a tool to work with grids on a high abstraction level.
 
+[![Downloads](https://static.pepy.tech/personalized-badge/gridkit?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/gridkit)
+
 Documentation
 =============
 Find the docs on [GitHub Pages](https://tmillenaar.github.io/GridKit).
