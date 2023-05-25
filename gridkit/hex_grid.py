@@ -452,13 +452,12 @@ class HexGrid(BaseGrid):
             ids_pointy = numpy.arange(left_top_id[1], left_bottom_id[1]-1, -1, dtype="int64") # y-axis goes from top to bottom (high to low), hence step size is -1
             nr_cells_flat = int(numpy.floor((bounds[2] - bounds[0]) / self.dx) + 1)
             ids_flat_even = numpy.arange(left_bottom_id[0], left_bottom_id[0] + nr_cells_flat)
-            if left_bottom_id[0] % self.dx == 0 and (bounds[0] % self.dx) == 0: # cuts through cells in even rows
-                ids_flat_even -= 1
-
             if (((bounds[2] - bounds[0]) % self.dx) / self.dx) == 0.5:
                 if (bounds[0] % self.dx) == 0: # cuts through cells in even rows
                     nr_cells_flat_odd = nr_cells_flat
                     nr_cells_flat_even = nr_cells_flat
+                    if left_bottom_id[flat_axis] % 2 == 0:
+                        ids_flat_even -= 1
                     ids_flat_odd = ids_flat_even
                     ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
                 else:
@@ -466,14 +465,16 @@ class HexGrid(BaseGrid):
                     nr_cells_flat_even = nr_cells_flat
                     ids_flat_odd = ids_flat_even
             else:
-                if (bounds[0] % self.dx) != 0: # cuts through cells in even rows   # Remove: never triggered
+                if (bounds[0] % self.dx) != 0: # cuts through cells in even rows
                     nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat
+                    nr_cells_flat_even = nr_cells_flat  
                     ids_flat_odd = ids_flat_even[:-1]
                     ids_flat_even = ids_flat_even
                 else: # aligns with sides of cells in even rows
                     nr_cells_flat_odd = nr_cells_flat
                     nr_cells_flat_even = nr_cells_flat - 1
+                    if left_bottom_id[flat_axis] % 2 == 0:
+                        ids_flat_even -= 1
                     ids_flat_odd = ids_flat_even
                     ids_flat_even = ids_flat_even[1:]
         elif self._shape == "flat":
@@ -482,12 +483,12 @@ class HexGrid(BaseGrid):
             ids_pointy = numpy.arange(left_bottom_id[0], right_bottom_id[0]+1, dtype="int64")
             nr_cells_flat = int((bounds[3] - bounds[1]) / self.dy) + 1
             ids_flat_even = numpy.arange(left_bottom_id[pointy_axis], left_bottom_id[pointy_axis] + nr_cells_flat)
-            if left_bottom_id[pointy_axis] % self.dy == 0 and (bounds[1] % self.dy) == 0: # cuts through cells in even rows
-                ids_flat_even -= 1
             if (((bounds[3] - bounds[1]) % self.dy) / self.dy) == 0.5:
                 if (bounds[1] % self.dy) == 0: # cuts through cells in even rows  # TODO: Remove, never triggered
                     nr_cells_flat_odd = nr_cells_flat
                     nr_cells_flat_even = nr_cells_flat
+                    if left_bottom_id[flat_axis] % 2 == 0:
+                        ids_flat_even -= 1
                     ids_flat_odd = ids_flat_even
                     ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
                 else:
@@ -498,9 +499,10 @@ class HexGrid(BaseGrid):
                 if (bounds[1] % self.dy) == 0: # cuts through cells in even rows
                     nr_cells_flat_odd = nr_cells_flat
                     nr_cells_flat_even = nr_cells_flat - 1
+                    if left_bottom_id[flat_axis] % 2 == 0:
+                        ids_flat_even -= 1
                     ids_flat_odd = ids_flat_even
                     ids_flat_even = ids_flat_even[1:]
-
                 else: # aligns with sides of cells in even rows
                     nr_cells_flat_odd = nr_cells_flat - 1
                     nr_cells_flat_even = nr_cells_flat
@@ -513,7 +515,7 @@ class HexGrid(BaseGrid):
 
         ids = numpy.empty((2, nr_cells), dtype="int64")
         counter = 0
-        for i, pointy_id in enumerate(ids_pointy):
+        for pointy_id in ids_pointy:
             if pointy_id % 2 == 0:
                 nr_flat = nr_cells_flat_even
                 flat_ids = ids_flat_even
