@@ -259,7 +259,6 @@ class HexGrid(BaseGrid):
         point = numpy.array(point)
         point = numpy.expand_dims(point, axis=0).T if len(point.shape) == 1 else point.T
 
-        # create rectangular grid
         # approach adapted after https://stackoverflow.com/a/7714148
         if self._shape == "pointy":
             flat_axis = 0
@@ -535,7 +534,7 @@ class HexGrid(BaseGrid):
 
 class BoundedRectGrid(BoundedGrid, RectGrid):
 
-    def __init__(self, data, *args, bounds, **kwargs):
+    def __init__(self, data, *args, bounds, shape="flat", **kwargs):
         if bounds[2] <= bounds [0] or bounds[3] <= bounds[1]:
             raise ValueError(f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}")
         dx = (bounds[2] - bounds[0]) / data.shape[1]
@@ -577,45 +576,8 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         """
         return numpy.linspace(self.bounds[3] - self.dy / 2, self.bounds[1] + self.dy / 2, self.height)
 
-    def centroid(self, index=None):
-        """Centroids of all cells
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            Multidimensional array containing the longitude and latitude of the center of each cell respectively,
-            in (width, height, lonlat)
-        """
-        if index is not None:
-            return super(BoundedRectGrid, self).centroid(index=index)
-        # get grid in shape (latlon, width, height)
-        latlon = numpy.array(numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy"))
-
-        # return grid in shape (width, height, lonlat)
-        return numpy.array([latlon[0].ravel(),latlon[1].ravel()]).T
-
     def intersecting_cells(self, other):
         raise NotImplementedError()
-
-    def shared_bounds(self, other):
-        other_bounds = other.bounds if isinstance(other, BaseGrid) else other
-        if not self.intersects(other):
-            raise IntersectionError(f"Grid with bounds {self.bounds} does not intersect with grid with bounds {other_bounds}.")
-        return (
-            max(self.bounds[0], other_bounds[0]),
-            max(self.bounds[1], other_bounds[1]),
-            min(self.bounds[2], other_bounds[2]),
-            min(self.bounds[3], other_bounds[3]),
-        )
-
-    def combined_bounds(self, other):
-        other_bounds = other.bounds if isinstance(other, BaseGrid) else other
-        return (
-            min(self.bounds[0], other_bounds[0]),
-            min(self.bounds[1], other_bounds[1]),
-            max(self.bounds[2], other_bounds[2]),
-            max(self.bounds[3], other_bounds[3]),
-        )
 
     def crop(self, new_bounds, bounds_crs=None, buffer_cells=0):
 
