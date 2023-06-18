@@ -118,3 +118,27 @@ def test_cells_near_point(shape, point, expected_nearby_cells):
     grid = HexGrid(size=3, shape=shape)
     nearby_cells = grid.cells_near_point(point)
     numpy.testing.assert_allclose(nearby_cells, expected_nearby_cells)
+
+
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+@pytest.mark.parametrize("depth", list(range(1,7)))
+@pytest.mark.parametrize("index", [[2,1], [1,2]])
+@pytest.mark.parametrize("include_selected", [False, True])
+def test_neighbours(shape, depth, index, include_selected):
+    grid = HexGrid(size=3, shape=shape)
+    neighbours = grid.neighbours(index, depth=depth, include_selected=include_selected)
+
+    if include_selected:
+        # make sure the index is present and at the center of the neighbours array
+        center_index = int(numpy.floor(len(neighbours) / 2))
+        numpy.testing.assert_allclose(neighbours[center_index], index)
+        # remove center index for further testing of other neighbours
+        neighbours = numpy.delete(neighbours, center_index, axis=0)
+
+    # If the neighbours are correct, there are always a multiple of 6 cells with the same distance to the center cell
+    distances = numpy.linalg.norm(grid.centroid(neighbours) - grid.centroid(index), axis=1)
+    for d in numpy.unique(distances):
+        assert sum(distances == d) % 6 == 0
+
+    # No cell can be further away than 'depth' number of cells * cell size
+    assert all(distances <= grid.size * depth)

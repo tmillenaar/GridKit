@@ -12,6 +12,7 @@ class HexGrid(BaseGrid):
 
     def __init__(self, *args, size, shape="pointy", **kwargs):
         
+        self._size = size
         self._radius = size / 3**0.5
         
         if shape == "pointy":
@@ -44,40 +45,65 @@ class HexGrid(BaseGrid):
         """The radius of the cell. The radius is defined to be the distance from the cell center to an outer corner.
         """
         return self._radius
-
-    def neighbours(self, index, connect_corners=False, include_selected=False, flat=False):
+    
+    @property
+    def shape(self) -> float:
+        """The shape of the grid as supplied when initiating the class.
+        This can be either "flat" or "pointy" referring to the top of the cells.
         """
+        return self._shape
+
+    @property
+    def size(self) -> float:
+        """The size of the cell as supplied when initiating the class.
+        This is the same as dx for a flat grid and the same as dy for a pointy grid.
         """
-        if not isinstance(index, numpy.ndarray):
-            index = numpy.array(index)
+        return self._size
+    
+    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False, flat=True):
 
-        relative_neighbours = numpy.vstack([
-            numpy.array([[-1,0,1]] * 3).ravel(),
-            numpy.array([[1,0,-1]] * 3).T.ravel()
-        ]).T
+        if depth < 1:
+            raise ValueError("'depth' cannot be lower than 1")
+        
+        if flat == False:
+            raise NotImplementedError()
 
-        if self._shape == "pointy":
-            even_index = index[:,1] % 2 == 0
-            relative_neighbour_ids_even = {0,1,3,5,6,7}
-            relative_neighbour_ids_odd = {1,2,3,5,7,8}
-        elif self._shape == "flat":
-            even_index = index[:,0] % 2 == 0
-            relative_neighbour_ids_even = {1,3,5,6,7,8}
-            relative_neighbour_ids_odd = {0,1,2,3,5,7}
+        nr_neighbours = sum(6*numpy.arange(1, depth+1)) + 1 # Add 1 for the first cell
+        neighbours = numpy.empty((nr_neighbours, 2), dtype=int)
+        start_slice = 0
+        rows = range(depth, -1, -1)
 
-        if include_selected:
-            relative_neighbour_ids_even.add(4)
-            relative_neighbour_ids_odd.add(4)
+        # create top half of selection
+        for i, row in enumerate(rows): # loop from top row to bottom row
+            row_length = depth + i + 1
+            row_slice = slice(start_slice, start_slice+row_length)
+            max_val = int(numpy.floor(row_length/2))
+            if self._shape == "pointy":
+                pointy_axis = 1
+                flat_axis = 0
+            elif self._shape == "flat":
+                pointy_axis = 0
+                flat_axis = 1
 
-        neighbours = numpy.expand_dims(index, 1)
-        neighbours = numpy.repeat(neighbours, 6, axis=1)
-        neighbours[even_index] += relative_neighbours[list(relative_neighbour_ids_even)]
-        neighbours[~even_index] += relative_neighbours[list(relative_neighbour_ids_odd)]
+            if (i % 2 == 0) == (depth % 2 == 0):
+                neighbours[row_slice, flat_axis] = range(-max_val, max_val+1)
+            else:
+                if index[pointy_axis] % 2 != 0:
+                    neighbours[row_slice, flat_axis] = range(-max_val+1, max_val+1)
+                else:
+                    neighbours[row_slice, flat_axis] = range(-max_val, max_val)
+            neighbours[row_slice, pointy_axis] = row
+            start_slice += row_length
 
-        if index.ndim == 1: # make sure 'neighbours' is in the desired shape if index contains only one ID
-            neighbours = neighbours.T
+        # mirror top half to bottom half (leaving the center row be)
+        neighbours[start_slice:] = neighbours[0:start_slice - row_length][::-1]
+        neighbours[start_slice:, pointy_axis] *= -1
 
-        return neighbours if not flat else neighbours.reshape(-1, neighbours.shape[-1])
+        if include_selected is False:
+            center_cell = int(numpy.floor(len(neighbours)/2))
+            neighbours = numpy.delete(neighbours, center_cell, 0)
+
+        return neighbours + index
 
 
     def centroid(self, index=None):
