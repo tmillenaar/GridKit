@@ -173,7 +173,7 @@ def test_intersect_geometries(basic_bounded_rect_grid, shapely_geoms, expected_c
         ]
     ])
 ])
-def test_neighbors(include_selected, connect_corners, expected_cell_ids):
+def test_neighbours(include_selected, connect_corners, expected_cell_ids):
     expected_cell_ids = numpy.array(expected_cell_ids)
     testgrid = rect_grid.RectGrid(dx=1, dy=2)
 

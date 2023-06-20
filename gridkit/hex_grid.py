@@ -25,7 +25,7 @@ class HexGrid(BaseGrid):
             raise ValueError(f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'")
         
         self._shape = shape
-        self.bounded_cls = BoundedRectGrid #TODO create a BoundedRectGrid
+        self.bounded_cls = None #TODO create a BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
@@ -60,7 +60,7 @@ class HexGrid(BaseGrid):
         """
         return self._size
     
-    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
+    def relative_neighbours(index, depth=1, connect_corners=False, include_selected=False):
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
@@ -100,7 +100,7 @@ class HexGrid(BaseGrid):
             center_cell = int(numpy.floor(len(neighbours)/2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
 
-        return neighbours + index
+        return neighbours
 
 
     def centroid(self, index=None):
@@ -555,6 +555,7 @@ class HexGrid(BaseGrid):
         return HexGrid
 
 
+
 class BoundedRectGrid(BoundedGrid, RectGrid):
 
     def __init__(self, data, *args, bounds, shape="flat", **kwargs):
@@ -744,4 +745,3 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
         return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
-

@@ -27,11 +27,10 @@ class RectGrid(BaseGrid):
         """
         return self.__dy
 
-    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
-        """
-        """
-        if not isinstance(index, numpy.ndarray):
-            index = numpy.array(index)
+    def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False):
+
+        if depth < 1:
+            raise ValueError("'depth' cannot be lower than 1")
 
         neighbours = numpy.empty(((2*depth+1)**2, 2), dtype=int)
 
@@ -47,8 +46,7 @@ class RectGrid(BaseGrid):
             center_cell = int(numpy.floor(len(neighbours)/2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
 
-        return neighbours + index
-
+        return neighbours
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
