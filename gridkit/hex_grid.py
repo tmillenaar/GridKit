@@ -60,13 +60,10 @@ class HexGrid(BaseGrid):
         """
         return self._size
     
-    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False, flat=True):
+    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
-        
-        if flat == False:
-            raise NotImplementedError()
 
         nr_neighbours = sum(6*numpy.arange(1, depth+1)) + 1 # Add 1 for the first cell
         neighbours = numpy.empty((nr_neighbours, 2), dtype=int)

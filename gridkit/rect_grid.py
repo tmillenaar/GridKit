@@ -27,32 +27,27 @@ class RectGrid(BaseGrid):
         """
         return self.__dy
 
-    def neighbours(self, index, connect_corners=False, include_selected=False):
+    def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
         """
         """
         if not isinstance(index, numpy.ndarray):
             index = numpy.array(index)
 
-        relative_neighbours = numpy.vstack([
-            numpy.array([[-1,0,1]] * 3).ravel(),
-            numpy.array([[1,0,-1]] * 3).T.ravel()
-        ]).T
+        neighbours = numpy.empty(((2*depth+1)**2, 2), dtype=int)
 
-        relative_neighbour_indices = {1,3,5,7}
-        if connect_corners:
-            relative_neighbour_indices.update({0,2,6,8})
-        if include_selected:
-            center_id = int(numpy.mean(list(relative_neighbour_indices)))
-            relative_neighbour_indices.add(center_id)
-        relative_neighbours = relative_neighbours[list(relative_neighbour_indices)]
-    
-        neighbours = numpy.expand_dims(index, 1)
-        neighbours = numpy.repeat(neighbours, len(relative_neighbours), axis=1)
+        relative_ids_1d = numpy.arange(-depth, depth+1)
+        relative_x, relative_y = numpy.meshgrid(relative_ids_1d, relative_ids_1d[::-1])
+        neighbours[:,0], neighbours[:,1] = numpy.ravel(relative_x), numpy.ravel(relative_y)
 
-        if index.ndim == 1: # make sure 'neighbours' is in the desired shape if index contains only one ID
-            neighbours = neighbours.T
+        if not connect_corners:
+            mask = abs(numpy.multiply(*neighbours.T)) < depth
+            neighbours = neighbours[mask]
 
-        return neighbours + relative_neighbours
+        if include_selected is False:
+            center_cell = int(numpy.floor(len(neighbours)/2))
+            neighbours = numpy.delete(neighbours, center_cell, 0)
+
+        return neighbours + index
 
 
     def centroid(self, index=None):

@@ -132,3 +132,31 @@ def test_interp_nodata(basic_bounded_rect_grid, method):
         numpy.testing.assert_allclose(result_grid, numpy.vstack([3*[[0,1,2]], 2*[[12,13,14]]]))
     else:
         numpy.testing.assert_allclose(result_grid, basic_bounded_rect_grid)
+
+
+@pytest.mark.parametrize("depth", list(range(1,7)))
+@pytest.mark.parametrize("index", [[2,1], [1,2]])
+@pytest.mark.parametrize("include_selected", [False, True])
+@pytest.mark.parametrize("connect_corners", [False, True])
+def test_neighbours(depth, index, include_selected, connect_corners):
+    grid = RectGrid(dx=3, dy=3)
+    neighbours = grid.neighbours(index, depth=depth, connect_corners=connect_corners, include_selected=include_selected)
+
+    if include_selected:
+        # make sure the index is present and at the center of the neighbours array
+        center_index = int(numpy.floor(len(neighbours) / 2))
+        numpy.testing.assert_allclose(neighbours[center_index], index)
+        # remove center index for further testing of other neighbours
+        neighbours = numpy.delete(neighbours, center_index, axis=0)
+
+    # If the neighbours are correct, there are always a multiple of 6 cells with the same distance to the center cell
+    distances = numpy.linalg.norm(grid.centroid(neighbours) - grid.centroid(index), axis=1)
+    for d in numpy.unique(distances):
+        assert sum(distances == d) % 4 == 0
+
+    if connect_corners:
+        # No cell can be further away than 'depth' number of cells * diagonal
+        assert all(distances <= (grid.dx**2 + grid.dy**2)**0.5 * depth + 1e-14) # add 1e-14 in absence of atol
+    else:
+        # No cell can be further away than 'depth' number of cells * cell size
+        assert all(distances <= grid.dx * depth)
