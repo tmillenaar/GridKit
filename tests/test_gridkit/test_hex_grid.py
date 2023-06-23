@@ -123,10 +123,20 @@ def test_cells_near_point(shape, point, expected_nearby_cells):
 @pytest.mark.parametrize("shape", ["pointy", "flat"])
 @pytest.mark.parametrize("depth", list(range(1,7)))
 @pytest.mark.parametrize("index", [[2,1], [1,2]])
+@pytest.mark.parametrize("multi_index", [False, True])
 @pytest.mark.parametrize("include_selected", [False, True])
-def test_neighbours(shape, depth, index, include_selected):
+def test_neighbours(shape, depth, index, multi_index, include_selected):
     grid = HexGrid(size=3, shape=shape)
+
+    if multi_index:
+        index = [index, index]
+
     neighbours = grid.neighbours(index, depth=depth, include_selected=include_selected)
+
+    if multi_index: 
+        numpy.testing.assert_allclose(*neighbours) # make sure the neighbours are the same (since index was duplicated)
+        neighbours = neighbours[0] # continue to check single index
+        index = index[0]
 
     if include_selected:
         # make sure the index is present and at the center of the neighbours array

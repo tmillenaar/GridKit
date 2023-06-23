@@ -72,12 +72,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if not isinstance(index, numpy.ndarray):
             index = numpy.array(index)
 
-        neighbours = self.relative_neighbours(depth=1, connect_corners=connect_corners, include_selected=include_selected)
+        neighbours = self.relative_neighbours(depth=1, connect_corners=connect_corners, include_selected=include_selected, index=index)
 
         if len(index.shape) == 1:
             return neighbours + index
 
-        neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
+        # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
+        neighbours = numpy.swapaxes(neighbours, 0, 1)
         neighbours = neighbours + index
         return numpy.swapaxes(neighbours, 0, 1)
 

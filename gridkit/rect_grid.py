@@ -27,7 +27,7 @@ class RectGrid(BaseGrid):
         """
         return self.__dy
 
-    def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False):
+    def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False, index=None):
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
@@ -45,6 +45,9 @@ class RectGrid(BaseGrid):
         if include_selected is False:
             center_cell = int(numpy.floor(len(neighbours)/2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
+
+        if len(index.shape) == 2:
+            neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
 
         return neighbours
 

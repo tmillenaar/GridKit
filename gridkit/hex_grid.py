@@ -60,13 +60,17 @@ class HexGrid(BaseGrid):
         """
         return self._size
     
-    def relative_neighbours(index, depth=1, connect_corners=False, include_selected=False):
+    def relative_neighbours(self, depth=1, *, connect_corners=False, include_selected=False, index):
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
+        
+        if len(index.shape) == 1:
+            index = index[numpy.newaxis]
 
         nr_neighbours = sum(6*numpy.arange(1, depth+1)) + 1 # Add 1 for the first cell
-        neighbours = numpy.empty((nr_neighbours, 2), dtype=int)
+        nr_indices= len(index)
+        neighbours = numpy.empty((nr_indices, nr_neighbours, 2), dtype=int)
         start_slice = 0
         rows = range(depth, -1, -1)
 
@@ -83,24 +87,23 @@ class HexGrid(BaseGrid):
                 flat_axis = 1
 
             if (i % 2 == 0) == (depth % 2 == 0):
-                neighbours[row_slice, flat_axis] = range(-max_val, max_val+1)
+                neighbours[:, row_slice, flat_axis] = range(-max_val, max_val+1)
             else:
-                if index[pointy_axis] % 2 != 0:
-                    neighbours[row_slice, flat_axis] = range(-max_val+1, max_val+1)
-                else:
-                    neighbours[row_slice, flat_axis] = range(-max_val, max_val)
-            neighbours[row_slice, pointy_axis] = row
+                odd_mask = index[:, pointy_axis] % 2 != 0
+                neighbours[odd_mask, row_slice, flat_axis] = range(-max_val+1, max_val+1)
+                neighbours[~odd_mask, row_slice, flat_axis] = range(-max_val, max_val)
+            neighbours[:, row_slice, pointy_axis] = row
             start_slice += row_length
 
         # mirror top half to bottom half (leaving the center row be)
-        neighbours[start_slice:] = neighbours[0:start_slice - row_length][::-1]
-        neighbours[start_slice:, pointy_axis] *= -1
+        neighbours[:, start_slice:] = neighbours[:, 0:start_slice - row_length][::-1]
+        neighbours[:, start_slice:, pointy_axis] *= -1
 
         if include_selected is False:
-            center_cell = int(numpy.floor(len(neighbours)/2))
-            neighbours = numpy.delete(neighbours, center_cell, 0)
+            center_cell = int(numpy.floor(neighbours.shape[1]/2))
+            neighbours = numpy.delete(neighbours, center_cell, 1)
 
-        return neighbours
+        return neighbours if len(neighbours) > 1 else neighbours[0]
 
 
     def centroid(self, index=None):
