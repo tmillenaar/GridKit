@@ -42,12 +42,12 @@ class HexGrid(BaseGrid):
     
     @property
     def r(self) -> float:
-        """The radius of the cell. The radius is defined to be the distance from the cell center to an outer corner.
+        """The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner.
         """
         return self._radius
     
     @property
-    def shape(self) -> float:
+    def shape(self) -> str:
         """The shape of the grid as supplied when initiating the class.
         This can be either "flat" or "pointy" referring to the top of the cells.
         """
@@ -60,11 +60,96 @@ class HexGrid(BaseGrid):
         """
         return self._size
     
-    def relative_neighbours(self, depth=1, *, connect_corners=False, include_selected=False, index):
+    def relative_neighbours(self, depth=1, *, index, include_selected=False, connect_corners=False) -> numpy.ndarray:
+        """The relative indices of the neighbouring cells.
+
+        Parameters
+        ----------
+        depth: :class:`int` Default: 1
+            Determines the number of neighbours that are returned.
+            If `depth=1` the direct neighbours are returned.
+            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
+            `depth=3` returns yet another layer of neighbours, and so forth.
+        index: :class:`numpy.ndarray`
+            The index of the cell of which the relative neighbours are desired.
+            This is mostly relevant because in hexagonal grids the neighbouring indices differ
+            when dealing with odd or even indices.
+        include_selected: :class:`bool` Default: False
+            Whether to include the specified cell in the return array.
+            Even though the specified cell can never be a neighbour of itself,
+            this can be useful when for example a weighted average of the neighbours is desired
+            in which case the cell itself often should also be included.
+        connect_corners: :class:`bool` Default: False
+            Whether to consider cells that touch corners but not sides as neighbours.
+            This is not relevant in hexagonal grids. It does nothing here.
+            See :py:meth:`.RectGrid.relative_neighbours`
+
+
+        Examples
+        --------
+        The direct neighbours of a cell can be returned by using depth=1, which is the default.
+        For hexagonal grids, the relative indices of the neighbours differs depending on the index.
+        There are two cases, neighbour indices for even colums and neighbour indices for odd columns,
+        in the case of a grid 'pointy' shape.
+        This works on rows if the grid has a 'flat' shape.
+
+        .. code-block:: python
+
+            >>> from gridkit.hex_grid import HexGrid
+            >>> grid = HexGrid(size=3)
+            >>> grid.relative_neighbours(index=[0,0])
+            array([[-1,  1],
+                   [ 0,  1],
+                   [-1,  0],
+                   [ 1,  0],
+                   [-1, -1],
+                   [ 0, -1]])
+            >>> grid.relative_neighbours(index=[0,1])
+            array([[ 0,  1],
+                   [ 1,  1],
+                   [-1,  0],
+                   [ 1,  0],
+                   [ 0, -1],
+                   [ 1, -1]])
+
+        ..
+
+        By specifying `depth` we can include indirect neighbours from further away.
+        The number of neighbours increases with depth by a factor of `depth*6`.
+        So the 3rd element in the list will be `1*6 + 2*6 + 3*6 = 36`.
+
+        .. code-block:: python
+
+            >>> [len(grid.relative_neighbours(index=[0,0], depth=depth)) for depth in range(1,5)]
+            [6, 18, 36, 60]
+
+        ..
+
+        The specified cell can be included if `include_selected` is set to True:
+
+        .. code-block:: python
+
+            >>> grid.relative_neighbours(index=[0,0], include_selected=True)
+            array([[-1,  1],
+                   [ 0,  1],
+                   [-1,  0],
+                   [ 0,  0],
+                   [ 1,  0],
+                   [-1, -1],
+                   [ 0, -1]])
+
+        ..
+
+        See also
+        --------
+        :py:meth:`.BaseGrid.neighbours`
+        :py:meth:`.RectGrid.relative_neighbours`
+        """
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
         
+        index = numpy.array(index)
         if len(index.shape) == 1:
             index = index[numpy.newaxis]
 

@@ -28,6 +28,92 @@ class RectGrid(BaseGrid):
         return self.__dy
 
     def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False, index=None):
+        """The relative indices of the neighbouring cells.
+
+        Parameters
+        ----------
+        depth: :class:`int` Default: 1
+            Determines the number of neighbours that are returned.
+            If `depth=1` the direct neighbours are returned.
+            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
+            `depth=3` returns yet another layer of neighbours, and so forth.
+        include_selected: :class:`bool` Default: False
+            Whether to include the specified cell in the return array.
+            Even though the specified cell can never be a neighbour of itself,
+            this can be useful when for example a weighted average of the neighbours is desired
+            in which case the cell itself often should also be included.
+        connect_corners: :class:`bool` Default: False
+            Whether to consider cells that touch corners but not sides as neighbours.
+            If `connect_corners` is True, the 4 cells directly touching the cell are considered neighbours.
+            If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.
+            This escalates in combination with `depth` where indices in a square shape around the cell are returned
+            when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.
+        index: :class:`numpy.ndarray`
+            The index is mostly relevant for hexagonal grids.
+            For a square grid the relative neighbours are independent on the location on the grid.
+            Here it is only used for the return length.
+            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.
+            This is to keep a consistent api between the two classes.
+
+
+        Examples
+        --------
+        The direct neighbours of a cell can be returned by using depth=1, which is the default.
+        For square grids, the number of returned neighbours depends on whether `connect_corners` is True or False:
+        
+        .. code-block:: python
+
+            >>> from gridkit.rect_grid import RectGrid
+            >>> grid = RectGrid(dx=2, dy=3)
+            >>> grid.relative_neighbours()
+            array([[ 0,  1],
+                   [-1,  0],
+                   [ 1,  0],
+                   [ 0, -1]])
+            >>> grid.relative_neighbours(connect_corners=True)
+            array([[-1,  1],
+                   [ 0,  1],
+                   [ 1,  1],
+                   [-1,  0],
+                   [ 1,  0],
+                   [-1, -1],
+                   [ 0, -1],
+                   [ 1, -1]])
+
+        ..
+
+        By specifying `depth` we can include indirect neighbours from further away.
+        The number of neighbours increases with depth by a factor of `depth*4` or `depth*8` depending on `connect_corners` being True or False.
+        So the 3rd element in the list will be `1*4 + 2*4 + 3*4 = 24` if `connect_corners` is False.
+        And it will be `1*8 + 2*8 + 3*8 = 48` if `connect_corners` is True.
+
+        .. code-block:: python
+
+            >>> [len(grid.relative_neighbours(depth=depth)) for depth in range(1,5)]
+            [4, 12, 24, 36]
+            >>> [len(grid.relative_neighbours(depth=depth, connect_corners=True)) for depth in range(1,5)]
+            [8, 24, 48, 80]
+
+        ..
+
+        The specified cell can be included if `include_selected` is set to True:
+
+        .. code-block:: python
+
+            >>> grid.relative_neighbours(include_selected=True)
+            array([[ 0,  1],
+                   [-1,  0],
+                   [ 0,  0],
+                   [ 1,  0],
+                   [ 0, -1]])
+
+        ..
+
+        See also
+        --------
+        :py:meth:`.BaseGrid.neighbours`
+        :py:meth:`.HexGrid.relative_neighbours`
+        """
 
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
@@ -46,8 +132,10 @@ class RectGrid(BaseGrid):
             center_cell = int(numpy.floor(len(neighbours)/2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
 
-        if index and len(index.shape) == 2:
-            neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
+        if index:
+            index = numpy.array(index)
+            if len(index.shape) == 2:
+                neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
 
         return neighbours
 
