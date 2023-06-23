@@ -46,7 +46,7 @@ class RectGrid(BaseGrid):
             center_cell = int(numpy.floor(len(neighbours)/2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
 
-        if len(index.shape) == 2:
+        if index and len(index.shape) == 2:
             neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
 
         return neighbours
