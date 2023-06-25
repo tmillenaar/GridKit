@@ -649,13 +649,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         # make sure the bounds align with the grid
         if different_crs:
             transformer = Transformer.from_crs(self.crs, alignment_grid.crs, always_xy=True)
-            transformed_corners = numpy.vstack(transformer.transform(*self.corners.T)).T
-            bounds = (
-                min(transformed_corners[0, 0], transformed_corners[3, 0]),
-                min(transformed_corners[2, 1], transformed_corners[3, 1]),
-                max(transformed_corners[1, 0], transformed_corners[2, 0]),
-                max(transformed_corners[0, 1], transformed_corners[1, 1])
-            )
+            bounds = transformer.transform_bounds(*self.bounds)
         else:
             bounds = self.bounds
 
