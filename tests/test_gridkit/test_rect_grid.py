@@ -132,3 +132,89 @@ def test_interp_nodata(basic_bounded_rect_grid, method):
         numpy.testing.assert_allclose(result_grid, numpy.vstack([3*[[0,1,2]], 2*[[12,13,14]]]))
     else:
         numpy.testing.assert_allclose(result_grid, basic_bounded_rect_grid)
+
+
+@pytest.mark.parametrize("depth", list(range(1,7)))
+@pytest.mark.parametrize("index", [[2,1], [1,2]])
+@pytest.mark.parametrize("include_selected", [False, True])
+@pytest.mark.parametrize("connect_corners", [False, True])
+def test_neighbours(depth, index, include_selected, connect_corners):
+    grid = RectGrid(dx=3, dy=3)
+    neighbours = grid.neighbours(index, depth=depth, connect_corners=connect_corners, include_selected=include_selected)
+
+    if include_selected:
+        # make sure the index is present and at the center of the neighbours array
+        center_index = int(numpy.floor(len(neighbours) / 2))
+        numpy.testing.assert_allclose(neighbours[center_index], index)
+        # remove center index for further testing of other neighbours
+        neighbours = numpy.delete(neighbours, center_index, axis=0)
+
+    # If the neighbours are correct, there are always a multiple of 6 cells with the same distance to the center cell
+    distances = numpy.linalg.norm(grid.centroid(neighbours) - grid.centroid(index), axis=1)
+    for d in numpy.unique(distances):
+        assert sum(distances == d) % 4 == 0
+
+    if connect_corners:
+        # No cell can be further away than 'depth' number of cells * diagonal
+        assert all(distances <= (grid.dx**2 + grid.dy**2)**0.5 * depth + 1e-14) # add 1e-14 in absence of atol
+    else:
+        # No cell can be further away than 'depth' number of cells * cell size
+        assert all(distances <= grid.dx * depth)
+
+@pytest.mark.parametrize("include_selected", [False, True])
+@pytest.mark.parametrize("connect_corners, expected_cell_ids", [
+    (False, [
+        [
+            [-1,1],
+            [-2,0],
+            [-1,0], # selected id
+            [0,0],
+            [-1,-1],
+        ],
+        [
+            [2,2],
+            [1,1],
+            [2,1], # selected id
+            [3,1],
+            [2,0],
+        ]
+    ]),
+    (True, [
+        [
+            [-2,1],
+            [-1,1],
+            [0,1],
+            [-2,0],
+            [-1,0], # selected id
+            [0,0],
+            [-2,-1],
+            [-1,-1],
+            [0,-1],
+        ],
+        [
+            [1,2],
+            [2,2],
+            [3,2],
+            [1,1],
+            [2,1], # selected id
+            [3,1],
+            [1,0],
+            [2,0],
+            [3,0],
+        ]
+    ])
+])
+def test_neighbours_multiple_indices(include_selected, connect_corners, expected_cell_ids):
+    expected_cell_ids = numpy.array(expected_cell_ids)
+    testgrid = RectGrid(dx=1, dy=2)
+
+    neighbours = testgrid.neighbours([[-1,0],[2,1]], connect_corners=connect_corners, include_selected=include_selected)
+    if not include_selected:
+        # exclude fourth cell (center)
+        center_cell = int(expected_cell_ids.shape[1]/2)
+        remaining_cells = numpy.delete(numpy.arange(expected_cell_ids.shape[1]), center_cell)
+        expected_cell_ids = expected_cell_ids[:,remaining_cells]
+
+    numpy.testing.assert_allclose(neighbours, expected_cell_ids)
+    neighbours_one_point = testgrid.neighbours([-1,0], connect_corners=connect_corners, include_selected=include_selected)
+    numpy.testing.assert_allclose(neighbours_one_point, expected_cell_ids[0])

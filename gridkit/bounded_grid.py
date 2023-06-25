@@ -8,7 +8,7 @@ import functools
 
 import gridkit
 from gridkit.base_grid import BaseGrid
-from gridkit.errors import AlignmentError
+from gridkit.errors import IntersectionError, AlignmentError
 
 class _BoundedGridMeta(type):
     """metaclass of the Raster class"""
@@ -363,14 +363,25 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         ids = ids.reshape([*shape, 2])
         return ids[mask]
 
-
-    @abc.abstractmethod
     def shared_bounds(self, other):
-        pass
-        
-    @abc.abstractmethod
+        other_bounds = other.bounds if isinstance(other, BaseGrid) else other
+        if not self.intersects(other):
+            raise IntersectionError(f"Grid with bounds {self.bounds} does not intersect with grid with bounds {other_bounds}.")
+        return (
+            max(self.bounds[0], other_bounds[0]),
+            max(self.bounds[1], other_bounds[1]),
+            min(self.bounds[2], other_bounds[2]),
+            min(self.bounds[3], other_bounds[3]),
+        )
+
     def combined_bounds(self, other):
-        pass
+        other_bounds = other.bounds if isinstance(other, BaseGrid) else other
+        return (
+            min(self.bounds[0], other_bounds[0]),
+            min(self.bounds[1], other_bounds[1]),
+            max(self.bounds[2], other_bounds[2]),
+            max(self.bounds[3], other_bounds[3]),
+        )
 
     @abc.abstractmethod
     def crop(self, new_bounds, bounds_crs=None):
