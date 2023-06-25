@@ -67,12 +67,54 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
 
     def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
-        """
+        """The indices of the neighbouring cells.
+        The argument 'depth' can be used to include cells from further away.
+
+        Parameters
+        ----------
+        index: :class:`numpy.ndarray`
+            The index of the cell(s) of which to get the neighbours.
+        depth: :class:`int` Default: 1
+            Determines the number of neighbours that are returned.
+            If `depth=1` the direct neighbours are returned.
+            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
+            `depth=3` returns yet another layer of neighbours, and so forth.
+        connect_corners: :class:`bool` Default: False
+            Whether to consider cells that touch corners but not sides as neighbours.
+            This does not apply to :py:meth:`.HexGrid.relative_neighbours`.
+            For further information on this argument, refer to :py:meth:`.RectGrid.relative_neighbours`.
+        include_selected: :class:`bool` Default: False
+            Whether to include the specified cell in the return array.
+            Even though the specified cell can never be a neighbour of itself,
+            this can be useful when for example a weighted average of the neighbours is desired
+            in which case the cell itself often should also be included.
+
+        Examples
+        --------
+        The direct neighbours of a cell can be returned by using depth=1, which is the default.
+
+        .. code-block:: python
+
+            >>> from gridkit.rect_grid import RectGrid
+            >>> grid = RectGrid(dx=2, dy=3)
+            >>> grid.neighbours([1,2])
+            array([[ 1,  3],
+                   [ 0,  2],
+                   [ 2,  2],
+                   [ 1,  1]])
+        ..
+
+        For more detailed examples:
+
+        See also
+        --------
+        :py:meth:`.RectGrid.relative_neighbours`
+        :py:meth:`.HexGrid.relative_neighbours`
         """
         if not isinstance(index, numpy.ndarray):
             index = numpy.array(index)
 
-        neighbours = self.relative_neighbours(depth=1, connect_corners=connect_corners, include_selected=include_selected, index=index)
+        neighbours = self.relative_neighbours(depth=depth, connect_corners=connect_corners, include_selected=include_selected, index=index)
 
         if len(index.shape) == 1:
             return neighbours + index
