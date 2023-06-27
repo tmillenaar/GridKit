@@ -311,12 +311,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         interp_func = method_lut[method]
         nodata_mask = values == nodata_value
+
         interpolator = interp_func(
             points[~nodata_mask],
             values[~nodata_mask],
         )
         centroids = self.centroid(ids)
-        interp_values.ravel()[:] = interpolator(centroids)
 
-        return self.bounded_cls(data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value)
+        interp_values.ravel()[:] = interpolator(centroids)
+        grid_kwargs = dict(
+            data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value
+        )
+        if hasattr(self, "_shape"):
+            grid_kwargs["shape"] = self._shape
+        return self.bounded_cls(**grid_kwargs)
 
