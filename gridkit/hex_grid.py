@@ -25,7 +25,7 @@ class HexGrid(BaseGrid):
             raise ValueError(f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'")
         
         self._shape = shape
-        self.bounded_cls = None #TODO create a BoundedHexGrid
+        self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
@@ -502,13 +502,26 @@ class HexGrid(BaseGrid):
         elif self._shape == "flat":
             step_x = self.dx
             step_y = self.dy / 2
-
         if mode == "expand":
+            left_rounded = numpy.floor((bounds[0] - self.offset[0]) / step_x)
+            bottom_rounded = numpy.floor((bounds[1] - self.offset[1]) / step_y)
+            right_rounded = numpy.ceil((bounds[2] - self.offset[0]) / step_x)
+            top_rounded = numpy.ceil((bounds[3] - self.offset[1]) / step_y)
+            if self._shape == "pointy":
+                if left_rounded % 2 != 0:
+                    left_rounded -= 1
+                if right_rounded % 2 != 0:
+                    right_rounded += 1
+            elif self._shape == "flat":
+                if bottom_rounded % 2 != 0:
+                    bottom_rounded -= 1
+                if top_rounded % 2 != 0:
+                    top_rounded += 1
             return (
-                numpy.floor((bounds[0] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.floor((bounds[1] - self.offset[1]) / step_y) * step_y + self.offset[1],
-                numpy.ceil((bounds[2] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.ceil((bounds[3] - self.offset[1]) / step_y) * step_y + self.offset[1],
+                left_rounded * step_x + self.offset[0],
+                bottom_rounded * step_y + self.offset[1],
+                right_rounded * step_x + self.offset[0],
+                top_rounded * step_y + self.offset[1],
             )
         if mode == "contract":
             return (
@@ -527,18 +540,12 @@ class HexGrid(BaseGrid):
         raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
 
     def cells_in_bounds(self, bounds):
-        """
+        """Cells contained within a bounding box.
+
         Parameters
         ----------
         bounds: :class:`tuple`
-        align_mode: :class:`str`
-            Specifies when to consider a cell included in the bounds. Options:
-             - contains
-               select cells fully contained in the specified bounds
-             - contains_center
-               select cells of which the center is contained in the specified bounds
-             - intersects
-               select cells partially or fully contained in the specified bounds
+            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)
         """
         # TODO: Simplify function. Conceptually hard to follow and not very DRY
         if not self.are_bounds_aligned(bounds):
@@ -565,27 +572,27 @@ class HexGrid(BaseGrid):
             if (((bounds[2] - bounds[0]) % self.dx) / self.dx) == 0.5:
                 if (bounds[0] % self.dx) == 0: # cuts through cells in even rows
                     nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
+                    nr_cells_flat_even = nr_cells_flat - 1
                     if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
+                        ids_flat_even = ids_flat_even - 1
                     ids_flat_odd = ids_flat_even
-                    ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
+                    ids_flat_even = ids_flat_even[1:]
                 else:
-                    nr_cells_flat_odd = nr_cells_flat
+                    nr_cells_flat_odd = nr_cells_flat - 1
                     nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even
+                    ids_flat_odd = ids_flat_even[:-1]
             else:
                 if (bounds[0] % self.dx) != 0: # cuts through cells in even rows
                     nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat  
+                    nr_cells_flat_even = nr_cells_flat - 1
                     ids_flat_odd = ids_flat_even[:-1]
-                    ids_flat_even = ids_flat_even
+                    ids_flat_even = ids_flat_even[:-1]
                 else: # aligns with sides of cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
+                    nr_cells_flat_odd = nr_cells_flat - 1
                     nr_cells_flat_even = nr_cells_flat - 1
                     if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
+                        ids_flat_even = ids_flat_even - 1
+                    ids_flat_odd = ids_flat_even[:-1]
                     ids_flat_even = ids_flat_even[1:]
         elif self._shape == "flat":
             flat_axis = 0
@@ -596,27 +603,29 @@ class HexGrid(BaseGrid):
             if (((bounds[3] - bounds[1]) % self.dy) / self.dy) == 0.5:
                 if (bounds[1] % self.dy) == 0: # cuts through cells in even rows  # TODO: Remove, never triggered
                     nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
-                else:
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even
-            else:
-                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
                     nr_cells_flat_even = nr_cells_flat - 1
                     if left_bottom_id[flat_axis] % 2 == 0:
                         ids_flat_even -= 1
                     ids_flat_odd = ids_flat_even
-                    ids_flat_even = ids_flat_even[1:]
-                else: # aligns with sides of cells in even rows
+                    ids_flat_even = ids_flat_even[:-1]
+                else:
                     nr_cells_flat_odd = nr_cells_flat - 1
                     nr_cells_flat_even = nr_cells_flat
                     ids_flat_odd = ids_flat_even[:-1]
+            else:
+                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows
+                    nr_cells_flat_odd = nr_cells_flat - 1
+                    nr_cells_flat_even = nr_cells_flat - 1
+                    ids_flat_odd = ids_flat_even[:-1]
+                    ids_flat_even = ids_flat_even[1:]
+                    if left_bottom_id[flat_axis] % 2 == 0: # does not seem to work in tests/test_cells_in_grid.py
+                        ids_flat_odd = ids_flat_odd - 1
+                        ids_flat_even = ids_flat_even - 1
+                else: # aligns with sides of cells in even rows
+                    nr_cells_flat_odd = nr_cells_flat - 1
+                    nr_cells_flat_even = nr_cells_flat - 1
+                    ids_flat_even = ids_flat_even[:-1]
+                    ids_flat_odd = ids_flat_even
         else:
             raise ValueError(f"Unrecognized hexagon cell shape '{self._shape}'. Expected 'pointy' or 'flat'")
         
@@ -636,21 +645,34 @@ class HexGrid(BaseGrid):
             ids[flat_axis, slice(counter, counter + nr_flat)] = pointy_id
             counter += nr_flat
 
-        return ids.T, None
+        if nr_flat == 0: # FIXME: with some small selections nr_flat is 0, should not be able to happen
+            nr_flat += 1
+
+        return ids.T, (int(counter/nr_flat), nr_flat) # FIXME, shape differs per row (depending on selection)
 
     @property
     def parent_grid_class(self):
         return HexGrid
 
 
-
-class BoundedRectGrid(BoundedGrid, RectGrid):
+class BoundedHexGrid(BoundedGrid, HexGrid):
 
     def __init__(self, data, *args, bounds, shape="flat", **kwargs):
         if bounds[2] <= bounds [0] or bounds[3] <= bounds[1]:
             raise ValueError(f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}")
-        dx = (bounds[2] - bounds[0]) / data.shape[1]
-        dy = (bounds[3] - bounds[1]) / data.shape[0]
+
+        if shape == "pointy":
+            dx = (bounds[2] - bounds[0]) / data.shape[1]
+            dy = (bounds[3] - bounds[1]) / data.shape[0]
+            size = dx
+            if not numpy.isclose(size / 2, dy / 3**0.5):
+                raise ValueError("The supplied data cannot be covered by hexagons with sides of equal length.")
+        elif shape == "flat":
+            dx = (bounds[2] - bounds[0]) / data.shape[0]
+            dy = (bounds[3] - bounds[1]) / data.shape[1]
+            size = dy
+            if not numpy.isclose(size / 2, dx / 3**0.5):
+                raise ValueError("The supplied data cannot be covered by hexagons with sides of equal length.")
 
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
@@ -660,7 +682,10 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             0 if numpy.isclose(offset_x, dx) else offset_x, 
             0 if numpy.isclose(offset_y, dy) else offset_y
         )
-        super(BoundedRectGrid, self).__init__(data, *args, dx=dx, dy=dy, bounds=bounds, offset=offset, **kwargs)
+        super(BoundedHexGrid, self).__init__(data, *args, size=size, bounds=bounds, offset=offset, shape=shape, **kwargs)
+
+        if not self.are_bounds_aligned(bounds):
+            raise AlignmentError("Something went wrong, the supplied bounds are not aligned with the resulting grid.")
 
     @property
     def nr_cells(self):
@@ -742,7 +767,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
             index = self.indices()
-        return super(BoundedRectGrid, self).cell_corners(index=index)
+        return super(BoundedHexGrid, self).cell_corners(index=index)
 
     def indices(self, index: numpy.ndarray = None):
         """Return the indices"""
@@ -811,12 +836,12 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
-        new_grid = BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
+        new_grid = BoundedHexGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
 
         return new_grid
 
     def to_crs(self, crs, resample_method="nearest"):
-        new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)
+        new_inf_grid = super(BoundedHexGrid, self).to_crs(crs, resample_method=resample_method)
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
@@ -832,4 +857,5 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
-        return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
+        return super(BoundedHexGrid, self).interp_nodata(*args, **kwargs)
+
