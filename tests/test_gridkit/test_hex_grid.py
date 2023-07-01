@@ -21,31 +21,32 @@ def test_centroid(shape, indices, expected_centroids):
     numpy.testing.assert_allclose(centroids, expected_centroids)
 
 
-@pytest.mark.parametrize("shape, bounds, expected_ids", [
-    ["pointy", (0,-2,2,2), [[-1,-1]]],
-    ["pointy", (0,-2,3,2), [[0,0],[-1,-1]]],
-    ["pointy", (0,0,1,5), [[-1,1]]],
-    ["pointy", (0,0,3,5), [[-1,1],[0,0]]],
-    ["pointy", (-2,-2,2,2), [[-1,0],[-1,-1]]],
-    ["pointy", (-2,-2,3,2), [[-1,0],[0,0],[-1,-1]]],
-    ["pointy", (-2,0,2,5), [[-1,1],[-1,0]]],
-    ["pointy", (-2,0,3,5), [[-1,1],[-1,0],[0,0]]],
-    ["flat", (-2,-2,2,2), [[-1,-1],[0,-1]]],
-    ["flat", (-2,-2,2,3), [[-1,-1],[0,-1],[0,0]]],
-    ["flat", (0,-2,5,2), [[0,-1],[1,-1]]],
-    ["flat", (0,-2,5,3), [[0,-1],[0,0],[1,-1]]],
-    ["flat", (-2,0,2,2), [[-1,-1]]],
-    ["flat", (-2,0,2,3), [[-1,-1],[0,0]]],
-    ["flat", (-2,2,2,3), [[0,0]]],
-    ["flat", (-2,2,2,5), [[-1,0],[0,0]]],
-    ["flat", (0,0,5,1), [[1,-1]]],
-    ["flat", (0,0,5,3), [[0,0],[1,-1]]],
+@pytest.mark.parametrize("shape, bounds, expected_ids, expected_shape", [
+    ["pointy", (0,-2,2,2), [[-1,-1]], (1,1)],
+    ["pointy", (0,-2,3,2), [[-1,-1],[0,0]], (2,1)],
+    ["pointy", (0,0,1,5), [[-1,1]], (1,1)],
+    ["pointy", (0,0,3,5), [[0,0],[-1,1]], (2,1)],
+    ["pointy", (-2,-2,2,2), [[-1,-1],[-1,0]], (2,1)],
+    ["pointy", (-2,-2,3,2), [[-1,-1],[-1,0],[0,0]], (2,2)],
+    ["pointy", (-2,0,2,5), [[-1,0],[-1,1]], (2,1)],
+    ["pointy", (-2,0,3,5), [[-1,0],[0,0],[-1,1]], (2,2)],
+    ["flat", (-2,-2,2,2), [[-1,-1],[0,-1]], (2,1)],
+    ["flat", (-2,-2,2,3), [[-1,-1],[0,-1],[0,0]], (2,2)],
+    ["flat", (0,-2,5,2), [[0,-1],[1,-1]], (2,1)],
+    ["flat", (0,-2,5,3), [[0,-1],[1,-1],[0,0]], (2,2)],
+    ["flat", (-2,0,2,2), [[-1,-1]], (1,1)],
+    ["flat", (-2,0,2,3), [[-1,-1],[0,0]], (2,1)],
+    ["flat", (-2,2,2,3), [[0,0]], (1,1)],
+    ["flat", (-2,2,2,5), [[-1,0],[0,0]], (2,1)],
+    ["flat", (0,0,5,1), [[1,-1]], (1,1)],
+    ["flat", (0,0,5,3), [[1,-1],[0,0]], (2,1)],
 ])
-def test_cells_in_bounds(shape, bounds, expected_ids):
+def test_cells_in_bounds(shape, bounds, expected_ids, expected_shape):
     grid = HexGrid(size=3, shape=shape)
     aligned_bounds = grid.align_bounds(bounds, mode="nearest")
-    ids, _ = grid.cells_in_bounds(aligned_bounds) #TODO: Think about returned shape, what does it need to look like?
+    ids, shape = grid.cells_in_bounds(aligned_bounds)
     numpy.testing.assert_allclose(ids, expected_ids)
+    numpy.testing.assert_allclose(shape, expected_shape)
 
 
 @pytest.mark.parametrize("shape, point, expected_nearby_cells", [

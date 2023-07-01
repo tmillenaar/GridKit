@@ -567,14 +567,17 @@ class HexGrid(BaseGrid):
             nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
         elif self._shape == "flat":
             nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
+        if nr_cells_flat == 0:
+            nr_cells_flat = 1
 
         ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
-        ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)#[::-1]
-        xx, yy = numpy.meshgrid(ids_x, ids_y, indexing="xy")
-        ids = numpy.vstack([xx.ravel(), yy.ravel()]).T
+        ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
+        ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="xy")
+        ids = numpy.vstack([ids_x_full.ravel(), ids_y_full.ravel()]).T
+        
+        # determine what cells are outside of bounding box
         centroids = self.centroid(ids).T
-
-        error_margin = numpy.finfo(numpy.float32).eps
+        error_margin = numpy.finfo(numpy.float32).eps # expect problems with machine precision since some cells are on the bounds by design
         oob_mask = centroids[0] < (bounds[0] - error_margin)
         oob_mask |= centroids[1] < (bounds[1] - error_margin)
         oob_mask |= centroids[0] >= (bounds[2] - error_margin)
@@ -582,7 +585,7 @@ class HexGrid(BaseGrid):
 
         ids = ids[~oob_mask]
 
-        return ids, (int(ids.shape[0] / nr_cells_flat), nr_cells_flat)
+        return ids, (int(numpy.ceil(ids.shape[0] / nr_cells_flat)), nr_cells_flat)
 
     @property
     def parent_grid_class(self):
