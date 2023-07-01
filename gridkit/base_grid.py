@@ -162,9 +162,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def is_aligned_with(self, other):
         pass
 
-    def interp_from_points(self) -> float:
-        pass
-
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the 
 
@@ -289,6 +286,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :class:`~gridkit.bounded_grid.BoundedGrid`
             A Bounded version of the supplied grid where the data is interpolated between the supplied points.
         """
+        points = numpy.array(points)
+        values = numpy.array(values)
+
         method_lut = dict(
             nearest = scipy.interpolate.NearestNDInterpolator,
             linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value),
