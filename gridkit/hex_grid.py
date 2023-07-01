@@ -564,91 +564,25 @@ class HexGrid(BaseGrid):
         left_top_id, left_bottom_id, right_top_id, right_bottom_id = self.cell_at_point([left_top, left_bottom, right_top, right_bottom])
 
         if self._shape == "pointy":
-            flat_axis = 1
-            pointy_axis = 0
-            ids_pointy = numpy.arange(left_top_id[1], left_bottom_id[1]-1, -1, dtype="int64") # y-axis goes from top to bottom (high to low), hence step size is -1
-            nr_cells_flat = int(numpy.floor((bounds[2] - bounds[0]) / self.dx) + 1)
-            ids_flat_even = numpy.arange(left_bottom_id[0], left_bottom_id[0] + nr_cells_flat)
-            if (((bounds[2] - bounds[0]) % self.dx) / self.dx) == 0.5:
-                if (bounds[0] % self.dx) == 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even = ids_flat_even - 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = ids_flat_even[1:]
-                else:
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even[:-1]
-            else:
-                if (bounds[0] % self.dx) != 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    ids_flat_odd = ids_flat_even[:-1]
-                    ids_flat_even = ids_flat_even[:-1]
-                else: # aligns with sides of cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even = ids_flat_even - 1
-                    ids_flat_odd = ids_flat_even[:-1]
-                    ids_flat_even = ids_flat_even[1:]
+            nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
         elif self._shape == "flat":
-            flat_axis = 0
-            pointy_axis = 1
-            ids_pointy = numpy.arange(left_bottom_id[0], right_bottom_id[0]+1, dtype="int64")
-            nr_cells_flat = int((bounds[3] - bounds[1]) / self.dy) + 1
-            ids_flat_even = numpy.arange(left_bottom_id[pointy_axis], left_bottom_id[pointy_axis] + nr_cells_flat)
-            if (((bounds[3] - bounds[1]) % self.dy) / self.dy) == 0.5:
-                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows  # TODO: Remove, never triggered
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = ids_flat_even[:-1]
-                else:
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even[:-1]
-            else:
-                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    ids_flat_odd = ids_flat_even[:-1]
-                    ids_flat_even = ids_flat_even[1:]
-                    if left_bottom_id[flat_axis] % 2 == 0: # does not seem to work in tests/test_cells_in_grid.py
-                        ids_flat_odd = ids_flat_odd - 1
-                        ids_flat_even = ids_flat_even - 1
-                else: # aligns with sides of cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    ids_flat_even = ids_flat_even[:-1]
-                    ids_flat_odd = ids_flat_even
-        else:
-            raise ValueError(f"Unrecognized hexagon cell shape '{self._shape}'. Expected 'pointy' or 'flat'")
-        
-        even_ids = ids_pointy % 2 == 0
-        nr_cells = even_ids.sum() * nr_cells_flat_even + (~even_ids).sum() * nr_cells_flat_odd
+            nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
 
-        ids = numpy.empty((2, nr_cells), dtype="int64")
-        counter = 0
-        for pointy_id in ids_pointy:
-            if pointy_id % 2 == 0:
-                nr_flat = nr_cells_flat_even
-                flat_ids = ids_flat_even
-            else:
-                nr_flat = nr_cells_flat_odd
-                flat_ids = ids_flat_odd
-            ids[pointy_axis, slice(counter, counter + nr_flat)] = flat_ids
-            ids[flat_axis, slice(counter, counter + nr_flat)] = pointy_id
-            counter += nr_flat
+        ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
+        ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)#[::-1]
+        xx, yy = numpy.meshgrid(ids_x, ids_y, indexing="xy")
+        ids = numpy.vstack([xx.ravel(), yy.ravel()]).T
+        centroids = self.centroid(ids).T
 
-        if nr_flat == 0: # FIXME: with some small selections nr_flat is 0, should not be able to happen
-            nr_flat += 1
+        error_margin = numpy.finfo(numpy.float32).eps
+        oob_mask = centroids[0] < (bounds[0] - error_margin)
+        oob_mask |= centroids[1] < (bounds[1] - error_margin)
+        oob_mask |= centroids[0] >= (bounds[2] - error_margin)
+        oob_mask |= centroids[1] >= (bounds[3] - error_margin)
 
-        return ids.T, (int(counter/nr_flat), nr_flat) # FIXME, shape differs per row (depending on selection)
+        ids = ids[~oob_mask]
+
+        return ids, (int(ids.shape[0] / nr_cells_flat), nr_cells_flat)
 
     @property
     def parent_grid_class(self):
