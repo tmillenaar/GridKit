@@ -569,7 +569,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is not None:
             return super(BoundedRectGrid, self).centroid(index=index)
         # get grid in shape (latlon, width, height)
-        latlon = numpy.array(numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy"))
+        latlon = numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy")
 
         # return grid in shape (width, height, lonlat)
         return numpy.array([latlon[0].ravel(),latlon[1].ravel()]).T
