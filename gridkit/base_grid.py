@@ -267,6 +267,20 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
 
     def to_shapely(self, index, as_multipolygon: bool = False):
+        """Represent the cells as Shapely Polygons
+
+        Parameters
+        ----------
+        index: :class:`numpy.ndarray`
+            The indices of the cells to convert to Shapely Polygons
+        as_multipolygon: :class:`numpy.ndarray`
+            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False
+
+        See also
+        --------
+        :meth:`.BoundedRectGrid.to_shapely`
+        :meth:`.BoundedHexGrid.to_shapely`
+        """
         index = numpy.array(index)
         if len(index.shape) == 1:
             index = numpy.expand_dims(index, 0)

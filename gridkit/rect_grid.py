@@ -629,14 +629,22 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is None:
             index = self.indices()
         return super(BoundedRectGrid, self).cell_corners(index=index)
+    
+    def to_shapely(self, index=None, as_multipolygon: bool = False):
+        """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
-    def indices(self, index: numpy.ndarray = None):
-        """Return the indices"""
-        # I guess this only makes sense for data grids, maybe remove the index argument?
+        Difference with parent method:
+            `index` is optional. 
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+        
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        :meth:`.BoundedHexGrid.to_shapely`
+        """
         if index is None:
-            return self.cells_in_bounds(self.bounds)
-        cell_centers = self.centroid(index=index)
-        return self.cell_at_point(cell_centers)
+            index = self.indices
+        return super().to_shapely(index, as_multipolygon)
 
     def resample(self, alignment_grid, method="nearest"):
 

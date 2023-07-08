@@ -3,7 +3,6 @@ from gridkit.bounded_grid import BoundedGrid
 from gridkit.rect_grid import RectGrid
 from gridkit.errors import IntersectionError, AlignmentError
 
-import scipy
 import numpy
 import warnings
 from pyproj import CRS, Transformer
@@ -706,13 +705,21 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             index = self.indices()
         return super(BoundedHexGrid, self).cell_corners(index=index)
 
-    def indices(self, index: numpy.ndarray = None):
-        """Return the indices"""
-        # I guess this only makes sense for data grids, maybe remove the index argument?
+    def to_shapely(self, index=None, as_multipolygon: bool = False):
+        """Refer to :meth:`.BaseGrid.to_shapely`
+
+        Difference with :meth:`.BaseGrid.to_shapely`:
+            `index` is optional. 
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        :meth:`.BoundedRectGrid.to_shapely`
+        """
         if index is None:
-            return self.cells_in_bounds(self.bounds)
-        cell_centers = self.centroid(index=index)
-        return self.cell_at_point(cell_centers)
+            index = self.indices
+        return super().to_shapely(index, as_multipolygon)
 
     def resample(self, alignment_grid, method="nearest"):
 
