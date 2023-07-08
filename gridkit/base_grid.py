@@ -248,6 +248,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
                     warnings.warn("Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points")
                     suppress_point_warning=True # Only warn once per function call
             geom_bounds = self.align_bounds(geom.bounds, mode="expand")
+            geom_bounds = ( # buffer bounds to be on the safe side
+                geom_bounds[0] - self.dx,
+                geom_bounds[1] - self.dy,
+                geom_bounds[2] + self.dx,
+                geom_bounds[3] + self.dy,
+            )
             cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
             if len(cells_in_bounds) == 0: # happens only if point or line lies on an edge
                 geom = geom.buffer(min(self.dx, self.dy) / 10) # buffer may never reach further then a single cell size
