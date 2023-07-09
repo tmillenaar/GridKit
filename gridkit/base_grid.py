@@ -98,10 +98,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             >>> from gridkit.rect_grid import RectGrid
             >>> grid = RectGrid(dx=2, dy=3)
             >>> grid.neighbours([1,2])
-            array([[ 1,  3],
-                   [ 0,  2],
-                   [ 2,  2],
-                   [ 1,  1]])
+            array([[1, 3],
+                   [0, 2],
+                   [2, 2],
+                   [1, 1]])
+
         ..
 
         For more detailed examples:
