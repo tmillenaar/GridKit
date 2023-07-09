@@ -659,7 +659,14 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
-        new_grid = alignment_grid.bounded_cls(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
+
+        grid_kwargs = dict(
+            data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
+        )
+        if hasattr(alignment_grid, "_shape"):
+            grid_kwargs["shape"] = alignment_grid._shape
+
+        new_grid = alignment_grid.bounded_cls(**grid_kwargs)
 
         return new_grid
 
