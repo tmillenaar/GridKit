@@ -399,6 +399,11 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     def grid_id_to_numpy_id(self, index):
         pass
 
+    @property
+    def indices(self):
+        """Return the indices within the bounds of the data"""       
+        return self.cells_in_bounds(self.bounds)[0]
+
     def assign(self, data, *, anchor=None, bounds=None, in_place=True, assign_nodata=True):
         if not any([anchor, bounds]):
             raise ValueError("Please supply either an 'anchor' or 'bounds' keyword to position the data in the grid.")

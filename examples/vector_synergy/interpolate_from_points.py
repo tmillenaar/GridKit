@@ -5,7 +5,7 @@ Interpolate from points
 Fill a BoundedGrid based on point data
 
 Introduction
-============
+------------
 
 In this example a BoundedGrid is created from a set of points by interpolating between the points.
 For this operation we need:
@@ -44,28 +44,50 @@ plt.show()
 # 
 # Now we can create a grid and interpolate onto that grid.
 
-from gridkit import rect_grid
+from gridkit import hex_grid
 
-empty_grid = rect_grid.RectGrid(dx=5, dy=5)
+empty_grid = hex_grid.HexGrid(size=6, shape="pointy")
 data_grid = empty_grid.interp_from_points(points, values)
-print(data_grid)
 
 # %%
 # 
 # Currently the interpolation methods "nearest", "linear" and "cubic" are supported,
 # based on scpiy's ``NearestNDInterpolator``, ``LinearNDInterpolator`` and ``CloughTocher2DInterpolator``, respectively.
 # Here we try each method and plot them next to each other to compare.
+import matplotlib.pylab as pl
+from matplotlib.patches import Rectangle
 fig, axes = plt.subplots(1, 3, sharey=True, figsize=(12, 5))
 
 for ax, method in zip(axes, ("nearest", "linear", "cubic")):
-    import matplotlib.pyplot as plt
+
     data_grid = empty_grid.interp_from_points(
         points,
         values,
         method=method,
     )
-    ax.imshow(data_grid, extent=data_grid.mpl_extent)
+
+    # create colormap that matches our values
+    cmap = getattr(pl.cm, "viridis")
+    vals = data_grid.data.ravel()
+    vmin = numpy.nanmin(vals)
+    values_normalized = vals - vmin
+    vmax = numpy.nanmax(values_normalized)
+    values_normalized = values_normalized / vmax
+    colors = cmap(values_normalized)
+    colors[numpy.all(colors == 0, axis=1)] += 1 # turn black (nodata) to white
+    
+    # plot each cell as a polygon with color
+    for geom, color in zip(data_grid.to_shapely(), colors):
+        ax.fill(*geom.exterior.xy, alpha=1.0, color=color)
+
+    # plot original data
     ax.scatter(x, y, c=values, edgecolors='black')
+
+    # add outline of the grid bounds
+    b = data_grid.bounds
+    rect = Rectangle((b[0],b[1]),b[2]-b[0],b[3]-b[1],linewidth=1,edgecolor='r',facecolor='none')
+    ax.add_patch(rect)
+
     ax.set_title(method, fontdict={'fontsize': 30})
 
 fig.tight_layout()

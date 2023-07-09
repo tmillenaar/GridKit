@@ -98,10 +98,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             >>> from gridkit.rect_grid import RectGrid
             >>> grid = RectGrid(dx=2, dy=3)
             >>> grid.neighbours([1,2])
-            array([[ 1,  3],
-                   [ 0,  2],
-                   [ 2,  2],
-                   [ 1,  1]])
+            array([[1, 3],
+                   [0, 2],
+                   [2, 2],
+                   [1, 1]])
+
         ..
 
         For more detailed examples:
@@ -160,9 +161,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def is_aligned_with(self, other):
-        pass
-
-    def interp_from_points(self) -> float:
         pass
 
     def to_crs(self, crs, resample_method="nearest"):
@@ -231,6 +229,46 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def aggregate(self) -> float:
         pass
 
+    def are_bounds_aligned(self, bounds, separate=False):
+        is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(val, cellsize)
+        per_axis = (
+            is_aligned((bounds[0] - self.offset[0]) % self.dx, self.dx), # left
+            is_aligned((bounds[1] - self.offset[1]) % self.dy, self.dy), # bottom
+            is_aligned((bounds[2] - self.offset[0]) % self.dx, self.dx), # right
+            is_aligned((bounds[3] - self.offset[1]) % self.dy, self.dy)  # top
+        )
+        return per_axis if separate else numpy.all(per_axis)
+
+    def align_bounds(self, bounds, mode="expand"):
+        
+        if self.are_bounds_aligned(bounds):
+            return bounds
+
+        if mode == "expand":
+            left_rounded = numpy.floor((bounds[0] - self.offset[0]) / self.dx)
+            bottom_rounded = numpy.floor((bounds[1] - self.offset[1]) / self.dy)
+            right_rounded = numpy.ceil((bounds[2] - self.offset[0]) / self.dx)
+            top_rounded = numpy.ceil((bounds[3] - self.offset[1]) / self.dy)
+        elif mode == "contract":
+            left_rounded = numpy.ceil((bounds[0] - self.offset[0]) / self.dx)
+            bottom_rounded = numpy.ceil((bounds[1] - self.offset[1]) / self.dy)
+            right_rounded = numpy.floor((bounds[2] - self.offset[0]) / self.dx)
+            top_rounded = numpy.floor((bounds[3] - self.offset[1]) / self.dy)
+        elif mode == "nearest":
+            left_rounded = round((bounds[0] - self.offset[0]) / self.dx)
+            bottom_rounded = round((bounds[1] - self.offset[1]) / self.dy)
+            right_rounded = round((bounds[2] - self.offset[0]) / self.dx)
+            top_rounded = round((bounds[3] - self.offset[1]) / self.dy)
+        else:
+            raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
+        
+        return (
+            left_rounded * self.dx + self.offset[0],
+            bottom_rounded * self.dy + self.offset[1],
+            right_rounded * self.dx + self.offset[0],
+            top_rounded * self.dy + self.offset[1],
+        )
+
     def intersect_geometries(self, geometries, suppress_point_warning=False):
         if not isinstance(geometries, Iterable):
             geometries = [geometries]
@@ -251,6 +289,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
                     warnings.warn("Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points")
                     suppress_point_warning=True # Only warn once per function call
             geom_bounds = self.align_bounds(geom.bounds, mode="expand")
+            geom_bounds = ( # buffer bounds to be on the safe side
+                geom_bounds[0] - self.dx,
+                geom_bounds[1] - self.dy,
+                geom_bounds[2] + self.dx,
+                geom_bounds[3] + self.dy,
+            )
             cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
             if len(cells_in_bounds) == 0: # happens only if point or line lies on an edge
                 geom = geom.buffer(min(self.dx, self.dy) / 10) # buffer may never reach further then a single cell size
@@ -264,6 +308,20 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
 
     def to_shapely(self, index, as_multipolygon: bool = False):
+        """Represent the cells as Shapely Polygons
+
+        Parameters
+        ----------
+        index: :class:`numpy.ndarray`
+            The indices of the cells to convert to Shapely Polygons
+        as_multipolygon: :class:`numpy.ndarray`
+            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False
+
+        See also
+        --------
+        :meth:`.BoundedRectGrid.to_shapely`
+        :meth:`.BoundedHexGrid.to_shapely`
+        """
         index = numpy.array(index)
         if len(index.shape) == 1:
             index = numpy.expand_dims(index, 0)
@@ -289,6 +347,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :class:`~gridkit.bounded_grid.BoundedGrid`
             A Bounded version of the supplied grid where the data is interpolated between the supplied points.
         """
+        points = numpy.array(points)
+        values = numpy.array(values)
+
         method_lut = dict(
             nearest = scipy.interpolate.NearestNDInterpolator,
             linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value),
@@ -311,12 +372,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         interp_func = method_lut[method]
         nodata_mask = values == nodata_value
+
         interpolator = interp_func(
             points[~nodata_mask],
             values[~nodata_mask],
         )
         centroids = self.centroid(ids)
-        interp_values.ravel()[:] = interpolator(centroids)
 
-        return self.bounded_cls(data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value)
+        interp_values.ravel()[:] = interpolator(centroids)
+        grid_kwargs = dict(
+            data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value
+        )
+        if hasattr(self, "_shape"):
+            grid_kwargs["shape"] = self._shape
+        return self.bounded_cls(**grid_kwargs)
 

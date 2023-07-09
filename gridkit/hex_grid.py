@@ -3,7 +3,6 @@ from gridkit.bounded_grid import BoundedGrid
 from gridkit.rect_grid import RectGrid
 from gridkit.errors import IntersectionError, AlignmentError
 
-import scipy
 import numpy
 import warnings
 from pyproj import CRS, Transformer
@@ -25,7 +24,7 @@ class HexGrid(BaseGrid):
             raise ValueError(f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'")
         
         self._shape = shape
-        self.bounded_cls = None #TODO create a BoundedHexGrid
+        self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
@@ -474,71 +473,13 @@ class HexGrid(BaseGrid):
         return aligned, reason
 
 
-    def are_bounds_aligned(self, bounds, separate=False):
-        if self._shape == "pointy":
-            step_x = self.dx / 2
-            step_y = self.dy
-        elif self._shape == "flat":
-            step_x = self.dx
-            step_y = self.dy / 2
-        is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(val, cellsize)
-        per_axis = (
-            is_aligned((bounds[0] - self.offset[0]) % step_x, step_x), # left
-            is_aligned((bounds[1] - self.offset[1]) % step_y, step_y), # bottom
-            is_aligned((bounds[2] - self.offset[0]) % step_x, step_x), # right
-            is_aligned((bounds[3] - self.offset[1]) % step_y, step_y)  # top
-        )
-        return per_axis if separate else numpy.all(per_axis)
-
-
-    def align_bounds(self, bounds, mode="expand"):
-        
-        if self.are_bounds_aligned(bounds):
-            return bounds
-        
-        if self._shape == "pointy":
-            step_x = self.dx / 2
-            step_y = self.dy
-        elif self._shape == "flat":
-            step_x = self.dx
-            step_y = self.dy / 2
-
-        if mode == "expand":
-            return (
-                numpy.floor((bounds[0] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.floor((bounds[1] - self.offset[1]) / step_y) * step_y + self.offset[1],
-                numpy.ceil((bounds[2] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.ceil((bounds[3] - self.offset[1]) / step_y) * step_y + self.offset[1],
-            )
-        if mode == "contract":
-            return (
-                numpy.ceil((bounds[0] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.ceil((bounds[1] - self.offset[1]) / step_y) * step_y + self.offset[1],
-                numpy.floor((bounds[2] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                numpy.floor((bounds[3] - self.offset[1]) / step_y) * step_y + self.offset[1],
-            )
-        if mode == "nearest":
-            return (
-                round((bounds[0] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                round((bounds[1] - self.offset[1]) / step_y) * step_y + self.offset[1],
-                round((bounds[2] - self.offset[0]) / step_x) * step_x + self.offset[0],
-                round((bounds[3] - self.offset[1]) / step_y) * step_y + self.offset[1],
-            )
-        raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
-
     def cells_in_bounds(self, bounds):
-        """
+        """Cells contained within a bounding box.
+
         Parameters
         ----------
         bounds: :class:`tuple`
-        align_mode: :class:`str`
-            Specifies when to consider a cell included in the bounds. Options:
-             - contains
-               select cells fully contained in the specified bounds
-             - contains_center
-               select cells of which the center is contained in the specified bounds
-             - intersects
-               select cells partially or fully contained in the specified bounds
+            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)
         """
         # TODO: Simplify function. Conceptually hard to follow and not very DRY
         if not self.are_bounds_aligned(bounds):
@@ -557,100 +498,51 @@ class HexGrid(BaseGrid):
         left_top_id, left_bottom_id, right_top_id, right_bottom_id = self.cell_at_point([left_top, left_bottom, right_top, right_bottom])
 
         if self._shape == "pointy":
-            flat_axis = 1
-            pointy_axis = 0
-            ids_pointy = numpy.arange(left_top_id[1], left_bottom_id[1]-1, -1, dtype="int64") # y-axis goes from top to bottom (high to low), hence step size is -1
-            nr_cells_flat = int(numpy.floor((bounds[2] - bounds[0]) / self.dx) + 1)
-            ids_flat_even = numpy.arange(left_bottom_id[0], left_bottom_id[0] + nr_cells_flat)
-            if (((bounds[2] - bounds[0]) % self.dx) / self.dx) == 0.5:
-                if (bounds[0] % self.dx) == 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
-                else:
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even
-            else:
-                if (bounds[0] % self.dx) != 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat  
-                    ids_flat_odd = ids_flat_even[:-1]
-                    ids_flat_even = ids_flat_even
-                else: # aligns with sides of cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = ids_flat_even[1:]
+            nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
         elif self._shape == "flat":
-            flat_axis = 0
-            pointy_axis = 1
-            ids_pointy = numpy.arange(left_bottom_id[0], right_bottom_id[0]+1, dtype="int64")
-            nr_cells_flat = int((bounds[3] - bounds[1]) / self.dy) + 1
-            ids_flat_even = numpy.arange(left_bottom_id[pointy_axis], left_bottom_id[pointy_axis] + nr_cells_flat)
-            if (((bounds[3] - bounds[1]) % self.dy) / self.dy) == 0.5:
-                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows  # TODO: Remove, never triggered
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = numpy.array([*ids_flat_even[1:], ids_flat_even[-1] + 1]) # FIXME: inefficient
-                else:
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even
-            else:
-                if (bounds[1] % self.dy) == 0: # cuts through cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat
-                    nr_cells_flat_even = nr_cells_flat - 1
-                    if left_bottom_id[flat_axis] % 2 == 0:
-                        ids_flat_even -= 1
-                    ids_flat_odd = ids_flat_even
-                    ids_flat_even = ids_flat_even[1:]
-                else: # aligns with sides of cells in even rows
-                    nr_cells_flat_odd = nr_cells_flat - 1
-                    nr_cells_flat_even = nr_cells_flat
-                    ids_flat_odd = ids_flat_even[:-1]
-        else:
-            raise ValueError(f"Unrecognized hexagon cell shape '{self._shape}'. Expected 'pointy' or 'flat'")
+            nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
+
+        ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
+        ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
+        ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="xy")
+        ids = numpy.vstack([ids_x_full.ravel(), ids_y_full.ravel()]).T
         
-        even_ids = ids_pointy % 2 == 0
-        nr_cells = even_ids.sum() * nr_cells_flat_even + (~even_ids).sum() * nr_cells_flat_odd
+        # determine what cells are outside of bounding box
+        centroids = self.centroid(ids).T
+        error_margin = numpy.finfo(numpy.float32).eps # expect problems with machine precision since some cells are on the bounds by design
+        oob_mask = centroids[0] < (bounds[0] - error_margin)
+        oob_mask |= centroids[1] < (bounds[1] - error_margin)
+        oob_mask |= centroids[0] >= (bounds[2] - error_margin)
+        oob_mask |= centroids[1] >= (bounds[3] - error_margin)
 
-        ids = numpy.empty((2, nr_cells), dtype="int64")
-        counter = 0
-        for pointy_id in ids_pointy:
-            if pointy_id % 2 == 0:
-                nr_flat = nr_cells_flat_even
-                flat_ids = ids_flat_even
-            else:
-                nr_flat = nr_cells_flat_odd
-                flat_ids = ids_flat_odd
-            ids[pointy_axis, slice(counter, counter + nr_flat)] = flat_ids
-            ids[flat_axis, slice(counter, counter + nr_flat)] = pointy_id
-            counter += nr_flat
+        ids = ids[~oob_mask]
 
-        return ids.T, None
+        shape = (int(numpy.ceil(ids.shape[0] / nr_cells_flat)), nr_cells_flat) if nr_cells_flat != 0 else (0, 0)
+        return ids, shape
 
     @property
     def parent_grid_class(self):
         return HexGrid
 
 
-
-class BoundedRectGrid(BoundedGrid, RectGrid):
+class BoundedHexGrid(BoundedGrid, HexGrid):
 
     def __init__(self, data, *args, bounds, shape="flat", **kwargs):
         if bounds[2] <= bounds [0] or bounds[3] <= bounds[1]:
             raise ValueError(f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}")
-        dx = (bounds[2] - bounds[0]) / data.shape[1]
-        dy = (bounds[3] - bounds[1]) / data.shape[0]
+
+        if shape == "pointy":
+            dx = (bounds[2] - bounds[0]) / data.shape[1]
+            dy = (bounds[3] - bounds[1]) / data.shape[0]
+            size = dx
+            if not numpy.isclose(size / 2, dy / 3**0.5):
+                raise ValueError("The supplied data cannot be covered by hexagons with sides of equal length.")
+        elif shape == "flat":
+            dx = (bounds[2] - bounds[0]) / data.shape[0]
+            dy = (bounds[3] - bounds[1]) / data.shape[1]
+            size = dy
+            if not numpy.isclose(size / 2, dx / 3**0.5):
+                raise ValueError("The supplied data cannot be covered by hexagons with sides of equal length.")
 
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
@@ -660,7 +552,10 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             0 if numpy.isclose(offset_x, dx) else offset_x, 
             0 if numpy.isclose(offset_y, dy) else offset_y
         )
-        super(BoundedRectGrid, self).__init__(data, *args, dx=dx, dy=dy, bounds=bounds, offset=offset, **kwargs)
+        super(BoundedHexGrid, self).__init__(data, *args, size=size, bounds=bounds, offset=offset, shape=shape, **kwargs)
+
+        if not self.are_bounds_aligned(bounds):
+            raise AlignmentError("Something went wrong, the supplied bounds are not aligned with the resulting grid.")
 
     @property
     def nr_cells(self):
@@ -742,89 +637,39 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
             index = self.indices()
-        return super(BoundedRectGrid, self).cell_corners(index=index)
+        return super(BoundedHexGrid, self).cell_corners(index=index)
 
-    def indices(self, index: numpy.ndarray = None):
-        """Return the indices"""
-        # I guess this only makes sense for data grids, maybe remove the index argument?
+    def to_shapely(self, index=None, as_multipolygon: bool = False):
+        """Refer to :meth:`.BaseGrid.to_shapely`
+
+        Difference with :meth:`.BaseGrid.to_shapely`:
+            `index` is optional. 
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        :meth:`.BoundedRectGrid.to_shapely`
+        """
         if index is None:
-            return self.cells_in_bounds(self.bounds)
-        cell_centers = self.centroid(index=index)
-        return self.cell_at_point(cell_centers)
+            index = self.indices
+        return super().to_shapely(index, as_multipolygon)
 
     def resample(self, alignment_grid, method="nearest"):
-
-        if self.crs is None or alignment_grid.crs is None:
-            warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
-            different_crs = False
-        else:
-            different_crs = not self.crs.is_exact_same(alignment_grid.crs)
-
-        # make sure the bounds align with the grid
-        if different_crs:
-            transformer = Transformer.from_crs(self.crs, alignment_grid.crs, always_xy=True)
-            transformed_corners = numpy.vstack(transformer.transform(*self.corners.T)).T
-            bounds = (
-                min(transformed_corners[0, 0], transformed_corners[3, 0]),
-                min(transformed_corners[2, 1], transformed_corners[3, 1]),
-                max(transformed_corners[1, 0], transformed_corners[2, 0]),
-                max(transformed_corners[0, 1], transformed_corners[1, 1])
-            )
-        else:
-            bounds = self.bounds
-
-        # Align using "contract" for we cannot sample outside of the original bounds
-        new_bounds = alignment_grid.align_bounds(bounds, mode="contract")
-
-        new_ids, new_shape = alignment_grid.cells_in_bounds(bounds=new_bounds)
-
-        new_points = alignment_grid.centroid(new_ids)
-
-        if different_crs:
-            transformer = Transformer.from_crs(alignment_grid.crs, self.crs, always_xy=True)
-            transformed_points = transformer.transform(*new_points.T)
-            new_points = numpy.vstack(transformed_points).T
-
-        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        if method == "nearest":
-            new_ids = self.cell_at_point(new_points)
-            value = self.value(new_ids)
-        elif method == "bilinear":
-            tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(new_points)
-
-            tl_val = self.value(tl_ids, oob_value=nodata_value)
-            tr_val = self.value(tr_ids, oob_value=nodata_value)
-            bl_val = self.value(bl_ids, oob_value=nodata_value)
-            br_val = self.value(br_ids, oob_value=nodata_value)
-
-            # determine relative location of new point between old cell centers in x and y directions
-            abs_diff = (new_points - self.centroid(bl_ids))
-            x_diff = abs_diff[:,0] / self.dx
-            y_diff = abs_diff[:,1] / self.dy
-
-            top_val = tl_val + (tr_val - tl_val) * x_diff
-            bot_val = bl_val + (br_val - bl_val) * x_diff
-            value = bot_val + (top_val - bot_val) * y_diff
-
-            # TODO: remove rows and cols with nans around the edge after bilinear
-        else:
-            raise ValueError(f"Resampling method '{method}' is not supported.")
-
-        value = value.reshape(new_shape)
-        new_grid = BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
-
-        return new_grid
+        raise NotImplementedError()
 
     def to_crs(self, crs, resample_method="nearest"):
-        new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)
+        new_inf_grid = super(BoundedHexGrid, self).to_crs(crs, resample_method=resample_method)
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
+        raise NotImplementedError()
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
 
     def grid_id_to_numpy_id(self, index):
+        raise NotImplementedError()
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft[1] - index[1], index[0] - index_topleft[0])
@@ -832,4 +677,5 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
-        return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
+        return super(BoundedHexGrid, self).interp_nodata(*args, **kwargs)
+

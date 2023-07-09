@@ -427,45 +427,6 @@ class RectGrid(BaseGrid):
         return aligned, reason
 
 
-    def are_bounds_aligned(self, bounds, separate=False):
-        is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(val, cellsize)
-        per_axis = (
-            is_aligned((bounds[0] - self.offset[0]) % self.dx, self.dx), # left
-            is_aligned((bounds[1] - self.offset[1]) % self.dy, self.dy), # bottom
-            is_aligned((bounds[2] - self.offset[0]) % self.dx, self.dx), # right
-            is_aligned((bounds[3] - self.offset[1]) % self.dy, self.dy)  # top
-        )
-        return per_axis if separate else numpy.all(per_axis)
-
-
-    def align_bounds(self, bounds, mode="expand"):
-        
-        if self.are_bounds_aligned(bounds):
-            return bounds
-
-        if mode == "expand":
-            return (
-                numpy.floor((bounds[0] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                numpy.floor((bounds[1] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-                numpy.ceil((bounds[2] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                numpy.ceil((bounds[3] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-            )
-        if mode == "contract":
-            return (
-                numpy.ceil((bounds[0] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                numpy.ceil((bounds[1] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-                numpy.floor((bounds[2] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                numpy.floor((bounds[3] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-            )
-        if mode == "nearest":
-            return (
-                round((bounds[0] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                round((bounds[1] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-                round((bounds[2] - self.offset[0]) / self.dx) * self.dx + self.offset[0],
-                round((bounds[3] - self.offset[1]) / self.dy) * self.dy + self.offset[1],
-            )
-        raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
-
     def cells_in_bounds(self, bounds):
         """
         Parameters
@@ -569,7 +530,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is not None:
             return super(BoundedRectGrid, self).centroid(index=index)
         # get grid in shape (latlon, width, height)
-        latlon = numpy.array(numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy"))
+        latlon = numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy")
 
         # return grid in shape (width, height, lonlat)
         return numpy.array([latlon[0].ravel(),latlon[1].ravel()]).T
@@ -629,17 +590,24 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is None:
             index = self.indices()
         return super(BoundedRectGrid, self).cell_corners(index=index)
+    
+    def to_shapely(self, index=None, as_multipolygon: bool = False):
+        """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
-    def indices(self, index: numpy.ndarray = None):
-        """Return the indices"""
-        # I guess this only makes sense for data grids, maybe remove the index argument?
+        Difference with parent method:
+            `index` is optional. 
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+        
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        :meth:`.BoundedHexGrid.to_shapely`
+        """
         if index is None:
-            return self.cells_in_bounds(self.bounds)
-        cell_centers = self.centroid(index=index)
-        return self.cell_at_point(cell_centers)
+            index = self.indices
+        return super().to_shapely(index, as_multipolygon)
 
     def resample(self, alignment_grid, method="nearest"):
-
         if self.crs is None or alignment_grid.crs is None:
             warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
             different_crs = False
@@ -691,7 +659,14 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
-        new_grid = BoundedRectGrid(value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value)
+
+        grid_kwargs = dict(
+            data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
+        )
+        if hasattr(alignment_grid, "_shape"):
+            grid_kwargs["shape"] = alignment_grid._shape
+
+        new_grid = alignment_grid.bounded_cls(**grid_kwargs)
 
         return new_grid
 

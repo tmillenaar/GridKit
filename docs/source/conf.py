@@ -110,6 +110,8 @@ autodoc_default_options = {
 # and will instead just say 'alias of ...'
 # after https://github.com/slundberg/shap/blob/6af9e1008702fb0fab939bf2154bbf93dfe84a16/docs/conf.py#L380-L394
 import gridkit.rect_grid
+import gridkit.hex_grid
 import gridkit.bounded_grid
 gridkit.rect_grid.BoundedRectGrid.__name__ = "BoundedRectGrid"
+gridkit.hex_grid.BoundedHexGrid.__name__ = "BoundedHexGrid"
 gridkit.bounded_grid.BoundedGrid.__name__ = "BoundedGrid"

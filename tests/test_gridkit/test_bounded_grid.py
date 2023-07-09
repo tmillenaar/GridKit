@@ -303,13 +303,13 @@ def test_centroid():
     numpy.testing.assert_equal(grid.centroid(), expected_centroids)
 
     # test using ids
-    ids, _ = grid.indices()
+    ids = grid.indices
     numpy.testing.assert_equal(grid.centroid(ids), expected_centroids)
     
 def test_centroid_index_comparisson():
     data = numpy.array([[0,1],[2,3]])
     grid = rect_grid.BoundedRectGrid(data, bounds=(-2, 0, 0.2, 2.1))
-    ids, _ = grid.indices()
+    ids = grid.indices
     numpy.testing.assert_almost_equal(grid.centroid(ids), grid.centroid())
 
 def test_assign():

@@ -22,6 +22,9 @@ jobs:
       run: |
         pip install ./[doc]
 
+    - name: Set the gridkit version to that of the tag
+      run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+
     - name: Build Sphinx documentation
       run: |
         python3 setup.py build_sphinx
