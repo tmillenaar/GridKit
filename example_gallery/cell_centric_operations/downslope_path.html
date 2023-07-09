@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Downslope path &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>Downslope path &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -15,13 +15,15 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Raster operations" href="../raster_operations/index.html" />
+    <link rel="next" title="Cell selection using other grids" href="selecting_cells.html" />
     <link rel="prev" title="Cell centric" href="index.html" /> 
 </head>
 
@@ -37,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -52,12 +54,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#shape-interactions">Shape interactions</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="index.html">Cell centric</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Downslope path</a></li>
+<li class="toctree-l4"><a class="reference internal" href="selecting_cells.html">Cell selection using other grids</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../grid_definitions/index.html">Grid definitions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../raster_operations/index.html">Raster operations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../vector_synergy/index.html">Shape interactions</a></li>
 </ul>
@@ -199,7 +204,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
 or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.271 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.294 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/df89e8dce4f564036c6eab559331be35/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
@@ -217,7 +222,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Cell centric" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../raster_operations/index.html" class="btn btn-neutral float-right" title="Raster operations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="selecting_cells.html" class="btn btn-neutral float-right" title="Cell selection using other grids" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

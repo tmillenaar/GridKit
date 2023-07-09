@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Example Gallery &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>Example Gallery &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -15,6 +15,8 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
@@ -37,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -52,9 +54,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Example Gallery</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#cell-centric">Cell centric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grid-definitions">Grid definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#raster-operations">Raster operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#shape-interactions">Shape interactions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cell_centric_operations/index.html">Cell centric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="grid_definitions/index.html">Grid definitions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="raster_operations/index.html">Raster operations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="vector_synergy/index.html">Shape interactions</a></li>
 </ul>
@@ -101,6 +105,16 @@ and to serve as inspiration regarding the types of problems that can be solved u
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Use a DEM to determine the downslope path from a point on the DEM to the edge."><img alt="" src="../_images/sphx_glr_downslope_path_thumb.png" />
 <p><a class="reference internal" href="cell_centric_operations/downslope_path.html#sphx-glr-example-gallery-cell-centric-operations-downslope-path-py"><span class="std std-ref">Downslope path</span></a></p>
   <div class="sphx-glr-thumbnail-title">Downslope path</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Identify specific cells using other grids"><img alt="" src="../_images/sphx_glr_selecting_cells_thumb.png" />
+<p><a class="reference internal" href="cell_centric_operations/selecting_cells.html#sphx-glr-example-gallery-cell-centric-operations-selecting-cells-py"><span class="std std-ref">Cell selection using other grids</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Cell selection using other grids</div>
+</div></div></section>
+<section id="grid-definitions">
+<h2>Grid definitions<a class="headerlink" href="#grid-definitions" title="Permalink to this heading"></a></h2>
+<p>These examples highlight the different ways grids can be constructed and manipulated.</p>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Adjusting shapes and sizes"><img alt="" src="../_images/sphx_glr_hex_grids_thumb.png" />
+<p><a class="reference internal" href="grid_definitions/hex_grids.html#sphx-glr-example-gallery-grid-definitions-hex-grids-py"><span class="std std-ref">Hexagon grids</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Hexagon grids</div>
 </div></div></section>
 <section id="raster-operations">
 <h2>Raster operations<a class="headerlink" href="#raster-operations" title="Permalink to this heading"></a></h2>
@@ -108,6 +122,9 @@ and to serve as inspiration regarding the types of problems that can be solved u
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Operation using two raster bands"><img alt="" src="../_images/sphx_glr_ndvi_thumb.png" />
 <p><a class="reference internal" href="raster_operations/ndvi.html#sphx-glr-example-gallery-raster-operations-ndvi-py"><span class="std std-ref">NDVI</span></a></p>
   <div class="sphx-glr-thumbnail-title">NDVI</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Resample data from one grid onto another."><img alt="" src="../_images/sphx_glr_resampling_thumb.png" />
+<p><a class="reference internal" href="raster_operations/resampling.html#sphx-glr-example-gallery-raster-operations-resampling-py"><span class="std std-ref">Resampling</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Resampling</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Create an elevation histogram for a particular land cover"><img alt="" src="../_images/sphx_glr_elevation_distribution_per_land_cover_thumb.png" />
 <p><a class="reference internal" href="raster_operations/elevation_distribution_per_land_cover.html#sphx-glr-example-gallery-raster-operations-elevation-distribution-per-land-cover-py"><span class="std std-ref">Combining land cover and DEM</span></a></p>
   <div class="sphx-glr-thumbnail-title">Combining land cover and DEM</div>
@@ -115,12 +132,12 @@ and to serve as inspiration regarding the types of problems that can be solved u
 <section id="shape-interactions">
 <h2>Shape interactions<a class="headerlink" href="#shape-interactions" title="Permalink to this heading"></a></h2>
 <p>The following examples highlight the interactions between vector data and regular grids.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data"><img alt="" src="../_images/sphx_glr_interpolate_from_points_thumb.png" />
-<p><a class="reference internal" href="vector_synergy/interpolate_from_points.html#sphx-glr-example-gallery-vector-synergy-interpolate-from-points-py"><span class="std std-ref">Interpolate from points</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries."><img alt="" src="../_images/sphx_glr_intersect_geometries_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries."><img alt="" src="../_images/sphx_glr_intersect_geometries_thumb.png" />
 <p><a class="reference internal" href="vector_synergy/intersect_geometries.html#sphx-glr-example-gallery-vector-synergy-intersect-geometries-py"><span class="std std-ref">Geometry intersections</span></a></p>
   <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data"><img alt="" src="../_images/sphx_glr_interpolate_from_points_thumb.png" />
+<p><a class="reference internal" href="vector_synergy/interpolate_from_points.html#sphx-glr-example-gallery-vector-synergy-interpolate-from-points-py"><span class="std std-ref">Interpolate from points</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-gallery docutils container">

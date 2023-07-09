@@ -51,6 +51,57 @@ These examples highlight operations where specific cells are targeted.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Identify specific cells using other grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_selecting_cells_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Cell selection using other grids</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+Grid definitions
+================
+
+These examples highlight the different ways grids can be constructed and manipulated.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Adjusting shapes and sizes">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_hex_grids_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hexagon grids</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -81,6 +132,23 @@ These examples show how traditional raster data can be analysed and modified usi
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">NDVI</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Resample data from one grid onto another.">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_resampling_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_resampling.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Resampling</div>
     </div>
 
 
@@ -121,23 +189,6 @@ The following examples highlight the interactions between vector data and regula
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
-
-.. only:: html
-
-  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries.">
 
 .. only:: html
@@ -155,6 +206,23 @@ The following examples highlight the interactions between vector data and regula
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -164,6 +232,7 @@ The following examples highlight the interactions between vector data and regula
 
 
    /example_gallery/cell_centric_operations/index.rst
+   /example_gallery/grid_definitions/index.rst
    /example_gallery/raster_operations/index.rst
    /example_gallery/vector_synergy/index.rst
 

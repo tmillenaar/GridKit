@@ -36,6 +36,23 @@ These examples show how traditional raster data can be analysed and modified usi
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Resample data from one grid onto another.">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_resampling_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_resampling.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Resampling</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Create an elevation histogram for a particular land cover">
 
 .. only:: html
@@ -60,5 +77,6 @@ These examples show how traditional raster data can be analysed and modified usi
    :hidden:
 
    /example_gallery/raster_operations/ndvi
+   /example_gallery/raster_operations/resampling
    /example_gallery/raster_operations/elevation_distribution_per_land_cover
 

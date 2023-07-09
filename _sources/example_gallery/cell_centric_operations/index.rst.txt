@@ -36,6 +36,23 @@ These examples highlight operations where specific cells are targeted.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Identify specific cells using other grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_selecting_cells_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Cell selection using other grids</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -43,4 +60,5 @@ These examples highlight operations where specific cells are targeted.
    :hidden:
 
    /example_gallery/cell_centric_operations/downslope_path
+   /example_gallery/cell_centric_operations/selecting_cells
 

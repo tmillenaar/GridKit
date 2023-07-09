@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>Index &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
@@ -14,6 +14,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -34,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -106,15 +108,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.aggregate">aggregate() (gridkit.base_grid.BaseGrid method)</a>
 </li>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.align_bounds">align_bounds() (gridkit.rect_grid.RectGrid method)</a>
+      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.align_bounds">align_bounds() (gridkit.base_grid.BaseGrid method)</a>
 </li>
       <li><a href="api/gridkit.errors.html#gridkit.errors.AlignmentError">AlignmentError</a>
 </li>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.are_bounds_aligned">are_bounds_aligned() (gridkit.rect_grid.RectGrid method)</a>
+      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.are_bounds_aligned">are_bounds_aligned() (gridkit.base_grid.BaseGrid method)</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.argmax">argmax() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.argmax">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmax">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -123,6 +127,8 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.argmin">argmin() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.argmin">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmin">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -142,6 +148,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid">BoundedHexGrid (class in gridkit.hex_grid)</a>
+</li>
       <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid">BoundedRectGrid (class in gridkit.rect_grid)</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.bounds">bounds (gridkit.bounded_grid.BoundedGrid property)</a>
@@ -155,43 +163,53 @@
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_at_point">cell_at_point() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point">(gridkit.hex_grid.HexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cell_at_point">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_corners">cell_corners() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.cell_corners">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners">(gridkit.hex_grid.HexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.cell_corners">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cell_corners">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds">cells_in_bounds() (gridkit.rect_grid.RectGrid method)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds">cells_in_bounds() (gridkit.hex_grid.HexGrid method)</a>
+
+      <ul>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds">(gridkit.rect_grid.RectGrid method)</a>
 </li>
+      </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_near_point">cells_near_point() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point">(gridkit.hex_grid.HexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_near_point">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.cellsize">cellsize (gridkit.bounded_grid.BoundedGrid property)</a>
 </li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.centroid">centroid() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid">(gridkit.hex_grid.HexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.centroid">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.centroid">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.combined_bounds">combined_bounds() (gridkit.bounded_grid.BoundedGrid method)</a>
-
-      <ul>
-        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.combined_bounds">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
-      </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.copy">copy() (gridkit.bounded_grid.BoundedGrid method)</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.corners">corners (gridkit.bounded_grid.BoundedGrid property)</a>
@@ -201,6 +219,8 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.crop">crop() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.crop">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.crop">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -216,14 +236,22 @@
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.dtype">dtype (gridkit.bounded_grid.BoundedGrid property)</a>
 </li>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.dx">dx (gridkit.rect_grid.RectGrid property)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.dx">dx (gridkit.hex_grid.HexGrid property)</a>
+
+      <ul>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.dx">(gridkit.rect_grid.RectGrid property)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dx">dx() (gridkit.base_grid.BaseGrid method)</a>
 </li>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.dy">dy (gridkit.rect_grid.RectGrid property)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.dy">dy (gridkit.hex_grid.HexGrid property)</a>
+
+      <ul>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.dy">(gridkit.rect_grid.RectGrid property)</a>
 </li>
+      </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dy">dy() (gridkit.base_grid.BaseGrid method)</a>
 </li>
   </ul></td>
@@ -235,6 +263,8 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.grid_id_to_numpy_id">grid_id_to_numpy_id() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.grid_id_to_numpy_id">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -276,6 +306,13 @@
 </li>
       </ul></li>
       <li>
+    gridkit.hex_grid
+
+      <ul>
+        <li><a href="api/gridkit.hex_grid.html#module-gridkit.hex_grid">module</a>
+</li>
+      </ul></li>
+      <li>
     gridkit.io
 
       <ul>
@@ -305,31 +342,39 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.height">height (gridkit.bounded_grid.BoundedGrid property)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid">HexGrid (class in gridkit.hex_grid)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.indices">indices() (gridkit.rect_grid.BoundedRectGrid method)</a>
+      <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.indices">indices (gridkit.bounded_grid.BoundedGrid property)</a>
 </li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points">interp_from_points() (gridkit.base_grid.BaseGrid method)</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interp_nodata">interp_nodata() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.interp_nodata">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.interp_nodata">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.intersect_geometries">intersect_geometries() (gridkit.base_grid.BaseGrid method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.intersecting_cells">intersecting_cells() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.intersecting_cells">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.intersecting_cells">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.errors.html#gridkit.errors.IntersectionError">IntersectionError</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.intersects">intersects() (gridkit.bounded_grid.BoundedGrid method)</a>
@@ -337,6 +382,8 @@
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.is_aligned_with">is_aligned_with() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.is_aligned_with">(gridkit.hex_grid.HexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.is_aligned_with">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
@@ -346,12 +393,20 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.lat">lat (gridkit.rect_grid.BoundedRectGrid property)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.lat">lat (gridkit.hex_grid.BoundedHexGrid property)</a>
+
+      <ul>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.lat">(gridkit.rect_grid.BoundedRectGrid property)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.lon">lon (gridkit.rect_grid.BoundedRectGrid property)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.lon">lon (gridkit.hex_grid.BoundedHexGrid property)</a>
+
+      <ul>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.lon">(gridkit.rect_grid.BoundedRectGrid property)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -361,12 +416,16 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.max">max() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.max">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.max">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mean">mean() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.mean">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.mean">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
         <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean">(in module gridkit._statistical_functions)</a>
@@ -375,12 +434,16 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.median">median() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.median">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.median">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.min">min() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.min">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.min">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -400,6 +463,8 @@
 </li>
         <li><a href="api/gridkit.errors.html#module-gridkit.errors">gridkit.errors</a>
 </li>
+        <li><a href="api/gridkit.hex_grid.html#module-gridkit.hex_grid">gridkit.hex_grid</a>
+</li>
         <li><a href="api/gridkit.io.html#module-gridkit.io">gridkit.io</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#module-gridkit.rect_grid">gridkit.rect_grid</a>
@@ -416,24 +481,24 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours">neighbours() (gridkit.base_grid.BaseGrid method)</a>
-
-      <ul>
-        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.neighbours">(gridkit.rect_grid.RectGrid method)</a>
 </li>
-      </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.nodata">nodata() (gridkit.bounded_grid.BoundedGrid method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.nr_cells">nr_cells (gridkit.bounded_grid.BoundedGrid property)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.nr_cells">(gridkit.hex_grid.BoundedHexGrid property)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.nr_cells">(gridkit.rect_grid.BoundedRectGrid property)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.numpy_id_to_grid_id">numpy_id_to_grid_id() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.numpy_id_to_grid_id">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -456,6 +521,8 @@
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.parent_grid_class">parent_grid_class (gridkit.base_grid.BaseGrid property)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.parent_grid_class">(gridkit.hex_grid.HexGrid property)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.parent_grid_class">(gridkit.rect_grid.RectGrid property)</a>
 </li>
       </ul></li>
@@ -469,18 +536,30 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.r">r (gridkit.hex_grid.HexGrid property)</a>
+</li>
       <li><a href="api/gridkit.io.html#gridkit.io.read_geotiff">read_geotiff() (in module gridkit.io)</a>
 </li>
       <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid">RectGrid (class in gridkit.rect_grid)</a>
 </li>
-      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.resample">resample() (gridkit.base_grid.BaseGrid method)</a>
+      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.relative_neighbours">relative_neighbours() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
-        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.resample">(gridkit.rect_grid.BoundedRectGrid method)</a>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours">(gridkit.hex_grid.HexGrid method)</a>
+</li>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours">(gridkit.rect_grid.RectGrid method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.resample">resample() (gridkit.base_grid.BaseGrid method)</a>
+
+      <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.resample">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.resample">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+      </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotate">rotate() (gridkit.base_grid.BaseGrid method)</a>
 </li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotation">rotation() (gridkit.base_grid.BaseGrid method)</a>
@@ -491,15 +570,17 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.shared_bounds">shared_bounds() (gridkit.bounded_grid.BoundedGrid method)</a>
-
-      <ul>
-        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.shared_bounds">(gridkit.rect_grid.BoundedRectGrid method)</a>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.shape">shape (gridkit.hex_grid.HexGrid property)</a>
 </li>
-      </ul></li>
+      <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.shared_bounds">shared_bounds() (gridkit.bounded_grid.BoundedGrid method)</a>
+</li>
+      <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.size">size (gridkit.hex_grid.HexGrid property)</a>
+</li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.std">std() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.std">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.std">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
@@ -508,6 +589,8 @@
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.sum">sum() (gridkit.bounded_grid.BoundedGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.sum">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.sum">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
         <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum">(in module gridkit._statistical_functions)</a>
@@ -522,13 +605,21 @@
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_crs">to_crs() (gridkit.base_grid.BaseGrid method)</a>
 
       <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_crs">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely">to_shapely() (gridkit.base_grid.BaseGrid method)</a>
+
+      <ul>
+        <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely">(gridkit.hex_grid.BoundedHexGrid method)</a>
+</li>
+        <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_shapely">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely">to_shapely() (gridkit.base_grid.BaseGrid method)</a>
-</li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_vector_file">to_vector_file() (gridkit.base_grid.BaseGrid method)</a>
 </li>
       <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.total_bounds">total_bounds() (in module gridkit._statistical_functions)</a>

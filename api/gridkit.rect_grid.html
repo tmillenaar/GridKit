@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rect_grid &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>rect_grid &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -15,6 +15,8 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
@@ -37,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -57,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">rect_grid</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#gridkit.rect_grid.RectGrid"><code class="docutils literal notranslate"><span class="pre">RectGrid</span></code></a></li>
@@ -118,9 +121,78 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.neighbours">
-<span class="sig-name descname"><span class="pre">neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.neighbours" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.relative_neighbours">
+<span class="sig-name descname"><span class="pre">relative_neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.relative_neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.relative_neighbours" title="Permalink to this definition"></a></dt>
+<dd><p>The relative indices of the neighbouring cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> Default: 1) – Determines the number of neighbours that are returned.
+If <cite>depth=1</cite> the direct neighbours are returned.
+If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
+<cite>depth=3</cite> returns yet another layer of neighbours, and so forth.</p></li>
+<li><p><strong>include_selected</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to include the specified cell in the return array.
+Even though the specified cell can never be a neighbour of itself,
+this can be useful when for example a weighted average of the neighbours is desired
+in which case the cell itself often should also be included.</p></li>
+<li><p><strong>connect_corners</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to consider cells that touch corners but not sides as neighbours.
+If <cite>connect_corners</cite> is True, the 4 cells directly touching the cell are considered neighbours.
+If <cite>connect_corners</cite> is True, the 8 cells surrounding the cell are considered neighbours.
+This escalates in combination with <cite>depth</cite> where indices in a square shape around the cell are returned
+when <cite>connect_corners</cite> is True, and indices in a diamond shape around the cell are returned when <cite>connect_corners</cite> is False.</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The index is mostly relevant for hexagonal grids.
+For a square grid the relative neighbours are independent on the location on the grid.
+Here it is only used for the return length.
+If 10 cells are supplied to <cite>index</cite>, the relative neighbours are returned 10 times.
+This is to keep a consistent api between the two classes.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The direct neighbours of a cell can be returned by using depth=1, which is the default.
+For square grids, the number of returned neighbours depends on whether <cite>connect_corners</cite> is True or False:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">()</span>
+<span class="go">array([[ 0,  1],</span>
+<span class="go">       [-1,  0],</span>
+<span class="go">       [ 1,  0],</span>
+<span class="go">       [ 0, -1]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">array([[-1,  1],</span>
+<span class="go">       [ 0,  1],</span>
+<span class="go">       [ 1,  1],</span>
+<span class="go">       [-1,  0],</span>
+<span class="go">       [ 1,  0],</span>
+<span class="go">       [-1, -1],</span>
+<span class="go">       [ 0, -1],</span>
+<span class="go">       [ 1, -1]])</span>
+</pre></div>
+</div>
+<p>By specifying <cite>depth</cite> we can include indirect neighbours from further away.
+The number of neighbours increases with depth by a factor of <cite>depth*4</cite> or <cite>depth*8</cite> depending on <cite>connect_corners</cite> being True or False.
+So the 3rd element in the list will be <cite>1*4 + 2*4 + 3*4 = 24</cite> if <cite>connect_corners</cite> is False.
+And it will be <cite>1*8 + 2*8 + 3*8 = 48</cite> if <cite>connect_corners</cite> is True.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="go">[4, 12, 24, 36]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="go">[8, 24, 48, 80]</span>
+</pre></div>
+</div>
+<p>The specified cell can be included if <cite>include_selected</cite> is set to True:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">array([[ 0,  1],</span>
+<span class="go">       [-1,  0],</span>
+<span class="go">       [ 0,  0],</span>
+<span class="go">       [ 1,  0],</span>
+<span class="go">       [ 0, -1]])</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.base_grid.BaseGrid.neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.neighbours()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a></p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.centroid">
@@ -286,16 +358,6 @@ and thus can influnce what cell contains the point:</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.are_bounds_aligned">
-<span class="sig-name descname"><span class="pre">are_bounds_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.are_bounds_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.are_bounds_aligned" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.align_bounds">
-<span class="sig-name descname"><span class="pre">align_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'expand'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.align_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.align_bounds" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.cells_in_bounds">
 <span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cells_in_bounds" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -393,16 +455,6 @@ in (width, height, lonlat)</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.shared_bounds">
-<span class="sig-name descname"><span class="pre">shared_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.shared_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.shared_bounds" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.combined_bounds">
-<span class="sig-name descname"><span class="pre">combined_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.combined_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.combined_bounds" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.crop">
 <span class="sig-name descname"><span class="pre">crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds_crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.crop" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -414,9 +466,18 @@ in (width, height, lonlat)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.indices">
-<span class="sig-name descname"><span class="pre">indices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.indices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.indices" title="Permalink to this definition"></a></dt>
-<dd><p>Return the indices</p>
+<dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.to_shapely">
+<span class="sig-name descname"><span class="pre">to_shapely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_multipolygon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.to_shapely"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.to_shapely" title="Permalink to this definition"></a></dt>
+<dd><p>Refer to parent method <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p>
+<dl class="simple">
+<dt>Difference with parent method:</dt><dd><p><cite>index</cite> is optional.
+If <cite>index</cite> is None (default) the cells containing data are used as the <cite>index</cite> argument.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely" title="gridkit.hex_grid.BoundedHexGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_shapely()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="py method">

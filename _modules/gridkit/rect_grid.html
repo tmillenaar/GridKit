@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.rect_grid &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>gridkit.rect_grid &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -14,6 +14,8 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/doctools.js"></script>
         <script src="../../_static/sphinx_highlight.js"></script>
@@ -34,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -108,33 +110,117 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dy</span>
 
-<div class="viewcode-block" id="RectGrid.neighbours"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.neighbours">[docs]</a>    <span class="k">def</span> <span class="nf">neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RectGrid.relative_neighbours"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours">[docs]</a>    <span class="k">def</span> <span class="nf">relative_neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The relative indices of the neighbouring cells.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        depth: :class:`int` Default: 1</span>
+<span class="sd">            Determines the number of neighbours that are returned.</span>
+<span class="sd">            If `depth=1` the direct neighbours are returned.</span>
+<span class="sd">            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.</span>
+<span class="sd">            `depth=3` returns yet another layer of neighbours, and so forth.</span>
+<span class="sd">        include_selected: :class:`bool` Default: False</span>
+<span class="sd">            Whether to include the specified cell in the return array.</span>
+<span class="sd">            Even though the specified cell can never be a neighbour of itself,</span>
+<span class="sd">            this can be useful when for example a weighted average of the neighbours is desired</span>
+<span class="sd">            in which case the cell itself often should also be included.</span>
+<span class="sd">        connect_corners: :class:`bool` Default: False</span>
+<span class="sd">            Whether to consider cells that touch corners but not sides as neighbours.</span>
+<span class="sd">            If `connect_corners` is True, the 4 cells directly touching the cell are considered neighbours.</span>
+<span class="sd">            If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.</span>
+<span class="sd">            This escalates in combination with `depth` where indices in a square shape around the cell are returned</span>
+<span class="sd">            when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.</span>
+<span class="sd">        index: :class:`numpy.ndarray`</span>
+<span class="sd">            The index is mostly relevant for hexagonal grids.</span>
+<span class="sd">            For a square grid the relative neighbours are independent on the location on the grid.</span>
+<span class="sd">            Here it is only used for the return length.</span>
+<span class="sd">            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.</span>
+<span class="sd">            This is to keep a consistent api between the two classes.</span>
+
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        The direct neighbours of a cell can be returned by using depth=1, which is the default.</span>
+<span class="sd">        For square grids, the number of returned neighbours depends on whether `connect_corners` is True or False:</span>
+<span class="sd">        </span>
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; from gridkit.rect_grid import RectGrid</span>
+<span class="sd">            &gt;&gt;&gt; grid = RectGrid(dx=2, dy=3)</span>
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours()</span>
+<span class="sd">            array([[ 0,  1],</span>
+<span class="sd">                   [-1,  0],</span>
+<span class="sd">                   [ 1,  0],</span>
+<span class="sd">                   [ 0, -1]])</span>
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours(connect_corners=True)</span>
+<span class="sd">            array([[-1,  1],</span>
+<span class="sd">                   [ 0,  1],</span>
+<span class="sd">                   [ 1,  1],</span>
+<span class="sd">                   [-1,  0],</span>
+<span class="sd">                   [ 1,  0],</span>
+<span class="sd">                   [-1, -1],</span>
+<span class="sd">                   [ 0, -1],</span>
+<span class="sd">                   [ 1, -1]])</span>
+
+<span class="sd">        ..</span>
+
+<span class="sd">        By specifying `depth` we can include indirect neighbours from further away.</span>
+<span class="sd">        The number of neighbours increases with depth by a factor of `depth*4` or `depth*8` depending on `connect_corners` being True or False.</span>
+<span class="sd">        So the 3rd element in the list will be `1*4 + 2*4 + 3*4 = 24` if `connect_corners` is False.</span>
+<span class="sd">        And it will be `1*8 + 2*8 + 3*8 = 48` if `connect_corners` is True.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours(depth=depth)) for depth in range(1,5)]</span>
+<span class="sd">            [4, 12, 24, 36]</span>
+<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours(depth=depth, connect_corners=True)) for depth in range(1,5)]</span>
+<span class="sd">            [8, 24, 48, 80]</span>
+
+<span class="sd">        ..</span>
+
+<span class="sd">        The specified cell can be included if `include_selected` is set to True:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours(include_selected=True)</span>
+<span class="sd">            array([[ 0,  1],</span>
+<span class="sd">                   [-1,  0],</span>
+<span class="sd">                   [ 0,  0],</span>
+<span class="sd">                   [ 1,  0],</span>
+<span class="sd">                   [ 0, -1]])</span>
+
+<span class="sd">        ..</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :py:meth:`.BaseGrid.neighbours`</span>
+<span class="sd">        :py:meth:`.HexGrid.relative_neighbours`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;depth&#39; cannot be lower than 1&quot;</span><span class="p">)</span>
+
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(((</span><span class="mi">2</span><span class="o">*</span><span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">relative_ids_1d</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">depth</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">relative_x</span><span class="p">,</span> <span class="n">relative_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">relative_ids_1d</span><span class="p">,</span> <span class="n">relative_ids_1d</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">neighbours</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">neighbours</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">relative_x</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">relative_y</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">connect_corners</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">*</span><span class="n">neighbours</span><span class="o">.</span><span class="n">T</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">depth</span>
+            <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">include_selected</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="n">center_cell</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">center_cell</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">neighbours</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">relative_neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="p">])</span><span class="o">.</span><span class="n">T</span>
-
-        <span class="n">relative_neighbor_indices</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">}</span>
-        <span class="k">if</span> <span class="n">connect_corners</span><span class="p">:</span>
-            <span class="n">relative_neighbor_indices</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">})</span>
-        <span class="k">if</span> <span class="n">include_selected</span><span class="p">:</span>
-            <span class="n">center_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">relative_neighbor_indices</span><span class="p">)))</span>
-            <span class="n">relative_neighbor_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">center_id</span><span class="p">)</span>
-        <span class="n">relative_neighbours</span> <span class="o">=</span> <span class="n">relative_neighbours</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">relative_neighbor_indices</span><span class="p">)]</span>
-    
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">relative_neighbours</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># make sure &#39;neighbours&#39; is in the desired shape if index contains only one ID</span>
-            <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span><span class="o">.</span><span class="n">T</span>
-
-        <span class="k">return</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">relative_neighbours</span></div>
-
+        <span class="k">return</span> <span class="n">neighbours</span></div>
 
 <div class="viewcode-block" id="RectGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by `index`.</span>
@@ -424,45 +510,6 @@
         <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">reason</span></div>
 
 
-<div class="viewcode-block" id="RectGrid.are_bounds_aligned"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.are_bounds_aligned">[docs]</a>    <span class="k">def</span> <span class="nf">are_bounds_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">separate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="n">is_aligned</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">)</span>
-        <span class="n">per_axis</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span> <span class="c1"># left</span>
-            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">),</span> <span class="c1"># bottom</span>
-            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span> <span class="c1"># right</span>
-            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>  <span class="c1"># top</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">per_axis</span> <span class="k">if</span> <span class="n">separate</span> <span class="k">else</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">per_axis</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="RectGrid.align_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.align_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">align_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">):</span>
-        
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">bounds</span>
-
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;expand&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;contract&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-            <span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;mode = &#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported modes: (&#39;expand&#39;, &#39;contract&#39;, &#39;nearest&#39;)&quot;</span><span class="p">)</span></div>
-
 <div class="viewcode-block" id="RectGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -566,33 +613,13 @@
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedRectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
         <span class="c1"># get grid in shape (latlon, width, height)</span>
-        <span class="n">latlon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">))</span>
+        <span class="n">latlon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
 
         <span class="c1"># return grid in shape (width, height, lonlat)</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">latlon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span><span class="n">latlon</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="BoundedRectGrid.intersecting_cells"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.intersecting_cells">[docs]</a>    <span class="k">def</span> <span class="nf">intersecting_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
-
-<div class="viewcode-block" id="BoundedRectGrid.shared_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.shared_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">shared_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="n">other_bounds</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">)</span> <span class="k">else</span> <span class="n">other</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">IntersectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> does not intersect with grid with bounds </span><span class="si">{</span><span class="n">other_bounds</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
-        <span class="p">)</span></div>
-
-<div class="viewcode-block" id="BoundedRectGrid.combined_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.combined_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">combined_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="n">other_bounds</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">)</span> <span class="k">else</span> <span class="n">other</span>
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-            <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
-        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedRectGrid.crop"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer_cells</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 
@@ -646,17 +673,24 @@
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedRectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="BoundedRectGrid.to_shapely"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_shapely">[docs]</a>    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refer to parent method :meth:`.BaseGrid.to_shapely`</span>
 
-<div class="viewcode-block" id="BoundedRectGrid.indices"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.indices">[docs]</a>    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the indices&quot;&quot;&quot;</span>
-        <span class="c1"># I guess this only makes sense for data grids, maybe remove the index argument?</span>
+<span class="sd">        Difference with parent method:</span>
+<span class="sd">            `index` is optional. </span>
+<span class="sd">            If `index` is None (default) the cells containing data are used as the `index` argument.</span>
+<span class="sd">        </span>
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`.BaseGrid.to_shapely`</span>
+<span class="sd">        :meth:`.BoundedHexGrid.to_shapely`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
-        <span class="n">cell_centers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">cell_centers</span><span class="p">)</span></div>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedRectGrid.resample"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;`crs` not set for one or both grids. Assuming both grids have an identical CRS.&quot;</span><span class="p">)</span>
             <span class="n">different_crs</span> <span class="o">=</span> <span class="kc">False</span>
@@ -666,13 +700,7 @@
         <span class="c1"># make sure the bounds align with the grid</span>
         <span class="k">if</span> <span class="n">different_crs</span><span class="p">:</span>
             <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">transformed_corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">corners</span><span class="o">.</span><span class="n">T</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
-            <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">min</span><span class="p">(</span><span class="n">transformed_corners</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">transformed_corners</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-                <span class="nb">min</span><span class="p">(</span><span class="n">transformed_corners</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">transformed_corners</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
-                <span class="nb">max</span><span class="p">(</span><span class="n">transformed_corners</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">transformed_corners</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span>
-                <span class="nb">max</span><span class="p">(</span><span class="n">transformed_corners</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">transformed_corners</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-            <span class="p">)</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform_bounds</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
 
@@ -714,7 +742,14 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resampling method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span>
 
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
-        <span class="n">new_grid</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">)</span>
+
+        <span class="n">grid_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="s2">&quot;_shape&quot;</span><span class="p">):</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">_shape</span>
+
+        <span class="n">new_grid</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span><span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">new_grid</span></div>
 

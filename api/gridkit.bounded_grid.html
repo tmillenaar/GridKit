@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bounded_grid &mdash; GridKit 0.1.0.beta documentation</title>
+  <title>bounded_grid &mdash; GridKit v0.2.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -15,6 +15,8 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
@@ -37,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.beta
+                v0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -60,6 +62,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.rect_grid.html">rect_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.version.html">version</a></li>
@@ -210,12 +213,12 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.shared_bounds">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shared_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.shared_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.shared_bounds" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">shared_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.shared_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.shared_bounds" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.combined_bounds">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">combined_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.combined_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.combined_bounds" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">combined_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.combined_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.combined_bounds" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -237,6 +240,12 @@
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.grid_id_to_numpy_id">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">grid_id_to_numpy_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.grid_id_to_numpy_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.grid_id_to_numpy_id" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.indices" title="Permalink to this definition"></a></dt>
+<dd><p>Return the indices within the bounds of the data</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.assign">
