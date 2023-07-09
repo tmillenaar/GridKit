@@ -501,8 +501,6 @@ class HexGrid(BaseGrid):
             nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
         elif self._shape == "flat":
             nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
-        if nr_cells_flat == 0:
-            nr_cells_flat = 1
 
         ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
         ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
@@ -519,7 +517,8 @@ class HexGrid(BaseGrid):
 
         ids = ids[~oob_mask]
 
-        return ids, (int(numpy.ceil(ids.shape[0] / nr_cells_flat)), nr_cells_flat)
+        shape = (int(numpy.ceil(ids.shape[0] / nr_cells_flat)), nr_cells_flat) if nr_cells_flat != 0 else (0, 0)
+        return ids, shape
 
     @property
     def parent_grid_class(self):
