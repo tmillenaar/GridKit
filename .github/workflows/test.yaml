@@ -1,9 +1,11 @@
 name: Pytest
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - "*"
 
 jobs:
-  publish:
+  pytest:
     runs-on: ubuntu-latest
 
     steps:
