@@ -427,16 +427,12 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     def value(self, index, oob_value = None):
         """Return the value at the given cell index"""
 
-        # Convert grid-ids into numpy-ids
-        # Note: the (0,0) id for numpy refers to the top-left
         index = numpy.array(index)
         index = index[numpy.newaxis, :] if len(index.shape) == 1  else index
-        left_top = self.corners[0]
-        left_top_id = self.cell_at_point(left_top + [self.dx / 2, - self.dy / 2])[:,numpy.newaxis]
         index = index.T # TODO: maybe always work with xy axis first
-        np_id = numpy.empty_like(index)
-        np_id[0] = index[0] - left_top_id[0]
-        np_id[1] = left_top_id[1] - index[1]
+
+        # Convert grid-ids into numpy-ids
+        np_id = numpy.stack(self.grid_id_to_numpy_id(index)[::-1])
 
         # Identify any id outside the bounds
         oob_mask = numpy.where(np_id[0] >= self._data.shape[1])
