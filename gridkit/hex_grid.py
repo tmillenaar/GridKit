@@ -300,14 +300,17 @@ class HexGrid(BaseGrid):
         centroid = self.centroid(cell)
         distance_vector = point - centroid
         azimuth = numpy.arctan2(*distance_vector.T) * 180 / numpy.pi
+        # FIXME: if there is one point, azimuth is a float in which we cannot use a mask. Make the check more elegant
+        point = numpy.array(point)
+        if len(point.shape) == 1:
+            azimuth = numpy.array([azimuth])
 
         if len(cell.shape) == 1:
             cell = numpy.expand_dims(cell, axis=0)
-
+        az_ranges = [(0,60), (60,120), (120,180), (180,240), (240,300), (300,360)]
         if self._shape == "flat":
             inconsistent_axis = 0 # TODO: Make consistent and inconsisten axis a property of self
             consistent_axis = 1
-            az_ranges = [(0,60), (60,120), (120,180), (-180,-120), (-120,-60), (-60,0)]
             shift_odd_cells = [1, slice(1,3), 2, 1, slice(1,3), 2]
             nearby_cells_relative_idx = [
                 [[1,0],[0,1]],
@@ -321,7 +324,6 @@ class HexGrid(BaseGrid):
             inconsistent_axis = 1
             consistent_axis = 0
             azimuth += 30 # it is easier to work with ranges starting at 0 rather than -30
-            az_ranges = [(0,60), (60,120), (120,180), (180,210), (-120,-60), (-60,0)]
             shift_odd_cells = [slice(1,3), 1, 2, slice(1,3), 1, 2]
             nearby_cells_relative_idx = [
                 [[-1,1], [0,1]],
@@ -336,7 +338,11 @@ class HexGrid(BaseGrid):
 
         nearby_cells = numpy.repeat(numpy.expand_dims(cell, axis=0), 3, axis=0) # shape: neighbours(3), points(n), xy(2)
         odd_cells_mask = cell[:, inconsistent_axis] % 2 == 1
-        
+
+        # make sure azimuth is inbetween 0 and 360, and not between -180 and 180
+        azimuth[azimuth <= 0] += 360
+        azimuth[azimuth > 360] -= 360
+
         for az_range, shift_odd, cells in zip(az_ranges, shift_odd_cells, nearby_cells_relative_idx):
             mask = numpy.logical_and(azimuth > az_range[0], azimuth <= az_range[1])
             nearby_cells[1, mask] += cells[0]
@@ -504,7 +510,12 @@ class HexGrid(BaseGrid):
 
         ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
         ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
-        ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="xy")
+        if self._shape == "flat":
+            ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="ij")
+            ids_y_full = numpy.fliplr(ids_y_full)
+        else:
+            ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="xy")
+            ids_y_full = numpy.flipud(ids_y_full)
         ids = numpy.vstack([ids_x_full.ravel(), ids_y_full.ravel()]).T
         
         # determine what cells are outside of bounding box
@@ -656,7 +667,87 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         return super().to_shapely(index, as_multipolygon)
 
     def resample(self, alignment_grid, method="nearest"):
-        raise NotImplementedError()
+        if self.crs is None or alignment_grid.crs is None:
+            warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
+            different_crs = False
+        else:
+            different_crs = not self.crs.is_exact_same(alignment_grid.crs)
+
+        # make sure the bounds align with the grid
+        if different_crs:
+            transformer = Transformer.from_crs(self.crs, alignment_grid.crs, always_xy=True)
+            bounds = transformer.transform_bounds(*self.bounds)
+        else:
+            bounds = self.bounds
+
+        # Align using "contract" for we cannot sample outside of the original bounds
+        new_bounds = alignment_grid.align_bounds(bounds, mode="contract")
+
+        new_ids, new_shape = alignment_grid.cells_in_bounds(bounds=new_bounds)
+
+        new_points = alignment_grid.centroid(new_ids)
+
+        if different_crs:
+            transformer = Transformer.from_crs(alignment_grid.crs, self.crs, always_xy=True)
+            transformed_points = transformer.transform(*new_points.T)
+            new_points = numpy.vstack(transformed_points).T
+
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
+        if method == "nearest":
+            new_ids = self.cell_at_point(new_points)
+            value = self.value(new_ids)
+        elif method == "bilinear":
+            # FIXME: clean up and speed up (numba)
+            def get_weight(point,aa,bb,cc):
+            
+                def _project(point, line_points):
+                    """Project 'point' onto a line drawn between 'line_points[0]' and 'line_points[1]'
+                    Credits to https://stackoverflow.com/a/61343727/22128453
+                    """
+                    # distance between line_points[0] and line_points[1]
+                    line_length = numpy.sum((line_points[0]-line_points[1])**2)
+
+                    # project point on line extension connecting line_points[0] and line_points[1]
+                    t = numpy.sum((point - line_points[0]) * (line_points[1] - line_points[0])) / line_length
+
+                    return line_points[0] + t * (line_points[1] - line_points[0])
+            
+                side_length = numpy.linalg.norm(aa - bb)
+                dd = bb + (bb - cc)/2
+                if numpy.linalg.norm(dd - aa) > side_length:
+                    dd = bb - (bb - cc)/2
+                ad = dd - aa
+
+                projected = _project(point-aa, [cc-aa, bb-aa])
+                return numpy.linalg.norm((projected - (point-aa)) / numpy.linalg.norm(ad))
+
+            all_nearby_cells = self.cells_near_point(new_points) # (points, nearby_cells, xy)
+            value = numpy.empty(len(new_points))
+            for idx, (point, nearby_cells) in enumerate(zip(new_points, all_nearby_cells)):
+                nearby_centroids = self.centroid(nearby_cells)
+                p1, p2, p3 = nearby_centroids
+                weights = numpy.array([
+                    get_weight(point, p1, p2, p3),
+                    get_weight(point, p2, p1, p3),
+                    get_weight(point, p3, p2, p1),
+                ])
+                value[idx] = numpy.sum(weights * self.value(nearby_cells))
+
+            # TODO: remove rows and cols with nans around the edge after bilinear
+        else:
+            raise ValueError(f"Resampling method '{method}' is not supported.")
+
+        value = value.reshape(new_shape)
+
+        grid_kwargs = dict(
+            data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
+        )
+        if hasattr(alignment_grid, "_shape"):
+            grid_kwargs["shape"] = alignment_grid._shape
+
+        new_grid = alignment_grid.bounded_cls(**grid_kwargs)
+
+        return new_grid
 
     def to_crs(self, crs, resample_method="nearest"):
         new_inf_grid = super(BoundedHexGrid, self).to_crs(crs, resample_method=resample_method)
@@ -669,13 +760,27 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
 
     def grid_id_to_numpy_id(self, index):
-        raise NotImplementedError()
+        if self._shape == "pointy":
+            offset_rows = index[1] % 2 == 1
+            index[0, offset_rows] += 1
+        elif self._shape == "flat":
+            offset_rows = index[0] % 2 == 1
+            index[1, offset_rows] += 1
+
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft[1] - index[1], index[0] - index_topleft[0])
+        if self._shape == "pointy":
+            np_id = (index_topleft[1] - index[1], index[0] - index_topleft[0])
+        elif self._shape == "flat":
+            np_id = ((index[0] - index_topleft[0]), (index_topleft[1] - index[1]))
+        return np_id
 
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
         return super(BoundedHexGrid, self).interp_nodata(*args, **kwargs)
 
+    def centroid(self, index=None):
+        if index is None:
+            index = self.indices
+        return super(BoundedHexGrid, self).centroid(index)
