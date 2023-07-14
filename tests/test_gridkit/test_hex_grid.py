@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from gridkit.hex_grid import HexGrid
+from gridkit.hex_grid import HexGrid, BoundedHexGrid
 
 
 @pytest.mark.parametrize("shape, indices, expected_centroids", [
@@ -128,3 +128,49 @@ def test_neighbours(shape, depth, index, multi_index, include_selected):
 
     # No cell can be further away than 'depth' number of cells * cell size
     assert all(distances <= grid.size * depth)
+
+@pytest.mark.parametrize("shape, method, expected_result, expected_bounds", (
+    (
+        "pointy",
+        "nearest",
+        [[2, 1],[2, 3],[4, 5],[6, 7]], 
+        (-1.0, -1.7320508075688776, 1.0, 1.7320508075688776),
+    ),
+    (
+        "pointy",
+        "bilinear", 
+        [
+            [   1.08333333,    1.75      ],
+            [   2.58333333,    3.25      ],
+            [   3.91666667,    4.58333333],
+            [   5.41666667, -827.66666667] # FIXME: outlier value artifact of nodata value of -9999. Nodata should not be taken into account
+        ],
+        (-1.0, -1.7320508075688776, 1.0, 1.7320508075688776),
+    ),
+    (
+        "flat",
+        "nearest",
+        [[0, 3],[0, 0],[1, 4],[1, 5]],
+        (-1.0, -0.8660254037844388, 1.0, 2.5980762113533165),
+    ),
+    (
+        "flat",
+        "bilinear", 
+        [
+            [-3.85752650e+03, -6.60020632e+00],
+            [-2.69773379e+03,  1.88397460e+00],
+            [ 1.11417424e+00,  3.80847549e+00],
+            [-2.69684981e+03,  3.03867513e+00]
+        ],
+        (-1.0, -0.8660254037844388, 1.0, 2.5980762113533165),
+    )
+))
+def test_resample(basic_bounded_flat_grid, basic_bounded_pointy_grid, shape, method, expected_result, expected_bounds):
+    new_grid = HexGrid(size=1)
+    grid = basic_bounded_flat_grid if shape == "flat" else basic_bounded_pointy_grid
+
+    resampled = grid.resample(new_grid, method = method)
+
+    numpy.testing.assert_allclose(resampled.data, expected_result)
+    numpy.testing.assert_allclose(resampled.bounds, expected_bounds)
+
