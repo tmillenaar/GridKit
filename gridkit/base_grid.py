@@ -333,6 +333,14 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def interp_from_points(self, points, values, method="linear", nodata_value=numpy.nan):
         """Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.
 
+        This function turns any set of points at arbitrary location into a regularly spaced :class:`.BoundedGrid`
+        that has the properties of the current :class:`.BaseGrid` (``self``).
+        :meth:`.BoundedGrid.interpolate` works in the other direction, where a values on a :class:`.BoundedGrid`
+        are sampled in order to obtain values at arbitrary location.
+        
+        .. Note ::
+            This function is significantly slower than :meth:`.BoundedGrid.interpolate`
+
         Parameters
         ----------
         point: :class:`numpy.ndarray`
@@ -344,8 +352,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        :class:`~gridkit.bounded_grid.BoundedGrid`
+        :class:`.BoundedGrid`
             A Bounded version of the supplied grid where the data is interpolated between the supplied points.
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.resample`
+        :py:meth:`.BoundedGrid.interpolate`
         """
         points = numpy.array(points)
         values = numpy.array(values)

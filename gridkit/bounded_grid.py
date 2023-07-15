@@ -10,6 +10,7 @@ import gridkit
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import IntersectionError, AlignmentError
 from pyproj import Transformer
+from typing import Literal
 
 class _BoundedGridMeta(type):
     """metaclass of the Raster class"""
@@ -516,7 +517,75 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         self.data.ravel()[nodata_mask] = filled_values
         return self
     
+    def interpolate(self, sample_points, method="nearest"):
+        """Interpolate the value at the location of ``sample_points``.
+
+        Points that are outside of the bounds of the data are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.
+         
+        Parameters
+        ----------
+        sample_points: :class:`numpy.ndarray`
+            The coordinates of the points at which to sample the data
+        method: :class:`str`, `'nearest', 'bilinear'`, optional
+            The interpolation method used to determine the value at the supplied `sample_points`.
+            Supported methods: 
+            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+            - "bilinear", linear interpolation using the four cells surrounding the point
+            Default: "nearest"
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.resample`
+        :py:meth:`.BaseGrid.interp_from_points`
+        """
+        if method == "nearest":
+            new_ids = self.cell_at_point(sample_points)
+            return self.value(new_ids)
+        elif method == "bilinear" or method == "linear":
+            return self._bilinear_interpolation(sample_points)
+        raise ValueError(f"Resampling method '{method}' is not supported.")
+    
     def resample(self, alignment_grid, method="nearest"):
+        """Resample the grid onto another grid.
+        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
+        and determine the value on these location based on the values of the original grid (``self``).
+
+        The steps are as follows:
+         1. Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
+            No transformation is done if any of the grids has no CRS set.
+         2. Find the cells of the alignment grid within these transformed bounds
+         3. Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
+            How many nearby cells are selected depends on the selected ``method``
+         4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
+         5. Create a new bounded grid using the attributes of the alignment grid
+         
+        Parameters
+        ----------
+        alignment_grid: :class:`BaseGrid`
+            The grid with the desired attributes on which to resample.
+
+        method: :class:`str`, `'nearest', 'bilinear'`, optional
+            The interpolation method used to determine the value at the supplied `sample_points`.
+            Supported methods: 
+            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+            - "bilinear", linear interpolation using the four cells surrounding the point
+            Default: "nearest"
+
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.BaseGrid.interp_from_points`
+        """
         if self.crs is None or alignment_grid.crs is None:
             warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
             different_crs = False
@@ -542,16 +611,10 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             transformed_points = transformer.transform(*new_points.T)
             new_points = numpy.vstack(transformed_points).T
 
-        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        if method == "nearest":
-            new_ids = self.cell_at_point(new_points)
-            value = self.value(new_ids)
-        elif method == "bilinear":
-            value = self._bilinear_interpolation(new_points)
-        else:
-            raise ValueError(f"Resampling method '{method}' is not supported.")
-
+        value = self.interpolate(new_points, method=method)
         value = value.reshape(new_shape)
+
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
 
         grid_kwargs = dict(
             data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
