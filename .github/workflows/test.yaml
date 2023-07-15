@@ -29,6 +29,12 @@ jobs:
       - name: Run doctest
         run: python -m pytest gridkit/ --doctest-modules
 
+      - name: Run black check
+        run: python3 -m black gridkit tests --check
+
+      - name: Run isort check
+        run: python3 -m isort gridkit tests --check
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:

@@ -41,6 +41,26 @@ create an 'easy-install.pth' file that points to this local repository.
 
 ``python3 -m pip install -e .[doc,test]``
 
+Code formatting
+---------------
+`black <https://pypi.org/project/black/>`_ and `isort <https://pypi.org/project/isort/>`_ are used for code formatting.
+These packages are installed when the ``[test]`` argument is used during installation (see the command above).
+Pytest-black will test the format of the python files.
+Code that does not pass the test should be reformatted using black
+
+``python3 -m black tests/test_gridkit/``
+
+and isort
+
+``python3 -m isort tests/test_gridkit/``
+
+It is recommended to install the pre-commit hook, which will check the code format on commit and fix it if needed
+
+``pre-commit install``
+
+This process should take away a lot of strain around neatly formatting the code and
+ensures the same code standards are enforced all over the codebase.
+
 Running tests and building docs
 -------------------------------
 

@@ -1,22 +1,23 @@
+import abc
+import functools
+import operator
+import warnings
 from multiprocessing.sharedctypes import Value
+from typing import Literal
+
 import numpy
 import scipy
-import operator
-import abc
-import warnings
-import functools
+from pyproj import Transformer
 
 import gridkit
 from gridkit.base_grid import BaseGrid
-from gridkit.errors import IntersectionError, AlignmentError
-from pyproj import Transformer
-from typing import Literal
+from gridkit.errors import AlignmentError, IntersectionError
+
 
 class _BoundedGridMeta(type):
     """metaclass of the Raster class"""
 
     def __new__(cls, name, bases, namespace):
-
         # operators with a nan-base
         for op, as_idx in (
             (operator.mul, False),
@@ -31,7 +32,9 @@ class _BoundedGridMeta(type):
         ):
             opname = "__{}__".format(op.__name__)
             opname_reversed = "__r{}__".format(op.__name__)
-            normal_op, reverse_op = cls._gen_operator(op, base_value=numpy.nan, as_idx=as_idx)
+            normal_op, reverse_op = cls._gen_operator(
+                op, base_value=numpy.nan, as_idx=as_idx
+            )
             namespace[opname] = normal_op
             namespace[opname_reversed] = reverse_op
 
@@ -97,7 +100,6 @@ class _BoundedGridMeta(type):
         """
 
         def _grid_op(left, right, op, base_value):
-
             if not isinstance(right, BoundedGrid):
                 data = op(left._data, right)
                 if left.nodata_value is not None:
@@ -106,8 +108,10 @@ class _BoundedGridMeta(type):
                 return left.__class__(data, bounds=left.bounds, crs=left.crs)
 
             if not left.intersects(right):
-                raise AlignmentError("Operation not allowed on grids that do not overlap.") # TODO rethink errors. Do we want an out of bounds error?
-            
+                raise AlignmentError(
+                    "Operation not allowed on grids that do not overlap."
+                )  # TODO rethink errors. Do we want an out of bounds error?
+
             aligned, reason = left.is_aligned_with(right)
             if not aligned:
                 raise AlignmentError(f"Grids are not aligned. {reason}")
@@ -116,44 +120,64 @@ class _BoundedGridMeta(type):
             def dominant_dtype_and_nodata_value(*grids):
                 dtypes = [grid._data.dtype for grid in grids]
                 dtype = numpy.result_type(*dtypes)
-                
+
                 nodata_values = [grid.nodata_value for grid in grids]
                 if all([val == nodata_values[0] for val in nodata_values]):
                     nodata_value = nodata_values[0]
                 elif all([val is not None for val in nodata_values]):
                     nodata_value = nodata_values[0]
-                    warnings.warn(f"Two grids have different `nodata_value`s: {nodata_values}. Using {nodata_value} for the resulting grid.")
+                    warnings.warn(
+                        f"Two grids have different `nodata_value`s: {nodata_values}. Using {nodata_value} for the resulting grid."
+                    )
                 elif all([val is None for val in nodata_values]):
                     nodata_value = None
-                    warnings.warn(f"No `nodata_value` was set on any of the grids. Any potential nodata gaps are filled with `{dtype.type(0)}`. Set a nodata_value by assigning a value to grid.nodata_value.")
-                else: # one but not all grids have a nodata_value set
+                    warnings.warn(
+                        f"No `nodata_value` was set on any of the grids. Any potential nodata gaps are filled with `{dtype.type(0)}`. Set a nodata_value by assigning a value to grid.nodata_value."
+                    )
+                else:  # one but not all grids have a nodata_value set
                     for val in nodata_values:
                         if val is not None:
                             nodata_value = val
                             break
                     else:
-                        raise ValueError("Oops, something unexpected went wrong when determining the new nodata_value. To resolve this you could try setting the `nodata_value` attribute of your grids.")
+                        raise ValueError(
+                            "Oops, something unexpected went wrong when determining the new nodata_value. To resolve this you could try setting the `nodata_value` attribute of your grids."
+                        )
                 return dtype, nodata_value
+
             dtype, nodata_value = dominant_dtype_and_nodata_value(left, right)
-            
+
             # create combined grid, spanning both inputs
             combined_bounds = left.combined_bounds(right)
             combined_data = numpy.full(
-                ( # data shape is y,x
-                    round((combined_bounds[3]-combined_bounds[1])/left.dy),
-                    round((combined_bounds[2]-combined_bounds[0])/left.dx)
+                (  # data shape is y,x
+                    round((combined_bounds[3] - combined_bounds[1]) / left.dy),
+                    round((combined_bounds[2] - combined_bounds[0]) / left.dx),
                 ),
                 fill_value=dtype.type(0) if nodata_value is None else nodata_value,
                 dtype=dtype,
             )
-            combined_grid = left.__class__(combined_data, bounds=combined_bounds, crs=left.crs, nodata_value=nodata_value)
+            combined_grid = left.__class__(
+                combined_data,
+                bounds=combined_bounds,
+                crs=left.crs,
+                nodata_value=nodata_value,
+            )
 
             shared_bounds = left.shared_bounds(right)
             left_shared = left.crop(shared_bounds)
             right_shared = right.crop(shared_bounds)
 
-            left_data = numpy.ma.masked_array(left_shared._data, left_shared.data==left_shared.nodata_value, dtype=dtype)
-            right_data = numpy.ma.masked_array(right_shared._data, right_shared.data==right_shared.nodata_value, dtype=dtype)
+            left_data = numpy.ma.masked_array(
+                left_shared._data,
+                left_shared.data == left_shared.nodata_value,
+                dtype=dtype,
+            )
+            right_data = numpy.ma.masked_array(
+                right_shared._data,
+                right_shared.data == right_shared.nodata_value,
+                dtype=dtype,
+            )
 
             result = op(left_data, right_data)
 
@@ -161,21 +185,29 @@ class _BoundedGridMeta(type):
             left_data = left._data.astype(dtype)
             if left.nodata_value is not None:
                 left_data[left._data == left.nodata_value] = nodata_value
-            combined_grid.assign(left_data, bounds=left.bounds, in_place=True, assign_nodata=False)
+            combined_grid.assign(
+                left_data, bounds=left.bounds, in_place=True, assign_nodata=False
+            )
 
             # assign data of `right` to combined_grid
             right_data = right._data.astype(dtype)
             if right.nodata_value is not None:
                 right_data[right._data == right.nodata_value] = nodata_value
-            combined_grid.assign(right_data, bounds=right.bounds, in_place=True, assign_nodata=False)
+            combined_grid.assign(
+                right_data, bounds=right.bounds, in_place=True, assign_nodata=False
+            )
 
             # overwrite shared area in combined_grid with the combined results
             count = gridkit.count([left, right])
             shared_mask = count == 2
             shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
             result = op(left.value(shared_mask), right.value(shared_mask))
-            combined_grid = combined_grid.astype(numpy.result_type(combined_grid._data.dtype, result.dtype)) # when dividing the dtype changes
-            combined_grid._data[shared_mask_np] = result # TODO: find more elegant way of updating data with grid ids as mask
+            combined_grid = combined_grid.astype(
+                numpy.result_type(combined_grid._data.dtype, result.dtype)
+            )  # when dividing the dtype changes
+            combined_grid._data[
+                shared_mask_np
+            ] = result  # TODO: find more elegant way of updating data with grid ids as mask
 
             return combined_grid
 
@@ -188,7 +220,9 @@ class _BoundedGridMeta(type):
                 grid = left.update(data)
             else:
                 grid = _grid_op(left, right, op, base_value=base_value)
-            return left._mask_to_index(grid._data) if as_idx else grid #TODO: left._mask_to_index(data) works if as_idx is true
+            return (
+                left._mask_to_index(grid._data) if as_idx else grid
+            )  # TODO: left._mask_to_index(data) works if as_idx is true
 
         def reverse_op(left, right):
             if not isinstance(right, BoundedGrid):
@@ -199,17 +233,20 @@ class _BoundedGridMeta(type):
                 grid = left.update(data)
             else:
                 grid = _grid_op(left, right, op, base_value=base_value)
-            return grid._mask_to_index(grid._data) if as_idx else grid #TODO: left._mask_to_index(data) works if as_idx is true
+            return (
+                grid._mask_to_index(grid._data) if as_idx else grid
+            )  # TODO: left._mask_to_index(data) works if as_idx is true
 
         return normal_op, reverse_op
 
     @staticmethod
     def _gen_reduce_operator(op, as_idx=False):
         def internal(self, *args, **kwargs):
-
             data = self._data
             if not self.nodata_value is None:
-                data = numpy.ma.masked_array(data, numpy.isclose(data, self.nodata_value, equal_nan=True))
+                data = numpy.ma.masked_array(
+                    data, numpy.isclose(data, self.nodata_value, equal_nan=True)
+                )
             result = op(data, *args, **kwargs)
 
             if not as_idx:
@@ -220,20 +257,29 @@ class _BoundedGridMeta(type):
             np_id_x = int(result % self.width)
             np_id_y = int(numpy.floor(result / self.width))
             left_top = self.corners[0]
-            left_top_id = self.cell_at_point(left_top + [self.dx / 2, - self.dy / 2])
+            left_top_id = self.cell_at_point(left_top + [self.dx / 2, -self.dy / 2])
             index = left_top_id + [np_id_x, -np_id_y]
             return index
 
         return internal
 
+
 class _AbstractBoundedGridMeta(abc.ABCMeta, _BoundedGridMeta):
     """Class that enables usage of the :class:`~gridkit.bounded_grid._BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class."""
+
     pass
 
+
 class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
-
-    def __init__(self, data: numpy.ndarray, *args, bounds: tuple, nodata_value=None, prevent_copy: bool=False, **kwargs) -> None:
-
+    def __init__(
+        self,
+        data: numpy.ndarray,
+        *args,
+        bounds: tuple,
+        nodata_value=None,
+        prevent_copy: bool = False,
+        **kwargs,
+    ) -> None:
         self._data = data if prevent_copy else data.copy()
         self._bounds = bounds
         self.nodata_value = nodata_value
@@ -247,9 +293,13 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     def data(self, data):
         new_data = numpy.array(data)
         if new_data.dtype.name == "object":
-            raise TypeError(f"Data cannot be interpreted as a numpy.ndarray, got {type(data)}")
+            raise TypeError(
+                f"Data cannot be interpreted as a numpy.ndarray, got {type(data)}"
+            )
         if new_data.shape != self.data.shape:
-            raise ValueError(f"Cannot set data that is different in size. Expected a shape of {self.data.shape}, got {new_data.shape}.")
+            raise ValueError(
+                f"Cannot set data that is different in size. Expected a shape of {self.data.shape}, got {new_data.shape}."
+            )
         self._data = data
 
     def __array__(self, dtype=None):
@@ -265,14 +315,16 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         return self.update(new_data=self._data.astype(dtype))
 
     def update(self, new_data, bounds=None, crs=None, nodata_value=None):
-        #TODO figure out how to update dx, dy, origin
+        # TODO figure out how to update dx, dy, origin
         if not bounds:
             bounds = self.bounds
         if not crs:
             crs = self.crs
         if not nodata_value:
             nodata_value = self.nodata_value
-        return self.__class__(new_data, bounds=bounds, crs=crs, nodata_value=nodata_value)
+        return self.__class__(
+            new_data, bounds=bounds, crs=crs, nodata_value=nodata_value
+        )
 
     def copy(self):
         return self.update(self.data)
@@ -303,12 +355,14 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     @property
     def corners(self):
         b = self.bounds
-        return numpy.array([
-            [b[0], b[3]], # left-top
-            [b[2], b[3]], # right-top
-            [b[2], b[1]], # right-bottom
-            [b[0], b[1]], # left-bottom
-        ])
+        return numpy.array(
+            [
+                [b[0], b[3]],  # left-top
+                [b[2], b[3]],  # right-top
+                [b[2], b[1]],  # right-bottom
+                [b[0], b[1]],  # left-bottom
+            ]
+        )
 
     @property
     def width(self):
@@ -348,7 +402,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         return self.height * self.width
 
     def intersects(self, other):
-        other_bounds = other.bounds if isinstance(other, BaseGrid) else other # Allow for both grid objects and bounds
+        other_bounds = (
+            other.bounds if isinstance(other, BaseGrid) else other
+        )  # Allow for both grid objects and bounds
         return not (
             self.bounds[0] >= other_bounds[2]
             or self.bounds[2] <= other_bounds[0]
@@ -357,9 +413,10 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         )
 
     def _mask_to_index(self, mask):
-
         if not self._data.shape == mask.shape:
-            raise ValueError(f"Mask shape {mask.shape} does not match data shape {self._data.shape}")
+            raise ValueError(
+                f"Mask shape {mask.shape} does not match data shape {self._data.shape}"
+            )
 
         ids, shape = self.cells_in_bounds(self.bounds)
         ids = ids.reshape([*shape, 2])
@@ -368,7 +425,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     def shared_bounds(self, other):
         other_bounds = other.bounds if isinstance(other, BaseGrid) else other
         if not self.intersects(other):
-            raise IntersectionError(f"Grid with bounds {self.bounds} does not intersect with grid with bounds {other_bounds}.")
+            raise IntersectionError(
+                f"Grid with bounds {self.bounds} does not intersect with grid with bounds {other_bounds}."
+            )
         return (
             max(self.bounds[0], other_bounds[0]),
             max(self.bounds[1], other_bounds[1]),
@@ -403,12 +462,16 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     @property
     def indices(self):
-        """Return the indices within the bounds of the data"""       
+        """Return the indices within the bounds of the data"""
         return self.cells_in_bounds(self.bounds)[0]
 
-    def assign(self, data, *, anchor=None, bounds=None, in_place=True, assign_nodata=True):
+    def assign(
+        self, data, *, anchor=None, bounds=None, in_place=True, assign_nodata=True
+    ):
         if not any([anchor, bounds]):
-            raise ValueError("Please supply either an 'anchor' or 'bounds' keyword to position the data in the grid.")
+            raise ValueError(
+                "Please supply either an 'anchor' or 'bounds' keyword to position the data in the grid."
+            )
         new_data = self.data if in_place else self.data.copy()
 
         if bounds:
@@ -419,19 +482,19 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
                 crop[mask] = data[mask]
             else:
                 crop[:] = data
-        elif anchor: # a corner or center
+        elif anchor:  # a corner or center
             raise NotImplementedError()
         else:
             raise ValueError("Please supply one of: {anchor, bounds}")
 
         return self.__class__(new_data, bounds=self.bounds, crs=self.crs)
 
-    def value(self, index, oob_value = None):
+    def value(self, index, oob_value=None):
         """Return the value at the given cell index"""
 
         index = numpy.array(index)
-        index = index[numpy.newaxis, :] if len(index.shape) == 1  else index
-        index = index.T # TODO: maybe always work with xy axis first
+        index = index[numpy.newaxis, :] if len(index.shape) == 1 else index
+        index = index.T  # TODO: maybe always work with xy axis first
 
         # Convert grid-ids into numpy-ids
         np_id = numpy.stack(self.grid_id_to_numpy_id(index)[::-1])
@@ -443,21 +506,33 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         oob_mask += numpy.where(np_id[1] < 0)
         oob_mask = numpy.hstack(oob_mask)
 
-        if numpy.any(oob_mask): # make sure we know what nodata value to set if ids are out of bounds
+        if numpy.any(
+            oob_mask
+        ):  # make sure we know what nodata value to set if ids are out of bounds
             if oob_value is None and self.nodata_value is None:
-                raise ValueError("Some indices do not have data. Please remove these ids, set a 'nodata_value' or supply an 'oob_value'.")
+                raise ValueError(
+                    "Some indices do not have data. Please remove these ids, set a 'nodata_value' or supply an 'oob_value'."
+                )
             oob_value = oob_value if oob_value else self.nodata_value
         else:
-            oob_value = oob_value if oob_value else 0 # the oob_value does not matter if no ids are out of bounds
+            oob_value = (
+                oob_value if oob_value else 0
+            )  # the oob_value does not matter if no ids are out of bounds
 
         # Return array's `dtype` needs to be float instead of integer if an id falls outside of bounds
         # For NaNs don't make sense as integer
-        if numpy.any(oob_mask) and not numpy.isfinite(oob_value) and not numpy.issubdtype(self._data.dtype, float):
-            print(f"Warning: dtype `{self._data.dtype}` might not support an `oob_value` of `{oob_value}`.")
+        if (
+            numpy.any(oob_mask)
+            and not numpy.isfinite(oob_value)
+            and not numpy.issubdtype(self._data.dtype, float)
+        ):
+            print(
+                f"Warning: dtype `{self._data.dtype}` might not support an `oob_value` of `{oob_value}`."
+            )
 
         values = numpy.full(np_id.shape[1], oob_value, dtype=self._data.dtype)
 
-        sample_mask = numpy.ones_like(values, dtype='bool')
+        sample_mask = numpy.ones_like(values, dtype="bool")
         sample_mask[oob_mask] = False
 
         np_id = np_id[:, sample_mask]
@@ -491,16 +566,22 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             A copy of the grid with interpolated values.
         """
         method_lut = dict(
-            nearest = scipy.interpolate.NearestNDInterpolator,
-            linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=self.nodata_value),
-            cubic = scipy.interpolate.CloughTocher2DInterpolator,
+            nearest=scipy.interpolate.NearestNDInterpolator,
+            linear=functools.partial(
+                scipy.interpolate.LinearNDInterpolator, fill_value=self.nodata_value
+            ),
+            cubic=scipy.interpolate.CloughTocher2DInterpolator,
         )
 
         if self.nodata_value is None:
-            raise ValueError(f"Cannot interpolate nodata values if attribute 'nodata_value' is not set.")
+            raise ValueError(
+                f"Cannot interpolate nodata values if attribute 'nodata_value' is not set."
+            )
 
         if method not in method_lut:
-            raise ValueError(f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}")
+            raise ValueError(
+                f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}"
+            )
 
         if not in_place:
             self = self.copy()
@@ -516,19 +597,19 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         filled_values = interpolator(points[nodata_mask])
         self.data.ravel()[nodata_mask] = filled_values
         return self
-    
+
     def interpolate(self, sample_points, method="nearest"):
         """Interpolate the value at the location of ``sample_points``.
 
         Points that are outside of the bounds of the data are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.
-         
+
         Parameters
         ----------
         sample_points: :class:`numpy.ndarray`
             The coordinates of the points at which to sample the data
         method: :class:`str`, `'nearest', 'bilinear'`, optional
             The interpolation method used to determine the value at the supplied `sample_points`.
-            Supported methods: 
+            Supported methods:
             - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
             - "bilinear", linear interpolation using the four cells surrounding the point
             Default: "nearest"
@@ -549,7 +630,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         elif method == "bilinear" or method == "linear":
             return self._bilinear_interpolation(sample_points)
         raise ValueError(f"Resampling method '{method}' is not supported.")
-    
+
     def resample(self, alignment_grid, method="nearest"):
         """Resample the grid onto another grid.
         This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
@@ -563,7 +644,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             How many nearby cells are selected depends on the selected ``method``
          4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
          5. Create a new bounded grid using the attributes of the alignment grid
-         
+
         Parameters
         ----------
         alignment_grid: :class:`BaseGrid`
@@ -571,7 +652,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
         method: :class:`str`, `'nearest', 'bilinear'`, optional
             The interpolation method used to determine the value at the supplied `sample_points`.
-            Supported methods: 
+            Supported methods:
             - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
             - "bilinear", linear interpolation using the four cells surrounding the point
             Default: "nearest"
@@ -587,14 +668,18 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         :py:meth:`.BaseGrid.interp_from_points`
         """
         if self.crs is None or alignment_grid.crs is None:
-            warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
+            warnings.warn(
+                "`crs` not set for one or both grids. Assuming both grids have an identical CRS."
+            )
             different_crs = False
         else:
             different_crs = not self.crs.is_exact_same(alignment_grid.crs)
 
         # make sure the bounds align with the grid
         if different_crs:
-            transformer = Transformer.from_crs(self.crs, alignment_grid.crs, always_xy=True)
+            transformer = Transformer.from_crs(
+                self.crs, alignment_grid.crs, always_xy=True
+            )
             bounds = transformer.transform_bounds(*self.bounds)
         else:
             bounds = self.bounds
@@ -607,7 +692,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         new_points = alignment_grid.centroid(new_ids)
 
         if different_crs:
-            transformer = Transformer.from_crs(alignment_grid.crs, self.crs, always_xy=True)
+            transformer = Transformer.from_crs(
+                alignment_grid.crs, self.crs, always_xy=True
+            )
             transformed_points = transformer.transform(*new_points.T)
             new_points = numpy.vstack(transformed_points).T
 
@@ -617,7 +704,10 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
 
         grid_kwargs = dict(
-            data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
+            data=value,
+            bounds=new_bounds,
+            crs=alignment_grid.crs,
+            nodata_value=nodata_value,
         )
         if hasattr(alignment_grid, "_shape"):
             grid_kwargs["shape"] = alignment_grid._shape
@@ -625,4 +715,3 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         new_grid = alignment_grid.bounded_cls(**grid_kwargs)
 
         return new_grid
-

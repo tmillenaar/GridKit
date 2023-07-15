@@ -1,14 +1,15 @@
-from gridkit.base_grid import BaseGrid
-from gridkit.bounded_grid import BoundedGrid
-from gridkit.errors import IntersectionError, AlignmentError
-
-import scipy
-import numpy
 import warnings
+
+import numpy
+import scipy
 from pyproj import CRS, Transformer
 
-class RectGrid(BaseGrid):
+from gridkit.base_grid import BaseGrid
+from gridkit.bounded_grid import BoundedGrid
+from gridkit.errors import AlignmentError, IntersectionError
 
+
+class RectGrid(BaseGrid):
     def __init__(self, *args, dx, dy, **kwargs):
         self.__dx = dx
         self.__dy = dy
@@ -17,17 +18,17 @@ class RectGrid(BaseGrid):
 
     @property
     def dx(self) -> float:
-        """The cellsize in x-direction
-        """
+        """The cellsize in x-direction"""
         return self.__dx
 
     @property
     def dy(self) -> float:
-        """The cellsize in y-direction
-        """
+        """The cellsize in y-direction"""
         return self.__dy
 
-    def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False, index=None):
+    def relative_neighbours(
+        self, depth=1, connect_corners=False, include_selected=False, index=None
+    ):
         """The relative indices of the neighbouring cells.
 
         Parameters
@@ -60,7 +61,7 @@ class RectGrid(BaseGrid):
         --------
         The direct neighbours of a cell can be returned by using depth=1, which is the default.
         For square grids, the number of returned neighbours depends on whether `connect_corners` is True or False:
-        
+
         .. code-block:: python
 
             >>> from gridkit.rect_grid import RectGrid
@@ -118,18 +119,20 @@ class RectGrid(BaseGrid):
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
 
-        neighbours = numpy.empty(((2*depth+1)**2, 2), dtype=int)
+        neighbours = numpy.empty(((2 * depth + 1) ** 2, 2), dtype=int)
 
-        relative_ids_1d = numpy.arange(-depth, depth+1)
+        relative_ids_1d = numpy.arange(-depth, depth + 1)
         relative_x, relative_y = numpy.meshgrid(relative_ids_1d, relative_ids_1d[::-1])
-        neighbours[:,0], neighbours[:,1] = numpy.ravel(relative_x), numpy.ravel(relative_y)
+        neighbours[:, 0], neighbours[:, 1] = numpy.ravel(relative_x), numpy.ravel(
+            relative_y
+        )
 
         if not connect_corners:
             mask = abs(numpy.multiply(*neighbours.T)) < depth
             neighbours = neighbours[mask]
 
         if include_selected is False:
-            center_cell = int(numpy.floor(len(neighbours)/2))
+            center_cell = int(numpy.floor(len(neighbours) / 2))
             neighbours = numpy.delete(neighbours, center_cell, 0)
 
         if index is not None:
@@ -165,7 +168,7 @@ class RectGrid(BaseGrid):
 
         Examples
         --------
-        Cell centers of single index are returned as an array with one dimention: 
+        Cell centers of single index are returned as an array with one dimention:
 
         .. code-block:: python
 
@@ -203,9 +206,11 @@ class RectGrid(BaseGrid):
 
 
         """
-        
+
         if index is None:
-            raise ValueError("For grids that do not contain data, argument `index` is to be supplied to method `centroid`.")
+            raise ValueError(
+                "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
+            )
         index = numpy.array(index, dtype="int").T
         centroids = numpy.empty_like(index, dtype=float)
         centroids[0] = index[0] * self.dx + (self.dx / 2) + self.offset[0]
@@ -272,11 +277,7 @@ class RectGrid(BaseGrid):
         """
 
         # Split each cell into 4 quadrants in order to identify what 3 neigbors to select
-        new_grid = RectGrid(
-            dx = self.dx/2,
-            dy = self.dy/2,
-            offset = self.offset
-        )
+        new_grid = RectGrid(dx=self.dx / 2, dy=self.dy / 2, offset=self.offset)
         ids = new_grid.cell_at_point(point).T
         left_top_mask = numpy.logical_and(ids[0] % 2 == 0, ids[1] % 2 == 1)
         right_top_mask = numpy.logical_and(ids[0] % 2 == 1, ids[1] % 2 == 1)
@@ -286,16 +287,16 @@ class RectGrid(BaseGrid):
         # obtain the bottom-left cell based on selected quadrant
         base_ids = numpy.empty_like(ids, dtype="int")
         # bottom-left if point in upper-right quadrant
-        base_ids[:,right_top_mask] = numpy.floor(ids[:,right_top_mask] / 2)
+        base_ids[:, right_top_mask] = numpy.floor(ids[:, right_top_mask] / 2)
         # bottom-left if point in bottom-right quadrant
-        base_ids[:,right_bottom_mask] = numpy.floor(ids[:,right_bottom_mask] / 2)
-        base_ids[1,right_bottom_mask] -= 1
+        base_ids[:, right_bottom_mask] = numpy.floor(ids[:, right_bottom_mask] / 2)
+        base_ids[1, right_bottom_mask] -= 1
         # bottom-left if point in bottom-left quadrant
-        base_ids[:,left_bottom_mask] = numpy.floor(ids[:,left_bottom_mask] / 2)
-        base_ids[:,left_bottom_mask] -= 1
+        base_ids[:, left_bottom_mask] = numpy.floor(ids[:, left_bottom_mask] / 2)
+        base_ids[:, left_bottom_mask] -= 1
         # bottom-left if point in upper-left qudrant
-        base_ids[:,left_top_mask] = numpy.floor(ids[:,left_top_mask] / 2)
-        base_ids[0,left_top_mask] -= 1
+        base_ids[:, left_top_mask] = numpy.floor(ids[:, left_top_mask] / 2)
+        base_ids[0, left_top_mask] -= 1
 
         # use the bottom-left cell to determine the other three
         bl_ids = base_ids.copy()
@@ -305,9 +306,8 @@ class RectGrid(BaseGrid):
         tr_ids += 1
         tl_ids = base_ids.copy()
         tl_ids[1] += 1
-            
-        return tl_ids.T, tr_ids.T, bl_ids.T, br_ids.T
 
+        return tl_ids.T, tr_ids.T, bl_ids.T, br_ids.T
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
@@ -375,22 +375,24 @@ class RectGrid(BaseGrid):
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         """Return corners in (cells, corners, xy)"""
         if index is None:
-            raise ValueError("For grids that do not contain data, argument `index` is to be supplied to method `corners`.")
+            raise ValueError(
+                "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
+            )
         centroids = self.centroid(index).T
-        
-        if len(centroids.shape) == 1:
-            corners = numpy.empty((4,2))
-        else:
-            corners = numpy.empty((4,2,centroids.shape[1]))
 
-        corners[0,0] = centroids[0] - self.dx / 2
-        corners[0,1] = centroids[1] - self.dy / 2
-        corners[1,0] = centroids[0] + self.dx / 2
-        corners[1,1] = centroids[1] - self.dy / 2
-        corners[2,0] = centroids[0] + self.dx / 2
-        corners[2,1] = centroids[1] + self.dy / 2
-        corners[3,0] = centroids[0] - self.dx / 2
-        corners[3,1] = centroids[1] + self.dy / 2
+        if len(centroids.shape) == 1:
+            corners = numpy.empty((4, 2))
+        else:
+            corners = numpy.empty((4, 2, centroids.shape[1]))
+
+        corners[0, 0] = centroids[0] - self.dx / 2
+        corners[0, 1] = centroids[1] - self.dy / 2
+        corners[1, 0] = centroids[0] + self.dx / 2
+        corners[1, 1] = centroids[1] - self.dy / 2
+        corners[2, 0] = centroids[0] + self.dx / 2
+        corners[2, 1] = centroids[1] + self.dy / 2
+        corners[3, 0] = centroids[0] - self.dx / 2
+        corners[3, 1] = centroids[1] + self.dy / 2
 
         # swap from (corners, xy, cells) to (cells, corners, xy)
         if len(centroids.shape) > 1:
@@ -398,15 +400,14 @@ class RectGrid(BaseGrid):
 
         return corners
 
-
     def is_aligned_with(self, other):
         if not isinstance(other, RectGrid):
             raise ValueError(f"Expected a RectGrid, got {type(other)}")
         aligned = True
         reason = ""
         reasons = []
-        
-        if (self.crs is None and other.crs is None):
+
+        if self.crs is None and other.crs is None:
             pass
         elif self.crs is None:
             aligned = False
@@ -419,13 +420,18 @@ class RectGrid(BaseGrid):
             aligned = False
             reasons.append("cellsize")
 
-        if not all(numpy.isclose(self.offset, other.offset, atol=1e-7)): # FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid
+        if not all(
+            numpy.isclose(self.offset, other.offset, atol=1e-7)
+        ):  # FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid
             aligned = False
             reasons.append("offset")
 
-        reason = f"The following attributes are not the same: {reasons}" if reasons else reason
+        reason = (
+            f"The following attributes are not the same: {reasons}"
+            if reasons
+            else reason
+        )
         return aligned, reason
-
 
     def cells_in_bounds(self, bounds):
         """
@@ -443,7 +449,9 @@ class RectGrid(BaseGrid):
         """
 
         if not self.are_bounds_aligned(bounds):
-            raise ValueError(f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first.")
+            raise ValueError(
+                f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
+            )
 
         if not self.are_bounds_aligned(bounds):
             bounds = self.align_bounds(bounds, mode="expand")
@@ -457,8 +465,10 @@ class RectGrid(BaseGrid):
 
         # turn minimum and maximum indices into fully arranged array
         # TODO: think about dtype. 64 is too large. Should this be exposed? Or automated based on id range?
-        ids_y = numpy.arange(left_top_id[1], right_bottom_id[1]-1, -1, dtype="int32") # y-axis goes from top to bottom (high to low), hence step size is -1
-        ids_x = list(range(left_top_id[0], right_bottom_id[0]+1))
+        ids_y = numpy.arange(
+            left_top_id[1], right_bottom_id[1] - 1, -1, dtype="int32"
+        )  # y-axis goes from top to bottom (high to low), hence step size is -1
+        ids_x = list(range(left_top_id[0], right_bottom_id[0] + 1))
 
         # TODO: only return ids_y and ids_x without fully filled grid
         shape = (len(ids_y), len(ids_x))
@@ -475,10 +485,11 @@ class RectGrid(BaseGrid):
 
 
 class BoundedRectGrid(BoundedGrid, RectGrid):
-
     def __init__(self, data, *args, bounds, **kwargs):
-        if bounds[2] <= bounds [0] or bounds[3] <= bounds[1]:
-            raise ValueError(f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}")
+        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+            raise ValueError(
+                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
+            )
         dx = (bounds[2] - bounds[0]) / data.shape[1]
         dy = (bounds[3] - bounds[1]) / data.shape[0]
 
@@ -487,10 +498,12 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         offset_x = dx - offset_x if offset_x < 0 else offset_x
         offset_y = dy - offset_y if offset_y < 0 else offset_y
         offset = (
-            0 if numpy.isclose(offset_x, dx) else offset_x, 
-            0 if numpy.isclose(offset_y, dy) else offset_y
+            0 if numpy.isclose(offset_x, dx) else offset_x,
+            0 if numpy.isclose(offset_y, dy) else offset_y,
         )
-        super(BoundedRectGrid, self).__init__(data, *args, dx=dx, dy=dy, bounds=bounds, offset=offset, **kwargs)
+        super(BoundedRectGrid, self).__init__(
+            data, *args, dx=dx, dy=dy, bounds=bounds, offset=offset, **kwargs
+        )
 
     @property
     def nr_cells(self):
@@ -505,7 +518,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :class:`numpy.ndarray`
             1D-Array of size `width`, containing the longitudinal values from left to right
         """
-        return numpy.linspace(self.bounds[0] + self.dx / 2, self.bounds[2] - self.dx / 2, self.width)
+        return numpy.linspace(
+            self.bounds[0] + self.dx / 2, self.bounds[2] - self.dx / 2, self.width
+        )
 
     @property
     def lat(self):
@@ -516,7 +531,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :class:`numpy.ndarray`
             1D-Array of size `height`, containing the latitudinal values from top to bottom
         """
-        return numpy.linspace(self.bounds[3] - self.dy / 2, self.bounds[1] + self.dy / 2, self.height)
+        return numpy.linspace(
+            self.bounds[3] - self.dy / 2, self.bounds[1] + self.dy / 2, self.height
+        )
 
     def centroid(self, index=None):
         """Centroids of all cells
@@ -533,20 +550,21 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         latlon = numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy")
 
         # return grid in shape (width, height, lonlat)
-        return numpy.array([latlon[0].ravel(),latlon[1].ravel()]).T
+        return numpy.array([latlon[0].ravel(), latlon[1].ravel()]).T
 
     def intersecting_cells(self, other):
         raise NotImplementedError()
 
     def crop(self, new_bounds, bounds_crs=None, buffer_cells=0):
-
         if bounds_crs is not None:
             bounds_crs = CRS.from_user_input(bounds_crs)
             transformer = Transformer.from_crs(bounds_crs, self.crs, always_xy=True)
             new_bounds = transformer.transform_bounds(*new_bounds)
 
         if not self.intersects(new_bounds):
-            raise IntersectionError(f"Cannot crop grid with bounds {self.bounds} to {new_bounds} for they do not intersect.")
+            raise IntersectionError(
+                f"Cannot crop grid with bounds {self.bounds} to {new_bounds} for they do not intersect."
+            )
         new_bounds = self.shared_bounds(new_bounds)
 
         new_bounds = self.align_bounds(new_bounds, mode="contract")
@@ -561,27 +579,30 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
                 new_bounds[3] + buffer_cells * self.dy,
             )
         # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
-        cropped_data = self._data[slice_y, slice_x] #Fixme: seems to be flipped?
+        cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
         # cropped_data = self._data[slice_x, slice_y]
         return self.update(cropped_data, bounds=new_bounds)
 
     def _data_slice_from_bounds(self, bounds):
-
         if not self.are_bounds_aligned(bounds):
-            raise ValueError(f"Cannot create slice from unaligned bounds {tuple(bounds)}")
+            raise ValueError(
+                f"Cannot create slice from unaligned bounds {tuple(bounds)}"
+            )
 
         difference_left = round(abs((self.bounds[0] - bounds[0]) / self.dx))
         difference_right = round(abs((self.bounds[2] - bounds[2]) / self.dx))
         slice_x = slice(
             difference_left,
-            self.width - difference_right, # add one for upper bound of slice is exclusive
+            self.width
+            - difference_right,  # add one for upper bound of slice is exclusive
         )
 
         difference_bottom = round(abs((self.bounds[1] - bounds[1]) / self.dy))
         difference_top = round(abs((self.bounds[3] - bounds[3]) / self.dy))
         slice_y = slice(
             difference_top,
-            self.height - difference_bottom, # add one for upper bound of slice is exclusive
+            self.height
+            - difference_bottom,  # add one for upper bound of slice is exclusive
         )
 
         return slice_y, slice_x
@@ -590,14 +611,14 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is None:
             index = self.indices()
         return super(BoundedRectGrid, self).cell_corners(index=index)
-    
+
     def to_shapely(self, index=None, as_multipolygon: bool = False):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
         Difference with parent method:
-            `index` is optional. 
+            `index` is optional.
             If `index` is None (default) the cells containing data are used as the `index` argument.
-        
+
         See also
         --------
         :meth:`.BaseGrid.to_shapely`
@@ -606,11 +627,11 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is None:
             index = self.indices
         return super().to_shapely(index, as_multipolygon)
-    
+
     def _bilinear_interpolation(self, sample_points):
         """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation
         using the 4 cells around the point.
-        
+
         Parameters
         ----------
         sample_points: :class:`numpy.ndarray`
@@ -634,9 +655,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         br_val = self.value(br_ids, oob_value=nodata_value)
 
         # determine relative location of new point between old cell centers in x and y directions
-        abs_diff = (sample_points - self.centroid(bl_ids))
-        x_diff = abs_diff[:,0] / self.dx
-        y_diff = abs_diff[:,1] / self.dy
+        abs_diff = sample_points - self.centroid(bl_ids)
+        x_diff = abs_diff[:, 0] / self.dx
+        y_diff = abs_diff[:, 1] / self.dy
 
         top_val = tl_val + (tr_val - tl_val) * x_diff
         bot_val = bl_val + (br_val - bl_val) * x_diff
@@ -646,7 +667,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         return values
 
     def to_crs(self, crs, resample_method="nearest"):
-        new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)
+        new_inf_grid = super(BoundedRectGrid, self).to_crs(
+            crs, resample_method=resample_method
+        )
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
@@ -663,4 +686,3 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""
         # Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn
         return super(BoundedRectGrid, self).interp_nodata(*args, **kwargs)
-

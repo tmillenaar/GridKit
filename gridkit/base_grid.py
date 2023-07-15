@@ -1,16 +1,16 @@
 import abc
-import scipy
-import numpy
 import functools
-from pyproj import CRS, Transformer
-import shapely
-from collections.abc import Iterable
 import warnings
+from collections.abc import Iterable
+
+import numpy
+import scipy
+import shapely
+from pyproj import CRS, Transformer
+
 
 class BaseGrid(metaclass=abc.ABCMeta):
-
-    def __init__(self, offset=(0,0), crs=None):
-
+    def __init__(self, offset=(0, 0), crs=None):
         # limit offset to be positive and max 1 cell-size
         offset_x, offset_y = offset[0], offset[1]
         offset_x = offset_x % self.dx
@@ -62,9 +62,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def relative_neighbours(self, depth=1, connect_corners=False, include_selected=False):
+    def relative_neighbours(
+        self, depth=1, connect_corners=False, include_selected=False
+    ):
         pass
-
 
     def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
         """The indices of the neighbouring cells.
@@ -115,7 +116,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if not isinstance(index, numpy.ndarray):
             index = numpy.array(index)
 
-        neighbours = self.relative_neighbours(depth=depth, connect_corners=connect_corners, include_selected=include_selected, index=index)
+        neighbours = self.relative_neighbours(
+            depth=depth,
+            connect_corners=connect_corners,
+            include_selected=include_selected,
+            index=index,
+        )
 
         if len(index.shape) == 1:
             return neighbours + index
@@ -126,7 +132,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return numpy.swapaxes(neighbours, 0, 1)
 
     @abc.abstractmethod
-    def cell_at_point(self, point: numpy.ndarray) -> tuple: 
+    def cell_at_point(self, point: numpy.ndarray) -> tuple:
         """Determine the ID of the cell in which `point` falls.
 
         Parameters
@@ -142,7 +148,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def cell_corners(self, index: numpy.ndarray, as_poly: bool = False) -> numpy.ndarray:
+    def cell_corners(
+        self, index: numpy.ndarray, as_poly: bool = False
+    ) -> numpy.ndarray:
         """Determine the corners of the cells as specified by `index`.
 
         Parameters
@@ -164,7 +172,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     def to_crs(self, crs, resample_method="nearest"):
-        """Transforms the 
+        """Transforms the
 
         The ``crs`` attribute on the current GeometryArray must
         be set.  Either ``crs`` or ``epsg`` may be specified for output.
@@ -173,7 +181,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         assumed to be lines in the current projection, not geodesics.  Objects
         crossing the dateline (or other projection boundary) will have
         undesirable behavior.
-        
+
         Parameters
         ----------
         crs :class:`pyproj.CRS`
@@ -183,14 +191,14 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        
+
         """
         if self.crs is None:
             raise ValueError(
                 "Cannot transform naive grids.  "
                 "Please set a crs on the object first."
             )
-        
+
         crs = CRS.from_user_input(crs)
 
         # skip if the input CRS and output CRS are the exact same
@@ -204,11 +212,15 @@ class BaseGrid(metaclass=abc.ABCMeta):
         point_end = transformer.transform(self.dx, self.dy)
         new_dx, new_dy = [end - start for (end, start) in zip(point_end, point_start)]
 
-        return self.parent_grid_class(dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs)
+        return self.parent_grid_class(
+            dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs
+        )
 
     @property
     def parent_grid(self):
-        return self.parent_grid_class(dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs)
+        return self.parent_grid_class(
+            dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs
+        )
 
     @abc.abstractproperty
     def parent_grid_class(self):
@@ -230,17 +242,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     def are_bounds_aligned(self, bounds, separate=False):
-        is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(val, cellsize)
+        is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(
+            val, cellsize
+        )
         per_axis = (
-            is_aligned((bounds[0] - self.offset[0]) % self.dx, self.dx), # left
-            is_aligned((bounds[1] - self.offset[1]) % self.dy, self.dy), # bottom
-            is_aligned((bounds[2] - self.offset[0]) % self.dx, self.dx), # right
-            is_aligned((bounds[3] - self.offset[1]) % self.dy, self.dy)  # top
+            is_aligned((bounds[0] - self.offset[0]) % self.dx, self.dx),  # left
+            is_aligned((bounds[1] - self.offset[1]) % self.dy, self.dy),  # bottom
+            is_aligned((bounds[2] - self.offset[0]) % self.dx, self.dx),  # right
+            is_aligned((bounds[3] - self.offset[1]) % self.dy, self.dy),  # top
         )
         return per_axis if separate else numpy.all(per_axis)
 
     def align_bounds(self, bounds, mode="expand"):
-        
         if self.are_bounds_aligned(bounds):
             return bounds
 
@@ -260,8 +273,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
             right_rounded = round((bounds[2] - self.offset[0]) / self.dx)
             top_rounded = round((bounds[3] - self.offset[1]) / self.dy)
         else:
-            raise ValueError(f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')")
-        
+            raise ValueError(
+                f"mode = '{mode}' is not supported. Supported modes: ('expand', 'contract', 'nearest')"
+            )
+
         return (
             left_rounded * self.dx + self.offset[0],
             bottom_rounded * self.dy + self.offset[1],
@@ -286,18 +301,24 @@ class BaseGrid(metaclass=abc.ABCMeta):
         for geom in _geom_iterator():
             if isinstance(geom, shapely.geometry.Point):
                 if not suppress_point_warning:
-                    warnings.warn("Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points")
-                    suppress_point_warning=True # Only warn once per function call
+                    warnings.warn(
+                        "Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points"
+                    )
+                    suppress_point_warning = True  # Only warn once per function call
             geom_bounds = self.align_bounds(geom.bounds, mode="expand")
-            geom_bounds = ( # buffer bounds to be on the safe side
+            geom_bounds = (  # buffer bounds to be on the safe side
                 geom_bounds[0] - self.dx,
                 geom_bounds[1] - self.dy,
                 geom_bounds[2] + self.dx,
                 geom_bounds[3] + self.dy,
             )
             cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
-            if len(cells_in_bounds) == 0: # happens only if point or line lies on an edge
-                geom = geom.buffer(min(self.dx, self.dy) / 10) # buffer may never reach further then a single cell size
+            if (
+                len(cells_in_bounds) == 0
+            ):  # happens only if point or line lies on an edge
+                geom = geom.buffer(
+                    min(self.dx, self.dy) / 10
+                )  # buffer may never reach further then a single cell size
                 geom_bounds = self.align_bounds(geom.bounds, mode="expand")
                 cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
 
@@ -305,7 +326,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
             mask = [geom.intersects(cell) for cell in cell_shapes]
             intersecting_cells.extend(cells_in_bounds[mask])
         return numpy.unique(intersecting_cells, axis=0)
-
 
     def to_shapely(self, index, as_multipolygon: bool = False):
         """Represent the cells as Shapely Polygons
@@ -329,15 +349,16 @@ class BaseGrid(metaclass=abc.ABCMeta):
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
         return shapely.geometry.MultiPolygon(polygons) if as_multipolygon else polygons
 
-
-    def interp_from_points(self, points, values, method="linear", nodata_value=numpy.nan):
+    def interp_from_points(
+        self, points, values, method="linear", nodata_value=numpy.nan
+    ):
         """Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.
 
         This function turns any set of points at arbitrary location into a regularly spaced :class:`.BoundedGrid`
         that has the properties of the current :class:`.BaseGrid` (``self``).
         :meth:`.BoundedGrid.interpolate` works in the other direction, where a values on a :class:`.BoundedGrid`
         are sampled in order to obtain values at arbitrary location.
-        
+
         .. Note ::
             This function is significantly slower than :meth:`.BoundedGrid.interpolate`
 
@@ -364,13 +385,19 @@ class BaseGrid(metaclass=abc.ABCMeta):
         values = numpy.array(values)
 
         method_lut = dict(
-            nearest = scipy.interpolate.NearestNDInterpolator,
-            linear = functools.partial(scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value),
-            cubic = functools.partial(scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value),
+            nearest=scipy.interpolate.NearestNDInterpolator,
+            linear=functools.partial(
+                scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value
+            ),
+            cubic=functools.partial(
+                scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value
+            ),
         )
 
         if method not in method_lut:
-            raise ValueError(f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}")
+            raise ValueError(
+                f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}"
+            )
 
         coords = points.T
         bounds = (
@@ -381,7 +408,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
         )
         aligned_bounds = self.align_bounds(bounds, mode="expand")
         ids, shape = self.cells_in_bounds(aligned_bounds)
-        interp_values = numpy.full(shape=shape, fill_value = nodata_value, dtype=values.dtype)
+        interp_values = numpy.full(
+            shape=shape, fill_value=nodata_value, dtype=values.dtype
+        )
 
         interp_func = method_lut[method]
         nodata_mask = values == nodata_value
@@ -394,9 +423,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         interp_values.ravel()[:] = interpolator(centroids)
         grid_kwargs = dict(
-            data=interp_values, bounds=aligned_bounds, crs=self.crs, nodata_value=nodata_value
+            data=interp_values,
+            bounds=aligned_bounds,
+            crs=self.crs,
+            nodata_value=nodata_value,
         )
         if hasattr(self, "_shape"):
             grid_kwargs["shape"] = self._shape
         return self.bounded_cls(**grid_kwargs)
-
