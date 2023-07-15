@@ -606,6 +606,44 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         if index is None:
             index = self.indices
         return super().to_shapely(index, as_multipolygon)
+    
+    def _bilinear_interpolation(self, sample_points):
+        """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation
+        using the 4 cells around the point.
+        
+        Parameters
+        ----------
+        sample_points: :class:`numpy.ndarray`
+            The coordinates of the points at which to sample the data
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.RectGrid.cell_at_point`
+        """
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
+        tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points)
+
+        tl_val = self.value(tl_ids, oob_value=nodata_value)
+        tr_val = self.value(tr_ids, oob_value=nodata_value)
+        bl_val = self.value(bl_ids, oob_value=nodata_value)
+        br_val = self.value(br_ids, oob_value=nodata_value)
+
+        # determine relative location of new point between old cell centers in x and y directions
+        abs_diff = (sample_points - self.centroid(bl_ids))
+        x_diff = abs_diff[:,0] / self.dx
+        y_diff = abs_diff[:,1] / self.dy
+
+        top_val = tl_val + (tr_val - tl_val) * x_diff
+        bot_val = bl_val + (br_val - bl_val) * x_diff
+        values = bot_val + (top_val - bot_val) * y_diff
+
+        # TODO: remove rows and cols with nans around the edge after bilinear
+        return values
 
     def resample(self, alignment_grid, method="nearest"):
         if self.crs is None or alignment_grid.crs is None:
@@ -633,33 +671,17 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             transformed_points = transformer.transform(*new_points.T)
             new_points = numpy.vstack(transformed_points).T
 
-        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
         if method == "nearest":
             new_ids = self.cell_at_point(new_points)
             value = self.value(new_ids)
         elif method == "bilinear":
-            tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(new_points)
-
-            tl_val = self.value(tl_ids, oob_value=nodata_value)
-            tr_val = self.value(tr_ids, oob_value=nodata_value)
-            bl_val = self.value(bl_ids, oob_value=nodata_value)
-            br_val = self.value(br_ids, oob_value=nodata_value)
-
-            # determine relative location of new point between old cell centers in x and y directions
-            abs_diff = (new_points - self.centroid(bl_ids))
-            x_diff = abs_diff[:,0] / self.dx
-            y_diff = abs_diff[:,1] / self.dy
-
-            top_val = tl_val + (tr_val - tl_val) * x_diff
-            bot_val = bl_val + (br_val - bl_val) * x_diff
-            value = bot_val + (top_val - bot_val) * y_diff
-
-            # TODO: remove rows and cols with nans around the edge after bilinear
+            value = self._bilinear_interpolation(new_points)
         else:
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
         value = value.reshape(new_shape)
 
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
         grid_kwargs = dict(
             data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
         )

@@ -666,6 +666,63 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             index = self.indices
         return super().to_shapely(index, as_multipolygon)
 
+    def _bilinear_interpolation(self, sample_points):
+        """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation
+        using the 4 cells around the point.
+        
+        Parameters
+        ----------
+        sample_points: :class:`numpy.ndarray`
+            The coordinates of the points at which to sample the data
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.RectGrid.cell_at_point`
+        """
+        # FIXME: speed up (numba)
+        def get_weight(point, p1, p2, p3):
+        
+            def _project(point, line_points):
+                """Project 'point' onto a line drawn between 'line_points[0]' and 'line_points[1]'
+                Credits to https://stackoverflow.com/a/61343727/22128453
+                """
+                # distance between line_points[0] and line_points[1]
+                line_length = numpy.sum((line_points[0]-line_points[1])**2)
+
+                # project point on line extension connecting line_points[0] and line_points[1]
+                t = numpy.sum((point - line_points[0]) * (line_points[1] - line_points[0])) / line_length
+
+                return line_points[0] + t * (line_points[1] - line_points[0])
+        
+            side_length = numpy.linalg.norm(p1 - p2)
+            dd = p2 + (p2 - p3)/2
+            if numpy.linalg.norm(dd - p1) > side_length:
+                dd = p2 - (p2 - p3)/2
+            ad = dd - p1
+
+            projected = _project(point-p1, [p3-p1, p2-p1])
+            return numpy.linalg.norm((projected - (point-p1)) / numpy.linalg.norm(ad))
+
+        all_nearby_cells = self.cells_near_point(sample_points) # (points, nearby_cells, xy)
+        values = numpy.empty(len(sample_points))
+        for idx, (point, nearby_cells) in enumerate(zip(sample_points, all_nearby_cells)):
+            nearby_centroids = self.centroid(nearby_cells)
+            p1, p2, p3 = nearby_centroids
+            weights = numpy.array([
+                get_weight(point, p1, p2, p3),
+                get_weight(point, p2, p1, p3),
+                get_weight(point, p3, p2, p1),
+            ])
+            values[idx] = numpy.sum(weights * self.value(nearby_cells))
+
+        # TODO: remove rows and cols with nans around the edge after bilinear
+        return values
+
     def resample(self, alignment_grid, method="nearest"):
         if self.crs is None or alignment_grid.crs is None:
             warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
@@ -697,43 +754,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             new_ids = self.cell_at_point(new_points)
             value = self.value(new_ids)
         elif method == "bilinear":
-            # FIXME: clean up and speed up (numba)
-            def get_weight(point,aa,bb,cc):
-            
-                def _project(point, line_points):
-                    """Project 'point' onto a line drawn between 'line_points[0]' and 'line_points[1]'
-                    Credits to https://stackoverflow.com/a/61343727/22128453
-                    """
-                    # distance between line_points[0] and line_points[1]
-                    line_length = numpy.sum((line_points[0]-line_points[1])**2)
-
-                    # project point on line extension connecting line_points[0] and line_points[1]
-                    t = numpy.sum((point - line_points[0]) * (line_points[1] - line_points[0])) / line_length
-
-                    return line_points[0] + t * (line_points[1] - line_points[0])
-            
-                side_length = numpy.linalg.norm(aa - bb)
-                dd = bb + (bb - cc)/2
-                if numpy.linalg.norm(dd - aa) > side_length:
-                    dd = bb - (bb - cc)/2
-                ad = dd - aa
-
-                projected = _project(point-aa, [cc-aa, bb-aa])
-                return numpy.linalg.norm((projected - (point-aa)) / numpy.linalg.norm(ad))
-
-            all_nearby_cells = self.cells_near_point(new_points) # (points, nearby_cells, xy)
-            value = numpy.empty(len(new_points))
-            for idx, (point, nearby_cells) in enumerate(zip(new_points, all_nearby_cells)):
-                nearby_centroids = self.centroid(nearby_cells)
-                p1, p2, p3 = nearby_centroids
-                weights = numpy.array([
-                    get_weight(point, p1, p2, p3),
-                    get_weight(point, p2, p1, p3),
-                    get_weight(point, p3, p2, p1),
-                ])
-                value[idx] = numpy.sum(weights * self.value(nearby_cells))
-
-            # TODO: remove rows and cols with nans around the edge after bilinear
+            value = self._bilinear_interpolation(new_points)
         else:
             raise ValueError(f"Resampling method '{method}' is not supported.")
 
