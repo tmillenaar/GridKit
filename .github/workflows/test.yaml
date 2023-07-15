@@ -24,7 +24,7 @@ jobs:
         run: pip install ./[test]
 
       - name: Run pytest
-        run: python -m pytest tests
+        run: python -m pytest tests --cov
 
       - name: Run doctest
         run: python -m pytest gridkit/ --doctest-modules
