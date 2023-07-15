@@ -3,9 +3,10 @@ GridKit
 
 GridKit is a tool to work with grids on a high abstraction level.
 
-[![Downloads](https://static.pepy.tech/personalized-badge/gridkit?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/gridkit)
+[![download stats: PePy](https://static.pepy.tech/personalized-badge/gridkit?period=total&units=international_system&left_color=grey&right_color=blue&left_text=Downloads)](https://pepy.tech/project/gridkit)
 [![codecov](https://codecov.io/gh/tmillenaar/GridKit/branch/main/graph/badge.svg?token=23BKSMAHM1)](https://codecov.io/gh/tmillenaar/GridKit)
-[![Downloads](https://badge.fury.io/py/gridkit.svg)](https://pypi.org/project/gridkit/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI](https://badge.fury.io/py/gridkit.svg)](https://pypi.org/project/gridkit/)
 
 Documentation
 =============
