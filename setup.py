@@ -10,6 +10,7 @@ with open("requirements.txt") as file:
 tests_require = [
     "black",
     "geopandas",
+    "pytest-cov",
     "pytest-pylint",
     "pytest-black",
     "pylint",
