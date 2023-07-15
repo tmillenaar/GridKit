@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.hex_grid &mdash; GridKit v0.2.0 documentation</title>
+  <title>gridkit.hex_grid &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -81,53 +81,52 @@
            <div itemprop="articleBody">
              
   <h1>Source code for gridkit.hex_grid</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">gridkit.base_grid</span> <span class="kn">import</span> <span class="n">BaseGrid</span>
-<span class="kn">from</span> <span class="nn">gridkit.bounded_grid</span> <span class="kn">import</span> <span class="n">BoundedGrid</span>
-<span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
-<span class="kn">from</span> <span class="nn">gridkit.errors</span> <span class="kn">import</span> <span class="n">IntersectionError</span><span class="p">,</span> <span class="n">AlignmentError</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
 
-<div class="viewcode-block" id="HexGrid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid">[docs]</a><span class="k">class</span> <span class="nc">HexGrid</span><span class="p">(</span><span class="n">BaseGrid</span><span class="p">):</span>
+<span class="kn">from</span> <span class="nn">gridkit.base_grid</span> <span class="kn">import</span> <span class="n">BaseGrid</span>
+<span class="kn">from</span> <span class="nn">gridkit.bounded_grid</span> <span class="kn">import</span> <span class="n">BoundedGrid</span>
+<span class="kn">from</span> <span class="nn">gridkit.errors</span> <span class="kn">import</span> <span class="n">AlignmentError</span><span class="p">,</span> <span class="n">IntersectionError</span>
+<span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
 
+
+<div class="viewcode-block" id="HexGrid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid">[docs]</a><span class="k">class</span> <span class="nc">HexGrid</span><span class="p">(</span><span class="n">BaseGrid</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
-        
+
         <span class="k">if</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="n">size</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
         <span class="k">elif</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="n">size</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A HexGrid&#39;s `shape` can either be &#39;pointy&#39; or &#39;flat&#39;, got &#39;</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
-        
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;A HexGrid&#39;s `shape` can either be &#39;pointy&#39; or &#39;flat&#39;, got &#39;</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span> <span class="o">=</span> <span class="n">BoundedHexGrid</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in x-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in x-direction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in y-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in y-direction&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
-    
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The shape of the grid as supplied when initiating the class.</span>
@@ -141,8 +140,10 @@
 <span class="sd">        This is the same as dx for a flat grid and the same as dy for a pointy grid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
-    
-<div class="viewcode-block" id="HexGrid.relative_neighbours"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours">[docs]</a>    <span class="k">def</span> <span class="nf">relative_neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+
+<div class="viewcode-block" id="HexGrid.relative_neighbours"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours">[docs]</a>    <span class="k">def</span> <span class="nf">relative_neighbours</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The relative indices of the neighbouring cells.</span>
 
 <span class="sd">        Parameters</span>
@@ -230,22 +231,24 @@
 
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;depth&#39; cannot be lower than 1&quot;</span><span class="p">)</span>
-        
+
         <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
 
-        <span class="n">nr_neighbours</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">6</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="c1"># Add 1 for the first cell</span>
-        <span class="n">nr_indices</span><span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">nr_neighbours</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># Add 1 for the first cell</span>
+        <span class="n">nr_indices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nr_indices</span><span class="p">,</span> <span class="n">nr_neighbours</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">start_slice</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># create top half of selection</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span> <span class="c1"># loop from top row to bottom row</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>  <span class="c1"># loop from top row to bottom row</span>
             <span class="n">row_length</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="n">row_slice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">start_slice</span><span class="p">,</span> <span class="n">start_slice</span><span class="o">+</span><span class="n">row_length</span><span class="p">)</span>
-            <span class="n">max_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">row_length</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">row_slice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">start_slice</span><span class="p">,</span> <span class="n">start_slice</span> <span class="o">+</span> <span class="n">row_length</span><span class="p">)</span>
+            <span class="n">max_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">row_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
                 <span class="n">pointy_axis</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="n">flat_axis</span> <span class="o">=</span> <span class="mi">0</span>
@@ -254,24 +257,25 @@
                 <span class="n">flat_axis</span> <span class="o">=</span> <span class="mi">1</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">depth</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">flat_axis</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">max_val</span><span class="p">,</span> <span class="n">max_val</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">flat_axis</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">max_val</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">odd_mask</span> <span class="o">=</span> <span class="n">index</span><span class="p">[:,</span> <span class="n">pointy_axis</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span>
-                <span class="n">neighbours</span><span class="p">[</span><span class="n">odd_mask</span><span class="p">,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">flat_axis</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">max_val</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">neighbours</span><span class="p">[</span><span class="n">odd_mask</span><span class="p">,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">flat_axis</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span>
+                    <span class="o">-</span><span class="n">max_val</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="p">)</span>
                 <span class="n">neighbours</span><span class="p">[</span><span class="o">~</span><span class="n">odd_mask</span><span class="p">,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">flat_axis</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">max_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">)</span>
             <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">row_slice</span><span class="p">,</span> <span class="n">pointy_axis</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span>
             <span class="n">start_slice</span> <span class="o">+=</span> <span class="n">row_length</span>
 
         <span class="c1"># mirror top half to bottom half (leaving the center row be)</span>
-        <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">start_slice</span><span class="p">:]</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">start_slice</span> <span class="o">-</span> <span class="n">row_length</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">start_slice</span><span class="p">:]</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[:,</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">start_slice</span> <span class="o">-</span> <span class="n">row_length</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">neighbours</span><span class="p">[:,</span> <span class="n">start_slice</span><span class="p">:,</span> <span class="n">pointy_axis</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">include_selected</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">center_cell</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">neighbours</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">center_cell</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">neighbours</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
             <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">center_cell</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">neighbours</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">neighbours</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
-
 
 <div class="viewcode-block" id="HexGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by `index`.</span>
@@ -299,7 +303,7 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        Cell centers of single index are returned as an array with one dimention: </span>
+<span class="sd">        Cell centers of single index are returned as an array with one dimention:</span>
 
 <span class="sd">        .. code-block:: python</span>
 
@@ -337,9 +341,11 @@
 
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+            <span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;int&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
         <span class="n">centroids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -347,10 +353,10 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
             <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
-            <span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
             <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
-            <span class="n">centroids</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">centroids</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="k">return</span> <span class="n">centroids</span><span class="o">.</span><span class="n">T</span></div>
 
 <div class="viewcode-block" id="HexGrid.cells_near_point"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point">[docs]</a>    <span class="k">def</span> <span class="nf">cells_near_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
@@ -383,44 +389,58 @@
         <span class="n">centroid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
         <span class="n">distance_vector</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">centroid</span>
         <span class="n">azimuth</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="o">*</span><span class="n">distance_vector</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span>
+        <span class="c1"># FIXME: if there is one point, azimuth is a float in which we cannot use a mask. Make the check more elegant</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">azimuth</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">azimuth</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">cell</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
+        <span class="n">az_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">180</span><span class="p">),</span> <span class="p">(</span><span class="mi">180</span><span class="p">,</span> <span class="mi">240</span><span class="p">),</span> <span class="p">(</span><span class="mi">240</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">360</span><span class="p">)]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
-            <span class="n">inconsistent_axis</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># TODO: Make consistent and inconsisten axis a property of self</span>
+            <span class="n">inconsistent_axis</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="mi">0</span>  <span class="c1"># TODO: Make consistent and inconsisten axis a property of self</span>
+            <span class="p">)</span>
             <span class="n">consistent_axis</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">az_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span><span class="mi">180</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">180</span><span class="p">,</span><span class="o">-</span><span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">120</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
-            <span class="n">shift_odd_cells</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">shift_odd_cells</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">2</span><span class="p">]</span>
             <span class="n">nearby_cells_relative_idx</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
             <span class="p">]</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
             <span class="n">inconsistent_axis</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">consistent_axis</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">azimuth</span> <span class="o">+=</span> <span class="mi">30</span> <span class="c1"># it is easier to work with ranges starting at 0 rather than -30</span>
-            <span class="n">az_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span><span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span><span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span><span class="mi">180</span><span class="p">),</span> <span class="p">(</span><span class="mi">180</span><span class="p">,</span><span class="mi">210</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">120</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
-            <span class="n">shift_odd_cells</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">azimuth</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="mi">30</span>  <span class="c1"># it is easier to work with ranges starting at 0 rather than -30</span>
+            <span class="p">)</span>
+            <span class="n">shift_odd_cells</span> <span class="o">=</span> <span class="p">[</span><span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="nb">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
             <span class="n">nearby_cells_relative_idx</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]],</span>
-                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
             <span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized grid shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">nearby_cells</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># shape: neighbours(3), points(n), xy(2)</span>
+        <span class="n">nearby_cells</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>  <span class="c1"># shape: neighbours(3), points(n), xy(2)</span>
         <span class="n">odd_cells_mask</span> <span class="o">=</span> <span class="n">cell</span><span class="p">[:,</span> <span class="n">inconsistent_axis</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
-        
-        <span class="k">for</span> <span class="n">az_range</span><span class="p">,</span> <span class="n">shift_odd</span><span class="p">,</span> <span class="n">cells</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">az_ranges</span><span class="p">,</span> <span class="n">shift_odd_cells</span><span class="p">,</span> <span class="n">nearby_cells_relative_idx</span><span class="p">):</span>
+
+        <span class="c1"># make sure azimuth is inbetween 0 and 360, and not between -180 and 180</span>
+        <span class="n">azimuth</span><span class="p">[</span><span class="n">azimuth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">360</span>
+        <span class="n">azimuth</span><span class="p">[</span><span class="n">azimuth</span> <span class="o">&gt;</span> <span class="mi">360</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">360</span>
+
+        <span class="k">for</span> <span class="n">az_range</span><span class="p">,</span> <span class="n">shift_odd</span><span class="p">,</span> <span class="n">cells</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">az_ranges</span><span class="p">,</span> <span class="n">shift_odd_cells</span><span class="p">,</span> <span class="n">nearby_cells_relative_idx</span>
+        <span class="p">):</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">azimuth</span> <span class="o">&gt;</span> <span class="n">az_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">azimuth</span> <span class="o">&lt;=</span> <span class="n">az_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">nearby_cells</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">nearby_cells</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">mask</span><span class="p">]</span> <span class="o">+=</span> <span class="n">cells</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -429,7 +449,6 @@
 
         <span class="n">nearby_cells</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nearby_cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">nearby_cells</span></div>
-
 
 <div class="viewcode-block" id="HexGrid.cell_at_point"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point">[docs]</a>    <span class="k">def</span> <span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Index of the cell containing the supplied point(s).</span>
@@ -448,7 +467,7 @@
 <span class="sd">            If a single point is supplied, the index is returned as a 1d array of length 2.</span>
 <span class="sd">            If multiple points are supplied, the indices are returned as Nx2 ndarrays.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>       
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">point</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">point</span><span class="o">.</span><span class="n">T</span>
 
@@ -464,23 +483,44 @@
             <span class="n">flat_stepsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
             <span class="n">pointy_stepsize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A HexGrid&#39;s `shape` can either be &#39;pointy&#39; or &#39;flat&#39;, got &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;A HexGrid&#39;s `shape` can either be &#39;pointy&#39; or &#39;flat&#39;, got &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_shape</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
 
-        <span class="n">ids_pointy</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">point</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="n">pointy_stepsize</span><span class="p">)</span>
+        <span class="n">ids_pointy</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">pointy_stepsize</span>
+        <span class="p">)</span>
         <span class="n">even</span> <span class="o">=</span> <span class="n">ids_pointy</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="n">ids_flat</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">ids_pointy</span><span class="p">)</span>
-        <span class="n">ids_flat</span><span class="p">[</span><span class="o">~</span><span class="n">even</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">][</span><span class="o">~</span><span class="n">even</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">]</span> <span class="o">-</span> <span class="n">flat_stepsize</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">flat_stepsize</span><span class="p">)</span>
-        <span class="n">ids_flat</span><span class="p">[</span><span class="n">even</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">][</span><span class="n">even</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">])</span> <span class="o">/</span> <span class="n">flat_stepsize</span><span class="p">)</span>
-        
+        <span class="n">ids_flat</span><span class="p">[</span><span class="o">~</span><span class="n">even</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">][</span><span class="o">~</span><span class="n">even</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">]</span> <span class="o">-</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">flat_stepsize</span>
+        <span class="p">)</span>
+        <span class="n">ids_flat</span><span class="p">[</span><span class="n">even</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">][</span><span class="n">even</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">])</span> <span class="o">/</span> <span class="n">flat_stepsize</span>
+        <span class="p">)</span>
+
         <span class="c1"># Finetune ambiguous points</span>
         <span class="c1"># Points at the top of the cell can be in this cell or in the cell to the top right or top left</span>
-        <span class="n">rel_loc_y</span> <span class="o">=</span> <span class="p">((</span><span class="n">point</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">%</span> <span class="n">pointy_stepsize</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span>
-        <span class="n">rel_loc_x</span> <span class="o">=</span> <span class="p">((</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">])</span> <span class="o">%</span> <span class="n">flat_stepsize</span><span class="p">)</span>
-        <span class="n">top_left_even</span> <span class="o">=</span> <span class="n">rel_loc_x</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">rel_loc_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
-        <span class="n">top_right_even</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="o">-</span> <span class="n">rel_loc_y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
-        <span class="n">top_right_odd</span> <span class="o">=</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">rel_loc_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">rel_loc_y</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">pointy_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="o">%</span> <span class="n">pointy_stepsize</span>
+        <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="n">rel_loc_x</span> <span class="o">=</span> <span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="n">flat_axis</span><span class="p">])</span> <span class="o">%</span> <span class="n">flat_stepsize</span>
+        <span class="n">top_left_even</span> <span class="o">=</span> <span class="n">rel_loc_x</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span>
+            <span class="n">rel_loc_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="p">)</span>
+        <span class="n">top_right_even</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="o">-</span> <span class="n">rel_loc_y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
+        <span class="p">)</span>
+        <span class="n">top_right_odd</span> <span class="o">=</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="p">(</span>
+            <span class="n">rel_loc_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">/</span> <span class="mi">4</span>
+        <span class="p">)</span>
         <span class="n">top_right_odd</span> <span class="o">&amp;=</span> <span class="n">rel_loc_x</span> <span class="o">&gt;=</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="n">top_left_odd</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="o">-</span> <span class="n">rel_loc_y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+        <span class="n">top_left_odd</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">*</span> <span class="mf">1.25</span> <span class="o">-</span> <span class="n">rel_loc_y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">rel_loc_x</span> <span class="o">-</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span>
+        <span class="p">)</span>
         <span class="n">top_left_odd</span> <span class="o">&amp;=</span> <span class="n">rel_loc_x</span> <span class="o">&lt;</span> <span class="n">flat_stepsize</span> <span class="o">/</span> <span class="mi">2</span>
 
         <span class="n">ids_pointy</span><span class="p">[</span><span class="n">top_left_even</span> <span class="o">&amp;</span> <span class="n">even</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -499,17 +539,18 @@
 
         <span class="k">return</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">result</span></div>
 
-
 <div class="viewcode-block" id="HexGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners">[docs]</a>    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return corners in (cells, corners, xy)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `corners`.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `corners`.&quot;</span>
+            <span class="p">)</span>
         <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-        
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">):</span>
             <span class="n">angle_deg</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">30</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span> <span class="k">else</span> <span class="mi">60</span> <span class="o">*</span> <span class="n">i</span>
@@ -523,7 +564,6 @@
 
         <span class="k">return</span> <span class="n">corners</span></div>
 
-
 <div class="viewcode-block" id="HexGrid.is_aligned_with"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.is_aligned_with">[docs]</a>    <span class="k">def</span> <span class="nf">is_aligned_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a (child of) BaseGrid, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -533,9 +573,12 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">):</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Grid type is not the same. This is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">, the other is a </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Grid type is not the same. This is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">, the other is a </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
@@ -548,13 +591,18 @@
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;cellsize&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)):</span> <span class="c1"># FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
+        <span class="p">):</span>  <span class="c1"># FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;offset&quot;</span><span class="p">)</span>
 
-        <span class="n">reason</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;The following attributes are not the same: </span><span class="si">{</span><span class="n">reasons</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">reasons</span> <span class="k">else</span> <span class="n">reason</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The following attributes are not the same: </span><span class="si">{</span><span class="n">reasons</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">reasons</span>
+            <span class="k">else</span> <span class="n">reason</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">reason</span></div>
-
 
 <div class="viewcode-block" id="HexGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
@@ -566,7 +614,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Simplify function. Conceptually hard to follow and not very DRY</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;supplied bounds &#39;</span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&#39; are not aligned with the grid lines. Consider calling &#39;align_bounds&#39; first.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;supplied bounds &#39;</span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&#39; are not aligned with the grid lines. Consider calling &#39;align_bounds&#39; first.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
@@ -578,7 +628,9 @@
         <span class="n">right_bottom</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span>
 
         <span class="c1"># translate the coordinates of the corner cells into indices</span>
-        <span class="n">left_top_id</span><span class="p">,</span> <span class="n">left_bottom_id</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">,</span> <span class="n">right_bottom_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">([</span><span class="n">left_top</span><span class="p">,</span> <span class="n">left_bottom</span><span class="p">,</span> <span class="n">right_top</span><span class="p">,</span> <span class="n">right_bottom</span><span class="p">])</span>
+        <span class="n">left_top_id</span><span class="p">,</span> <span class="n">left_bottom_id</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">,</span> <span class="n">right_bottom_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">left_top</span><span class="p">,</span> <span class="n">left_bottom</span><span class="p">,</span> <span class="n">right_top</span><span class="p">,</span> <span class="n">right_bottom</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
             <span class="n">nr_cells_flat</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span>
@@ -587,12 +639,19 @@
 
         <span class="n">ids_x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">left_bottom_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">ids_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">left_bottom_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+            <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">ids_y_full</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
+            <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">ids_y_full</span><span class="p">)</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ids_x_full</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">ids_y_full</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
-        
+
         <span class="c1"># determine what cells are outside of bounding box</span>
         <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-        <span class="n">error_margin</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span> <span class="c1"># expect problems with machine precision since some cells are on the bounds by design</span>
+        <span class="n">error_margin</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">float32</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">eps</span>  <span class="c1"># expect problems with machine precision since some cells are on the bounds by design</span>
         <span class="n">oob_mask</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">error_margin</span><span class="p">)</span>
         <span class="n">oob_mask</span> <span class="o">|=</span> <span class="n">centroids</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">error_margin</span><span class="p">)</span>
         <span class="n">oob_mask</span> <span class="o">|=</span> <span class="n">centroids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">error_margin</span><span class="p">)</span>
@@ -600,7 +659,11 @@
 
         <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="p">[</span><span class="o">~</span><span class="n">oob_mask</span><span class="p">]</span>
 
-        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">nr_cells_flat</span><span class="p">)),</span> <span class="n">nr_cells_flat</span><span class="p">)</span> <span class="k">if</span> <span class="n">nr_cells_flat</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">nr_cells_flat</span><span class="p">)),</span> <span class="n">nr_cells_flat</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nr_cells_flat</span> <span class="o">!=</span> <span class="mi">0</span>
+            <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span></div>
 
     <span class="nd">@property</span>
@@ -609,36 +672,45 @@
 
 
 <div class="viewcode-block" id="BoundedHexGrid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid">[docs]</a><span class="k">class</span> <span class="nc">BoundedHexGrid</span><span class="p">(</span><span class="n">BoundedGrid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;flat&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">dx</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dy</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span>
+                <span class="p">)</span>
         <span class="k">elif</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">dy</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span>
+                <span class="p">)</span>
 
         <span class="n">offset_x</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">dx</span>
         <span class="n">offset_y</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="n">dy</span>
         <span class="n">offset_x</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">-</span> <span class="n">offset_x</span> <span class="k">if</span> <span class="n">offset_x</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">offset_x</span>
         <span class="n">offset_y</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">-</span> <span class="n">offset_y</span> <span class="k">if</span> <span class="n">offset_y</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">offset_y</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_x</span><span class="p">,</span> 
-            <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_y</span>
+            <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_x</span><span class="p">,</span>
+            <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_y</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span><span class="s2">&quot;Something went wrong, the supplied bounds are not aligned with the resulting grid.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span>
+                <span class="s2">&quot;Something went wrong, the supplied bounds are not aligned with the resulting grid.&quot;</span>
+            <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nr_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -653,7 +725,9 @@
 <span class="sd">        :class:`numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `width`, containing the longitudinal values from left to right</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">lat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -664,20 +738,23 @@
 <span class="sd">        :class:`numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `height`, containing the latitudinal values from top to bottom</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="BoundedHexGrid.intersecting_cells"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.intersecting_cells">[docs]</a>    <span class="k">def</span> <span class="nf">intersecting_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BoundedHexGrid.crop"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buffer_cells</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="n">bounds_crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">bounds_crs</span> <span class="o">=</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">bounds_crs</span><span class="p">)</span>
             <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="n">bounds_crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">new_bounds</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">new_bounds</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">IntersectionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot crop grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_bounds</span><span class="si">}</span><span class="s2"> for they do not intersect.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">IntersectionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot crop grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_bounds</span><span class="si">}</span><span class="s2"> for they do not intersect.&quot;</span>
+            <span class="p">)</span>
         <span class="n">new_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">)</span>
 
         <span class="n">new_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;contract&quot;</span><span class="p">)</span>
@@ -692,27 +769,30 @@
                 <span class="n">new_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">buffer_cells</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="c1"># cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe</span>
-        <span class="n">cropped_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span><span class="p">]</span> <span class="c1">#Fixme: seems to be flipped?</span>
+        <span class="n">cropped_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span><span class="p">]</span>  <span class="c1"># Fixme: seems to be flipped?</span>
         <span class="c1"># cropped_data = self._data[slice_x, slice_y]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cropped_data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_data_slice_from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot create slice from unaligned bounds </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot create slice from unaligned bounds </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">difference_left</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span>
         <span class="n">difference_right</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span>
         <span class="n">slice_x</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span>
             <span class="n">difference_left</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">-</span> <span class="n">difference_right</span><span class="p">,</span> <span class="c1"># add one for upper bound of slice is exclusive</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+            <span class="o">-</span> <span class="n">difference_right</span><span class="p">,</span>  <span class="c1"># add one for upper bound of slice is exclusive</span>
         <span class="p">)</span>
 
         <span class="n">difference_bottom</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">))</span>
         <span class="n">difference_top</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">))</span>
         <span class="n">slice_y</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span>
             <span class="n">difference_top</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">-</span> <span class="n">difference_bottom</span><span class="p">,</span> <span class="c1"># add one for upper bound of slice is exclusive</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+            <span class="o">-</span> <span class="n">difference_bottom</span><span class="p">,</span>  <span class="c1"># add one for upper bound of slice is exclusive</span>
         <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span>
@@ -726,7 +806,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Refer to :meth:`.BaseGrid.to_shapely`</span>
 
 <span class="sd">        Difference with :meth:`.BaseGrid.to_shapely`:</span>
-<span class="sd">            `index` is optional. </span>
+<span class="sd">            `index` is optional.</span>
 <span class="sd">            If `index` is None (default) the cells containing data are used as the `index` argument.</span>
 
 <span class="sd">        See also</span>
@@ -738,11 +818,78 @@
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BoundedHexGrid.resample"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+    <span class="k">def</span> <span class="nf">_bilinear_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_points</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the value at the location of `sample_points` by doing a bilinear interpolation</span>
+<span class="sd">        using the 4 cells around the point.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sample_points: :class:`numpy.ndarray`</span>
+<span class="sd">            The coordinates of the points at which to sample the data</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">            The interpolated values at the supplied points</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :py:meth:`.RectGrid.cell_at_point`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># FIXME: speed up (numba)</span>
+        <span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">_project</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">line_points</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;Project &#39;point&#39; onto a line drawn between &#39;line_points[0]&#39; and &#39;line_points[1]&#39;</span>
+<span class="sd">                Credits to https://stackoverflow.com/a/61343727/22128453</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="c1"># distance between line_points[0] and line_points[1]</span>
+                <span class="n">line_length</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+                <span class="c1"># project point on line extension connecting line_points[0] and line_points[1]</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="p">)</span>
+                    <span class="o">/</span> <span class="n">line_length</span>
+                <span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="n">side_length</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span>
+            <span class="n">dd</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dd</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">side_length</span><span class="p">:</span>
+                <span class="n">dd</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">-</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">ad</span> <span class="o">=</span> <span class="n">dd</span> <span class="o">-</span> <span class="n">p1</span>
+
+            <span class="n">projected</span> <span class="o">=</span> <span class="n">_project</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="p">[</span><span class="n">p3</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">projected</span> <span class="o">-</span> <span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">))</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ad</span><span class="p">))</span>
+
+        <span class="n">all_nearby_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">(</span>
+            <span class="n">sample_points</span>
+        <span class="p">)</span>  <span class="c1"># (points, nearby_cells, xy)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_points</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">nearby_cells</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">all_nearby_cells</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">nearby_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span>
+            <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="n">nearby_centroids</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">),</span>
+                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">),</span>
+                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">),</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">))</span>
+
+        <span class="c1"># TODO: remove rows and cols with nans around the edge after bilinear</span>
+        <span class="k">return</span> <span class="n">values</span>
 
 <div class="viewcode-block" id="BoundedHexGrid.to_crs"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
-        <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="n">resample_method</span><span class="p">)</span>
+        <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+            <span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="n">resample_method</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">new_inf_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">resample_method</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedHexGrid.numpy_id_to_grid_id"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id">[docs]</a>    <span class="k">def</span> <span class="nf">numpy_id_to_grid_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_index</span><span class="p">):</span>
@@ -752,16 +899,30 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">index_topleft</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np_index</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">index_topleft</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">np_index</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="BoundedHexGrid.grid_id_to_numpy_id"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">[docs]</a>    <span class="k">def</span> <span class="nf">grid_id_to_numpy_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+            <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+            <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
         <span class="n">centroid_topleft</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">index_topleft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">centroid_topleft</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">index_topleft</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">index_topleft</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+            <span class="n">np_id</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_topleft</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">index_topleft</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+            <span class="n">np_id</span> <span class="o">=</span> <span class="p">((</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">index_topleft</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="p">(</span><span class="n">index_topleft</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">np_id</span></div>
 
 <div class="viewcode-block" id="BoundedHexGrid.interp_nodata"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.interp_nodata">[docs]</a>    <span class="k">def</span> <span class="nf">interp_nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`.&quot;&quot;&quot;</span>
         <span class="c1"># Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">interp_nodata</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">interp_nodata</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="BoundedHexGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; GridKit v0.2.0 documentation</title>
+  <title>Release notes &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -56,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-0-july-16-2023">Version 0.3.0 (July 16, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-2-0-july-10-2023">Version 0.2.0 (July 10, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-1-1-march-17-2023">Version 0.1.1 (March 17, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-1-0-march-17-2023">Version 0.1.0 (March 17, 2023)</a></li>
@@ -89,6 +90,31 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<section id="version-0-3-0-july-16-2023">
+<h2>Version 0.3.0 (July 16, 2023)<a class="headerlink" href="#version-0-3-0-july-16-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Resample method for BoundedHexGrid</p></li>
+<li><p>Bilinear interpolation method for BoundedHexGrid</p></li>
+<li><p>Split <code class="docutils literal notranslate"><span class="pre">Interpolate</span></code> method from <code class="docutils literal notranslate"><span class="pre">resample</span></code> method</p></li>
+<li><p>Codecov integration</p></li>
+</ul>
+</dd>
+<dt>CICD</dt><dd><ul class="simple">
+<li><p>black and isort checks in test pipeline</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add missing docstrings to resample method</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>reformat python files using black and isort</p></li>
+<li><p>move <code class="docutils literal notranslate"><span class="pre">Resample</span></code> method one step up in the inheritance hierarchy, to BoundedGrid</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-2-0-july-10-2023">
 <h2>Version 0.2.0 (July 10, 2023)<a class="headerlink" href="#version-0-2-0-july-10-2023" title="Permalink to this heading"></a></h2>
 <dl class="simple">

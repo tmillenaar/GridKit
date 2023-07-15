@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.2.0 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -418,11 +418,6 @@ If <cite>index</cite> is None (default) the cells containing data are used as th
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alignment_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.resample" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.to_crs">
 <span class="sig-name descname"><span class="pre">to_crs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.to_crs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.to_crs" title="Permalink to this definition"></a></dt>
 <dd><p>Transforms the</p>
@@ -446,6 +441,11 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">
+<span class="sig-name descname"><span class="pre">grid_id_to_numpy_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.grid_id_to_numpy_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.argmax">
 <span class="sig-name descname"><span class="pre">argmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.argmax" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -456,9 +456,10 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">
-<span class="sig-name descname"><span class="pre">grid_id_to_numpy_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.grid_id_to_numpy_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.interp_nodata">
+<span class="sig-name descname"><span class="pre">interp_nodata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.interp_nodata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.interp_nodata" title="Permalink to this definition"></a></dt>
+<dd><p>Please refer to <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interp_nodata" title="gridkit.bounded_grid.BoundedGrid.interp_nodata"><code class="xref py py-func docutils literal notranslate"><span class="pre">interp_nodata()</span></code></a>.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.max">
@@ -491,9 +492,55 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.interp_nodata">
-<span class="sig-name descname"><span class="pre">interp_nodata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.interp_nodata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.interp_nodata" title="Permalink to this definition"></a></dt>
-<dd><p>Please refer to <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interp_nodata" title="gridkit.bounded_grid.BoundedGrid.interp_nodata"><code class="xref py py-func docutils literal notranslate"><span class="pre">interp_nodata()</span></code></a>.</p>
+<dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.centroid">
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.centroid" title="Permalink to this definition"></a></dt>
+<dd><p>Coordinates at the center of the cell(s) specified by <cite>index</cite>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The two values that make up an <cite>index</cite> are expected to be integers, and will be cast as such.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – Index of the cell of which the centroid is to be calculated.
+The index consists of two integers specifying the nth cell in x- and y-direction.
+Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The longitude and latitude of the center of each cell.
+Axes order if multiple indices are specified: (points, xy), else (xy).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied. <cite>index</cite> can only be <cite>None</cite> in classes that contain data.</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Cell centers of single index are returned as an array with one dimention:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">array([2. , 0.5])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">array([-2. , -0.5])</span>
+</pre></div>
+</div>
+<p>Multiple cell indices can be supplied as a list of tuples or as an equivalent ndarray:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+<span class="go">array([[ 2. ,  0.5],</span>
+<span class="go">       [-2. , -0.5]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="go">array([[ 2. ,  0.5],</span>
+<span class="go">       [-2. , -0.5]])</span>
+</pre></div>
+</div>
+<p>Note that the center coordinate of the cell is also dependent on the grid’s offset:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">array([3., 1.])</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>

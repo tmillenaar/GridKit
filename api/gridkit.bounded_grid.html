@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bounded_grid &mdash; GridKit v0.2.0 documentation</title>
+  <title>bounded_grid &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -269,16 +269,6 @@
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.argmax">
-<span class="sig-name descname"><span class="pre">argmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.argmax" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.argmin">
-<span class="sig-name descname"><span class="pre">argmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.argmin" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.interp_nodata">
 <span class="sig-name descname"><span class="pre">interp_nodata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.interp_nodata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.interp_nodata" title="Permalink to this definition"></a></dt>
 <dd><p>Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</p>
@@ -301,6 +291,45 @@ A copy of the grid is made where nodata values are filled if in_place is False.<
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.interpolate">
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.interpolate" title="Permalink to this definition"></a></dt>
+<dd><p>Interpolate the value at the location of <code class="docutils literal notranslate"><span class="pre">sample_points</span></code>.</p>
+<p>Points that are outside of the bounds of the data are assigned <cite>self.nodata_value</cite>, or ‘NaN’ if no nodata value is set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_points</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The coordinates of the points at which to sample the data</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
+Supported methods:
+- “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+- “bilinear”, linear interpolation using the four cells surrounding the point
+Default: “nearest”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interpolated values at the supplied points</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>, <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points" title="gridkit.base_grid.BaseGrid.interp_from_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.interp_from_points()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.argmax">
+<span class="sig-name descname"><span class="pre">argmax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.argmax" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.argmin">
+<span class="sig-name descname"><span class="pre">argmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.argmin" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.max">
 <span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.max" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -319,6 +348,48 @@ A copy of the grid is made where nodata values are filled if in_place is False.<
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.min">
 <span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.min" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alignment_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.resample" title="Permalink to this definition"></a></dt>
+<dd><p>Resample the grid onto another grid.
+This will take the locations of the grid cells of the other grid (here called <code class="docutils literal notranslate"><span class="pre">alignment_grid</span></code>)
+and determine the value on these location based on the values of the original grid (<code class="docutils literal notranslate"><span class="pre">self</span></code>).</p>
+<dl class="simple">
+<dt>The steps are as follows:</dt><dd><ol class="arabic simple">
+<li><p>Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
+No transformation is done if any of the grids has no CRS set.</p></li>
+<li><p>Find the cells of the alignment grid within these transformed bounds</p></li>
+<li><p>Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
+How many nearby cells are selected depends on the selected <code class="docutils literal notranslate"><span class="pre">method</span></code></p></li>
+<li><p>Interpolate the values using the supplied <code class="docutils literal notranslate"><span class="pre">method</span></code> at each of the centroids of the alignment grid cells selected in 2.</p></li>
+<li><p>Create a new bounded grid using the attributes of the alignment grid</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alignment_grid</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code>) – The grid with the desired attributes on which to resample.</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
+Supported methods:
+- “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+- “bilinear”, linear interpolation using the four cells surrounding the point
+Default: “nearest”</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interpolated values at the supplied points</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a>, <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points" title="gridkit.base_grid.BaseGrid.interp_from_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.interp_from_points()</span></code></a></p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.std">

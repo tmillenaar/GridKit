@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.io &mdash; GridKit v0.2.0 documentation</title>
+  <title>gridkit.io &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -81,10 +81,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for gridkit.io</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">BoundedRectGrid</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">rasterio</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
+
+<span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">BoundedRectGrid</span>
 
 
 <div class="viewcode-block" id="read_geotiff"><a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.read_geotiff">[docs]</a><span class="k">def</span> <span class="nf">read_geotiff</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">border_buffer</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -110,7 +111,7 @@
             <span class="n">top</span><span class="p">,</span> <span class="n">left</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
             <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
-            <span class="k">if</span> <span class="n">border_buffer</span><span class="p">:</span> <span class="c1"># note rasterio slices from top to bottom</span>
+            <span class="k">if</span> <span class="n">border_buffer</span><span class="p">:</span>  <span class="c1"># note rasterio slices from top to bottom</span>
                 <span class="n">left</span> <span class="o">-=</span> <span class="n">border_buffer</span>
                 <span class="n">right</span> <span class="o">+=</span> <span class="n">border_buffer</span>
                 <span class="n">top</span> <span class="o">-=</span> <span class="n">border_buffer</span>
@@ -118,17 +119,20 @@
 
             <span class="c1"># Create a window from the indices</span>
             <span class="n">window</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">Window</span><span class="o">.</span><span class="n">from_slices</span><span class="p">((</span><span class="n">top</span><span class="p">,</span> <span class="n">bottom</span><span class="p">),</span> <span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">))</span>
-            <span class="n">bounds</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">transform</span><span class="p">)</span> <span class="c1"># update the bounds to those of the window</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">windows</span><span class="o">.</span><span class="n">bounds</span><span class="p">(</span>
+                <span class="n">window</span><span class="p">,</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">transform</span>
+            <span class="p">)</span>  <span class="c1"># update the bounds to those of the window</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">window</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">b</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">bounds</span>
             <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">top</span><span class="p">)</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>        
+        <span class="n">data</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
         <span class="n">nodata</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">nodata</span>
 
     <span class="n">grid</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grid</span></div>
+
 
 <div class="viewcode-block" id="write_raster"><a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.write_raster">[docs]</a><span class="k">def</span> <span class="nf">write_raster</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
@@ -138,7 +142,7 @@
         <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-        <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># nr bands</span>
+        <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># nr bands</span>
         <span class="n">dtype</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
         <span class="n">crs</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
         <span class="n">nodata</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">nodata_value</span><span class="p">,</span>

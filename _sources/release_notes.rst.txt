@@ -3,6 +3,25 @@
 Release notes
 ================
 
+Version 0.3.0 (July 16, 2023)
+-----------------------------
+
+Features
+ - Resample method for BoundedHexGrid
+ - Bilinear interpolation method for BoundedHexGrid
+ - Split ``Interpolate`` method from ``resample`` method
+ - Codecov integration
+
+CICD
+ - black and isort checks in test pipeline
+
+Documentation
+ - Add missing docstrings to resample method
+
+Misc
+ - reformat python files using black and isort
+ - move ``Resample`` method one step up in the inheritance hierarchy, to BoundedGrid
+
 Version 0.2.0 (July 10, 2023)
 -----------------------------
 

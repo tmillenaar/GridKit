@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>base_grid &mdash; GridKit v0.2.0 documentation</title>
+  <title>base_grid &mdash; GridKit v0.3.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.2.0
+                v0.3.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -328,6 +328,14 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.interp_from_points">
 <span class="sig-name descname"><span class="pre">interp_from_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.interp_from_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.interp_from_points" title="Permalink to this definition"></a></dt>
 <dd><p>Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</p>
+<p>This function turns any set of points at arbitrary location into a regularly spaced <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>
+that has the properties of the current <a class="reference internal" href="#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a> (<code class="docutils literal notranslate"><span class="pre">self</span></code>).
+<a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a> works in the other direction, where a values on a <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>
+are sampled in order to obtain values at arbitrary location.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is significantly slower than <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -343,6 +351,10 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd class="field-odd"><p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a></p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>, <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p>
+</div>
 </dd></dl>
 
 </dd></dl>
