@@ -645,53 +645,6 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         # TODO: remove rows and cols with nans around the edge after bilinear
         return values
 
-    def resample(self, alignment_grid, method="nearest"):
-        if self.crs is None or alignment_grid.crs is None:
-            warnings.warn("`crs` not set for one or both grids. Assuming both grids have an identical CRS.")
-            different_crs = False
-        else:
-            different_crs = not self.crs.is_exact_same(alignment_grid.crs)
-
-        # make sure the bounds align with the grid
-        if different_crs:
-            transformer = Transformer.from_crs(self.crs, alignment_grid.crs, always_xy=True)
-            bounds = transformer.transform_bounds(*self.bounds)
-        else:
-            bounds = self.bounds
-
-        # Align using "contract" for we cannot sample outside of the original bounds
-        new_bounds = alignment_grid.align_bounds(bounds, mode="contract")
-
-        new_ids, new_shape = alignment_grid.cells_in_bounds(bounds=new_bounds)
-
-        new_points = alignment_grid.centroid(new_ids)
-
-        if different_crs:
-            transformer = Transformer.from_crs(alignment_grid.crs, self.crs, always_xy=True)
-            transformed_points = transformer.transform(*new_points.T)
-            new_points = numpy.vstack(transformed_points).T
-
-        if method == "nearest":
-            new_ids = self.cell_at_point(new_points)
-            value = self.value(new_ids)
-        elif method == "bilinear":
-            value = self._bilinear_interpolation(new_points)
-        else:
-            raise ValueError(f"Resampling method '{method}' is not supported.")
-
-        value = value.reshape(new_shape)
-
-        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        grid_kwargs = dict(
-            data=value, bounds=new_bounds, crs=alignment_grid.crs, nodata_value=nodata_value
-        )
-        if hasattr(alignment_grid, "_shape"):
-            grid_kwargs["shape"] = alignment_grid._shape
-
-        new_grid = alignment_grid.bounded_cls(**grid_kwargs)
-
-        return new_grid
-
     def to_crs(self, crs, resample_method="nearest"):
         new_inf_grid = super(BoundedRectGrid, self).to_crs(crs, resample_method=resample_method)
         return self.resample(new_inf_grid, method=resample_method)
