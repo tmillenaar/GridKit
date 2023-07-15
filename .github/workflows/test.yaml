@@ -24,7 +24,12 @@ jobs:
         run: pip install ./[test]
 
       - name: Run pytest
-        run: python -m pytest tests
+        run: python -m pytest tests --cov
 
       - name: Run doctest
         run: python -m pytest gridkit/ --doctest-modules
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
