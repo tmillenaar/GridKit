@@ -149,18 +149,18 @@ class _BoundedGridMeta(type):
 
             # create combined grid, spanning both inputs
             combined_bounds = left.combined_bounds(right)
+            _, shape = left.cells_in_bounds(
+                combined_bounds
+            )  # TODO: split ids and shape outputs into different methods
             combined_data = numpy.full(
-                (  # data shape is y,x
-                    round((combined_bounds[3] - combined_bounds[1]) / left.dy),
-                    round((combined_bounds[2] - combined_bounds[0]) / left.dx),
-                ),
+                shape,
                 fill_value=dtype.type(0) if nodata_value is None else nodata_value,
                 dtype=dtype,
             )
-            combined_grid = left.__class__(
+
+            combined_grid = left.update(
                 combined_data,
                 bounds=combined_bounds,
-                crs=left.crs,
                 nodata_value=nodata_value,
             )
 
@@ -180,7 +180,6 @@ class _BoundedGridMeta(type):
             )
 
             result = op(left_data, right_data)
-
             # assign data of `left` to combined_grid
             left_data = left._data.astype(dtype)
             if left.nodata_value is not None:
@@ -486,8 +485,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             raise NotImplementedError()
         else:
             raise ValueError("Please supply one of: {anchor, bounds}")
-
-        return self.__class__(new_data, bounds=self.bounds, crs=self.crs)
+        return self.update(new_data)
 
     def value(self, index, oob_value=None):
         """Return the value at the given cell index"""
@@ -524,7 +522,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         if (
             numpy.any(oob_mask)
             and not numpy.isfinite(oob_value)
-            and not numpy.issubdtype(self._data.dtype, float)
+            and not numpy.issubdtype(self._data.dtype, numpy.floating)
         ):
             print(
                 f"Warning: dtype `{self._data.dtype}` might not support an `oob_value` of `{oob_value}`."
