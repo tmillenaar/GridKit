@@ -487,8 +487,7 @@ class HexGrid(BaseGrid):
         aligned = True
         reason = ""
         reasons = []
-
-        if not isinstance(other.parent_grid_class, self.parent_grid_class):
+        if not other.parent_grid_class == self.parent_grid_class:
             aligned = False
             return (
                 False,
@@ -816,6 +815,8 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
 
     def grid_id_to_numpy_id(self, index):
+        index = numpy.array(index)
+
         if self._shape == "pointy":
             offset_rows = index[1] % 2 == 1
             index[0, offset_rows] += 1
@@ -840,3 +841,17 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         if index is None:
             index = self.indices
         return super(BoundedHexGrid, self).centroid(index)
+
+    def update(self, new_data, bounds=None, crs=None, nodata_value=None, shape=None):
+        # TODO figure out how to update size, offset
+        if not bounds:
+            bounds = self.bounds
+        if not crs:
+            crs = self.crs
+        if not nodata_value:
+            nodata_value = self.nodata_value
+        if not shape:
+            shape = self.shape
+        return self.__class__(
+            new_data, bounds=bounds, crs=crs, nodata_value=nodata_value, shape=shape
+        )
