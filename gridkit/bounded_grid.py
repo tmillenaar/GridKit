@@ -645,7 +645,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
         Parameters
         ----------
-        alignment_grid: :class:`BaseGrid`
+        alignment_grid: :class:`.BaseGrid`
             The grid with the desired attributes on which to resample.
 
         method: :class:`str`, `'nearest', 'bilinear'`, optional
