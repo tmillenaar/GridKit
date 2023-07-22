@@ -809,10 +809,32 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
-        raise NotImplementedError()
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
+
+        if self._shape == "pointy":
+            index = numpy.array(
+                [
+                    index_topleft[0] + np_index[1],
+                    index_topleft[1]
+                    - np_index[
+                        0
+                    ],  # grid y is numpy [0] and is positive from top to bottom
+                ]
+            )
+            offset_rows = index[1] % 2 == 1
+            index[0][offset_rows] -= 1
+        elif self._shape == "flat":
+            index = numpy.array(
+                [
+                    index_topleft[0] + np_index[0],
+                    index_topleft[1] - np_index[1],
+                ]
+            )
+            offset_rows = index[0] % 2 == 1
+            index[1, offset_rows] -= 1
+
+        return index
 
     def grid_id_to_numpy_id(self, index):
         index = numpy.array(index)

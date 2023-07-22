@@ -506,3 +506,50 @@ def test_interp_from_points(method, expected_min, expected_max):
     numpy.testing.assert_allclose(data_grid.min(), expected_min)
     if method != "nearest":
         assert len(data_grid.nodata()) == 30
+
+
+@pytest.mark.parametrize(
+    "shape, expected_ids",
+    [
+        (
+            "rect",
+            (
+                [0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4],
+                [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2],
+            ),
+        ),
+        ("pointy", ([0, 0, 1, 1, 2, 2, 3, 3], [0, 1, 0, 1, 0, 1, 0, 1])),
+        ("flat", ([0, 0, 0, 1, 1, 1], [0, 1, 2, 0, 1, 2])),
+    ],
+)
+def test_grid_id_to_numpy_id(
+    basic_bounded_rect_grid,
+    basic_bounded_pointy_grid,
+    basic_bounded_flat_grid,
+    shape,
+    expected_ids,
+):
+    grid_lut = dict(
+        rect=basic_bounded_rect_grid,
+        pointy=basic_bounded_pointy_grid,
+        flat=basic_bounded_flat_grid,
+    )
+    grid = grid_lut[shape]
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
+    numpy.testing.assert_allclose(numpy.array(np_ids), expected_ids)
+
+
+@pytest.mark.parametrize("shape", ["rect", "pointy", "flat"])
+def test_grid_id_to_numpy_id(
+    basic_bounded_rect_grid, basic_bounded_pointy_grid, basic_bounded_flat_grid, shape
+):
+    grid_lut = dict(
+        rect=basic_bounded_rect_grid,
+        pointy=basic_bounded_pointy_grid,
+        flat=basic_bounded_flat_grid,
+    )
+    grid = grid_lut[shape]
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
+    grid_ids = grid.numpy_id_to_grid_id(np_ids)
+    # breakpoint()
+    numpy.testing.assert_allclose(grid_ids, grid.indices.T)
