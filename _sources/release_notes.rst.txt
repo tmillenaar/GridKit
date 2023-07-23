@@ -3,6 +3,18 @@
 Release notes
 ================
 
+Version 0.3.1 (July 23, 2023)
+-----------------------------
+Features
+ - add numpy_id_to_grid_id() to BoundedHexGrid
+ - add grid_id_to_numpy_id() to BoundedHexGrid
+
+Fixes
+ - resolve shift in data when using comparisson and mathematical operators on BoudedHexGrid 
+
+Documentation
+ - Add examle on coordinate transformations
+
 Version 0.3.0 (July 16, 2023)
 -----------------------------
 

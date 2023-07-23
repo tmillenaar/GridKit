@@ -5,7 +5,8 @@ Contributing
 
 Currently, GridKit is a solo maintained project, but **help is most welcome**!
 
-Since this is a small project there is no forum or mailing list, but please feel free to start a github issue, pull request or contact me directly
+Since this is a small project there is no forum or mailing list, but please feel free to
+start a [GitHub](https://github.com/tmillenaar/GridKit) issue, pull request or contact me directly
 on tmillenaar -at- gmail -dot- com.
 I'd love to get to know anyone interested in the package.
 I'd also love to learn what others might create with GridKit.
@@ -19,9 +20,9 @@ Naturally, you'll first want to fork or clone the repository.
     There are of course many ways of deploying software.
     In this example I will create a new virtual environment using Python's 'venv' package on an Ubuntu machine
 
-I'll assuming you now have a local version of the repository.
+Of course we start by cloning or forking from [GitHub](https://github.com/tmillenaar/GridKit).
 
-First go into the folder
+Then go into the folder
 ``cd GridKit``
 Now let's create a venv to use.
 

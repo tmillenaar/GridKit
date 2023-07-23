@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.bounded_grid &mdash; GridKit v0.3.0 documentation</title>
+  <title>gridkit.bounded_grid &mdash; GridKit v0.3.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.0
+                v0.3.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -232,18 +232,18 @@
 
             <span class="c1"># create combined grid, spanning both inputs</span>
             <span class="n">combined_bounds</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">combined_bounds</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span>
+                <span class="n">combined_bounds</span>
+            <span class="p">)</span>  <span class="c1"># TODO: split ids and shape outputs into different methods</span>
             <span class="n">combined_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                <span class="p">(</span>  <span class="c1"># data shape is y,x</span>
-                    <span class="nb">round</span><span class="p">((</span><span class="n">combined_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">combined_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">left</span><span class="o">.</span><span class="n">dy</span><span class="p">),</span>
-                    <span class="nb">round</span><span class="p">((</span><span class="n">combined_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">combined_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">left</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span>
-                <span class="p">),</span>
+                <span class="n">shape</span><span class="p">,</span>
                 <span class="n">fill_value</span><span class="o">=</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="n">nodata_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nodata_value</span><span class="p">,</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+
+            <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="n">combined_data</span><span class="p">,</span>
                 <span class="n">bounds</span><span class="o">=</span><span class="n">combined_bounds</span><span class="p">,</span>
-                <span class="n">crs</span><span class="o">=</span><span class="n">left</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
                 <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -263,7 +263,6 @@
             <span class="p">)</span>
 
             <span class="n">result</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">left_data</span><span class="p">,</span> <span class="n">right_data</span><span class="p">)</span>
-
             <span class="c1"># assign data of `left` to combined_grid</span>
             <span class="n">left_data</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -569,8 +568,7 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please supply one of: {anchor, bounds}&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedGrid.value"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the value at the given cell index&quot;&quot;&quot;</span>
@@ -607,7 +605,7 @@
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">oob_mask</span><span class="p">)</span>
             <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">oob_value</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Warning: dtype `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">` might not support an `oob_value` of `</span><span class="si">{</span><span class="n">oob_value</span><span class="si">}</span><span class="s2">`.&quot;</span>
@@ -730,7 +728,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        alignment_grid: :class:`BaseGrid`</span>
+<span class="sd">        alignment_grid: :class:`.BaseGrid`</span>
 <span class="sd">            The grid with the desired attributes on which to resample.</span>
 
 <span class="sd">        method: :class:`str`, `&#39;nearest&#39;, &#39;bilinear&#39;`, optional</span>
