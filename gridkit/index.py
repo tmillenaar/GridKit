@@ -54,6 +54,16 @@ class GridIndex(metaclass=_IndexMeta):
                 f"Unexpected index shape. Expected a shape of (2,) or (N, 2), got {self.index.shape}."
             )
 
+    @property
+    def x(self):
+        """The X-component of the cell-IDs"""
+        return self.index[:, 0]
+
+    @property
+    def y(self):
+        """The Y-component of the cell-IDs"""
+        return self.index[:, 1]
+
     def unique(self, **kwargs):
         """The unique IDs contained in the index. Remove duplicate IDs.
 

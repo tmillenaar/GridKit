@@ -110,6 +110,12 @@ def test_copy():
     assert id(index.index) != id(index.copy().index)
 
 
+def test_xy():
+    index = GridIndex([(0, 1), (-1, 1)])
+    numpy.testing.assert_allclose(index.x, [0, -1])
+    numpy.testing.assert_allclose(index.y, [1, 1])
+
+
 @pytest.mark.parametrize(
     "index",
     (
