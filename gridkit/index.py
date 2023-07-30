@@ -36,7 +36,7 @@ class GridIndex(metaclass=_IndexMeta):
 
     Parameters
     ----------
-    index: :class:`Union[numpy.ndarray, list, tuple]`
+    index: Union[numpy.ndarray, list, tuple, GridIndex]
         The index containing the cell-id.
         This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarray containing multiple of such pairs.
 
@@ -153,7 +153,7 @@ def validate_index(func):
 
         Parameters
         ----------
-        index: :class:`Union[numpy.ndarray, list, tuple, GridIndex]`
+        index: Union[numpy.ndarray, list, tuple, GridIndex]
             The index referring to the grid IDs
         *args:
             The arguments to be passed to the wrapped function
