@@ -20,4 +20,4 @@ Installation
 ============
 To install through PyPi, run `pip install gridkit`.
 
-Alternatively, install from source. For this, please refer to the [Contributing guide](https://tmillenaar.github.io/GridKit/contributing.html)
+Alternatively, install from source ([GitHub](https://github.com/tmillenaar/gridkit)). Please refer to the [Contributing guide](https://tmillenaar.github.io/GridKit/contributing.html)
