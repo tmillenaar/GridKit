@@ -58,6 +58,10 @@ class GridIndex(metaclass=_IndexMeta):
                 f"Unexpected index shape. Expected a shape of (2,) or (N, 2), got {self.index.shape}."
             )
 
+    def __len__(self):
+        """The number of indices"""
+        return len(self._1d_view)
+
     @property
     def x(self):
         """The X-component of the cell-IDs"""
