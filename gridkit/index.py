@@ -135,7 +135,9 @@ class GridIndex(metaclass=_IndexMeta):
         dtype = {"names": ["f0", "f1"], "formats": formats}
         return index.view(dtype)
 
-    # TODO: standard numpys https://docs.python.org/3/library/operator.html
+    def copy(self):
+        """Return an immutable copy of self."""
+        return GridIndex(self.index.copy())
 
 
 def _nd_view(index):

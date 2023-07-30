@@ -105,6 +105,11 @@ def test_operator(op, expected_result):
     numpy.testing.assert_allclose(result, expected_result)
 
 
+def test_copy():
+    index = GridIndex([(0, 1), (-1, 1)])
+    assert id(index.index) != id(index.copy().index)
+
+
 @pytest.mark.parametrize(
     "index",
     (
