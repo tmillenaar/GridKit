@@ -6,6 +6,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import validate_index
 from gridkit.rect_grid import RectGrid
 
 
@@ -836,22 +837,21 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
         return index
 
+    @validate_index
     def grid_id_to_numpy_id(self, index):
-        index = numpy.array(index)
-
         if self._shape == "pointy":
-            offset_rows = index[1] % 2 == 1
-            index[0, offset_rows] += 1
+            offset_rows = index.y % 2 == 1
+            index.x[offset_rows] += 1
         elif self._shape == "flat":
-            offset_rows = index[0] % 2 == 1
-            index[1, offset_rows] += 1
+            offset_rows = index.x % 2 == 1
+            index.y[offset_rows] += 1
 
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         if self._shape == "pointy":
-            np_id = (index_topleft[1] - index[1], index[0] - index_topleft[0])
+            np_id = (index_topleft[1] - index.y, index.x - index_topleft[0])
         elif self._shape == "flat":
-            np_id = ((index[0] - index_topleft[0]), (index_topleft[1] - index[1]))
+            np_id = ((index.x - index_topleft[0]), (index_topleft[1] - index.y))
         return np_id
 
     def interp_nodata(self, *args, **kwargs):

@@ -8,6 +8,8 @@ import scipy
 import shapely
 from pyproj import CRS, Transformer
 
+from gridkit.index import GridIndex
+
 
 class BaseGrid(metaclass=abc.ABCMeta):
     def __init__(self, offset=(0, 0), crs=None):
@@ -325,7 +327,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             cell_shapes = self.to_shapely(cells_in_bounds)
             mask = [geom.intersects(cell) for cell in cell_shapes]
             intersecting_cells.extend(cells_in_bounds[mask])
-        return numpy.unique(intersecting_cells, axis=0)
+        return GridIndex(intersecting_cells).unique()
 
     def to_shapely(self, index, as_multipolygon: bool = False):
         """Represent the cells as Shapely Polygons

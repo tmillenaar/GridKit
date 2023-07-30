@@ -199,7 +199,7 @@ class _BoundedGridMeta(type):
             # overwrite shared area in combined_grid with the combined results
             count = gridkit.count([left, right])
             shared_mask = count == 2
-            shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
+            shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask)
             result = op(left.value(shared_mask), right.value(shared_mask))
             combined_grid = combined_grid.astype(
                 numpy.result_type(combined_grid._data.dtype, result.dtype)
@@ -489,10 +489,6 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     def value(self, index, oob_value=None):
         """Return the value at the given cell index"""
-
-        index = numpy.array(index)
-        index = index[numpy.newaxis, :] if len(index.shape) == 1 else index
-        index = index.T  # TODO: maybe always work with xy axis first
 
         # Convert grid-ids into numpy-ids
         np_id = numpy.stack(self.grid_id_to_numpy_id(index)[::-1])

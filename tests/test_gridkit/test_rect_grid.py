@@ -78,7 +78,7 @@ def test_cells_in_bounds():
 @pytest.mark.parametrize(
     "index,expected_np_id,expected_value",
     [  # note, numpy id is in y,x
-        [(0, 0), (2, 1), 7],
+        [(0, 0), ([2], [1]), 7],
         [
             [(-1, 1), (1, -2)],  # index
             [(1, 4), (0, 2)],  # expected_np_id in [(y0, y1), (x0,x1)]

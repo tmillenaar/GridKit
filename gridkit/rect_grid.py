@@ -7,6 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import GridIndex, validate_index
 
 
 class RectGrid(BaseGrid):
@@ -372,7 +373,8 @@ class RectGrid(BaseGrid):
         ids_y = numpy.floor((point[1] - self.offset[1]) / self.dy)
         return numpy.array([ids_x, ids_y], dtype="int").T
 
-    def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
+    @validate_index
+    def cell_corners(self, index: GridIndex = None) -> numpy.ndarray:
         """Return corners in (cells, corners, xy)"""
         if index is None:
             raise ValueError(
@@ -398,7 +400,7 @@ class RectGrid(BaseGrid):
         if len(centroids.shape) > 1:
             corners = numpy.moveaxis(corners, 2, 0)
 
-        return corners
+        return numpy.squeeze(corners)
 
     def is_aligned_with(self, other):
         if not isinstance(other, RectGrid):
@@ -677,10 +679,11 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
 
+    @validate_index
     def grid_id_to_numpy_id(self, index):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft[1] - index[1], index[0] - index_topleft[0])
+        return (index_topleft[1] - index.y, index.x - index_topleft[0])
 
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""

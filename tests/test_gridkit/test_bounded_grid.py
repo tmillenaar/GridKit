@@ -549,7 +549,7 @@ def test_grid_id_to_numpy_id(
         flat=basic_bounded_flat_grid,
     )
     grid = grid_lut[shape]
-    np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
+    np_ids = grid.grid_id_to_numpy_id(grid.indices)
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
     # breakpoint()
     numpy.testing.assert_allclose(grid_ids, grid.indices.T)

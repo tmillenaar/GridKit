@@ -50,7 +50,7 @@ def count(grids):
             value_ids = combined_grid.cells_in_bounds(grid.bounds)[0]
         else:
             value_ids = grid != grid.nodata_value
-        numpy_ids = combined_grid.grid_id_to_numpy_id(value_ids.T)
+        numpy_ids = combined_grid.grid_id_to_numpy_id(value_ids)
         combined_grid._data[numpy_ids] += 1
     return combined_grid
 

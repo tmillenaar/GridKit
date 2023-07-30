@@ -1,3 +1,4 @@
+import inspect
 from typing import Union
 
 import numpy
@@ -48,6 +49,9 @@ class GridIndex(metaclass=_IndexMeta):
 
     def __init__(self, index):
         self.index = numpy.asarray(index)
+
+        if self.index.shape == (2,):
+            self.index = self.index[numpy.newaxis]
 
         if self.index.ndim > 2 or (self.index.ndim > 1 and self.index.shape[-1] != 2):
             raise ValueError(
@@ -160,7 +164,7 @@ def _nd_view(index):
 def validate_index(func):
     """Decorator to convert the index argument of a function to a GridIndex object."""
 
-    def wrapper(index, *args, **kwargs):
+    def wrapper(*args, **kwargs):
         """Inner function to convert the index argument to a GridIndex object.
 
         Parameters
@@ -172,8 +176,18 @@ def validate_index(func):
         *kwargs:
             The keyword arguments to be passed to the wrapped function
         """
-        if not isinstance(index, GridIndex):
-            index = GridIndex(index)
-        return func(index, *args, **kwargs)
+        arg_names = inspect.signature(func).parameters
+        new_args = []
+        for key, value in zip(arg_names, args):
+            if key == "index" and value is not None:
+                value = GridIndex(value)
+            new_args.append(value)
+        new_kwargs = {}
+        for key, value in kwargs.items():
+            if key == "index" and value is not None:
+                value = GridIndex(value)
+            new_kwargs[key] = value
+
+        return func(*new_args, **new_kwargs)
 
     return wrapper
