@@ -1,4 +1,5 @@
 dist/*
 *.egg-info
+gridkit/__pycache__/*
 *__pycache__*
 *gridkit/__pycache__*
