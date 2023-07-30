@@ -12,6 +12,7 @@ from pyproj import Transformer
 import gridkit
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import GridIndex
 
 
 class _BoundedGridMeta(type):
@@ -219,9 +220,10 @@ class _BoundedGridMeta(type):
                 grid = left.update(data)
             else:
                 grid = _grid_op(left, right, op, base_value=base_value)
-            return (
-                left._mask_to_index(grid._data) if as_idx else grid
-            )  # TODO: left._mask_to_index(data) works if as_idx is true
+            if not as_idx:
+                return grid
+            ids = left._mask_to_index(grid._data)
+            return GridIndex(ids)
 
         def reverse_op(left, right):
             if not isinstance(right, BoundedGrid):
