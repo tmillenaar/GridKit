@@ -125,6 +125,8 @@ def test_xy():
         [[1, 1], [-1, -2]],
         numpy.array([-2, 0]),
         numpy.arange(6).reshape(3, 2),
+        GridIndex([0, 1]),
+        GridIndex([(0, -1), (-1, -2)]),
     ),
 )
 def test_validate_index(index):
@@ -133,3 +135,9 @@ def test_validate_index(index):
         assert isinstance(index, GridIndex)
 
     assert_index(index)
+
+
+def test_rase_shape_error():
+    ids = numpy.arange(4 * 3 * 2).reshape(4, 3, 2)
+    with pytest.raises(ValueError):
+        GridIndex(ids)
