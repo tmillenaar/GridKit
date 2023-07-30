@@ -7,7 +7,7 @@ Obtain the cells that intersect with vector geometries.
 DEM data source: https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem
 
 Introduction
-============
+------------
 
 Vector geometries can be used to obtain the ID of the intersecting grid cells.
 These vector geometries can be either in the form of Shapely (Multi) Geometries or GeoPandas GeoSeries.
@@ -23,7 +23,7 @@ In this example, GeoPandas is used instead of Shapely, for it also allows us to 
     GeoPandas is not installed with GridKit by default, while Shapely is.
 
 Reading and preparing the data
-==============================
+------------------------------
 
 After reading the streams and lakes vector files, they are concatenated into a single GeoDataFrame.
 This allows us to obtain the intersecting cells in one function call.
@@ -33,32 +33,29 @@ With that approach it might be worthwhile to call a `numpy.unique` on axis 0 aft
 """
 
 import geopandas
-import pandas
 import matplotlib.pyplot as plt
-from gridkit.io import read_geotiff
+import pandas
 
+from gridkit.io import read_geotiff
 
 rivers = geopandas.read_file("../../tests/data/streams.gpkg")
 lakes = geopandas.read_file("../../tests/data/lakes.gpkg")
 dem = read_geotiff("../../tests/data/alps_dem.tiff")
 
-water_bodies = (
-    pandas.concat([rivers, lakes])
-    .reset_index()
-    .to_crs(dem.crs)
-)
+water_bodies = pandas.concat([rivers, lakes]).reset_index().to_crs(dem.crs)
 
 river_cell_ids = dem.intersect_geometries(water_bodies.geometry)
 # %%
 #
 # Visualization
-# =============
+# -------------
 # For a clear plot, we only need to plot the DEM near the vecor geometries as a backround.
 # For that reason, the dem is cropped to the extent of the water bodies with a little buffer.
 # Since ``intersect_geometries`` does it's own cropping, cropping the grid before ``intersect_geometries`` does not increase performance.
 # A plot showing DEM, the geometries (orange) and the selected cells (red) is then generated as follows:
 
 dem = dem.crop(water_bodies.total_bounds, bounds_crs=water_bodies.crs, buffer_cells=20)
+
 
 def generate_plot():
     fig, ax = plt.subplots()
@@ -80,6 +77,7 @@ def generate_plot():
     ax.set_ylabel("lat")
     return ax
 
+
 generate_plot()
 plt.show()
 
@@ -90,4 +88,3 @@ ax = generate_plot()
 ax.set_xlim(30040, 30160)
 ax.set_ylim(167230, 167325)
 plt.show()
-
