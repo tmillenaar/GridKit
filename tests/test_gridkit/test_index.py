@@ -31,8 +31,15 @@ def test_intersection():
     index1 = GridIndex([(1, 2), (2, 1), (1, 1), (1, 2)])
     index2 = GridIndex([(1, 1), (1, 2), (0, 1)])
     expected_intersection = [(1, 1), (1, 2)]
+
     intersection = index1.intersection(index2)
     numpy.testing.assert_allclose(intersection, expected_intersection)
+
+    intersection = index1.intersection(index2.index)
+    numpy.testing.assert_allclose(intersection, expected_intersection)
+
+    empty_intersection = index1.intersection([])
+    assert empty_intersection.shape == (0,)
 
 
 def test_difference():
@@ -45,6 +52,14 @@ def test_difference():
 
     # test index2 diff index1
     difference = index2.difference(index1)
+    numpy.testing.assert_allclose(difference, [(0, 1)])
+
+    # test index1 diff index2.index
+    difference = index1.difference(index2.index)
+    numpy.testing.assert_allclose(difference, [(2, 1)])
+
+    # test index2 diff index1.index
+    difference = index2.difference(index1.index)
     numpy.testing.assert_allclose(difference, [(0, 1)])
 
 

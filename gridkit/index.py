@@ -49,7 +49,7 @@ class GridIndex(metaclass=_IndexMeta):
     def __init__(self, index):
         self.index = numpy.asarray(index)
 
-        if self.index.ndim > 2 or self.index.shape[-1] != 2:
+        if self.index.ndim > 2 or (self.index.ndim > 1 and self.index.shape[-1] != 2):
             raise ValueError(
                 f"Unexpected index shape. Expected a shape of (2,) or (N, 2), got {self.index.shape}."
             )
