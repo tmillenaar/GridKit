@@ -97,27 +97,84 @@ def test_issuperset():
     assert issubset == True
 
 
-@pytest.mark.parametrize(
-    "op, expected_result",
-    [
-        (numpy.add, numpy.array([[2, 3], [1, 3]])),
-        (numpy.subtract, numpy.array([[-2, -1], [-3, -1]])),
-        (numpy.multiply, numpy.array([[0, 2], [-2, 2]])),
-        (numpy.true_divide, numpy.array([[0, 0.5], [-0.5, 0.5]])),
-        (numpy.floor_divide, numpy.array([[0, 0], [-1, 0]])),
-        (numpy.power, numpy.array([[0, 1], [1, 1]])),
-        (numpy.mod, numpy.array([[0, 1], [1, 1]])),
-        (numpy.greater_equal, numpy.array([[False, False], [False, False]])),
-        (numpy.less_equal, numpy.array([[True, True], [True, True]])),
-        (numpy.greater, numpy.array([[False, False], [False, False]])),
-        (numpy.less, numpy.array([[True, True], [True, True]])),
-    ],
-)
-def test_operator(op, expected_result):
+def test_operator():
     index = GridIndex([(0, 1), (-1, 1)])
 
-    result = op(index, 2)
-    numpy.testing.assert_allclose(result, expected_result)
+    result = index + 2
+    numpy.testing.assert_allclose(result, [[2, 3], [1, 3]])
+
+    result = index - 2
+    numpy.testing.assert_allclose(result, [[-2, -1], [-3, -1]])
+
+    result = index * 2
+    numpy.testing.assert_allclose(result, [[0, 2], [-2, 2]])
+
+    result = index / 2
+    numpy.testing.assert_allclose(result, [[0, 0], [-0, 0]])
+
+    result = index // 2
+    numpy.testing.assert_allclose(result, [[0, 0], [-1, 0]])
+
+    result = index**2
+    numpy.testing.assert_allclose(result, [[0, 1], [1, 1]])
+
+    result = index % 2
+    numpy.testing.assert_allclose(result, [[0, 1], [1, 1]])
+
+    result = index >= 2
+    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+
+    result = index <= 2
+    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+
+    result = index > 2
+    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+
+    result = index < 2
+    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+
+
+def test_reverse_operator():
+    index = GridIndex([(0, 1), (-1, 1)])
+
+    result = 2 + index
+    numpy.testing.assert_allclose(result, [[2, 3], [1, 3]])
+
+    result = 2 - index
+    numpy.testing.assert_allclose(result, [[2, 1], [3, 1]])
+
+    result = 2 * index
+    numpy.testing.assert_allclose(result, [[0, 2], [-2, 2]])
+
+    result = 2 / index
+    numpy.testing.assert_allclose(
+        result, [[-9223372036854775808, 2], [-2, 2]]
+    )  # inf as int is -9223372036854775808
+
+    result = 2 // index
+    numpy.testing.assert_allclose(
+        result, [[-9223372036854775808, 2], [-2, 2]]
+    )  # ind as int is -9223372036854775808
+
+    result = 2**index
+    numpy.testing.assert_allclose(result, [[1, 2], [0, 2]])
+
+    result = 2 % index
+    numpy.testing.assert_allclose(
+        result, [[-9223372036854775808, 0], [0, 0]]
+    )  # nan as int is -9223372036854775808
+
+    result = 2 >= index
+    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+
+    result = 2 <= index
+    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+
+    result = 2 > index
+    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+
+    result = 2 < index
+    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
 
 
 def test_copy():

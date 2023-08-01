@@ -1,4 +1,5 @@
 import inspect
+import operator
 from typing import Union
 
 import numpy
@@ -9,23 +10,31 @@ class _IndexMeta(type):
 
     def __new__(cls, name, bases, namespace):
         # numpys with a nan-base
-        for op, as_idx in (
-            (numpy.add, False),
-            (numpy.subtract, False),
-            (numpy.multiply, False),
-            (numpy.true_divide, False),
-            (numpy.floor_divide, False),
-            (numpy.power, False),
-            (numpy.mod, False),
-            (numpy.greater_equal, True),
-            (numpy.less_equal, True),
-            (numpy.greater, True),
-            (numpy.less, True),
+        def normal_op(op):
+            return lambda l, r: GridIndex(op(l.index.astype(float), r))
+
+        def reverse_op(op):
+            return lambda l, r: GridIndex(op(r, l.index.astype(float)))
+
+        for op, name_ in (
+            (numpy.add, "add"),
+            (numpy.subtract, "sub"),
+            (numpy.multiply, "mul"),
+            (numpy.true_divide, "truediv"),
+            (numpy.floor_divide, "floordiv"),
+            (numpy.power, "pow"),
+            (numpy.mod, "mod"),
+            (numpy.greater_equal, "ge"),
+            (numpy.less_equal, "le"),
+            (numpy.greater, "gt"),
+            (numpy.less, "lt"),
+            (numpy.equal, "eq"),
+            (numpy.not_equal, "ne"),
         ):
-            opname = "__{}__".format(op.__name__)
-            opname_reversed = "__r{}__".format(op.__name__)
-            namespace[opname] = op
-            namespace[opname_reversed] = op
+            opname = "__{}__".format(name_)
+            opname_reversed = "__r{}__".format(name_)
+            namespace[opname] = normal_op(op)
+            namespace[opname_reversed] = reverse_op(op)
         return super().__new__(cls, name, bases, namespace)
 
 
@@ -48,7 +57,7 @@ class GridIndex(metaclass=_IndexMeta):
     """
 
     def __init__(self, index):
-        self.index = numpy.asarray(index)
+        self.index = numpy.array(index, dtype=int)
 
         if self.index.shape == (2,):
             self.index = self.index[numpy.newaxis]
@@ -62,15 +71,39 @@ class GridIndex(metaclass=_IndexMeta):
         """The number of indices"""
         return len(self._1d_view)
 
+    def __iter__(self):
+        self._iter_id = 0
+        return self
+
+    def __next__(self):
+        if self._iter_id == len(self.index):
+            raise StopIteration
+        id = GridIndex(self.index[self._iter_id])
+        self._iter_id += 1
+        return id
+
+    def __getitem__(self, item):
+        return self.index[item]
+
     @property
     def x(self):
         """The X-component of the cell-IDs"""
-        return self.index[:, 0]
+        return self.index[..., 0]
+
+    @x.setter
+    def x(self, value):
+        self.index[..., 0] = value
+        return self
 
     @property
     def y(self):
         """The Y-component of the cell-IDs"""
-        return self.index[:, 1]
+        return self.index[..., 1]
+
+    @y.setter
+    def y(self, value):
+        self.index[..., 1] = value
+        return self
 
     def unique(self, **kwargs):
         """The unique IDs contained in the index. Remove duplicate IDs.
@@ -151,6 +184,8 @@ class GridIndex(metaclass=_IndexMeta):
             else 2 * [index.dtype]
         )
         dtype = {"names": ["f0", "f1"], "formats": formats}
+        if index.flags["F_CONTIGUOUS"]:  # https://stackoverflow.com/a/63196035
+            index = numpy.require(index, requirements=["C"])
         return index.view(dtype)
 
     def copy(self):
