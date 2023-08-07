@@ -279,27 +279,39 @@ def test_reduction_operators_arg():
     # test argmax
     idx = grid.argmax()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (
+        1,
+        2,
+    )
     numpy.testing.assert_allclose(value, data.max())
 
     # test argmin
     idx = grid.argmin()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (
+        1,
+        2,
+    )
     numpy.testing.assert_allclose(value, data.min())
 
     # test argmax with ndoata value
     grid.nodata_value = 8
     idx = grid.argmax()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (
+        1,
+        2,
+    )
     numpy.testing.assert_allclose(value, 7)
 
     # test argmin with nodata value
     grid.nodata_value = 0
     idx = grid.argmin()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (
+        1,
+        2,
+    )
     numpy.testing.assert_allclose(value, 1)
 
 
@@ -551,5 +563,4 @@ def test_grid_id_to_numpy_id(
     grid = grid_lut[shape]
     np_ids = grid.grid_id_to_numpy_id(grid.indices)
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
-    # breakpoint()
-    numpy.testing.assert_allclose(grid_ids, grid.indices.T)
+    numpy.testing.assert_allclose(grid_ids, grid.indices)

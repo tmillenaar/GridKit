@@ -420,8 +420,8 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             )
 
         ids, shape = self.cells_in_bounds(self.bounds)
-        ids = ids.reshape([*shape, 2])
-        return ids[mask]
+        ids = ids.index.reshape([*shape, 2])
+        return GridIndex(ids[mask])
 
     def shared_bounds(self, other):
         other_bounds = other.bounds if isinstance(other, BaseGrid) else other

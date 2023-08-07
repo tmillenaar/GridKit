@@ -279,36 +279,38 @@ class RectGrid(BaseGrid):
 
         # Split each cell into 4 quadrants in order to identify what 3 neigbors to select
         new_grid = RectGrid(dx=self.dx / 2, dy=self.dy / 2, offset=self.offset)
-        ids = new_grid.cell_at_point(point).T
-        left_top_mask = numpy.logical_and(ids[0] % 2 == 0, ids[1] % 2 == 1)
-        right_top_mask = numpy.logical_and(ids[0] % 2 == 1, ids[1] % 2 == 1)
-        right_bottom_mask = numpy.logical_and(ids[0] % 2 == 1, ids[1] % 2 == 0)
-        left_bottom_mask = numpy.logical_and(ids[0] % 2 == 0, ids[1] % 2 == 0)
+        ids = new_grid.cell_at_point(point)
+        left_top_mask = numpy.logical_and(ids.x % 2 == 0, ids.y % 2 == 1)
+        right_top_mask = numpy.logical_and(ids.x % 2 == 1, ids.y % 2 == 1)
+        right_bottom_mask = numpy.logical_and(ids.x % 2 == 1, ids.y % 2 == 0)
+        left_bottom_mask = numpy.logical_and(ids.x % 2 == 0, ids.y % 2 == 0)
 
         # obtain the bottom-left cell based on selected quadrant
-        base_ids = numpy.empty_like(ids, dtype="int")
+        base_ids = numpy.empty_like(ids.index, dtype="int")
         # bottom-left if point in upper-right quadrant
-        base_ids[:, right_top_mask] = numpy.floor(ids[:, right_top_mask] / 2)
+        base_ids[right_top_mask] = numpy.floor(ids.index[right_top_mask] / 2)
         # bottom-left if point in bottom-right quadrant
-        base_ids[:, right_bottom_mask] = numpy.floor(ids[:, right_bottom_mask] / 2)
-        base_ids[1, right_bottom_mask] -= 1
+        base_ids[right_bottom_mask] = numpy.floor(ids.index[right_bottom_mask] / 2)
+        base_ids[right_bottom_mask, 1] -= 1
         # bottom-left if point in bottom-left quadrant
-        base_ids[:, left_bottom_mask] = numpy.floor(ids[:, left_bottom_mask] / 2)
-        base_ids[:, left_bottom_mask] -= 1
+        base_ids[left_bottom_mask] = numpy.floor(ids.index[left_bottom_mask] / 2)
+        base_ids[left_bottom_mask] -= 1
         # bottom-left if point in upper-left qudrant
-        base_ids[:, left_top_mask] = numpy.floor(ids[:, left_top_mask] / 2)
-        base_ids[0, left_top_mask] -= 1
+        base_ids[left_top_mask] = numpy.floor(ids.index[left_top_mask] / 2)
+        base_ids[left_top_mask, 0] -= 1
+
+        base_ids = GridIndex(base_ids)
 
         # use the bottom-left cell to determine the other three
         bl_ids = base_ids.copy()
         br_ids = base_ids.copy()
-        br_ids[0] += 1
+        br_ids.x += 1
         tr_ids = base_ids.copy()
         tr_ids += 1
         tl_ids = base_ids.copy()
-        tl_ids[1] += 1
+        tl_ids.y += 1
 
-        return tl_ids.T, tr_ids.T, bl_ids.T, br_ids.T
+        return tl_ids, tr_ids, bl_ids, br_ids
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
@@ -371,7 +373,8 @@ class RectGrid(BaseGrid):
         point = numpy.array(point).T
         ids_x = numpy.floor((point[0] - self.offset[0]) / self.dx)
         ids_y = numpy.floor((point[1] - self.offset[1]) / self.dy)
-        return numpy.array([ids_x, ids_y], dtype="int").T
+        index = numpy.array([ids_x, ids_y], dtype="int").T
+        return GridIndex(index)
 
     @validate_index
     def cell_corners(self, index: GridIndex = None) -> numpy.ndarray:
@@ -468,9 +471,9 @@ class RectGrid(BaseGrid):
         # turn minimum and maximum indices into fully arranged array
         # TODO: think about dtype. 64 is too large. Should this be exposed? Or automated based on id range?
         ids_y = numpy.arange(
-            left_top_id[1], right_bottom_id[1] - 1, -1, dtype="int32"
+            left_top_id.y, right_bottom_id.y - 1, -1, dtype="int32"
         )  # y-axis goes from top to bottom (high to low), hence step size is -1
-        ids_x = list(range(left_top_id[0], right_bottom_id[0] + 1))
+        ids_x = list(range(int(left_top_id.x), int(right_bottom_id.x + 1)))
 
         # TODO: only return ids_y and ids_x without fully filled grid
         shape = (len(ids_y), len(ids_x))
@@ -479,7 +482,7 @@ class RectGrid(BaseGrid):
         # ids[1] = numpy.tile(ids_y[::-1], len(ids_x)) # invert y for ids are calculated from origin, not form the top of the bounding box
         ids[1] = numpy.repeat(ids_y, len(ids_x))
 
-        return ids.T, shape
+        return GridIndex(ids.T), shape
 
     @property
     def parent_grid_class(self):
@@ -677,13 +680,16 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
     def numpy_id_to_grid_id(self, np_index):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft[0] + np_index[1], index_topleft[1] - np_index[0])
+        ids = numpy.array(
+            [index_topleft.x + np_index[1], index_topleft.y - np_index[0]]
+        )
+        return GridIndex(ids.T)
 
     @validate_index
     def grid_id_to_numpy_id(self, index):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft[1] - index.y, index.x - index_topleft[0])
+        return (index_topleft.y - index.y, index.x - index_topleft.x)
 
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""

@@ -7,7 +7,7 @@ from gridkit.rect_grid import RectGrid
 @pytest.mark.parametrize(
     "points, expected_ids",
     [
-        [(340, -14.2), (68, -8)],  # test single point as tuple
+        [(340, -14.2), ((68, -8),)],  # test single point as tuple
         [[[14, 3], [-8, 1]], [[2, 1], [-2, 0]]],  # test multiple points as stacked list
         [
             numpy.array([[14, 3], [-8, 1]]),
@@ -99,7 +99,7 @@ def test_grid_id_to_numpy_id(
 @pytest.mark.parametrize(
     "np_index,expected_grid_id",
     [  # note, numpy id is in y,x
-        [(2, 1), (0, 0)],
+        [(2, 1), ((0, 0),)],
         [
             [(1, 4), (0, 2)],  # np_index
             [(-1, 1), (1, -2)],  # expected_grid_id in [(y0, y1), (x0,x1)]
