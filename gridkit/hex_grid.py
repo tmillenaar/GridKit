@@ -839,6 +839,10 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
     @validate_index
     def grid_id_to_numpy_id(self, index):
+        if index.index.ndim > 2:
+            raise ValueError(
+                "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
+            )
         if self._shape == "pointy":
             offset_rows = index.y % 2 == 1
             index.x[offset_rows] += 1

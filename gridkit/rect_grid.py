@@ -687,6 +687,10 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
     @validate_index
     def grid_id_to_numpy_id(self, index):
+        if index.index.ndim > 2:
+            raise ValueError(
+                "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
+            )
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft.y - index.y, index.x - index_topleft.x)

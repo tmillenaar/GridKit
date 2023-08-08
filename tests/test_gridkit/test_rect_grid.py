@@ -90,10 +90,16 @@ def test_grid_id_to_numpy_id(
     basic_bounded_rect_grid, index, expected_np_id, expected_value
 ):
     grid = basic_bounded_rect_grid
-    result = grid.grid_id_to_numpy_id(index)
 
+    result = grid.grid_id_to_numpy_id(index)
     numpy.testing.assert_almost_equal(result, expected_np_id)
     numpy.testing.assert_almost_equal(grid.data[result[0], result[1]], expected_value)
+
+
+def test_grid_id_to_numpy_id_nd_error(basic_bounded_rect_grid):
+    grid = basic_bounded_rect_grid
+    with pytest.raises(ValueError):
+        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
 
 
 @pytest.mark.parametrize(

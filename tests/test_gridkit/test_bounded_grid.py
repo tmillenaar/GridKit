@@ -550,6 +550,10 @@ def test_grid_id_to_numpy_id(
     np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
     numpy.testing.assert_allclose(numpy.array(np_ids), expected_ids)
 
+    # also check for error when supplying nd-index
+    with pytest.raises(ValueError):
+        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
+
 
 @pytest.mark.parametrize("shape", ["rect", "pointy", "flat"])
 def test_grid_id_to_numpy_id(
