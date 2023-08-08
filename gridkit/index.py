@@ -188,6 +188,42 @@ class GridIndex(metaclass=_IndexMeta):
             raveled_index = numpy.require(raveled_index, requirements=["C"])
         return raveled_index.view(dtype)
 
+    def ravel(self):
+        """Flatten a nd-index
+
+        Examples
+        --------
+
+        .. code-block:: python
+
+            >>> from gridkit.index import GridIndex
+            >>> import numpy
+            >>> index = GridIndex(numpy.arange(2*3*2).reshape(2,3,2))
+            >>> index.index
+            array([[[ 0,  1],
+                    [ 2,  3],
+                    [ 4,  5]],
+
+                   [[ 6,  7],
+                    [ 8,  9],
+                    [10, 11]]])
+            >>> flat_index = index.ravel()
+            >>> flat_index
+            array([[ 0,  1],
+                   [ 2,  3],
+                   [ 4,  5],
+                   [ 6,  7],
+                   [ 8,  9],
+                   [10, 11]])
+
+        ..
+
+        Returns
+        :class:`index`
+            A flattened copy of te index
+        """
+        return GridIndex(self.index.reshape((-1, 2)))
+
     def copy(self):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())

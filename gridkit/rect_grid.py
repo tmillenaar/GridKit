@@ -141,7 +141,7 @@ class RectGrid(BaseGrid):
             if len(index.shape) == 2:
                 neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
 
-        return neighbours
+        return GridIndex(neighbours)
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.

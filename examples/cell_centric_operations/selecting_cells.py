@@ -28,13 +28,16 @@ where one grid's cells are exactly three times larger than the other grid's cell
 
 # sphinx_gallery_thumbnail_number = -1
 
-from gridkit.hex_grid import HexGrid
 import numpy
+
+from gridkit.hex_grid import HexGrid
 
 # create a grids
 fine_grid = HexGrid(size=1, shape="pointy")
-fine_grid._offset = (0, fine_grid.dy/2)
-coarse_grid = HexGrid(size=3*fine_grid.dx, offset=(0, 3*fine_grid.dy/2), shape="pointy")
+fine_grid._offset = (0, fine_grid.dy / 2)
+coarse_grid = HexGrid(
+    size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
+)
 
 # %%
 #
@@ -62,11 +65,13 @@ coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids, as_multipolygon=True)
 
 import matplotlib.pyplot as plt
 
+
 def plot_shapes(shapes, color, fill=False, **kwargs):
     """Simple function to plot polygons with matplotlib"""
     plot_func = plt.fill if fill else plt.plot
     for geom in shapes.geoms:
         plot_func(*geom.exterior.xy, color=color, **kwargs)
+
 
 # %%
 #
@@ -75,8 +80,8 @@ def plot_shapes(shapes, color, fill=False, **kwargs):
 plot_shapes(fine_shapes, linewidth=1, color="purple")
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-plt.xlim(-4.5,4.5)
-plt.ylim(-4.5,4.5)
+plt.xlim(-4.5, 4.5)
+plt.ylim(-4.5, 4.5)
 plt.show()
 
 
@@ -86,37 +91,43 @@ plt.show()
 # between two orange cell edges, as intended.
 # Arguably, there are three categories of purple cells when compared to the orange grid.
 # The first category contains the purple cells at the center of each of the orange cells.
-# Secondly we have the neighbours of these center cells and lastly we have the purple cells at the 
+# Secondly we have the neighbours of these center cells and lastly we have the purple cells at the
 # vertices of the orange cells.
 # Let's start by coloring in the center cells.
 
 coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])
-center_cells = fine_grid.cell_at_point(coarse_centroids[:,:,0])
+center_cells = fine_grid.cell_at_point(coarse_centroids[:, :, 0])
 center_shapes = fine_grid.to_shapely(center_cells, as_multipolygon=True)
 
 plot_shapes(fine_shapes, linewidth=1, color="purple")
 plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-plt.xlim(-4.5,4.5)
-plt.ylim(-4.5,4.5)
+plt.xlim(-4.5, 4.5)
+plt.ylim(-4.5, 4.5)
 plt.show()
 
 # %%
 #
 # Next, let's use these center cells to find their neighbours and color them too.
 
-center_neighbour_cells = fine_grid.neighbours(center_cells)
-center_neighbour_cells = center_neighbour_cells.reshape((-1,2)) # flatten
-center_neighbour_shapes = fine_grid.to_shapely(center_neighbour_cells, as_multipolygon=True)
+center_neighbour_cells = fine_grid.neighbours(
+    center_cells
+)  # returns axes ('inital_cells', 'neighbours', 'xy') with shape (42, 6, 2)
+center_neighbour_cells = (
+    center_neighbour_cells.ravel()
+)  # flatten cell_ids to axes ('all_neigbours', 'xy') with shape (252, 2)
+center_neighbour_shapes = fine_grid.to_shapely(
+    center_neighbour_cells, as_multipolygon=True
+)
 
 plot_shapes(fine_shapes, linewidth=1, color="purple")
 plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
 plot_shapes(center_neighbour_shapes, fill=True, color="sandybrown", alpha=0.6)
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-plt.xlim(-4.5,4.5)
-plt.ylim(-4.5,4.5)
+plt.xlim(-4.5, 4.5)
+plt.ylim(-4.5, 4.5)
 plt.show()
 
 # %%
@@ -124,9 +135,9 @@ plt.show()
 # Lastly, let's find coordinates of the vertices of the orange cells.
 # We then find what purple cells are a these coordinates and color them as well.
 
-vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1,2))
+vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1, 2))
 vertices_cells = fine_grid.cell_at_point(vertices)
-vertices_cells = numpy.unique(vertices_cells, axis=0) # drop duplicate ids
+vertices_cells = numpy.unique(vertices_cells, axis=0)  # drop duplicate ids
 vertices_shapes = fine_grid.to_shapely(vertices_cells, as_multipolygon=True)
 
 plot_shapes(fine_shapes, linewidth=1, color="purple")
@@ -135,8 +146,8 @@ plot_shapes(center_neighbour_shapes, fill=True, color="sandybrown", alpha=0.6)
 plot_shapes(vertices_shapes, fill=True, color="darkcyan", alpha=0.6)
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-plt.xlim(-4.5,4.5)
-plt.ylim(-4.5,4.5)
+plt.xlim(-4.5, 4.5)
+plt.ylim(-4.5, 4.5)
 plt.show()
 
 # %%

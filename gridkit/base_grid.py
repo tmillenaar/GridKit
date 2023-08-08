@@ -131,7 +131,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
         neighbours = numpy.swapaxes(neighbours, 0, 1)
         neighbours = neighbours + index
-        return numpy.swapaxes(neighbours, 0, 1)
+        return GridIndex(numpy.swapaxes(neighbours, 0, 1))
 
     @abc.abstractmethod
     def cell_at_point(self, point: numpy.ndarray) -> tuple:

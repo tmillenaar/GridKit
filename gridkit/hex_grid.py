@@ -193,7 +193,7 @@ class HexGrid(BaseGrid):
             center_cell = int(numpy.floor(neighbours.shape[1] / 2))
             neighbours = numpy.delete(neighbours, center_cell, 1)
 
-        return neighbours if len(neighbours) > 1 else neighbours[0]
+        return GridIndex(neighbours if len(neighbours) > 1 else neighbours[0])
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
