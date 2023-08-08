@@ -12,7 +12,7 @@ from pyproj import Transformer
 import gridkit
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.index import GridIndex
+from gridkit.index import GridIndex, validate_index
 
 
 class _BoundedGridMeta(type):
@@ -489,11 +489,12 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             raise ValueError("Please supply one of: {anchor, bounds}")
         return self.update(new_data)
 
+    @validate_index
     def value(self, index, oob_value=None):
         """Return the value at the given cell index"""
 
         # Convert grid-ids into numpy-ids
-        np_id = numpy.stack(self.grid_id_to_numpy_id(index)[::-1])
+        np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
 
         # Identify any id outside the bounds
         oob_mask = numpy.where(np_id[0] >= self._data.shape[1])
@@ -534,7 +535,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         np_id = np_id[:, sample_mask]
         values[sample_mask] = self._data[np_id[1], np_id[0]]
 
-        return values
+        return values.reshape(index.index.shape[:-1])
 
     def nodata(self):
         if self.nodata_value is None:

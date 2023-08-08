@@ -482,6 +482,15 @@ def test_value_negative_bounds(ids, expected_value):
     numpy.testing.assert_allclose(expected_value, result)
 
 
+def test_value_nd_index():
+    data = numpy.arange(9).reshape((3, 3)).astype("float")
+    grid = rect_grid.BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
+
+    result = grid.value([[[1, 2]], [[3, 4]]])
+
+    numpy.testing.assert_allclose(result, [[6], [2]])
+
+
 @pytest.mark.parametrize("percentile", (2, 31, 50, 69, 98))
 def test_percentile(percentile):
     data = numpy.arange(9).reshape((3, 3)).astype("float")
