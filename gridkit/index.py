@@ -62,11 +62,6 @@ class GridIndex(metaclass=_IndexMeta):
         if self.index.shape == (2,):
             self.index = self.index[numpy.newaxis]
 
-        if self.index.ndim > 2 or (self.index.ndim > 1 and self.index.shape[-1] != 2):
-            raise ValueError(
-                f"Unexpected index shape. Expected a shape of (2,) or (N, 2), got {self.index.shape}."
-            )
-
     def __len__(self):
         """The number of indices"""
         return len(self._1d_view)
@@ -113,7 +108,12 @@ class GridIndex(metaclass=_IndexMeta):
         **kwargs:
             The keyword arguments to pass to numpy.unique
         """
-        return numpy.unique(self.index, axis=0, **kwargs)
+        if kwargs:
+            # kwargs to numpy.unique can result in multiple return arguments, return these too
+            unique, *other = numpy.unique(self._1d_view, axis=0, **kwargs)
+            return _nd_view(unique), *other
+        unique = numpy.unique(self._1d_view, axis=0, **kwargs)
+        return _nd_view(unique)
 
     def intersection(self, other):
         """The intersection of two GridIndex instances. Keep the IDs contained in both.
@@ -177,16 +177,16 @@ class GridIndex(metaclass=_IndexMeta):
     @property
     def _1d_view(self):
         """Create a structured array where each (x,y) pair is seen as a single entitiy"""
-        index = self.index
+        raveled_index = self.index.reshape((-1, 2))
         formats = (
-            numpy.full(len(index), index.dtype)
-            if index.shape[0] > 1
-            else 2 * [index.dtype]
+            numpy.full(len(raveled_index), raveled_index.dtype)
+            if raveled_index.shape[0] > 1
+            else 2 * [raveled_index.dtype]
         )
         dtype = {"names": ["f0", "f1"], "formats": formats}
-        if index.flags["F_CONTIGUOUS"]:  # https://stackoverflow.com/a/63196035
-            index = numpy.require(index, requirements=["C"])
-        return index.view(dtype)
+        if raveled_index.flags["F_CONTIGUOUS"]:  # https://stackoverflow.com/a/63196035
+            raveled_index = numpy.require(raveled_index, requirements=["C"])
+        return raveled_index.view(dtype)
 
     def copy(self):
         """Return an immutable copy of self."""

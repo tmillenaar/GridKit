@@ -9,7 +9,7 @@ from gridkit.index import GridIndex, validate_index
 def test_unique():
     index_raw = [(1, 2), (2, 1), (1, 1), (1, 2)]
     expected_unique = [(1, 1), (1, 2), (2, 1)]
-    index = GridIndex(index_raw)
+    index = GridIndex([index_raw, index_raw])  # duplicate to test nd arrays
 
     index_unique = index.unique()
     numpy.testing.assert_allclose(index_unique, expected_unique)
@@ -20,15 +20,17 @@ def test_unique():
 
     index_unique, inverse = index.unique(return_inverse=True)
     numpy.testing.assert_allclose(index_unique, expected_unique)
-    numpy.testing.assert_allclose(inverse, [1, 2, 0, 1])
+    numpy.testing.assert_allclose(inverse, [1, 2, 0, 1] * 2)
 
     index_unique, counts = index.unique(return_counts=True)
     numpy.testing.assert_allclose(index_unique, expected_unique)
-    numpy.testing.assert_allclose(counts, [1, 2, 1])
+    numpy.testing.assert_allclose(counts, [2, 4, 2])
 
 
 def test_intersection():
-    index1 = GridIndex([(1, 2), (2, 1), (1, 1), (1, 2)])
+    index1 = GridIndex(
+        [[(1, 2), (2, 1), (1, 1), (1, 2)], [(1, 2), (2, 1), (1, 1), (1, 2)]]
+    )
     index2 = GridIndex([(1, 1), (1, 2), (0, 1)])
     expected_intersection = [(1, 1), (1, 2)]
 
@@ -43,7 +45,9 @@ def test_intersection():
 
 
 def test_difference():
-    index1 = GridIndex([(1, 2), (2, 1), (1, 1), (1, 2)])
+    index1 = GridIndex(
+        [[(1, 2), (2, 1), (1, 1), (1, 2)], [(1, 2), (2, 1), (1, 1), (1, 2)]]
+    )
     index2 = GridIndex([(1, 1), (1, 2), (0, 1)])
 
     # test index1 diff index2
@@ -188,6 +192,12 @@ def test_xy():
     numpy.testing.assert_allclose(index.y, [1, 1])
 
 
+def test_xy_nd():
+    index = GridIndex([[(0, 1), (-1, 1)], [(0, 2), (-2, 2)]])
+    numpy.testing.assert_allclose(index.x, [[0, -1], [0, -2]])
+    numpy.testing.assert_allclose(index.y, [[1, 1], [2, 2]])
+
+
 @pytest.mark.parametrize(
     "index",
     (
@@ -207,9 +217,3 @@ def test_validate_index(index):
         assert isinstance(index, GridIndex)
 
     assert_index(index)
-
-
-def test_rase_shape_error():
-    ids = numpy.arange(4 * 3 * 2).reshape(4, 3, 2)
-    with pytest.raises(ValueError):
-        GridIndex(ids)

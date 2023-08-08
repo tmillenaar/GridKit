@@ -581,7 +581,7 @@ class HexGrid(BaseGrid):
             if nr_cells_flat != 0
             else (0, 0)
         )
-        return ids, shape
+        return GridIndex(ids), shape
 
     @property
     def parent_grid_class(self):
