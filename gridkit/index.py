@@ -1,8 +1,41 @@
 import inspect
-import operator
+from functools import wraps
 from typing import Union
 
 import numpy
+
+
+def validate_index(func):
+    """Decorator to convert the index argument of a function to a GridIndex object."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """Inner function to convert the index argument to a GridIndex object.
+
+        Parameters
+        ----------
+        index: Union[numpy.ndarray, list, tuple, GridIndex]
+            The index referring to the grid IDs
+        *args:
+            The arguments to be passed to the wrapped function
+        *kwargs:
+            The keyword arguments to be passed to the wrapped function
+        """
+        arg_names = inspect.signature(func).parameters
+        new_args = []
+        for key, value in zip(arg_names, args):
+            if key == "index" and value is not None:
+                value = GridIndex(value)
+            new_args.append(value)
+        new_kwargs = {}
+        for key, value in kwargs.items():
+            if key == "index" and value is not None:
+                value = GridIndex(value)
+            new_kwargs[key] = value
+
+        return func(*new_args, **new_kwargs)
+
+    return wrapper
 
 
 class _IndexMeta(type):
@@ -59,8 +92,8 @@ class GridIndex(metaclass=_IndexMeta):
     def __init__(self, index):
         self.index = numpy.array(index, dtype=int)
 
-        if self.index.shape == (2,):
-            self.index = self.index[numpy.newaxis]
+        # if self.index.shape == (2,):
+        #     self.index = self.index[numpy.newaxis]
 
     def __len__(self):
         """The number of indices"""
@@ -203,12 +236,12 @@ class GridIndex(metaclass=_IndexMeta):
             array([[[ 0,  1],
                     [ 2,  3],
                     [ 4,  5]],
-
+            <BLANKLINE>
                    [[ 6,  7],
                     [ 8,  9],
                     [10, 11]]])
             >>> flat_index = index.ravel()
-            >>> flat_index
+            >>> flat_index.index
             array([[ 0,  1],
                    [ 2,  3],
                    [ 4,  5],
@@ -224,6 +257,42 @@ class GridIndex(metaclass=_IndexMeta):
         """
         return GridIndex(self.index.reshape((-1, 2)))
 
+    @validate_index
+    def append(self, index):
+        """Add cell ids to the end of the current index.
+        This updates the .index attribute in-place as would an append on a python list.
+
+        Parameters
+        ----------
+        index: :class:`GridIndex`
+            The cell_ids to append to the current index
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+
+        .. code-block:: python
+
+            >>> cell_ids = GridIndex([0,1])
+            >>> cell_ids.index
+            array([ 0, 1])
+            >>> cell_ids.append([-5,9])
+            >>> cell_ids.index
+            array([[ 0, 1]
+                   [-5, 9]])
+
+        ..
+
+        """
+        if self.index.ndim == 1:
+            self.index = self.index[numpy.newaxis]
+        if index.index.ndim == 1:
+            index.index = index.index[numpy.newaxis]
+        self.index = numpy.append(self.index, index, axis=0)
+
     def copy(self):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())
@@ -234,35 +303,3 @@ def _nd_view(index):
     if index.shape[0] == 0:  # return index if empty
         return index
     return index.view(int).reshape(-1, 2)
-
-
-def validate_index(func):
-    """Decorator to convert the index argument of a function to a GridIndex object."""
-
-    def wrapper(*args, **kwargs):
-        """Inner function to convert the index argument to a GridIndex object.
-
-        Parameters
-        ----------
-        index: Union[numpy.ndarray, list, tuple, GridIndex]
-            The index referring to the grid IDs
-        *args:
-            The arguments to be passed to the wrapped function
-        *kwargs:
-            The keyword arguments to be passed to the wrapped function
-        """
-        arg_names = inspect.signature(func).parameters
-        new_args = []
-        for key, value in zip(arg_names, args):
-            if key == "index" and value is not None:
-                value = GridIndex(value)
-            new_args.append(value)
-        new_kwargs = {}
-        for key, value in kwargs.items():
-            if key == "index" and value is not None:
-                value = GridIndex(value)
-            new_kwargs[key] = value
-
-        return func(*new_args, **new_kwargs)
-
-    return wrapper

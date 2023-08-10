@@ -181,6 +181,12 @@ def test_reverse_operator():
     numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
 
 
+def test_append():
+    index = GridIndex((0, 1))
+    index.append([2, 3])
+    numpy.testing.assert_allclose(index, [[0, 1], [2, 3]])
+
+
 def test_copy():
     index = GridIndex([(0, 1), (-1, 1)])
     assert id(index.index) != id(index.copy().index)
