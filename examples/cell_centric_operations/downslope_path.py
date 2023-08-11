@@ -34,31 +34,33 @@ First let's import the dependencies and read in the DEM.
 
 # sphinx_gallery_thumbnail_number = -1
 
-import numpy
-from gridkit.io import read_geotiff
 import matplotlib.pyplot as plt
+import numpy
 
-dem = read_geotiff("../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100))
+from gridkit.io import read_geotiff
+
+dem = read_geotiff(
+    "../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100)
+)
 
 # %%
-# 
+#
 # Next, set up the recursive function and the required empty lists.
-# 
+#
 # .. Warning ::
 #    Python's recursion limit can be reached with this approach for paths longer than shown here.
 #    While you can raise this limit using `sys.setrecursionlimit`, you may want to reconsider the approach and use a while-loop instead of recursion.
-
 visited_cells = []
 all_neighbours = []
 neighbour_values = []
+
+
 def downslope_path(cell_id):
-
-    visited_cells.append(tuple(cell_id))
-
+    visited_cells.append(cell_id)
     # add new neigbours and their values to their respective lists
     neighbours = dem.neighbours(cell_id, connect_corners=True)
     for cell, value in zip(neighbours, dem.value(neighbours)):
-        cell = tuple(cell)
+        cell = tuple(cell.index)
         if not cell in visited_cells and not cell in all_neighbours:
             all_neighbours.append(cell)
             neighbour_values.append(value)
@@ -72,21 +74,22 @@ def downslope_path(cell_id):
     next_cell = all_neighbours[min_id]
     all_neighbours.pop(min_id)
     neighbour_values.pop(min_id)
-        
+
     return downslope_path(next_cell)
+
 
 # %%
 # Determine the starting cell and call the function
 start_cell_id = dem.cell_at_point((29330, 167848))
-downslope_path(start_cell_id)
+downslope_path(tuple(start_cell_id.index))
 
 
 # %%
 #
 # Results
-# ------------- 
+# -------------
 # Let's plot the path on the DEM
-# 
+#
 # For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.
 
 im = plt.imshow(dem, extent=dem.mpl_extent)
@@ -99,17 +102,17 @@ path_label = "Downslope path"
 for poly in dem.to_shapely(visited_cells):
     x, y = poly.exterior.xy
     plt.fill(x, y, alpha=1.0, color="red", label=path_label)
-    path_label = None # Only show the label in the legend once
+    path_label = None  # Only show the label in the legend once
 
-plt.scatter(*dem.centroid(start_cell_id), marker="*", label="Starting point", color="purple")
+plt.scatter(
+    *dem.centroid(start_cell_id), marker="*", label="Starting point", color="purple"
+)
 plt.legend()
 
 plt.show()
 
 # %%
-# 
+#
 # While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 # They can for example be used to obtain values form a different dataset along the path,
 # or intersected with a polygon to determine if the path crosses a particular zone of interest.
-
-
