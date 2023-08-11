@@ -11,9 +11,9 @@ from gridkit import rect_grid
 @pytest.mark.parametrize(
     "dx, dy, offset, point, expected_id",
     [
-        (5, 5, (0, 0), (0, 0), ((0, 0),)),
-        (5, 5, (0, 0), (-6, 6), ((-2, 1),)),
-        (5, 5, (3, 3), (-6, 6), ((-2, 0),)),
+        (5, 5, (0, 0), (0, 0), (0, 0)),
+        (5, 5, (0, 0), (-6, 6), (-2, 1)),
+        (5, 5, (3, 3), (-6, 6), (-2, 0)),
         (
             10,
             5,
@@ -133,7 +133,7 @@ def test_crs():
     [
         (
             shapely.geometry.Point(0.5, 1.5),
-            [[0, 1]],
+            [0, 1],
         ),  # point in cell
         (
             shapely.geometry.Point(1, 1.5),
@@ -153,7 +153,7 @@ def test_crs():
         ),  # L shaped line covering three cells
         (
             shapely.geometry.Point(0.5, 1.5).buffer(0.1),
-            [[0, 1]],
+            [0, 1],
         ),  # Polygon in single cell
         (
             shapely.geometry.LineString([[0.5, 0.5], [1.5, 0.5], [1.5, 1.5]]).buffer(
