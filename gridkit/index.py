@@ -272,7 +272,8 @@ class GridIndex(metaclass=_IndexMeta):
         ..
 
         Returns
-        :class:`index`
+        -------
+        :class:`GridIndex`
             A flattened copy of te index
         """
         return GridIndex(self.index.reshape((-1, 2)))
