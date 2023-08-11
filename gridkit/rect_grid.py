@@ -67,12 +67,12 @@ class RectGrid(BaseGrid):
 
             >>> from gridkit.rect_grid import RectGrid
             >>> grid = RectGrid(dx=2, dy=3)
-            >>> grid.relative_neighbours()
+            >>> grid.relative_neighbours().index
             array([[ 0,  1],
                    [-1,  0],
                    [ 1,  0],
                    [ 0, -1]])
-            >>> grid.relative_neighbours(connect_corners=True)
+            >>> grid.relative_neighbours(connect_corners=True).index
             array([[-1,  1],
                    [ 0,  1],
                    [ 1,  1],
@@ -102,7 +102,7 @@ class RectGrid(BaseGrid):
 
         .. code-block:: python
 
-            >>> grid.relative_neighbours(include_selected=True)
+            >>> grid.relative_neighbours(include_selected=True).index
             array([[ 0,  1],
                    [-1,  0],
                    [ 0,  0],
@@ -245,10 +245,16 @@ class RectGrid(BaseGrid):
         .. code-block:: python
 
             >>> grid = RectGrid(dx=4, dy=1)
-            >>> grid.cells_near_point((0, 0))
-            (array([-1,  0]), array([0, 0]), array([-1, -1]), array([ 0, -1]))
-            >>> grid.cells_near_point((3, 0.75))
-            (array([0, 1]), array([1, 1]), array([0, 0]), array([1, 0]))
+            >>> grid.cells_near_point((0, 0)).index
+            array([[-1,  0],
+                   [ 0,  0],
+                   [-1, -1],
+                   [ 0, -1]])
+            >>> grid.cells_near_point((3, 0.75)).index
+            array([[0, 1],
+                   [1, 1],
+                   [0, 0],
+                   [1, 0]])
 
         ..
 
@@ -258,20 +264,22 @@ class RectGrid(BaseGrid):
 
             >>> points = [(0, 0), (3, 0.75), (3, 0)]
             >>> nearby_cells = grid.cells_near_point(points)
-            >>> from pprint import pprint # used for output readability purposes only
-            >>> pprint(nearby_cells)
-            (array([[-1,  0],
-                   [ 0,  1],
-                   [ 0,  0]]),
-             array([[0, 0],
-                   [1, 1],
-                   [1, 0]]),
-             array([[-1, -1],
-                   [ 0,  0],
-                   [ 0, -1]]),
-             array([[ 0, -1],
-                   [ 1,  0],
-                   [ 1, -1]]))
+            >>> nearby_cells.index
+            array([[[-1,  0],
+                    [ 0,  1],
+                    [ 0,  0]],
+            <BLANKLINE>
+                   [[ 0,  0],
+                    [ 1,  1],
+                    [ 1,  0]],
+            <BLANKLINE>
+                   [[-1, -1],
+                    [ 0,  0],
+                    [ 0, -1]],
+            <BLANKLINE>
+                   [[ 0, -1],
+                    [ 1,  0],
+                    [ 1, -1]]])
 
         ..
 
@@ -310,7 +318,7 @@ class RectGrid(BaseGrid):
         tl_ids = base_ids.copy()
         tl_ids.y += 1
 
-        return tl_ids, tr_ids, bl_ids, br_ids
+        return GridIndex([tl_ids, tr_ids, bl_ids, br_ids])
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
@@ -335,7 +343,7 @@ class RectGrid(BaseGrid):
         .. code-block:: python
 
             >>> grid = RectGrid(dx=4, dy=1)
-            >>> grid.cell_at_point((1, 0))
+            >>> grid.cell_at_point((1, 0)).index
             array([0, 0])
 
         ..
@@ -346,7 +354,7 @@ class RectGrid(BaseGrid):
         .. code-block:: python
 
             >>> grid = RectGrid(dx=4, dy=1, offset=(2,0))
-            >>> grid.cell_at_point((1, 0))
+            >>> grid.cell_at_point((1, 0)).index
             array([-1,  0])
 
         ..
@@ -357,12 +365,12 @@ class RectGrid(BaseGrid):
 
             >>> grid = RectGrid(dx=4, dy=1)
             >>> points = [(3, 0), (-0.5, -0.5), (5, 0)]
-            >>> grid.cell_at_point(points)
+            >>> grid.cell_at_point(points).index
             array([[ 0,  0],
                    [-1, -1],
                    [ 1,  0]])
             >>> points = numpy.array(points)
-            >>> grid.cell_at_point(points)
+            >>> grid.cell_at_point(points).index
             array([[ 0,  0],
                    [-1, -1],
                    [ 1,  0]])

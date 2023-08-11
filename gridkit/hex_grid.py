@@ -98,14 +98,14 @@ class HexGrid(BaseGrid):
 
             >>> from gridkit.hex_grid import HexGrid
             >>> grid = HexGrid(size=3)
-            >>> grid.relative_neighbours(index=[0,0])
+            >>> grid.relative_neighbours(index=[0,0]).index
             array([[-1,  1],
                    [ 0,  1],
                    [-1,  0],
                    [ 1,  0],
                    [-1, -1],
                    [ 0, -1]])
-            >>> grid.relative_neighbours(index=[0,1])
+            >>> grid.relative_neighbours(index=[0,1]).index
             array([[ 0,  1],
                    [ 1,  1],
                    [-1,  0],
@@ -130,7 +130,7 @@ class HexGrid(BaseGrid):
 
         .. code-block:: python
 
-            >>> grid.relative_neighbours(index=[0,0], include_selected=True)
+            >>> grid.relative_neighbours(index=[0,0], include_selected=True).index
             array([[-1,  1],
                    [ 0,  1],
                    [-1,  0],
