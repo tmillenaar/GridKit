@@ -660,7 +660,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :py:meth:`.RectGrid.cell_at_point`
         """
         nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points)
+        tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points).index
 
         tl_val = self.value(tl_ids, oob_value=nodata_value)
         tr_val = self.value(tr_ids, oob_value=nodata_value)
