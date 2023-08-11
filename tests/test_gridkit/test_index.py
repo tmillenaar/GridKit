@@ -181,6 +181,7 @@ def test_reverse_operator():
     numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
 
 
+@pytest.mark.parametrize("in_place", [True, False])
 @pytest.mark.parametrize(
     "index, append_index, expected_result",
     [
@@ -190,10 +191,15 @@ def test_reverse_operator():
         ([0, 1], [[2, 3], [-1, 2]], [[0, 1], [2, 3], [-1, 2]]),
     ],
 )
-def test_append(index, append_index, expected_result):
+def test_append(index, append_index, expected_result, in_place):
     index = GridIndex(index)
-    index.append(append_index)
-    numpy.testing.assert_allclose(index, expected_result)
+    result = index.append(append_index, in_place=in_place)
+    numpy.testing.assert_allclose(result, expected_result)
+
+    if in_place:
+        assert id(result) == id(index)
+    else:
+        assert id(result) != id(index)
 
 
 def test_copy():
@@ -251,14 +257,25 @@ def test_isin(partial, index, result):
     assert (GridIndex(partial) in index) == result
 
 
+@pytest.mark.parametrize("in_place", [False, True])
 @pytest.mark.parametrize(
     "index, delete_id, expected_result",
     [
-        ([1, 2], [1, 2], []),
+        (
+            [1, 2],
+            [1, 2],
+            numpy.array([[], []]).T,
+        ),  # numpy.array([[],[]]).T results in empty array with shape=(0, 2)
         ([[1, 2], [0, 0]], [1, 2], [0, 0]),
+        ([[1, 2], [0, 0]], [[1, 2], [0, 0]], numpy.array([[], []]).T),
+        ([[1, 2], [0, 0], [1, 2]], [1, 2], [0, 0]),
     ],
 )
 @validate_index
-def test_delete(index, delete_id, expected_result):
-    result = index.delete(delete_id)
+def test_delete(index, delete_id, expected_result, in_place):
+    result = index.delete(delete_id, in_place)
     numpy.testing.assert_allclose(result, expected_result)
+    if in_place:
+        assert id(result) == id(index)
+    else:
+        assert id(result) != id(index)

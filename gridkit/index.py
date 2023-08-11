@@ -131,7 +131,7 @@ class GridIndex(metaclass=_IndexMeta):
         return id
 
     def __getitem__(self, item):
-        return self.index[item]
+        return GridIndex(self.index[item])
 
     @property
     def x(self):
@@ -278,7 +278,7 @@ class GridIndex(metaclass=_IndexMeta):
         return GridIndex(self.index.reshape((-1, 2)))
 
     @validate_index
-    def append(self, index):
+    def append(self, index, in_place=False):
         """Add cell ids to the end of the current index.
         This updates the .index attribute in-place as would an append on a python list.
 
@@ -286,6 +286,13 @@ class GridIndex(metaclass=_IndexMeta):
         ----------
         index: :class:`GridIndex`
             The cell_ids to append to the current index
+        in_place: :class:`bool`(optional, default False )
+            Updates the index of ``self`` if True.
+            Returns a copy if False.
+            Note: This does not improve performance as you might expect form a true in-place operation.
+            The copy is made regardless since the data stored in the GridIndex is based on a numpy
+            array and not on a Python List.
+            The ``in-place`` option is for convenience only, not performance.
 
         Returns
         -------
@@ -298,37 +305,99 @@ class GridIndex(metaclass=_IndexMeta):
 
             >>> cell_ids = GridIndex([0,1])
             >>> cell_ids.index
-            array([ 0, 1])
-            >>> cell_ids.append([-5,9])
+            array([0, 1])
+            >>> result = cell_ids.append([-5,9])
+            >>> result.index
+            array([[ 0,  1],
+                   [-5,  9]])
+
+        ..
+
+        Alternatively, by specifying ``in_place=True`` the original object can be updated.
+        As noted at the ``in_place`` parameter description, this does not result in performance gains.
+
+        .. code-block:: python
+
+            >>> cell_ids.append([-5,9], in_place=True)
+            <gridkit.index.GridIndex object at ...>
             >>> cell_ids.index
-            array([[ 0, 1]
-                   [-5, 9]])
+            array([[ 0,  1],
+                   [-5,  9]])
 
         ..
 
         """
         if self.index.size == 0:
-            self.index = index.index.copy()
-            return
-
-        if self.index.ndim == 1:
-            self.index = self.index[numpy.newaxis]
-        if index.index.ndim == 1:
-            index.index = index.index[numpy.newaxis]
-        self.index = numpy.append(self.index, index, axis=0)
+            result = index.index.copy()
+        else:
+            if self.index.ndim == 1:
+                self.index = self.index[numpy.newaxis]
+            if index.index.ndim == 1:
+                index.index = index.index[numpy.newaxis]
+            result = numpy.append(self.index, index, axis=0)
+        if not in_place:
+            return GridIndex(result)
+        self.index = result
+        return self
 
     @validate_index
-    def delete(self, index, all=False):
+    def delete(self, index, in_place=False):
         """Remove all instances of 'item' from self.
-        This is done in-place and returns the popped item.
+
+        Parameters
+        ----------
+        index: :class:`GridIndex`
+            The cell ids to remove from ``self``
+        in_place: :class:`bool`(optional, default False )
+            Updates the index of ``self`` if True.
+            Returns a copy if False.
+            Note: This does not improve performance as you might expect form a true in-place operation.
+            The copy is made regardless since the data stored in the GridIndex is based on a numpy
+            array and not on a Python List.
+            The ``in-place`` option is for convenience only, not performance.
+
+        Returns
+        -------
+        :class:`GridIndex`
+            The new index where the supplied ids were removed
+
+        Examples
+        --------
+
+        .. code-block:: python
+
+            >>> start_index = GridIndex([[0,1], [2,3], [0,1]])
+            >>> start_index.index
+            array([[0, 1],
+                   [2, 3],
+                   [0, 1]])
+            >>> reduced_index = start_index.delete([0,1])
+            >>> reduced_index.index
+            array([2, 3])
+
+        ..
+
+        Alternatively, by specifying ``in_place=True`` the original object can be updated.
+        As noted at the ``in_place`` parameter description, this does not result in performance gains.
+
+        .. code-block:: python
+
+            >>> start_index.delete([0,1], in_place=True)
+            <gridkit.index.GridIndex object at ...>
+            >>> start_index.index
+            array([2, 3])
+
+        ..
+
+
         """
-        ids = []
-        for del_id in index:
-            ids.extend([cell == del_id for cell in self])
-        result = numpy.delete(self._1d_view, ids)
-        if result.size == 0:
-            return GridIndex([])
-        return _nd_view(result)
+        mask = [cell_id not in index for cell_id in self]
+        masked_index = self.ravel()[mask]
+        masked_index.index = masked_index.index.squeeze()
+        if not in_place:
+            return masked_index
+        self.index = masked_index.index
+        return self
 
     def copy(self):
         """Return an immutable copy of self."""
