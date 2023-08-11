@@ -181,10 +181,19 @@ def test_reverse_operator():
     numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
 
 
-def test_append():
-    index = GridIndex((0, 1))
-    index.append([2, 3])
-    numpy.testing.assert_allclose(index, [[0, 1], [2, 3]])
+@pytest.mark.parametrize(
+    "index, append_index, expected_result",
+    [
+        ([], [2, 3], [2, 3]),
+        ([0, 1], [2, 3], [[0, 1], [2, 3]]),
+        ([], [[2, 3], [-1, 2]], [[2, 3], [-1, 2]]),
+        ([0, 1], [[2, 3], [-1, 2]], [[0, 1], [2, 3], [-1, 2]]),
+    ],
+)
+def test_append(index, append_index, expected_result):
+    index = GridIndex(index)
+    index.append(append_index)
+    numpy.testing.assert_allclose(index, expected_result)
 
 
 def test_copy():
@@ -223,3 +232,20 @@ def test_validate_index(index):
         assert isinstance(index, GridIndex)
 
     assert_index(index)
+
+
+@pytest.mark.parametrize(
+    "partial, index, result",
+    [
+        ([1, 2], [1, 2], True),
+        ([1, 2], [2, 1], False),
+        ([1, 2], [[1, 2]], True),
+        ([1, 2], [[[1, 2]]], True),
+        ([1, 2], [[[0, 0], [1, 2]], [[0, 0], [0, 0]]], True),
+        ([1, 2], [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], False),
+        ([0, 0], [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], True),
+    ],
+)
+@validate_index
+def test_isin(partial, index, result):
+    assert (GridIndex(partial) in index) == result

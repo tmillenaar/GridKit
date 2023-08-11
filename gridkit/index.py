@@ -38,18 +38,20 @@ def validate_index(func):
     return wrapper
 
 
+def _normal_op(op):
+    return lambda l, r: GridIndex(op(l.index.astype(float), r))
+
+
+def _reverse_op(op):
+    return lambda l, r: GridIndex(op(r, l.index.astype(float)))
+
+
 class _IndexMeta(type):
     """Metaclass for GridIndex which implements the basic operators"""
 
     def __new__(cls, name, bases, namespace):
-        # numpys with a nan-base
-        def normal_op(op):
-            return lambda l, r: GridIndex(op(l.index.astype(float), r))
-
-        def reverse_op(op):
-            return lambda l, r: GridIndex(op(r, l.index.astype(float)))
-
         for op, name_ in (
+            # mathematical operators
             (numpy.add, "add"),
             (numpy.subtract, "sub"),
             (numpy.multiply, "mul"),
@@ -57,18 +59,39 @@ class _IndexMeta(type):
             (numpy.floor_divide, "floordiv"),
             (numpy.power, "pow"),
             (numpy.mod, "mod"),
+            # comparison operators
             (numpy.greater_equal, "ge"),
             (numpy.less_equal, "le"),
             (numpy.greater, "gt"),
             (numpy.less, "lt"),
+        ):
+            opname = "__{}__".format(name_)
+            opname_reversed = "__r{}__".format(name_)
+            namespace[opname] = _normal_op(op)
+            namespace[opname_reversed] = _reverse_op(op)
+
+        for op, name_ in (
             (numpy.equal, "eq"),
             (numpy.not_equal, "ne"),
         ):
             opname = "__{}__".format(name_)
             opname_reversed = "__r{}__".format(name_)
-            namespace[opname] = normal_op(op)
-            namespace[opname_reversed] = reverse_op(op)
+            namespace[opname] = cls._gen_comparisson_op(_normal_op(op))
+            namespace[opname_reversed] = cls._gen_comparisson_op(_reverse_op(op))
         return super().__new__(cls, name, bases, namespace)
+
+    @staticmethod
+    def _gen_comparisson_op(op):
+        def comparison_op(left, right):
+            if not (isinstance(left, GridIndex) and isinstance(right, GridIndex)):
+                return op
+            if left.index.ndim != right.index.ndim:
+                return False
+            return all(left.ravel().x == right.ravel().x) and all(
+                left.ravel().y == right.ravel().y
+            )
+
+        return comparison_op
 
 
 class GridIndex(metaclass=_IndexMeta):
@@ -97,16 +120,16 @@ class GridIndex(metaclass=_IndexMeta):
 
     def __len__(self):
         """The number of indices"""
-        return len(self._1d_view)
+        return len(self.ravel().index)
 
     def __iter__(self):
         self._iter_id = 0
         return self
 
     def __next__(self):
-        if self._iter_id == len(self.index):
+        if self._iter_id == len(self):
             raise StopIteration
-        id = GridIndex(self.index[self._iter_id])
+        id = GridIndex(self.ravel()[self._iter_id])
         self._iter_id += 1
         return id
 
@@ -287,6 +310,10 @@ class GridIndex(metaclass=_IndexMeta):
         ..
 
         """
+        if self.index.size == 0:
+            self.index = index.index.copy()
+            return
+
         if self.index.ndim == 1:
             self.index = self.index[numpy.newaxis]
         if index.index.ndim == 1:
