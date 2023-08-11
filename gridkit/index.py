@@ -115,9 +115,6 @@ class GridIndex(metaclass=_IndexMeta):
     def __init__(self, index):
         self.index = numpy.array(index, dtype=int)
 
-        # if self.index.shape == (2,):
-        #     self.index = self.index[numpy.newaxis]
-
     def __len__(self):
         """The number of indices"""
         return len(self.ravel().index)
@@ -320,6 +317,19 @@ class GridIndex(metaclass=_IndexMeta):
             index.index = index.index[numpy.newaxis]
         self.index = numpy.append(self.index, index, axis=0)
 
+    @validate_index
+    def delete(self, index, all=False):
+        """Remove all instances of 'item' from self.
+        This is done in-place and returns the popped item.
+        """
+        ids = []
+        for del_id in index:
+            ids.extend([cell == del_id for cell in self])
+        result = numpy.delete(self._1d_view, ids)
+        if result.size == 0:
+            return GridIndex([])
+        return _nd_view(result)
+
     def copy(self):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())
@@ -328,5 +338,6 @@ class GridIndex(metaclass=_IndexMeta):
 def _nd_view(index):
     """Turn 1d-view into ndarray"""
     if index.shape[0] == 0:  # return index if empty
-        return index
-    return index.view(int).reshape(-1, 2)
+        result = index
+    result = index.view(int).reshape(-1, 2).squeeze()
+    return GridIndex(result)

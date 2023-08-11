@@ -41,7 +41,7 @@ def test_intersection():
     numpy.testing.assert_allclose(intersection, expected_intersection)
 
     empty_intersection = index1.intersection([])
-    assert empty_intersection.shape == (0,)
+    assert len(empty_intersection) == 0
 
 
 def test_difference():
@@ -52,25 +52,25 @@ def test_difference():
 
     # test index1 diff index2
     difference = index1.difference(index2)
-    numpy.testing.assert_allclose(difference, [(2, 1)])
+    numpy.testing.assert_allclose(difference, [2, 1])
 
     # test index2 diff index1
     difference = index2.difference(index1)
-    numpy.testing.assert_allclose(difference, [(0, 1)])
+    numpy.testing.assert_allclose(difference, [0, 1])
 
     # test index1 diff index2.index
     difference = index1.difference(index2.index)
-    numpy.testing.assert_allclose(difference, [(2, 1)])
+    numpy.testing.assert_allclose(difference, [2, 1])
 
     # test index2 diff index1.index
     difference = index2.difference(index1.index)
-    numpy.testing.assert_allclose(difference, [(0, 1)])
+    numpy.testing.assert_allclose(difference, [0, 1])
 
 
 def test_isdisjoint():
     index1 = GridIndex([(1, 2), (2, 1), (1, 1), (1, 2)])
     index2 = GridIndex([(1, 1), (1, 2), (0, 1)])
-    index3 = GridIndex([(0, 0)])
+    index3 = GridIndex([0, 0])
 
     isdisjoint = index1.isdisjoint(index2)
     assert isdisjoint == False
@@ -249,3 +249,16 @@ def test_validate_index(index):
 @validate_index
 def test_isin(partial, index, result):
     assert (GridIndex(partial) in index) == result
+
+
+@pytest.mark.parametrize(
+    "index, delete_id, expected_result",
+    [
+        ([1, 2], [1, 2], []),
+        ([[1, 2], [0, 0]], [1, 2], [0, 0]),
+    ],
+)
+@validate_index
+def test_delete(index, delete_id, expected_result):
+    result = index.delete(delete_id)
+    numpy.testing.assert_allclose(result, expected_result)
