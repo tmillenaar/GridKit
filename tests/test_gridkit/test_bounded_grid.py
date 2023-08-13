@@ -199,32 +199,32 @@ def test_comparissons_with_scalars(nodata):
     # test equal
     result = grid == 1
     expected = numpy.array([[1, 1]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
     # test not equal
     result = grid != 1
     expected = numpy.array([[0, 1], [0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
     # # test greater than
     result = grid > 1
     expected = numpy.array([[0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
     # # test smaller than
     result = grid < 1
     expected = numpy.array([[0, 1]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
     # # test greater than or equal
     result = grid >= 1
     expected = numpy.array([[1, 1], [0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
     # # test smaller than or equal
     result = grid <= 1
     expected = numpy.array([[0, 1], [1, 1]])
-    numpy.testing.assert_allclose(result.data, expected)
+    numpy.testing.assert_allclose(result.index, expected)
 
 
 def test_reduction_operators():
@@ -279,27 +279,27 @@ def test_reduction_operators_arg():
     # test argmax
     idx = grid.argmax()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (2,)
     numpy.testing.assert_allclose(value, data.max())
 
     # test argmin
     idx = grid.argmin()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (2,)
     numpy.testing.assert_allclose(value, data.min())
 
     # test argmax with ndoata value
     grid.nodata_value = 8
     idx = grid.argmax()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (2,)
     numpy.testing.assert_allclose(value, 7)
 
     # test argmin with nodata value
     grid.nodata_value = 0
     idx = grid.argmin()
     value = grid.value(idx)
-    assert idx.shape == (2,)
+    assert idx.index.shape == (2,)
     numpy.testing.assert_allclose(value, 1)
 
 
@@ -470,6 +470,15 @@ def test_value_negative_bounds(ids, expected_value):
     numpy.testing.assert_allclose(expected_value, result)
 
 
+def test_value_nd_index():
+    data = numpy.arange(9).reshape((3, 3)).astype("float")
+    grid = rect_grid.BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
+
+    result = grid.value([[[1, 2]], [[3, 4]]])
+
+    numpy.testing.assert_allclose(result, [[6], [2]])
+
+
 @pytest.mark.parametrize("percentile", (2, 31, 50, 69, 98))
 def test_percentile(percentile):
     data = numpy.arange(9).reshape((3, 3)).astype("float")
@@ -538,6 +547,10 @@ def test_grid_id_to_numpy_id(
     np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
     numpy.testing.assert_allclose(numpy.array(np_ids), expected_ids)
 
+    # also check for error when supplying nd-index
+    with pytest.raises(ValueError):
+        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
+
 
 @pytest.mark.parametrize("shape", ["rect", "pointy", "flat"])
 def test_grid_id_to_numpy_id(
@@ -549,7 +562,6 @@ def test_grid_id_to_numpy_id(
         flat=basic_bounded_flat_grid,
     )
     grid = grid_lut[shape]
-    np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
+    np_ids = grid.grid_id_to_numpy_id(grid.indices)
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
-    # breakpoint()
-    numpy.testing.assert_allclose(grid_ids, grid.indices.T)
+    numpy.testing.assert_allclose(grid_ids, grid.indices)

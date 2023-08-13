@@ -133,7 +133,7 @@ def test_crs():
     [
         (
             shapely.geometry.Point(0.5, 1.5),
-            [[0, 1]],
+            [0, 1],
         ),  # point in cell
         (
             shapely.geometry.Point(1, 1.5),
@@ -153,7 +153,7 @@ def test_crs():
         ),  # L shaped line covering three cells
         (
             shapely.geometry.Point(0.5, 1.5).buffer(0.1),
-            [[0, 1]],
+            [0, 1],
         ),  # Polygon in single cell
         (
             shapely.geometry.LineString([[0.5, 0.5], [1.5, 0.5], [1.5, 1.5]]).buffer(

@@ -33,9 +33,10 @@ We can make use of this to read out a crop of the same area form different files
 
 
 """
-from gridkit.io import read_geotiff
 import matplotlib.pyplot as plt
 import numpy
+
+from gridkit.io import read_geotiff
 
 # Define the bounding box of interest and the corresponding CRS
 bounds_matterhorn = (817723, 5826030, 964482, 5893982)
@@ -49,13 +50,12 @@ path_dem = "../../tests/data/alps_dem.tiff"
 dem = read_geotiff(path_dem, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
 
 # Read the same part of the landuse dataset and resample onto the DEM
-landuse = (
-    read_geotiff(path_landuse, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
-    .resample(dem, method="nearest")
-)
+landuse = read_geotiff(
+    path_landuse, bounds=bounds_matterhorn, bounds_crs=bounds_crs
+).resample(dem, method="nearest")
 
 # %%
-# 
+#
 # The resampling ``method`` 'nearest' was used to keep the land cover values discrete.
 #
 # .. Tip ::
@@ -71,7 +71,7 @@ landuse = (
 #
 
 # Initialize figure for plotting the dem and landuse datasets
-fig, axes = plt.subplots(2, constrained_layout = True)
+fig, axes = plt.subplots(2, constrained_layout=True)
 
 # Plot DEM
 mpl_extent = (dem.bounds[0], dem.bounds[2], dem.bounds[1], dem.bounds[3])
@@ -81,8 +81,15 @@ axes[0].set_ylabel("lat")
 axes[0].set_title("Elevation [m]", fontsize=10)
 
 # Plot Landuse
-mpl_extent = (landuse.bounds[0], landuse.bounds[2], landuse.bounds[1], landuse.bounds[3])
-im_landuse = axes[1].imshow(landuse, cmap="tab20c_r", extent=mpl_extent, aspect="auto", vmin=0, vmax=50)
+mpl_extent = (
+    landuse.bounds[0],
+    landuse.bounds[2],
+    landuse.bounds[1],
+    landuse.bounds[3],
+)
+im_landuse = axes[1].imshow(
+    landuse, cmap="tab20c_r", extent=mpl_extent, aspect="auto", vmin=0, vmax=50
+)
 fig.colorbar(im_landuse, ax=axes[1], fraction=0.04, pad=0.01, label="Landuse value")
 axes[1].set_xlabel("lon")
 axes[1].set_ylabel("lat")
@@ -94,11 +101,11 @@ plt.show()
 # To get a rough feeling for the land cover plot,
 # the orange shades roughly correspond to snow, ice and bare rock
 # and the green shades roughly correspond to vegetation.
-# To inspect the land cover categories with better accuracy, 
+# To inspect the land cover categories with better accuracy,
 # visit the source of the data mentioned a the top of this page.
 # You may notice the grey areas around the land cover dataset.
 # These are nodata values used to fill empty areas during the resampling step.
-# 
+#
 # Relating cells between datasets
 # -------------------------------
 #
@@ -127,7 +134,7 @@ glacier_heights = dem.value(landuse == 34)
 # %%
 #
 # .. Tip ::
-#    Since the IDs returned by the comparison operation are numpy arrays, we can combine them using numpy's vstack.
+#    Since the ``GridIndex`` returned by the comparison operation is based on ``numpy.ndarray``, we can combine them using numpy's vstack.
 #
 # Plotting the histogram distribution of the various land covers gives the following plot:
 #
@@ -135,15 +142,56 @@ glacier_heights = dem.value(landuse == 34)
 # Plot forest histograms
 fig, ax = plt.subplots(1)
 bins = list(range(dem.min(), dem.max(), 50))
-ax.hist(grass_and_shrub_heights, bins=bins, color="palegreen", alpha=0.5, label="Grass and shrubs", orientation="horizontal")
-ax.hist(bare_rock_heights, bins=bins, color="lightsalmon", alpha=0.5, label="Bare rock", orientation="horizontal")
-ax.hist(glacier_heights, bins=bins, color="lightseagreen", alpha=0.5, label="Glaciers and perma-snow", orientation="horizontal")
-ax.hist(conifer_forest_heights, bins=bins, color="darkgreen", alpha=0.5, label="Coniferous forest", orientation="horizontal")
-ax.hist(mixed_forest_heights, bins=bins, color="yellowgreen", alpha=0.5, label="Mixed forest", orientation="horizontal")
-ax.hist(broad_leaved_forest_heights, bins=bins, color="orange", alpha=0.5, label="Broad-leaved forest", orientation="horizontal")
+ax.hist(
+    grass_and_shrub_heights,
+    bins=bins,
+    color="palegreen",
+    alpha=0.5,
+    label="Grass and shrubs",
+    orientation="horizontal",
+)
+ax.hist(
+    bare_rock_heights,
+    bins=bins,
+    color="lightsalmon",
+    alpha=0.5,
+    label="Bare rock",
+    orientation="horizontal",
+)
+ax.hist(
+    glacier_heights,
+    bins=bins,
+    color="lightseagreen",
+    alpha=0.5,
+    label="Glaciers and perma-snow",
+    orientation="horizontal",
+)
+ax.hist(
+    conifer_forest_heights,
+    bins=bins,
+    color="darkgreen",
+    alpha=0.5,
+    label="Coniferous forest",
+    orientation="horizontal",
+)
+ax.hist(
+    mixed_forest_heights,
+    bins=bins,
+    color="yellowgreen",
+    alpha=0.5,
+    label="Mixed forest",
+    orientation="horizontal",
+)
+ax.hist(
+    broad_leaved_forest_heights,
+    bins=bins,
+    color="orange",
+    alpha=0.5,
+    label="Broad-leaved forest",
+    orientation="horizontal",
+)
 ax.legend()
 ax.set_xlabel("Nr. of cells per elevation bin")
 ax.set_ylabel("Elevation [m]")
 ax.set_title("Alpine land cover histogram", fontsize=10)
 plt.show()
-

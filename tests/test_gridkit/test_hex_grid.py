@@ -126,7 +126,7 @@ def test_neighbours(shape, depth, index, multi_index, include_selected):
 
     if multi_index:
         numpy.testing.assert_allclose(
-            *neighbours
+            neighbours.index[0], neighbours.index[1]
         )  # make sure the neighbours are the same (since index was duplicated)
         neighbours = neighbours[0]  # continue to check single index
         index = index[0]
@@ -136,7 +136,7 @@ def test_neighbours(shape, depth, index, multi_index, include_selected):
         center_index = int(numpy.floor(len(neighbours) / 2))
         numpy.testing.assert_allclose(neighbours[center_index], index)
         # remove center index for further testing of other neighbours
-        neighbours = numpy.delete(neighbours, center_index, axis=0)
+        neighbours.index = numpy.delete(neighbours.index, center_index, axis=0)
 
     # If the neighbours are correct, there are always a multiple of 6 cells with the same distance to the center cell
     distances = numpy.linalg.norm(

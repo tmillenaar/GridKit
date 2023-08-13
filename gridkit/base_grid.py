@@ -8,6 +8,8 @@ import scipy
 import shapely
 from pyproj import CRS, Transformer
 
+from gridkit.index import GridIndex
+
 
 class BaseGrid(metaclass=abc.ABCMeta):
     def __init__(self, offset=(0, 0), crs=None):
@@ -98,7 +100,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
             >>> from gridkit.rect_grid import RectGrid
             >>> grid = RectGrid(dx=2, dy=3)
-            >>> grid.neighbours([1,2])
+            >>> grid.neighbours([1,2]).index
             array([[1, 3],
                    [0, 2],
                    [2, 2],
@@ -129,7 +131,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
         neighbours = numpy.swapaxes(neighbours, 0, 1)
         neighbours = neighbours + index
-        return numpy.swapaxes(neighbours, 0, 1)
+        return GridIndex(numpy.swapaxes(neighbours, 0, 1))
 
     @abc.abstractmethod
     def cell_at_point(self, point: numpy.ndarray) -> tuple:
@@ -325,7 +327,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             cell_shapes = self.to_shapely(cells_in_bounds)
             mask = [geom.intersects(cell) for cell in cell_shapes]
             intersecting_cells.extend(cells_in_bounds[mask])
-        return numpy.unique(intersecting_cells, axis=0)
+        return GridIndex(intersecting_cells).unique()
 
     def to_shapely(self, index, as_multipolygon: bool = False):
         """Represent the cells as Shapely Polygons

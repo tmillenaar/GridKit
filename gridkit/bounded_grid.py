@@ -12,6 +12,7 @@ from pyproj import Transformer
 import gridkit
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import GridIndex, validate_index
 
 
 class _BoundedGridMeta(type):
@@ -199,7 +200,7 @@ class _BoundedGridMeta(type):
             # overwrite shared area in combined_grid with the combined results
             count = gridkit.count([left, right])
             shared_mask = count == 2
-            shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask.T)
+            shared_mask_np = combined_grid.grid_id_to_numpy_id(shared_mask)
             result = op(left.value(shared_mask), right.value(shared_mask))
             combined_grid = combined_grid.astype(
                 numpy.result_type(combined_grid._data.dtype, result.dtype)
@@ -219,9 +220,10 @@ class _BoundedGridMeta(type):
                 grid = left.update(data)
             else:
                 grid = _grid_op(left, right, op, base_value=base_value)
-            return (
-                left._mask_to_index(grid._data) if as_idx else grid
-            )  # TODO: left._mask_to_index(data) works if as_idx is true
+            if not as_idx:
+                return grid
+            ids = left._mask_to_index(grid._data)
+            return GridIndex(ids)
 
         def reverse_op(left, right):
             if not isinstance(right, BoundedGrid):
@@ -418,8 +420,8 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             )
 
         ids, shape = self.cells_in_bounds(self.bounds)
-        ids = ids.reshape([*shape, 2])
-        return ids[mask]
+        ids = ids.index.reshape([*shape, 2])
+        return GridIndex(ids[mask])
 
     def shared_bounds(self, other):
         other_bounds = other.bounds if isinstance(other, BaseGrid) else other
@@ -487,15 +489,12 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             raise ValueError("Please supply one of: {anchor, bounds}")
         return self.update(new_data)
 
+    @validate_index
     def value(self, index, oob_value=None):
         """Return the value at the given cell index"""
 
-        index = numpy.array(index)
-        index = index[numpy.newaxis, :] if len(index.shape) == 1 else index
-        index = index.T  # TODO: maybe always work with xy axis first
-
         # Convert grid-ids into numpy-ids
-        np_id = numpy.stack(self.grid_id_to_numpy_id(index)[::-1])
+        np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
 
         # Identify any id outside the bounds
         oob_mask = numpy.where(np_id[0] >= self._data.shape[1])
@@ -536,7 +535,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         np_id = np_id[:, sample_mask]
         values[sample_mask] = self._data[np_id[1], np_id[0]]
 
-        return values
+        return values.reshape(index.index.shape[:-1])
 
     def nodata(self):
         if self.nodata_value is None:

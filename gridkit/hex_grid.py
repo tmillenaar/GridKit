@@ -6,6 +6,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 
 
@@ -97,14 +98,14 @@ class HexGrid(BaseGrid):
 
             >>> from gridkit.hex_grid import HexGrid
             >>> grid = HexGrid(size=3)
-            >>> grid.relative_neighbours(index=[0,0])
+            >>> grid.relative_neighbours(index=[0,0]).index
             array([[-1,  1],
                    [ 0,  1],
                    [-1,  0],
                    [ 1,  0],
                    [-1, -1],
                    [ 0, -1]])
-            >>> grid.relative_neighbours(index=[0,1])
+            >>> grid.relative_neighbours(index=[0,1]).index
             array([[ 0,  1],
                    [ 1,  1],
                    [-1,  0],
@@ -129,7 +130,7 @@ class HexGrid(BaseGrid):
 
         .. code-block:: python
 
-            >>> grid.relative_neighbours(index=[0,0], include_selected=True)
+            >>> grid.relative_neighbours(index=[0,0], include_selected=True).index
             array([[-1,  1],
                    [ 0,  1],
                    [-1,  0],
@@ -192,7 +193,7 @@ class HexGrid(BaseGrid):
             center_cell = int(numpy.floor(neighbours.shape[1] / 2))
             neighbours = numpy.delete(neighbours, center_cell, 1)
 
-        return neighbours if len(neighbours) > 1 else neighbours[0]
+        return GridIndex(neighbours if len(neighbours) > 1 else neighbours[0])
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
@@ -580,7 +581,7 @@ class HexGrid(BaseGrid):
             if nr_cells_flat != 0
             else (0, 0)
         )
-        return ids, shape
+        return GridIndex(ids), shape
 
     @property
     def parent_grid_class(self):
@@ -834,24 +835,27 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             offset_rows = index[0] % 2 == 1
             index[1, offset_rows] -= 1
 
-        return index
+        return GridIndex(index.T)
 
+    @validate_index
     def grid_id_to_numpy_id(self, index):
-        index = numpy.array(index)
-
+        if index.index.ndim > 2:
+            raise ValueError(
+                "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
+            )
         if self._shape == "pointy":
-            offset_rows = index[1] % 2 == 1
-            index[0, offset_rows] += 1
+            offset_rows = index.y % 2 == 1
+            index.x[offset_rows] += 1
         elif self._shape == "flat":
-            offset_rows = index[0] % 2 == 1
-            index[1, offset_rows] += 1
+            offset_rows = index.x % 2 == 1
+            index.y[offset_rows] += 1
 
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         if self._shape == "pointy":
-            np_id = (index_topleft[1] - index[1], index[0] - index_topleft[0])
+            np_id = (index_topleft[1] - index.y, index.x - index_topleft[0])
         elif self._shape == "flat":
-            np_id = ((index[0] - index_topleft[0]), (index_topleft[1] - index[1]))
+            np_id = ((index.x - index_topleft[0]), (index_topleft[1] - index.y))
         return np_id
 
     def interp_nodata(self, *args, **kwargs):

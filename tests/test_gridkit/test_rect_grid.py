@@ -78,7 +78,7 @@ def test_cells_in_bounds():
 @pytest.mark.parametrize(
     "index,expected_np_id,expected_value",
     [  # note, numpy id is in y,x
-        [(0, 0), (2, 1), 7],
+        [(0, 0), ([2, 1]), 7],
         [
             [(-1, 1), (1, -2)],  # index
             [(1, 4), (0, 2)],  # expected_np_id in [(y0, y1), (x0,x1)]
@@ -90,10 +90,16 @@ def test_grid_id_to_numpy_id(
     basic_bounded_rect_grid, index, expected_np_id, expected_value
 ):
     grid = basic_bounded_rect_grid
-    result = grid.grid_id_to_numpy_id(index)
 
+    result = grid.grid_id_to_numpy_id(index)
     numpy.testing.assert_almost_equal(result, expected_np_id)
     numpy.testing.assert_almost_equal(grid.data[result[0], result[1]], expected_value)
+
+
+def test_grid_id_to_numpy_id_nd_error(basic_bounded_rect_grid):
+    grid = basic_bounded_rect_grid
+    with pytest.raises(ValueError):
+        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
 
 
 @pytest.mark.parametrize(
