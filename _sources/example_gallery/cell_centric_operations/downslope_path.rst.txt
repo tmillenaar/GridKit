@@ -49,17 +49,20 @@ This is of course assuming there are no nodata_values in the DEM.
 
 First let's import the dependencies and read in the DEM.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-42
+.. GENERATED FROM PYTHON SOURCE LINES 34-45
 
 .. code-block:: default
 
 
 
-    import numpy
-    from gridkit.io import read_geotiff
     import matplotlib.pyplot as plt
+    import numpy
 
-    dem = read_geotiff("../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100))
+    from gridkit.io import read_geotiff
+
+    dem = read_geotiff(
+        "../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100)
+    )
 
 
 
@@ -68,7 +71,7 @@ First let's import the dependencies and read in the DEM.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-49
+.. GENERATED FROM PYTHON SOURCE LINES 47-52
 
 Next, set up the recursive function and the required empty lists.
 
@@ -76,22 +79,21 @@ Next, set up the recursive function and the required empty lists.
    Python's recursion limit can be reached with this approach for paths longer than shown here.
    While you can raise this limit using `sys.setrecursionlimit`, you may want to reconsider the approach and use a while-loop instead of recursion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-78
+.. GENERATED FROM PYTHON SOURCE LINES 53-81
 
 .. code-block:: default
-
 
     visited_cells = []
     all_neighbours = []
     neighbour_values = []
+
+
     def downslope_path(cell_id):
-
-        visited_cells.append(tuple(cell_id))
-
+        visited_cells.append(cell_id)
         # add new neigbours and their values to their respective lists
         neighbours = dem.neighbours(cell_id, connect_corners=True)
         for cell, value in zip(neighbours, dem.value(neighbours)):
-            cell = tuple(cell)
+            cell = tuple(cell.index)
             if not cell in visited_cells and not cell in all_neighbours:
                 all_neighbours.append(cell)
                 neighbour_values.append(value)
@@ -105,7 +107,7 @@ Next, set up the recursive function and the required empty lists.
         next_cell = all_neighbours[min_id]
         all_neighbours.pop(min_id)
         neighbour_values.pop(min_id)
-        
+
         return downslope_path(next_cell)
 
 
@@ -115,16 +117,17 @@ Next, set up the recursive function and the required empty lists.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-80
+
+.. GENERATED FROM PYTHON SOURCE LINES 82-83
 
 Determine the starting cell and call the function
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-84
+.. GENERATED FROM PYTHON SOURCE LINES 83-87
 
 .. code-block:: default
 
     start_cell_id = dem.cell_at_point((29330, 167848))
-    downslope_path(start_cell_id)
+    downslope_path(tuple(start_cell_id.index))
 
 
 
@@ -134,15 +137,15 @@ Determine the starting cell and call the function
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-90
+.. GENERATED FROM PYTHON SOURCE LINES 88-93
 
 Results
-------------- 
+-------------
 Let's plot the path on the DEM
 
 For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-109
+.. GENERATED FROM PYTHON SOURCE LINES 94-114
 
 .. code-block:: default
 
@@ -157,9 +160,11 @@ For each cell along the path we plot the polygon as a square. This looks better 
     for poly in dem.to_shapely(visited_cells):
         x, y = poly.exterior.xy
         plt.fill(x, y, alpha=1.0, color="red", label=path_label)
-        path_label = None # Only show the label in the legend once
+        path_label = None  # Only show the label in the legend once
 
-    plt.scatter(*dem.centroid(start_cell_id), marker="*", label="Starting point", color="purple")
+    plt.scatter(
+        *dem.centroid(start_cell_id), marker="*", label="Starting point", color="purple"
+    )
     plt.legend()
 
     plt.show()
@@ -176,7 +181,7 @@ For each cell along the path we plot the polygon as a square. This looks better 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-113
+.. GENERATED FROM PYTHON SOURCE LINES 115-118
 
 While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
@@ -185,7 +190,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.528 seconds)
+   **Total running time of the script:** ( 0 minutes  1.362 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_downslope_path.py:

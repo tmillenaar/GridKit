@@ -3,11 +3,18 @@
 Release notes
 ================
 
+Version 0.4.0 (August 13, 2023)
+-----------------------------
+Features
+ - :class:`~gridkit.index.GridIndex` class to unify index representation
+ - :func:`~gridkit.index.validate_index` decorator to turn any index represetntation into a GridIndex on function call
+ - Operations that return grid indices now return GridIndex instances instead of numpy arrays 
+
 Version 0.3.1 (July 23, 2023)
 -----------------------------
 Features
- - add numpy_id_to_grid_id() to BoundedHexGrid
- - add grid_id_to_numpy_id() to BoundedHexGrid
+ - add :meth:`~gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id()` to :class:`~gridkit.hex_grid.BoundedHexGrid`
+ - add :meth:`~gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id()` to :class:`~gridkit.hex_grid.BoundedHexGrid`
 
 Fixes
  - resolve shift in data when using comparisson and mathematical operators on BoudedHexGrid 

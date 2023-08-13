@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.bounded_grid &mdash; GridKit v0.3.1 documentation</title>
+  <title>gridkit.bounded_grid &mdash; GridKit v0.4.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.1
+                v0.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -95,6 +95,7 @@
 <span class="kn">import</span> <span class="nn">gridkit</span>
 <span class="kn">from</span> <span class="nn">gridkit.base_grid</span> <span class="kn">import</span> <span class="n">BaseGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.errors</span> <span class="kn">import</span> <span class="n">AlignmentError</span><span class="p">,</span> <span class="n">IntersectionError</span>
+<span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span><span class="p">,</span> <span class="n">validate_index</span>
 
 
 <span class="k">class</span> <span class="nc">_BoundedGridMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
@@ -282,7 +283,7 @@
             <span class="c1"># overwrite shared area in combined_grid with the combined results</span>
             <span class="n">count</span> <span class="o">=</span> <span class="n">gridkit</span><span class="o">.</span><span class="n">count</span><span class="p">([</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">])</span>
             <span class="n">shared_mask</span> <span class="o">=</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">2</span>
-            <span class="n">shared_mask_np</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">shared_mask</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">shared_mask_np</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">shared_mask</span><span class="p">)</span>
             <span class="n">result</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">shared_mask</span><span class="p">),</span> <span class="n">right</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">shared_mask</span><span class="p">))</span>
             <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">combined_grid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -302,9 +303,10 @@
                 <span class="n">grid</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">grid</span> <span class="o">=</span> <span class="n">_grid_op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="n">base_value</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span>
-                <span class="n">left</span><span class="o">.</span><span class="n">_mask_to_index</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">as_idx</span> <span class="k">else</span> <span class="n">grid</span>
-            <span class="p">)</span>  <span class="c1"># TODO: left._mask_to_index(data) works if as_idx is true</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">as_idx</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">grid</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">_mask_to_index</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">reverse_op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">BoundedGrid</span><span class="p">):</span>
@@ -501,8 +503,8 @@
             <span class="p">)</span>
 
         <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
-        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">ids</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
 
 <div class="viewcode-block" id="BoundedGrid.shared_bounds"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.shared_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">shared_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="n">other_bounds</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">)</span> <span class="k">else</span> <span class="n">other</span>
@@ -570,15 +572,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please supply one of: {anchor, bounds}&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BoundedGrid.value"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="BoundedGrid.value"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value">[docs]</a>    <span class="nd">@validate_index</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the value at the given cell index&quot;&quot;&quot;</span>
 
-        <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">index</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># TODO: maybe always work with xy axis first</span>
-
         <span class="c1"># Convert grid-ids into numpy-ids</span>
-        <span class="n">np_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">index</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">np_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">())[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># Identify any id outside the bounds</span>
         <span class="n">oob_mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -619,7 +618,7 @@
         <span class="n">np_id</span> <span class="o">=</span> <span class="n">np_id</span><span class="p">[:,</span> <span class="n">sample_mask</span><span class="p">]</span>
         <span class="n">values</span><span class="p">[</span><span class="n">sample_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">np_id</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">np_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-        <span class="k">return</span> <span class="n">values</span></div>
+        <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="BoundedGrid.nodata"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.nodata">[docs]</a>    <span class="k">def</span> <span class="nf">nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

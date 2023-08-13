@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.3.1 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.4.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="io" href="gridkit.io.html" />
+    <link rel="next" title="index" href="gridkit.index.html" />
     <link rel="prev" title="errors" href="gridkit.errors.html" /> 
 </head>
 
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.1
+                v0.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -64,6 +64,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#gridkit.hex_grid.BoundedHexGrid"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.index.html">index</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.rect_grid.html">rect_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.version.html">version</a></li>
@@ -172,14 +173,14 @@ in the case of a grid ‘pointy’ shape.
 This works on rows if the grid has a ‘flat’ shape.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.hex_grid</span> <span class="kn">import</span> <span class="n">HexGrid</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[-1,  1],</span>
 <span class="go">       [ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
 <span class="go">       [ 1,  0],</span>
 <span class="go">       [-1, -1],</span>
 <span class="go">       [ 0, -1]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  1],</span>
 <span class="go">       [ 1,  1],</span>
 <span class="go">       [-1,  0],</span>
@@ -196,7 +197,7 @@ So the 3rd element in the list will be <cite>1*6 + 2*6 + 3*6 = 36</cite>.</p>
 </pre></div>
 </div>
 <p>The specified cell can be included if <cite>include_selected</cite> is set to True:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[-1,  1],</span>
 <span class="go">       [ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
@@ -557,7 +558,7 @@ Axes order if multiple indices are specified: (points, xy), else (xy).</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="gridkit.errors.html" class="btn btn-neutral float-left" title="errors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="gridkit.io.html" class="btn btn-neutral float-right" title="io" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gridkit.index.html" class="btn btn-neutral float-right" title="index" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

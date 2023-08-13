@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rect_grid &mdash; GridKit v0.3.1 documentation</title>
+  <title>rect_grid &mdash; GridKit v0.4.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.1
+                v0.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -60,6 +60,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.index.html">index</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">rect_grid</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#gridkit.rect_grid.RectGrid"><code class="docutils literal notranslate"><span class="pre">RectGrid</span></code></a></li>
@@ -153,12 +154,12 @@ This is to keep a consistent api between the two classes.</p></li>
 For square grids, the number of returned neighbours depends on whether <cite>connect_corners</cite> is True or False:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
 <span class="go">       [ 1,  0],</span>
 <span class="go">       [ 0, -1]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[-1,  1],</span>
 <span class="go">       [ 0,  1],</span>
 <span class="go">       [ 1,  1],</span>
@@ -180,7 +181,7 @@ And it will be <cite>1*8 + 2*8 + 3*8 = 48</cite> if <cite>connect_corners</cite>
 </pre></div>
 </div>
 <p>The specified cell can be included if <cite>include_selected</cite> is set to True:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
 <span class="go">       [ 0,  0],</span>
@@ -271,29 +272,37 @@ If multiple points are supplied, the four indices are returned as Nx2 ndarrays.<
 <p class="rubric">Examples</p>
 <p>Nearby cell indices are returned as a tuple:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="go">(array([-1,  0]), array([0, 0]), array([-1, -1]), array([ 0, -1]))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">))</span>
-<span class="go">(array([0, 1]), array([1, 1]), array([0, 0]), array([1, 0]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[-1,  0],</span>
+<span class="go">       [ 0,  0],</span>
+<span class="go">       [-1, -1],</span>
+<span class="go">       [ 0, -1]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">))</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[0, 1],</span>
+<span class="go">       [1, 1],</span>
+<span class="go">       [0, 0],</span>
+<span class="go">       [1, 0]])</span>
 </pre></div>
 </div>
 <p>If multiple points are supplied, a tuple with ndarrays is returned:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">nearby_cells</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span> <span class="c1"># used for output readability purposes only</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pprint</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span>
-<span class="go">(array([[-1,  0],</span>
-<span class="go">       [ 0,  1],</span>
-<span class="go">       [ 0,  0]]),</span>
-<span class="go"> array([[0, 0],</span>
-<span class="go">       [1, 1],</span>
-<span class="go">       [1, 0]]),</span>
-<span class="go"> array([[-1, -1],</span>
-<span class="go">       [ 0,  0],</span>
-<span class="go">       [ 0, -1]]),</span>
-<span class="go"> array([[ 0, -1],</span>
-<span class="go">       [ 1,  0],</span>
-<span class="go">       [ 1, -1]]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nearby_cells</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[[-1,  0],</span>
+<span class="go">        [ 0,  1],</span>
+<span class="go">        [ 0,  0]],</span>
+
+<span class="go">       [[ 0,  0],</span>
+<span class="go">        [ 1,  1],</span>
+<span class="go">        [ 1,  0]],</span>
+
+<span class="go">       [[-1, -1],</span>
+<span class="go">        [ 0,  0],</span>
+<span class="go">        [ 0, -1]],</span>
+
+<span class="go">       [[ 0, -1],</span>
+<span class="go">        [ 1,  0],</span>
+<span class="go">        [ 1, -1]]])</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -319,26 +328,26 @@ If multiple points are supplied, the indices are returned as Nx2 ndarrays.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([0, 0])</span>
 </pre></div>
 </div>
 <p>Offsets, shift the grid with respect to the coordinate system,
 and thus can influnce what cell contains the point:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([-1,  0])</span>
 </pre></div>
 </div>
 <p>Multiple points can be specified as a list of points or an ndarray:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  0],</span>
 <span class="go">       [-1, -1],</span>
 <span class="go">       [ 1,  0]])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  0],</span>
 <span class="go">       [-1, -1],</span>
 <span class="go">       [ 1,  0]])</span>
@@ -348,7 +357,7 @@ and thus can influnce what cell contains the point:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.cell_corners">
-<span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cell_corners" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><span class="pre">GridIndex</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cell_corners" title="Permalink to this definition"></a></dt>
 <dd><p>Return corners in (cells, corners, xy)</p>
 </dd></dl>
 

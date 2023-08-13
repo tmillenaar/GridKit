@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit._statistical_functions &mdash; GridKit v0.3.1 documentation</title>
+  <title>gridkit._statistical_functions &mdash; GridKit v0.4.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.1
+                v0.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -133,7 +133,7 @@
             <span class="n">value_ids</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">value_ids</span> <span class="o">=</span> <span class="n">grid</span> <span class="o">!=</span> <span class="n">grid</span><span class="o">.</span><span class="n">nodata_value</span>
-        <span class="n">numpy_ids</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">value_ids</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">numpy_ids</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">value_ids</span><span class="p">)</span>
         <span class="n">combined_grid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">numpy_ids</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">combined_grid</span></div>
 

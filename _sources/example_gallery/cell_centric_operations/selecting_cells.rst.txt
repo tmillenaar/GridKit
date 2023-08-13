@@ -43,19 +43,22 @@ For two grids to overlap in predictable ways, we need to be mindful of our grid 
 Let's create two grids, both centered around zero,
 where one grid's cells are exactly three times larger than the other grid's cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-38
+.. GENERATED FROM PYTHON SOURCE LINES 28-41
 
 .. code-block:: default
 
 
 
-    from gridkit.hex_grid import HexGrid
     import numpy
+
+    from gridkit.hex_grid import HexGrid
 
     # create a grids
     fine_grid = HexGrid(size=1, shape="pointy")
-    fine_grid._offset = (0, fine_grid.dy/2)
-    coarse_grid = HexGrid(size=3*fine_grid.dx, offset=(0, 3*fine_grid.dy/2), shape="pointy")
+    fine_grid._offset = (0, fine_grid.dy / 2)
+    coarse_grid = HexGrid(
+        size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
+    )
 
 
 
@@ -64,7 +67,7 @@ where one grid's cells are exactly three times larger than the other grid's cell
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-46
+.. GENERATED FROM PYTHON SOURCE LINES 43-49
 
 Now we have a fine grid, which is the one we want to color,
 and we have a course grid which we will use to do this.
@@ -73,7 +76,7 @@ To plot the outlines we can select an area of interest and represent the cells i
 These polygons can then be plotted. Since the grids were defined to be centered around zero,
 let's center our are of interest around zero as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-59
+.. GENERATED FROM PYTHON SOURCE LINES 50-62
 
 .. code-block:: default
 
@@ -96,16 +99,17 @@ let's center our are of interest around zero as well.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-61
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 Now let's define a plotting function that can either plot the outline of each cell or fill it with a color.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-71
+.. GENERATED FROM PYTHON SOURCE LINES 65-76
 
 .. code-block:: default
 
 
     import matplotlib.pyplot as plt
+
 
     def plot_shapes(shapes, color, fill=False, **kwargs):
         """Simple function to plot polygons with matplotlib"""
@@ -120,11 +124,12 @@ Now let's define a plotting function that can either plot the outline of each ce
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+
+.. GENERATED FROM PYTHON SOURCE LINES 77-78
 
 Let's use this to plot our grids in the same image so we can compare them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-83
+.. GENERATED FROM PYTHON SOURCE LINES 79-88
 
 .. code-block:: default
 
@@ -132,8 +137,8 @@ Let's use this to plot our grids in the same image so we can compare them.
     plot_shapes(fine_shapes, linewidth=1, color="purple")
     plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-    plt.xlim(-4.5,4.5)
-    plt.ylim(-4.5,4.5)
+    plt.xlim(-4.5, 4.5)
+    plt.ylim(-4.5, 4.5)
     plt.show()
 
 
@@ -149,31 +154,31 @@ Let's use this to plot our grids in the same image so we can compare them.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-91
+.. GENERATED FROM PYTHON SOURCE LINES 89-96
 
 The grids seem to align nicely. Also, there are exactly three purple cells
 between two orange cell edges, as intended.
 Arguably, there are three categories of purple cells when compared to the orange grid.
 The first category contains the purple cells at the center of each of the orange cells.
-Secondly we have the neighbours of these center cells and lastly we have the purple cells at the 
+Secondly we have the neighbours of these center cells and lastly we have the purple cells at the
 vertices of the orange cells.
 Let's start by coloring in the center cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-105
+.. GENERATED FROM PYTHON SOURCE LINES 97-110
 
 .. code-block:: default
 
 
     coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])
-    center_cells = fine_grid.cell_at_point(coarse_centroids[:,:,0])
+    center_cells = fine_grid.cell_at_point(coarse_centroids[:, :, 0])
     center_shapes = fine_grid.to_shapely(center_cells, as_multipolygon=True)
 
     plot_shapes(fine_shapes, linewidth=1, color="purple")
     plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
     plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-    plt.xlim(-4.5,4.5)
-    plt.ylim(-4.5,4.5)
+    plt.xlim(-4.5, 4.5)
+    plt.ylim(-4.5, 4.5)
     plt.show()
 
 
@@ -188,26 +193,32 @@ Let's start by coloring in the center cells.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-107
+.. GENERATED FROM PYTHON SOURCE LINES 111-112
 
 Next, let's use these center cells to find their neighbours and color them too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-122
+.. GENERATED FROM PYTHON SOURCE LINES 113-133
 
 .. code-block:: default
 
 
-    center_neighbour_cells = fine_grid.neighbours(center_cells)
-    center_neighbour_cells = center_neighbour_cells.reshape((-1,2)) # flatten
-    center_neighbour_shapes = fine_grid.to_shapely(center_neighbour_cells, as_multipolygon=True)
+    center_neighbour_cells = fine_grid.neighbours(
+        center_cells
+    )  # returns axes ('inital_cells', 'neighbours', 'xy') with shape (42, 6, 2)
+    center_neighbour_cells = (
+        center_neighbour_cells.ravel()
+    )  # flatten cell_ids to axes ('all_neigbours', 'xy') with shape (252, 2)
+    center_neighbour_shapes = fine_grid.to_shapely(
+        center_neighbour_cells, as_multipolygon=True
+    )
 
     plot_shapes(fine_shapes, linewidth=1, color="purple")
     plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
     plot_shapes(center_neighbour_shapes, fill=True, color="sandybrown", alpha=0.6)
     plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-    plt.xlim(-4.5,4.5)
-    plt.ylim(-4.5,4.5)
+    plt.xlim(-4.5, 4.5)
+    plt.ylim(-4.5, 4.5)
     plt.show()
 
 
@@ -222,19 +233,19 @@ Next, let's use these center cells to find their neighbours and color them too.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-125
+.. GENERATED FROM PYTHON SOURCE LINES 134-136
 
 Lastly, let's find coordinates of the vertices of the orange cells.
 We then find what purple cells are a these coordinates and color them as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-142
+.. GENERATED FROM PYTHON SOURCE LINES 137-153
 
 .. code-block:: default
 
 
-    vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1,2))
+    vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1, 2))
     vertices_cells = fine_grid.cell_at_point(vertices)
-    vertices_cells = numpy.unique(vertices_cells, axis=0) # drop duplicate ids
+    vertices_cells = numpy.unique(vertices_cells, axis=0)  # drop duplicate ids
     vertices_shapes = fine_grid.to_shapely(vertices_cells, as_multipolygon=True)
 
     plot_shapes(fine_shapes, linewidth=1, color="purple")
@@ -243,8 +254,8 @@ We then find what purple cells are a these coordinates and color them as well.
     plot_shapes(vertices_shapes, fill=True, color="darkcyan", alpha=0.6)
     plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
-    plt.xlim(-4.5,4.5)
-    plt.ylim(-4.5,4.5)
+    plt.xlim(-4.5, 4.5)
+    plt.ylim(-4.5, 4.5)
     plt.show()
 
 
@@ -259,14 +270,14 @@ We then find what purple cells are a these coordinates and color them as well.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-144
+.. GENERATED FROM PYTHON SOURCE LINES 154-155
 
 Now the purple grid is colored, based on it's relation to the orange grid.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  2.119 seconds)
+   **Total running time of the script:** ( 0 minutes  1.652 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_selecting_cells.py:

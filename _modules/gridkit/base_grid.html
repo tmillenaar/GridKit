@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.base_grid &mdash; GridKit v0.3.1 documentation</title>
+  <title>gridkit.base_grid &mdash; GridKit v0.4.0 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -36,7 +36,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.3.1
+                v0.4.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -90,6 +90,8 @@
 <span class="kn">import</span> <span class="nn">scipy</span>
 <span class="kn">import</span> <span class="nn">shapely</span>
 <span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
+
+<span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span>
 
 
 <div class="viewcode-block" id="BaseGrid"><a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid">[docs]</a><span class="k">class</span> <span class="nc">BaseGrid</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -181,7 +183,7 @@
 
 <span class="sd">            &gt;&gt;&gt; from gridkit.rect_grid import RectGrid</span>
 <span class="sd">            &gt;&gt;&gt; grid = RectGrid(dx=2, dy=3)</span>
-<span class="sd">            &gt;&gt;&gt; grid.neighbours([1,2])</span>
+<span class="sd">            &gt;&gt;&gt; grid.neighbours([1,2]).index</span>
 <span class="sd">            array([[1, 3],</span>
 <span class="sd">                   [0, 2],</span>
 <span class="sd">                   [2, 2],</span>
@@ -212,7 +214,7 @@
         <span class="c1"># neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">index</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="BaseGrid.cell_at_point"><a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_at_point">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
@@ -408,7 +410,7 @@
             <span class="n">cell_shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">)</span>
             <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cell_shapes</span><span class="p">]</span>
             <span class="n">intersecting_cells</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">intersecting_cells</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">intersecting_cells</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="BaseGrid.to_shapely"><a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely">[docs]</a>    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent the cells as Shapely Polygons</span>

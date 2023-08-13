@@ -9,6 +9,8 @@ The examples listed here are intended to familiarize the reader with the workflo
 and to serve as inspiration regarding the types of problems that can be solved using GridKit.
 
 
+
+
 .. raw:: html
 
     <div class="sphx-glr-thumbnails">

@@ -12,6 +12,7 @@ Submodules:
    gridkit.bounded_grid
    gridkit.errors
    gridkit.hex_grid
+   gridkit.index
    gridkit.io
    gridkit.rect_grid
    gridkit.version
