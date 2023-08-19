@@ -3,8 +3,19 @@
 Release notes
 ================
 
+Version 0.4.1 (August 20, 2023)
+-------------------------------
+Features
+ - make :class:`~gridkit.index.GridIndex` hashable so it works as pandas index
+ - remove any empty axis on :class:`~gridkit.index.GridIndex` initialization
+ 
+Documentation
+ - create example script :ref:`aggregate.py <example aggregate>`
+ - rename ``Shape interactions`` section to ``Vector data interactions``
+ - create ``doc_utils.py`` to contain helper functions for plotting and input generation used in examples
+
 Version 0.4.0 (August 13, 2023)
------------------------------
+-------------------------------
 Features
  - :class:`~gridkit.index.GridIndex` class to unify index representation
  - :func:`~gridkit.index.validate_index` decorator to turn any index represetntation into a GridIndex on function call
