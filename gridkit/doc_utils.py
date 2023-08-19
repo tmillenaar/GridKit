@@ -17,6 +17,7 @@ def generate_2d_scatter_doughnut(num_points: float, radius: float) -> numpy.ndar
         The radius of the circle around which the points are scattered
 
     Returns
+    -------
     :class:`numpy.ndarray`
         The points that make up the doughnut shape
     """
@@ -64,7 +65,9 @@ def plot_polygons(
     values_normalized = values - vmin
     vmax = numpy.nanmax(values_normalized)
     values_normalized = values_normalized / vmax
-    colors = cmap(values_normalized)
+    colors = cmap(
+        values_normalized
+    ).squeeze()  # squeeze to remove empty axes (when values is pandas series)
     colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
 
     # plot each cell as a polygon with color
