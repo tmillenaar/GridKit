@@ -312,6 +312,7 @@ class HexGrid(BaseGrid):
         if len(point.shape) == 1:
             azimuth = numpy.array([azimuth])
 
+        cell = cell.index
         if len(cell.shape) == 1:
             cell = numpy.expand_dims(cell, axis=0)
         az_ranges = [(0, 60), (60, 120), (120, 180), (180, 240), (240, 300), (300, 360)]
@@ -455,7 +456,7 @@ class HexGrid(BaseGrid):
         elif self._shape == "flat":
             result = numpy.array([ids_pointy, ids_flat], dtype="int").T
 
-        return result[0] if len(result) == 1 else result
+        return GridIndex(result)
 
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         """Return corners in (cells, corners, xy)"""
@@ -547,7 +548,7 @@ class HexGrid(BaseGrid):
         # translate the coordinates of the corner cells into indices
         left_top_id, left_bottom_id, right_top_id, right_bottom_id = self.cell_at_point(
             [left_top, left_bottom, right_top, right_bottom]
-        )
+        ).index
 
         if self._shape == "pointy":
             nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
@@ -810,14 +811,26 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
+        """Turn numpy indices that select values from self.data into a GridIndex instance that represents those same cells and can be used on the Grid object.
+
+        Parameters
+        ----------
+        np_index: :class:`numpy.ndarray`
+            The numpy indices to convert
+
+        Returns
+        -------
+        :class:`~.index.GridIndex`
+            The GridIndex representation of the cells
+        """
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
 
         if self._shape == "pointy":
             index = numpy.array(
                 [
-                    index_topleft[0] + np_index[1],
-                    index_topleft[1]
+                    index_topleft.x + np_index[1],
+                    index_topleft.y
                     - np_index[
                         0
                     ],  # grid y is numpy [0] and is positive from top to bottom
@@ -828,8 +841,8 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         elif self._shape == "flat":
             index = numpy.array(
                 [
-                    index_topleft[0] + np_index[0],
-                    index_topleft[1] - np_index[1],
+                    index_topleft.x + np_index[0],
+                    index_topleft.y - np_index[1],
                 ]
             )
             offset_rows = index[0] % 2 == 1
@@ -853,9 +866,9 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         if self._shape == "pointy":
-            np_id = (index_topleft[1] - index.y, index.x - index_topleft[0])
+            np_id = (index_topleft.y - index.y, index.x - index_topleft.x)
         elif self._shape == "flat":
-            np_id = ((index.x - index_topleft[0]), (index_topleft[1] - index.y))
+            np_id = ((index.x - index_topleft.x), (index_topleft.y - index.y))
         return np_id
 
     def interp_nodata(self, *args, **kwargs):

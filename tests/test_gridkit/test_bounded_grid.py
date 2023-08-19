@@ -198,7 +198,7 @@ def test_comparissons_with_scalars(nodata):
 
     # test equal
     result = grid == 1
-    expected = numpy.array([[1, 1]])
+    expected = numpy.array([1, 1])
     numpy.testing.assert_allclose(result.index, expected)
 
     # test not equal
@@ -213,7 +213,7 @@ def test_comparissons_with_scalars(nodata):
 
     # # test smaller than
     result = grid < 1
-    expected = numpy.array([[0, 1]])
+    expected = numpy.array([0, 1])
     numpy.testing.assert_allclose(result.index, expected)
 
     # # test greater than or equal
@@ -476,7 +476,7 @@ def test_value_nd_index():
 
     result = grid.value([[[1, 2]], [[3, 4]]])
 
-    numpy.testing.assert_allclose(result, [[6], [2]])
+    numpy.testing.assert_allclose(result, [6, 2])
 
 
 @pytest.mark.parametrize("percentile", (2, 31, 50, 69, 98))

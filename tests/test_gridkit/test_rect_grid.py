@@ -96,10 +96,11 @@ def test_grid_id_to_numpy_id(
     numpy.testing.assert_almost_equal(grid.data[result[0], result[1]], expected_value)
 
 
-def test_grid_id_to_numpy_id_nd_error(basic_bounded_rect_grid):
+def test_grid_id_to_numpy_id_nd(basic_bounded_rect_grid):
     grid = basic_bounded_rect_grid
-    with pytest.raises(ValueError):
-        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
+    index = [[[1, 2], [1, 2]]]
+    result = grid.grid_id_to_numpy_id(index)
+    numpy.testing.assert_allclose(grid.data[result], grid.value(index))
 
 
 @pytest.mark.parametrize(
@@ -132,7 +133,7 @@ def test_nodata_value(basic_bounded_rect_grid):
 
     # test only one value is nodata
     grid.nodata_value = 6
-    numpy.testing.assert_allclose(grid.nodata(), [[-1, 0]])
+    numpy.testing.assert_allclose(grid.nodata(), [-1, 0])
 
     # test all values are nodata
     grid = grid.update(numpy.ones((grid.height, grid.width)))
