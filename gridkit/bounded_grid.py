@@ -495,6 +495,8 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
         # Convert grid-ids into numpy-ids
         np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
+        if np_id.ndim == 1:
+            np_id = np_id[:, numpy.newaxis]
 
         # Identify any id outside the bounds
         oob_mask = numpy.where(np_id[0] >= self._data.shape[1])

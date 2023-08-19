@@ -87,7 +87,7 @@ class _IndexMeta(type):
                 return op
             if left.index.ndim != right.index.ndim:
                 return False
-            return all(left.ravel().x == right.ravel().x) and all(
+            return numpy.all(left.ravel().x == right.ravel().x) and numpy.all(
                 left.ravel().y == right.ravel().y
             )
 
@@ -113,11 +113,15 @@ class GridIndex(metaclass=_IndexMeta):
     """
 
     def __init__(self, index):
-        self.index = numpy.array(index, dtype=int)
+        self.index = numpy.array(index, dtype=int).squeeze()
+        if self.index.shape[-1] != 2 and self.index.size != 0:
+            raise ValueError(
+                f"The last axis should contain two elements (an x and a y coordinate). Got {self.index.shape[-1]} elements instead."
+            )
 
     def __len__(self):
         """The number of indices"""
-        return len(self.ravel().index)
+        return len(self.ravel().index) if self.index.ndim > 1 else 1
 
     def __iter__(self):
         self._iter_id = 0
@@ -126,12 +130,20 @@ class GridIndex(metaclass=_IndexMeta):
     def __next__(self):
         if self._iter_id == len(self):
             raise StopIteration
-        id = GridIndex(self.ravel()[self._iter_id])
+        if self.ravel().index.ndim == 1:
+            id = self
+        else:
+            id = GridIndex(self.ravel()[self._iter_id])
         self._iter_id += 1
         return id
 
     def __getitem__(self, item):
+        if self.index.ndim == 1:
+            return _nd_view(self._1d_view[item])
         return GridIndex(self.index[item])
+
+    def __hash__(self):
+        return hash(self.index.tobytes())
 
     @property
     def x(self):
@@ -173,7 +185,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         if not isinstance(other, GridIndex):
@@ -186,7 +198,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         if not isinstance(other, GridIndex):
@@ -199,7 +211,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return ~numpy.isin(self._1d_view, other._1d_view).any()
@@ -209,7 +221,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return numpy.isin(self._1d_view, other._1d_view).all()
@@ -219,7 +231,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return numpy.isin(other._1d_view, self._1d_view).all()
