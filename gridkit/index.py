@@ -133,6 +133,9 @@ class GridIndex(metaclass=_IndexMeta):
     def __getitem__(self, item):
         return GridIndex(self.index[item])
 
+    def __hash__(self):
+        return hash(self.index.tobytes())
+
     @property
     def x(self):
         """The X-component of the cell-IDs"""
@@ -173,7 +176,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         if not isinstance(other, GridIndex):
@@ -186,7 +189,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         if not isinstance(other, GridIndex):
@@ -199,7 +202,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return ~numpy.isin(self._1d_view, other._1d_view).any()
@@ -209,7 +212,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return numpy.isin(self._1d_view, other._1d_view).all()
@@ -219,7 +222,7 @@ class GridIndex(metaclass=_IndexMeta):
 
         Parameters
         ----------
-        **other:
+        other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
         return numpy.isin(other._1d_view, self._1d_view).all()
