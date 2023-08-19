@@ -114,7 +114,7 @@ Cell indices, what are they?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In GridKit, one cell in a grid is set to be cell (0,0), the starting cell.
-From this cell you can move either move one cell to the left, right, down or up.
+From this cell you can move one or more cells to the left, right, down or up.
 The first number indicates how many cells you moved in the x-direction (left or right).
 The second number indicates how many cells you moved in the y-direction (up or down).
 The directions up and right are defined to be the positive directins.
