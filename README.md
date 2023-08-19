@@ -8,6 +8,8 @@ GridKit is a tool to work with grids on a high abstraction level.
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI](https://badge.fury.io/py/gridkit.svg)](https://pypi.org/project/gridkit/)
 
+Note: the api is likely to change between versions until release 1.x.x
+
 Documentation
 =============
 Find the docs on [GitHub Pages](https://tmillenaar.github.io/GridKit).
@@ -15,6 +17,10 @@ Find the docs on [GitHub Pages](https://tmillenaar.github.io/GridKit).
 Examples
 ========
 Find examples in the [Example Gallery](https://tmillenaar.github.io/GridKit/example_gallery/index.html) section of the documentation.
+
+Source
+======
+Find me on [GitHub](https://github.com/tmillenaar/GridKit)
 
 Installation
 ============
