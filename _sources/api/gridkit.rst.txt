@@ -10,6 +10,7 @@ Submodules:
    gridkit._statistical_functions
    gridkit.base_grid
    gridkit.bounded_grid
+   gridkit.doc_utils
    gridkit.errors
    gridkit.hex_grid
    gridkit.index

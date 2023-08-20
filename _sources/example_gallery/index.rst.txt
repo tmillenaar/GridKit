@@ -193,8 +193,8 @@ These examples show how traditional raster data can be analysed and modified usi
     </div>
 
 
-Shape interactions
-==================
+Vector data interactions
+========================
 
 The following examples highlight the interactions between vector data and regular grids.
 
@@ -204,6 +204,23 @@ The following examples highlight the interactions between vector data and regula
 .. raw:: html
 
     <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Group points into grid cells">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_aggregate_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Aggregate from points</div>
+    </div>
 
 
 .. raw:: html

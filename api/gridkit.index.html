@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>index &mdash; GridKit v0.4.0 documentation</title>
+  <title>index &mdash; GridKit v0.4.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.0
+                v0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -58,6 +58,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.doc_utils.html">doc_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">index</a><ul>
@@ -157,7 +158,7 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd><p>The intersection of two GridIndex instances. Keep the IDs contained in both.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**other</strong> – The GridIndex instance to compare with</p>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
 </dd></dl>
@@ -168,7 +169,7 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd><p>The differenceof two GridIndex instances. Keep the IDs contained in <code class="docutils literal notranslate"><span class="pre">self</span></code> that are not in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**other</strong> – The GridIndex instance to compare with</p>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
 </dd></dl>
@@ -179,7 +180,7 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd><p>True if none of the IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> are in <code class="docutils literal notranslate"><span class="pre">other</span></code>. False if any ID in <code class="docutils literal notranslate"><span class="pre">self</span></code> is also in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**other</strong> – The GridIndex instance to compare with</p>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
 </dd></dl>
@@ -190,7 +191,7 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd><p>True if all of the IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> are in <code class="docutils literal notranslate"><span class="pre">other</span></code>. False if not all IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> is also in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**other</strong> – The GridIndex instance to compare with</p>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
 </dd></dl>
@@ -201,7 +202,7 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd><p>True if all of the IDs in <code class="docutils literal notranslate"><span class="pre">other</span></code> are in <code class="docutils literal notranslate"><span class="pre">self</span></code>. False if not all IDs in <code class="docutils literal notranslate"><span class="pre">other</span></code> is also in <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>**other</strong> – The GridIndex instance to compare with</p>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
 </dd></dl>

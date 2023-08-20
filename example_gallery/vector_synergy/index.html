@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shape interactions &mdash; GridKit v0.4.0 documentation</title>
+  <title>Vector data interactions &mdash; GridKit v0.4.1 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Geometry intersections" href="intersect_geometries.html" />
+    <link rel="next" title="Aggregate from points" href="aggregate.html" />
     <link rel="prev" title="Combining land cover and DEM" href="../raster_operations/elevation_distribution_per_land_cover.html" /> 
 </head>
 
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.0
+                v0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -56,11 +56,12 @@
 <li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html#shape-interactions">Shape interactions</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="../cell_centric_operations/index.html">Cell centric</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../grid_definitions/index.html">Grid definitions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../raster_operations/index.html">Raster operations</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Shape interactions</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Vector data interactions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="aggregate.html">Aggregate from points</a></li>
 <li class="toctree-l4"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
 <li class="toctree-l4"><a class="reference internal" href="interpolate_from_points.html">Interpolate from points</a></li>
 </ul>
@@ -90,7 +91,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
-      <li class="breadcrumb-item active">Shape interactions</li>
+      <li class="breadcrumb-item active">Vector data interactions</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/example_gallery/vector_synergy/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -100,10 +101,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="shape-interactions">
-<span id="sphx-glr-example-gallery-vector-synergy"></span><span id="id1"></span><h1>Shape interactions<a class="headerlink" href="#shape-interactions" title="Permalink to this heading"></a></h1>
+  <section id="vector-data-interactions">
+<span id="shape-interactions"></span><span id="sphx-glr-example-gallery-vector-synergy"></span><h1>Vector data interactions<a class="headerlink" href="#vector-data-interactions" title="Permalink to this heading"></a></h1>
 <p>The following examples highlight the interactions between vector data and regular grids.</p>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries."><img alt="" src="../../_images/sphx_glr_intersect_geometries_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Group points into grid cells"><img alt="" src="../../_images/sphx_glr_aggregate_thumb.png" />
+<p><a class="reference internal" href="aggregate.html#sphx-glr-example-gallery-vector-synergy-aggregate-py"><span class="std std-ref">Aggregate from points</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Aggregate from points</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries."><img alt="" src="../../_images/sphx_glr_intersect_geometries_thumb.png" />
 <p><a class="reference internal" href="intersect_geometries.html#sphx-glr-example-gallery-vector-synergy-intersect-geometries-py"><span class="std std-ref">Geometry intersections</span></a></p>
   <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data"><img alt="" src="../../_images/sphx_glr_interpolate_from_points_thumb.png" />
@@ -118,7 +122,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../raster_operations/elevation_distribution_per_land_cover.html" class="btn btn-neutral float-left" title="Combining land cover and DEM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="intersect_geometries.html" class="btn btn-neutral float-right" title="Geometry intersections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="aggregate.html" class="btn btn-neutral float-right" title="Aggregate from points" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

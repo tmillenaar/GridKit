@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.4.0 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.4.1 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.0
+                v0.4.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -58,6 +58,7 @@
 <li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.doc_utils.html">doc_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">hex_grid</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#gridkit.hex_grid.HexGrid"><code class="docutils literal notranslate"><span class="pre">HexGrid</span></code></a></li>
@@ -439,7 +440,19 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id">
 <span class="sig-name descname"><span class="pre">numpy_id_to_grid_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">np_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.numpy_id_to_grid_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Turn numpy indices that select values from self.data into a GridIndex instance that represents those same cells and can be used on the Grid object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>np_index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The numpy indices to convert</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The GridIndex representation of the cells</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">

@@ -6,10 +6,10 @@
 
 Computation times
 =================
-**00:03.014** total execution time for **example_gallery_cell_centric_operations** files:
+**00:05.291** total execution time for **example_gallery_cell_centric_operations** files:
 
 +-----------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py` (``selecting_cells.py``) | 00:01.652 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py` (``selecting_cells.py``) | 00:02.984 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py` (``downslope_path.py``)   | 00:01.362 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py` (``downslope_path.py``)   | 00:02.307 | 0.0 MB |
 +-----------------------------------------------------------------------------------------------------+-----------+--------+
