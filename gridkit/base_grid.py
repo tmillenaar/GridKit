@@ -173,6 +173,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def is_aligned_with(self, other):
         pass
 
+    @abc.abstractmethod
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the
 
@@ -195,28 +196,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         -------
 
         """
-        if self.crs is None:
-            raise ValueError(
-                "Cannot transform naive grids.  "
-                "Please set a crs on the object first."
-            )
-
-        crs = CRS.from_user_input(crs)
-
-        # skip if the input CRS and output CRS are the exact same
-        if self.crs.is_exact_same(crs):
-            return self
-
-        transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
-
-        new_offset = transformer.transform(*self.offset)
-        point_start = transformer.transform(0, 0)
-        point_end = transformer.transform(self.dx, self.dy)
-        new_dx, new_dy = [end - start for (end, start) in zip(point_end, point_start)]
-
-        return self.parent_grid_class(
-            dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs
-        )
+        pass
 
     @property
     def parent_grid(self):
