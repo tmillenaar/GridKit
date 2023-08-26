@@ -13,7 +13,7 @@ def test_initialized_objects():
         "mean",
         "sum",
         "count",
-        "read_geotiff",
+        "read_raster",
         "write_raster",
     ]
     for attr in expected_attributes:
