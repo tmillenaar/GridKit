@@ -1,7 +1,5 @@
 numpy
 scipy
-pytest
 shapely
 rasterio
-matplotlib
 pyproj

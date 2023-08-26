@@ -11,6 +11,9 @@ Fixes
 Documentation
  - Improved docstrings for to_crs on BaseGrid, HexGrid, RectGrid, BoundedHexGrid and BoundedRectGrid
 
+ Misc
+  - Move pytest and matplotlib requirements from requirements.txt to tests_require in setup.py
+
 Version 0.4.1 (August 20, 2023)
 -------------------------------
 Features

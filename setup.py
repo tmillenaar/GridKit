@@ -1,13 +1,18 @@
-from setuptools import setup, find_packages
 from pathlib import Path
 
+from setuptools import find_packages, setup
+
 with open("gridkit/version.py") as file:
-    version_info = dict(line.replace(" ","").replace('"', "").split("=") for line in file)
+    version_info = dict(
+        line.replace(" ", "").replace('"', "").split("=") for line in file
+    )
 
 with open("requirements.txt") as file:
     install_requires = file.read()
 
 tests_require = [
+    "pytest",
+    "matplotlib",
     "black",
     "geopandas",
     "pytest-cov",
@@ -31,7 +36,7 @@ setup(
     author="Timo Millenaar",
     description="Powerful abstractions of infinite grids for grid-vector interactions, tesselation, resampling and interactions between related grids.",
     long_description=(Path(__file__).parent / "README.md").read_text(),
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
