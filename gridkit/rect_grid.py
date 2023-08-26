@@ -446,26 +446,29 @@ class RectGrid(BaseGrid):
         )
         return aligned, reason
 
-    def to_crs(self, crs, resample_method="nearest"):
-        """Transforms the
+    def to_crs(self, crs):
+        """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+        This will modify the cell size and the bounds accordingly.
 
-        The ``crs`` attribute on the current GeometryArray must
-        be set.  Either ``crs`` or ``epsg`` may be specified for output.
-        This method will transform all points in all objects.  It has no notion
-        or projecting entire geometries.  All segments joining points are
-        assumed to be lines in the current projection, not geodesics.  Objects
-        crossing the dateline (or other projection boundary) will have
-        undesirable behavior.
+        The ``crs`` attribute on the current GeometryArray must be set.
 
         Parameters
         ----------
-        crs :class:`pyproj.CRS`
+        crs: Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
 
         Returns
         -------
+        :class:`~.rect_grid.RectGrid`
+            A copy of the grid with modified cell spacing and bounds to match the specified CRS
+
+        See also
+        --------
+        :meth:`.BoundedRectGrid.to_crs`
+        :meth:`.HexGrid.to_crs`
+        :meth:`.BoundedHexGrid.to_crs`
 
         """
         if self.crs is None:
@@ -726,6 +729,32 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         return values
 
     def to_crs(self, crs, resample_method="nearest"):
+        """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+        This will modify the cell size and the bounds accordingly.
+
+        The ``crs`` attribute on the current grid must be set.
+
+        Parameters
+        ----------
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.RectGrid.resample`.
+
+        Returns
+        -------
+        :class:`~.rect_grid.BoundedRectGrid`
+            A copy of the grid with modified cell spacing and bounds to match the specified CRS
+
+        See also
+        --------
+        :meth:`.RectGrid.to_crs`
+        :meth:`.HexGrid.to_crs`
+        :meth:`.BoundedHexGrid.to_crs`
+
+        """
         new_inf_grid = super(BoundedRectGrid, self).to_crs(
             crs, resample_method=resample_method
         )
