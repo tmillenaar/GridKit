@@ -111,23 +111,6 @@ def test_cell_corners(dx, dy, offset, id, expected_corners):
     numpy.testing.assert_allclose(corners, expected_corners)
 
 
-def test_crs():
-    dx = 10
-    dy = 20
-    offset = (5, 10)
-    crs = 3857
-    grid = rect_grid.RectGrid(dx=dx, dy=dy, offset=offset, crs=crs)
-    new_grid = grid.to_crs(crs=4326)
-
-    expected_dx = 8.983152841195213e-05
-    expected_dy = 2 * expected_dx
-
-    assert new_grid.crs.to_epsg() == 4326
-    numpy.testing.assert_allclose(new_grid.dx, expected_dx)
-    numpy.testing.assert_allclose(new_grid.dy, expected_dy)
-    numpy.testing.assert_allclose(new_grid.offset, (expected_dx / 2, expected_dy / 2))
-
-
 @pytest.mark.parametrize(
     "shapely_geoms, expected_cell_ids",
     [

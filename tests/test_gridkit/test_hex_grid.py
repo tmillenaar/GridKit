@@ -112,6 +112,19 @@ def test_cells_near_point(shape, point, expected_nearby_cells):
 
 
 @pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_crs(shape):
+    offset = (5, 10)
+    crs = 3857
+    grid = HexGrid(size=10, offset=offset, crs=crs, shape=shape)
+    new_grid = grid.to_crs(crs=4326)
+
+    expected_size = 8.983152841195213e-05
+
+    assert new_grid.crs.to_epsg() == 4326
+    numpy.testing.assert_allclose(new_grid.size, expected_size)
+
+
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
 @pytest.mark.parametrize("depth", list(range(1, 7)))
 @pytest.mark.parametrize("index", [[2, 1], [1, 2]])
 @pytest.mark.parametrize("multi_index", [False, True])

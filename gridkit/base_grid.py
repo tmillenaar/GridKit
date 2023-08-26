@@ -173,50 +173,29 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def is_aligned_with(self, other):
         pass
 
-    def to_crs(self, crs, resample_method="nearest"):
-        """Transforms the
+    @abc.abstractmethod
+    def to_crs(self, crs):
+        """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+        This will update the cell size and the origin offset.
 
-        The ``crs`` attribute on the current GeometryArray must
-        be set.  Either ``crs`` or ``epsg`` may be specified for output.
-        This method will transform all points in all objects.  It has no notion
-        or projecting entire geometries.  All segments joining points are
-        assumed to be lines in the current projection, not geodesics.  Objects
-        crossing the dateline (or other projection boundary) will have
-        undesirable behavior.
+        The ``crs`` attribute on the current GeometryArray must be set.
 
         Parameters
         ----------
-        crs :class:`pyproj.CRS`
+        crs Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
 
-        Returns
-        -------
+        See also
+        --------
+        :meth:`.RectGrid.to_crs`
+        :meth:`.HexGrid.to_crs`
+        :meth:`.BoundedRectGrid.to_crs`
+        :meth:`.BoundedHexGrid.to_crs`
 
         """
-        if self.crs is None:
-            raise ValueError(
-                "Cannot transform naive grids.  "
-                "Please set a crs on the object first."
-            )
-
-        crs = CRS.from_user_input(crs)
-
-        # skip if the input CRS and output CRS are the exact same
-        if self.crs.is_exact_same(crs):
-            return self
-
-        transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
-
-        new_offset = transformer.transform(*self.offset)
-        point_start = transformer.transform(0, 0)
-        point_end = transformer.transform(self.dx, self.dy)
-        new_dx, new_dy = [end - start for (end, start) in zip(point_end, point_start)]
-
-        return self.parent_grid_class(
-            dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs
-        )
+        pass
 
     @property
     def parent_grid(self):
