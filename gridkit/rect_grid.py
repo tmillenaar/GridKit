@@ -755,9 +755,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :meth:`.BoundedHexGrid.to_crs`
 
         """
-        new_inf_grid = super(BoundedRectGrid, self).to_crs(
-            crs, resample_method=resample_method
-        )
+        new_inf_grid = super(BoundedRectGrid, self).to_crs(crs)
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):

@@ -569,7 +569,7 @@ class HexGrid(BaseGrid):
 
         if self.shape == "pointy":
             size = new_dx
-        elif self.shape == "pointy":
+        elif self.shape == "flat":
             size = new_dy
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
@@ -883,9 +883,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         :meth:`.HexGrid.to_crs`
 
         """
-        new_inf_grid = super(BoundedHexGrid, self).to_crs(
-            crs, resample_method=resample_method
-        )
+        new_inf_grid = super(BoundedHexGrid, self).to_crs(crs)
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):
