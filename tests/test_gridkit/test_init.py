@@ -13,6 +13,8 @@ def test_initialized_objects():
         "mean",
         "sum",
         "count",
+        "read_geotiff",
+        "write_raster",
     ]
     for attr in expected_attributes:
         assert hasattr(gridkit, attr), f"Missing attribute '{attr}' from gridkit module"
