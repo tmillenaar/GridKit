@@ -14,9 +14,9 @@ TL;DR
     :emphasize-lines: 5-7
 
     import pandas
-    from gridkit import hex_grid
+    from gridkit import HexGrid
 
-    grid = hex_grid.HexGrid(size=1, shape="flat")
+    grid = HexGrid(size=1, shape="flat")
     cell_ids = grid.cell_at_point(points)
     df = pandas.DataFrame({"nr_points": 0, "grid_id": list(cell_ids)})
     occurrences = df.groupby("grid_id").count()
@@ -79,9 +79,9 @@ plt.show()
 #
 # Now we can create a grid and aggregate our points onto that grid.
 
-from gridkit import hex_grid
+from gridkit import HexGrid
 
-grid = hex_grid.HexGrid(size=1, shape="flat")
+grid = HexGrid(size=1, shape="flat")
 cell_ids = grid.cell_at_point(points)
 
 # %%

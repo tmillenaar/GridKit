@@ -45,9 +45,9 @@ plt.show()
 #
 # Now we can create a grid and interpolate onto that grid.
 
-from gridkit import hex_grid
+from gridkit import HexGrid
 
-empty_grid = hex_grid.HexGrid(size=6, shape="pointy")
+empty_grid = HexGrid(size=6, shape="pointy")
 data_grid = empty_grid.interp_from_points(points, values)
 
 from matplotlib.patches import Rectangle

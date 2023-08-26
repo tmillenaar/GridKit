@@ -36,7 +36,7 @@ import geopandas
 import matplotlib.pyplot as plt
 import pandas
 
-from gridkit.io import read_geotiff
+from gridkit import read_geotiff
 
 rivers = geopandas.read_file("../../tests/data/streams.gpkg")
 lakes = geopandas.read_file("../../tests/data/lakes.gpkg")
