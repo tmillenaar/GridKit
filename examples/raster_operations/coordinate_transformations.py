@@ -2,6 +2,8 @@
 Coordinate transformations
 ==========================
 
+.. _example coordinate transformations:
+
 Transform a grid from one CRS to another
 
 Introduction

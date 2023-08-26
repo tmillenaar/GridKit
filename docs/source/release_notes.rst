@@ -3,6 +3,14 @@
 Release notes
 ================
 
+Version 0.4.2 (August 27, 2023)
+-------------------------------
+Fixes
+ - Fix ``to_crs`` on HexGrid and RectGrid (only worked on bounded equivalents)
+
+Documentation
+ - Improved docstrings for to_crs on BaseGrid, HexGrid, RectGrid, BoundedHexGrid and BoundedRectGrid
+
 Version 0.4.1 (August 20, 2023)
 -------------------------------
 Features
