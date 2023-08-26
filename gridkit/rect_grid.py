@@ -466,6 +466,12 @@ class RectGrid(BaseGrid):
 
         See also
         --------
+        Examples:
+
+        :ref:`Example: coordinate transformations <example coordinate transformations>`
+
+        Methods:
+
         :meth:`.BoundedRectGrid.to_crs`
         :meth:`.HexGrid.to_crs`
         :meth:`.BoundedHexGrid.to_crs`
@@ -750,6 +756,12 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         See also
         --------
+        Examples:
+
+        :ref:`Example: coordinate transformations <example coordinate transformations>`
+
+        Methods:
+
         :meth:`.RectGrid.to_crs`
         :meth:`.HexGrid.to_crs`
         :meth:`.BoundedHexGrid.to_crs`

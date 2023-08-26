@@ -178,7 +178,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
 
-        The ``crs`` attribute on the current GeometryArray must be set.
+        The ``crs`` attribute on the current grid must be set.
 
         Parameters
         ----------
@@ -189,11 +189,16 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         See also
         --------
+        Examples:
+
+        :ref:`Example: coordinate transformations <example coordinate transformations>`
+
+        Methods:
+
         :meth:`.RectGrid.to_crs`
         :meth:`.HexGrid.to_crs`
         :meth:`.BoundedRectGrid.to_crs`
         :meth:`.BoundedHexGrid.to_crs`
-
         """
         pass
 
