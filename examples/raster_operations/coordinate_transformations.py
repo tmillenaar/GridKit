@@ -25,7 +25,7 @@ To demonstrate this, let's create a grid in WGS84 (epsg code 4326) and transform
 
 import numpy
 
-from gridkit.rect_grid import BoundedRectGrid
+from gridkit import BoundedRectGrid
 
 # Create a new grid
 grid_wgs84 = BoundedRectGrid(

@@ -18,13 +18,18 @@ These turn into NaN-values.
 This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 """
-from gridkit.io import read_geotiff
 import matplotlib.pyplot as plt
 import numpy
 
+from gridkit import read_geotiff
+
 # Read in the bands required to determine the NDVI
-band_4 = read_geotiff("../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff").astype("int32")
-band_8 = read_geotiff("../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff").astype("int32")
+band_4 = read_geotiff(
+    "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff"
+).astype("int32")
+band_8 = read_geotiff(
+    "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff"
+).astype("int32")
 
 # %%
 #
@@ -37,11 +42,11 @@ band_8 = read_geotiff("../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentin
 #
 
 # Determine the NDVI
-ndvi = (band_8 - band_4)/(band_8 + band_4)
-ndvi.data[~numpy.isfinite(ndvi)] = 0 # fill NaN values resulting from a division by 0
+ndvi = (band_8 - band_4) / (band_8 + band_4)
+ndvi.data[~numpy.isfinite(ndvi)] = 0  # fill NaN values resulting from a division by 0
 
 # %%
-# 
+#
 # .. note ::
 #    If, for any cell, the denominator (band_8 + band_4) is zero, Numpy raises a warning.
 #    The return value for these cells is a ``numpy.nan``.
