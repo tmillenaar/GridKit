@@ -111,10 +111,11 @@ def test_cells_near_point(shape, point, expected_nearby_cells):
     numpy.testing.assert_allclose(nearby_cells, expected_nearby_cells)
 
 
-def test_crs():
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_crs(shape):
     offset = (5, 10)
     crs = 3857
-    grid = HexGrid(size=10, offset=offset, crs=crs)
+    grid = HexGrid(size=10, offset=offset, crs=crs, shape=shape)
     new_grid = grid.to_crs(crs=4326)
 
     expected_size = 8.983152841195213e-05
