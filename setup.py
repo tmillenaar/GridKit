@@ -28,6 +28,7 @@ docs_require = [
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
     "geopandas",
+    "matplotlib",
 ]
 
 setup(
