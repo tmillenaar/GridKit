@@ -11,7 +11,7 @@ with open("requirements.txt") as file:
     install_requires = file.read()
 
 docs_require = [
-    "sphinx<7.0.0",
+    "sphinx",
     "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-plantuml",

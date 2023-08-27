@@ -3,16 +3,23 @@
 Release notes
 ================
 
-Version 0.4.4 (August 27, 2023)
+Version 0.4.5 (August 27, 2023)
 -------------------------------
 Fixes
  - Replace all mentions of ``read_geotiff`` in example gallery to ``write_geotiff``
+ - build docs without referencing setup.py
 
- Misc
- - Add test to verify if the documentation builds succesfully to the CI/CD
+Misc
+ - Add test to verify if the documentation builds succesfully
  - Add docs_require to tests_require in setup.py
+ - remove restriction on sphinx version
 
- Version 0.4.3 (August 27, 2023)
+Version 0.4.4 (August 27, 2023)
+-------------------------------
+Fixes
+ - Add missing matplotlib to docs_require
+
+Version 0.4.3 (August 27, 2023)
 -------------------------------
 Fixes
  - Pin sphinx version to prevent docs build step from erroring
