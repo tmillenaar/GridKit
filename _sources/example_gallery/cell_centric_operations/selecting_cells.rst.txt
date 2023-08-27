@@ -51,7 +51,7 @@ where one grid's cells are exactly three times larger than the other grid's cell
 
     import numpy
 
-    from gridkit.hex_grid import HexGrid
+    from gridkit import HexGrid
 
     # create a grids
     fine_grid = HexGrid(size=1, shape="pointy")
@@ -277,7 +277,7 @@ Now the purple grid is colored, based on it's relation to the orange grid.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.984 seconds)
+   **Total running time of the script:** (0 minutes 2.131 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_selecting_cells.py:

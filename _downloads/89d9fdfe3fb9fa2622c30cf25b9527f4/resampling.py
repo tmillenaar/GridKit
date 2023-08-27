@@ -20,12 +20,13 @@ Several grids with different cell shapes are then defined on which the DEM data 
 
 # sphinx_gallery_thumbnail_number = -1
 
-from gridkit.io import read_geotiff
-from gridkit.hex_grid import HexGrid
-from gridkit.rect_grid import RectGrid
 import numpy
 
-dem = read_geotiff("../../tests/data/alps_dem.tiff", bounds=(28300, 167300, 28700, 167700))
+from gridkit import HexGrid, RectGrid, read_raster
+
+dem = read_raster(
+    "../../tests/data/alps_dem.tiff", bounds=(28300, 167300, 28700, 167700)
+)
 print("Original resolution in (dx, dy):", dem.cellsize)
 
 # %%
@@ -39,7 +40,7 @@ print("Original resolution in (dx, dy):", dem.cellsize)
 #    It is generally recommended to work with grids defined in a local CRS that is not
 #    defined in degrees but either meters or feet.
 #
-# 
+#
 # Resampling onto the a grid
 # --------------------------
 #
@@ -49,10 +50,7 @@ print("Original resolution in (dx, dy):", dem.cellsize)
 # Let's define a rectangular grid with a cell size of 10x10 degrees.
 # I am calling it rectdem for later on I will define hexagonal ones as well.
 # To make sure it worked we can print out the cellsize after resampling
-rectdem = dem.resample(
-    RectGrid(dx=10, dy=10, crs=dem.crs),
-    method="bilinear"
-)
+rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.crs), method="bilinear")
 print("Downsampled resolution in (dx, dy):", dem.cellsize)
 
 # %%
@@ -71,26 +69,25 @@ plt.show()
 # There are two flavours, "pointy" and "flat" hexagonal grids.
 # Let's show both so we can compare them both to each other and the downsampled rectangular grid.
 # Hexagonal cells are smaller than square cells when given the same width,
-# so to make a more fair visual comparisson let's use a slightly larger cell width. 
+# so to make a more fair visual comparisson let's use a slightly larger cell width.
 # This way we will have a roughly equal number of cells covering the area.
 
 hexdem_flat = dem.resample(
-    HexGrid(size=11, shape="flat", crs=dem.crs),
-    method="bilinear"
+    HexGrid(size=11, shape="flat", crs=dem.crs), method="bilinear"
 )
 hexdem_pointy = dem.resample(
-    HexGrid(size=11, shape="pointy", crs=dem.crs),
-    method="bilinear"
+    HexGrid(size=11, shape="pointy", crs=dem.crs), method="bilinear"
 )
 
 # %%
-# 
+#
 # Since matplotlib's imshow cannot be used to plot this hexagonal data, we have to get a little more involved.
 # We can each cell as a polygon. This is more involved and less performant way of plotting than imshow,
 # but it will get the job done.
 # First, let's create a function that determines the colors for our polygons.
 
 import matplotlib.pylab as pl
+
 
 def get_colors(data):
     """Obtain a color for each data value based on the data range of the original dem"""
@@ -101,8 +98,9 @@ def get_colors(data):
     values_normalized = data.ravel() - vmin
     values_normalized = values_normalized / vmax
     colors = cmap(values_normalized)
-    colors[numpy.all(colors == 0, axis=1)] += 1 # turn black (nodata) to white
+    colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
     return colors
+
 
 # %%
 #

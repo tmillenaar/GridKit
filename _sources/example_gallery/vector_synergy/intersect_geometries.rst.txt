@@ -58,11 +58,11 @@ With that approach it might be worthwhile to call a `numpy.unique` on axis 0 aft
     import matplotlib.pyplot as plt
     import pandas
 
-    from gridkit.io import read_geotiff
+    from gridkit import read_raster
 
     rivers = geopandas.read_file("../../tests/data/streams.gpkg")
     lakes = geopandas.read_file("../../tests/data/lakes.gpkg")
-    dem = read_geotiff("../../tests/data/alps_dem.tiff")
+    dem = read_raster("../../tests/data/alps_dem.tiff")
 
     water_bodies = pandas.concat([rivers, lakes]).reset_index().to_crs(dem.crs)
 
@@ -155,7 +155,7 @@ A zoom-in of a section of the plot allows us to see more clearly what cells are 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 10.958 seconds)
+   **Total running time of the script:** (0 minutes 7.858 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_intersect_geometries.py:

@@ -36,7 +36,7 @@ We can make use of this to read out a crop of the same area form different files
 import matplotlib.pyplot as plt
 import numpy
 
-from gridkit.io import read_geotiff
+from gridkit import read_raster
 
 # Define the bounding box of interest and the corresponding CRS
 bounds_matterhorn = (817723, 5826030, 964482, 5893982)
@@ -47,10 +47,10 @@ path_landuse = "../../tests/data/alps_landuse.tiff"
 path_dem = "../../tests/data/alps_dem.tiff"
 
 # Read a part of the digital elevation model (DEM) and set to desired CRS
-dem = read_geotiff(path_dem, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
+dem = read_raster(path_dem, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
 
 # Read the same part of the landuse dataset and resample onto the DEM
-landuse = read_geotiff(
+landuse = read_raster(
     path_landuse, bounds=bounds_matterhorn, bounds_crs=bounds_crs
 ).resample(dem, method="nearest")
 

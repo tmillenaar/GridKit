@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Combining land cover and DEM &mdash; GridKit v0.4.1 documentation</title>
+  <title>Combining land cover and DEM &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -137,7 +137,7 @@ This means that more data is read when the bounds are warped more severely after
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">gridkit.io</span> <span class="kn">import</span> <span class="n">read_geotiff</span>
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">read_raster</span>
 
 <span class="c1"># Define the bounding box of interest and the corresponding CRS</span>
 <span class="n">bounds_matterhorn</span> <span class="o">=</span> <span class="p">(</span><span class="mi">817723</span><span class="p">,</span> <span class="mi">5826030</span><span class="p">,</span> <span class="mi">964482</span><span class="p">,</span> <span class="mi">5893982</span><span class="p">)</span>
@@ -148,10 +148,10 @@ This means that more data is read when the bounds are warped more severely after
 <span class="n">path_dem</span> <span class="o">=</span> <span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span>
 
 <span class="c1"># Read a part of the digital elevation model (DEM) and set to desired CRS</span>
-<span class="n">dem</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="n">path_dem</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds_matterhorn</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">bounds_crs</span><span class="p">)</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span><span class="n">path_dem</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds_matterhorn</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">bounds_crs</span><span class="p">)</span>
 
 <span class="c1"># Read the same part of the landuse dataset and resample onto the DEM</span>
-<span class="n">landuse</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span>
+<span class="n">landuse</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span>
     <span class="n">path_landuse</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds_matterhorn</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">bounds_crs</span>
 <span class="p">)</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
 </pre></div>
@@ -290,7 +290,7 @@ When these two steps are combined in one line, it looks like this:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" alt="Alpine land cover histogram" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.318 seconds)</p>
+<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" alt="Alpine land cover histogram" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.657 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-elevation-distribution-per-land-cover-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/5c14cf556019e9b7d189db937fd6175f/elevation_distribution_per_land_cover.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">elevation_distribution_per_land_cover.py</span></code></a></p>

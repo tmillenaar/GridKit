@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rect_grid &mdash; GridKit v0.4.1 documentation</title>
+  <title>rect_grid &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -368,6 +368,36 @@ and thus can influnce what cell contains the point:</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.to_crs">
+<span class="sig-name descname"><span class="pre">to_crs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.to_crs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.to_crs" title="Permalink to this definition"></a></dt>
+<dd><p>Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+This will modify the cell size and the bounds accordingly.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current GeometryArray must be set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
+by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the grid with modified cell spacing and bounds to match the specified CRS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Examples:</p>
+<p><a class="reference internal" href="../example_gallery/raster_operations/coordinate_transformations.html#example-coordinate-transformations"><span class="std std-ref">Example: coordinate transformations</span></a></p>
+<p>Methods:</p>
+<p><a class="reference internal" href="#gridkit.rect_grid.BoundedRectGrid.to_crs" title="gridkit.rect_grid.BoundedRectGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs" title="gridkit.hex_grid.HexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs" title="gridkit.hex_grid.BoundedHexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_crs()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.cells_in_bounds">
 <span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cells_in_bounds" title="Permalink to this definition"></a></dt>
 <dd><dl class="field-list simple">
@@ -493,19 +523,34 @@ If <cite>index</cite> is None (default) the cells containing data are used as th
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.to_crs">
 <span class="sig-name descname"><span class="pre">to_crs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid.to_crs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.to_crs" title="Permalink to this definition"></a></dt>
-<dd><p>Transforms the</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current GeometryArray must
-be set.  Either <code class="docutils literal notranslate"><span class="pre">crs</span></code> or <code class="docutils literal notranslate"><span class="pre">epsg</span></code> may be specified for output.
-This method will transform all points in all objects.  It has no notion
-or projecting entire geometries.  All segments joining points are
-assumed to be lines in the current projection, not geodesics.  Objects
-crossing the dateline (or other projection boundary) will have
-undesirable behavior.</p>
-<dl class="simple">
-<dt>:param crs <code class="xref py py-class docutils literal notranslate"><span class="pre">pyproj.CRS</span></code>: The value can be anything accepted</dt><dd><p>by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p>
+<dd><p>Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+This will modify the cell size and the bounds accordingly.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current grid must be set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
+by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
+<li><p><strong>resample_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The resampling method to be used for <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the grid with modified cell spacing and bounds to match the specified CRS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a></p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Examples:</p>
+<p><a class="reference internal" href="../example_gallery/raster_operations/coordinate_transformations.html#example-coordinate-transformations"><span class="std std-ref">Example: coordinate transformations</span></a></p>
+<p>Methods:</p>
+<p><a class="reference internal" href="#gridkit.rect_grid.RectGrid.to_crs" title="gridkit.rect_grid.RectGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs" title="gridkit.hex_grid.HexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs" title="gridkit.hex_grid.BoundedHexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_crs()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="py method">

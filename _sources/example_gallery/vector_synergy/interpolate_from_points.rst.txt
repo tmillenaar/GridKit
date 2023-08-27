@@ -95,9 +95,9 @@ Now we can create a grid and interpolate onto that grid.
 .. code-block:: default
 
 
-    from gridkit import hex_grid
+    from gridkit import HexGrid
 
-    empty_grid = hex_grid.HexGrid(size=6, shape="pointy")
+    empty_grid = HexGrid(size=6, shape="pointy")
     data_grid = empty_grid.interp_from_points(points, values)
 
     from matplotlib.patches import Rectangle
@@ -176,7 +176,7 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.843 seconds)
+   **Total running time of the script:** (0 minutes 2.019 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_interpolate_from_points.py:

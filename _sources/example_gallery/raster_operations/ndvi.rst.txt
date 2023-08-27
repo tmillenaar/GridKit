@@ -36,17 +36,22 @@ Also, a numpy warning is raised because we devide by zero for some cells.
 These turn into NaN-values.
 This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-29
+.. GENERATED FROM PYTHON SOURCE LINES 21-34
 
 .. code-block:: default
 
-    from gridkit.io import read_geotiff
     import matplotlib.pyplot as plt
     import numpy
 
+    from gridkit import read_raster
+
     # Read in the bands required to determine the NDVI
-    band_4 = read_geotiff("../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff").astype("int32")
-    band_8 = read_geotiff("../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff").astype("int32")
+    band_4 = read_raster(
+        "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff"
+    ).astype("int32")
+    band_8 = read_raster(
+        "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff"
+    ).astype("int32")
 
 
 
@@ -55,7 +60,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-37
+.. GENERATED FROM PYTHON SOURCE LINES 35-42
 
 .. warning ::
    The source data is defined in `int16`, which is consequently also the numpy dtype after reading.
@@ -65,14 +70,14 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
    If this is not done, the script will run, but the resulting values will be incorrect.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-43
+.. GENERATED FROM PYTHON SOURCE LINES 43-48
 
 .. code-block:: default
 
 
     # Determine the NDVI
-    ndvi = (band_8 - band_4)/(band_8 + band_4)
-    ndvi.data[~numpy.isfinite(ndvi)] = 0 # fill NaN values resulting from a division by 0
+    ndvi = (band_8 - band_4) / (band_8 + band_4)
+    ndvi.data[~numpy.isfinite(ndvi)] = 0  # fill NaN values resulting from a division by 0
 
 
 
@@ -81,7 +86,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-51
+.. GENERATED FROM PYTHON SOURCE LINES 49-56
 
 .. note ::
    If, for any cell, the denominator (band_8 + band_4) is zero, Numpy raises a warning.
@@ -91,7 +96,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
    This decision is of course use case dependent.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-63
+.. GENERATED FROM PYTHON SOURCE LINES 57-68
 
 .. code-block:: default
 
@@ -121,7 +126,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 8.038 seconds)
+   **Total running time of the script:** (0 minutes 7.645 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_ndvi.py:

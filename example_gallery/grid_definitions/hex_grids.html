@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hexagon grids &mdash; GridKit v0.4.1 documentation</title>
+  <title>Hexagon grids &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -114,7 +114,7 @@ to download the full example code</p>
 The goal of this exercise is to familiarize the reader with the various configurations of hexagonal grids
 and how they compare to one another.</p>
 <p>Let’s create a grid and obtain the polygons in some area of interest.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit.hex_grid</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
 
 <span class="c1"># create a grid</span>
 <span class="n">main_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
@@ -122,11 +122,13 @@ and how they compare to one another.</p>
 <span class="c1"># define an area of interest, slightly larger than what we want to plot</span>
 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 
+
 <span class="k">def</span> <span class="nf">get_shapes_in_bounds</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the cells of a grid in the specified bounds as a multipolygon&quot;&quot;&quot;</span>
     <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
     <span class="n">cell_ids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
 
 <span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">main_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 </pre></div>
@@ -135,10 +137,12 @@ and how they compare to one another.</p>
 Let’s plot the shapes to see what we are dealing with.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
+
 <span class="k">def</span> <span class="nf">plot_shapes</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple function to plot polygons with matplotlib&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">shapes</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">geom</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
 
 <span class="c1"># plot the cell outlines</span>
 <span class="n">plot_shapes</span><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -153,7 +157,7 @@ We can modify this using the ‘offset’.</p>
 <h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Permalink to this heading"></a></h2>
 <p>Let’s shift the whole grid vertically to center it around coordinate (0,0)
 Also, let’s zoom in a bit to the center</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">main_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 
 <span class="c1"># plot the cell outlines</span>
@@ -169,7 +173,9 @@ If we shift the grid a deliberate amount so that it has a vertex on the center,
 it creates interesting patterns with respect to the grid we just created.
 For this we need to shift it half a ‘dx’ horizontally and one radius (distance from center to corner) vertically,
 with respect to the main grid.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shifted_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">main_grid</span><span class="o">.</span><span class="n">r</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shifted_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
+    <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="n">shifted_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">shifted_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 
 <span class="c1"># plot the cell outlines</span>
@@ -189,8 +195,12 @@ is that we can use the already available <cite>dx</cite>, <cite>dy</cite> and <c
 <h2>Grid sizes<a class="headerlink" href="#grid-sizes" title="Permalink to this heading"></a></h2>
 <p>Finally, let’s play with the size of the grid. If we keep the grids centered around zero but vary the size,
 we also obtain interesting patterns.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
-<span class="n">third_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span>
+<span class="p">)</span>
+<span class="n">third_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span>
+<span class="p">)</span>
 <span class="n">half_size_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">half_size_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 <span class="n">third_size_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">third_size_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 
@@ -205,7 +215,7 @@ we also obtain interesting patterns.</p>
 </div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.855 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.626 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/67186b4128a685058ed8c30092023ec6/hex_grids.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">hex_grids.py</span></code></a></p>

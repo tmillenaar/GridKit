@@ -58,9 +58,9 @@ First let's import the dependencies and read in the DEM.
     import matplotlib.pyplot as plt
     import numpy
 
-    from gridkit.io import read_geotiff
+    from gridkit import read_raster
 
-    dem = read_geotiff(
+    dem = read_raster(
         "../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100)
     )
 
@@ -190,7 +190,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.307 seconds)
+   **Total running time of the script:** (0 minutes 1.736 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_downslope_path.py:

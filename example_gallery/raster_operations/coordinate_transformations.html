@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coordinate transformations &mdash; GridKit v0.4.1 documentation</title>
+  <title>Coordinate transformations &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -110,7 +110,7 @@ to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="coordinate-transformations">
 <span id="sphx-glr-example-gallery-raster-operations-coordinate-transformations-py"></span><h1>Coordinate transformations<a class="headerlink" href="#coordinate-transformations" title="Permalink to this heading"></a></h1>
-<p>Transform a grid from one CRS to another</p>
+<p id="example-coordinate-transformations">Transform a grid from one CRS to another</p>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
 <p>A Coordinate Reference System (CRS) is a means of representing a 3D surface (usually of Earth) onto a 2D map. There are many Coordinate Reference Systems, all with their own advantages and discrepencies. There is no one CRS to
@@ -127,7 +127,7 @@ When a straigt line is transformed to a different CRS, it often gets warped.
 To demonstrate this, let’s create a grid in WGS84 (epsg code 4326) and transform the coordinates of each cell to CRS UTM N29 (epsg code 32629).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">BoundedRectGrid</span>
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">BoundedRectGrid</span>
 
 <span class="c1"># Create a new grid</span>
 <span class="n">grid_wgs84</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span>
@@ -210,7 +210,7 @@ This does lead to artifacts at the boundaries.</p>
 </div>
 <img src="../../_images/sphx_glr_coordinate_transformations_005.png" srcset="../../_images/sphx_glr_coordinate_transformations_005.png" alt="coordinate transformations" class = "sphx-glr-single-img"/><p><code class="docutils literal notranslate"><span class="pre">to_crs()</span></code> is just a shorthand for creating a grid with the same properties as the source grid, but with a different CRS, and calling resample.
 Any time <code class="docutils literal notranslate"><span class="pre">source_grid.resample(target_grid)</span></code> is called, the CRS of the grids are compared. If they are different, the logic described in this example is applied.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.977 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.833 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-coordinate-transformations-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3eb6e372e071e958ff8e1f3028b6658e/coordinate_transformations.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">coordinate_transformations.py</span></code></a></p>

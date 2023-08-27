@@ -30,7 +30,7 @@ where one grid's cells are exactly three times larger than the other grid's cell
 
 import numpy
 
-from gridkit.hex_grid import HexGrid
+from gridkit import HexGrid
 
 # create a grids
 fine_grid = HexGrid(size=1, shape="pointy")

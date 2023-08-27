@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; GridKit v0.4.1 documentation</title>
+  <title>Release notes &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -56,6 +56,10 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-5-august-27-2023">Version 0.4.5 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-4-august-27-2023">Version 0.4.4 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-3-august-27-2023">Version 0.4.3 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-2-august-27-2023">Version 0.4.2 (August 27, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-1-august-20-2023">Version 0.4.1 (August 20, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-0-august-13-2023">Version 0.4.0 (August 13, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-3-1-july-23-2023">Version 0.3.1 (July 23, 2023)</a></li>
@@ -93,6 +97,60 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<section id="version-0-4-5-august-27-2023">
+<h2>Version 0.4.5 (August 27, 2023)<a class="headerlink" href="#version-0-4-5-august-27-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Replace all mentions of <code class="docutils literal notranslate"><span class="pre">read_geotiff</span></code> in example gallery to <code class="docutils literal notranslate"><span class="pre">write_geotiff</span></code></p></li>
+<li><p>build docs without referencing setup.py</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Add test to verify if the documentation builds succesfully</p></li>
+<li><p>Add docs_require to tests_require in setup.py</p></li>
+<li><p>remove restriction on sphinx version</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-4-august-27-2023">
+<h2>Version 0.4.4 (August 27, 2023)<a class="headerlink" href="#version-0-4-4-august-27-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Add missing matplotlib to docs_require</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-3-august-27-2023">
+<h2>Version 0.4.3 (August 27, 2023)<a class="headerlink" href="#version-0-4-3-august-27-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Pin sphinx version to prevent docs build step from erroring</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-2-august-27-2023">
+<h2>Version 0.4.2 (August 27, 2023)<a class="headerlink" href="#version-0-4-2-august-27-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">to_crs</span></code> on <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> and <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> (only worked on bounded equivalents)</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Improved docstrings for <code class="docutils literal notranslate"><span class="pre">to_crs</span></code> on <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> and  <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a></p></li>
+<li><p>Add docstrings to <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_raster" title="gridkit.io.read_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_raster()</span></code></a> and <a class="reference internal" href="api/gridkit.io.html#gridkit.io.write_raster" title="gridkit.io.write_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_raster()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Import <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>, <a class="reference internal" href="api/gridkit.index.html#gridkit.index.validate_index" title="gridkit.index.validate_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_index()</span></code></a>, <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>, <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> as part of gridkit to make for more convenient importing (eg <cite>from gridkit import HexGrid</cite>)</p></li>
+<li><p>Move pytest and matplotlib requirements from requirements.txt to tests_require in setup.py</p></li>
+<li><p>Rename <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_geotiff" title="gridkit.io.read_geotiff"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_geotiff()</span></code></a> to <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_raster" title="gridkit.io.read_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_raster()</span></code></a>. The former will be deprecated in a future release.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-4-1-august-20-2023">
 <h2>Version 0.4.1 (August 20, 2023)<a class="headerlink" href="#version-0-4-1-august-20-2023" title="Permalink to this heading"></a></h2>
 <dl class="simple">

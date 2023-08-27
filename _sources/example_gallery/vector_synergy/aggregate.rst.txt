@@ -33,9 +33,9 @@ TL;DR
     :emphasize-lines: 5-7
 
     import pandas
-    from gridkit import hex_grid
+    from gridkit import HexGrid
 
-    grid = hex_grid.HexGrid(size=1, shape="flat")
+    grid = HexGrid(size=1, shape="flat")
     cell_ids = grid.cell_at_point(points)
     df = pandas.DataFrame({"nr_points": 0, "grid_id": list(cell_ids)})
     occurrences = df.groupby("grid_id").count()
@@ -117,9 +117,9 @@ Now we can create a grid and aggregate our points onto that grid.
 .. code-block:: default
 
 
-    from gridkit import hex_grid
+    from gridkit import HexGrid
 
-    grid = hex_grid.HexGrid(size=1, shape="flat")
+    grid = HexGrid(size=1, shape="flat")
     cell_ids = grid.cell_at_point(points)
 
 
@@ -189,7 +189,7 @@ Now we have the number of points per cell, let's obtain the corresponding cell s
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.938 seconds)
+   **Total running time of the script:** (0 minutes 0.707 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate.py:

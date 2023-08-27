@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NDVI &mdash; GridKit v0.4.1 documentation</title>
+  <title>NDVI &mdash; GridKit 0.1.0.beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
@@ -15,11 +15,11 @@
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=808aa6b1"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -39,7 +39,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.4.1
+                0.1.0.beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -122,13 +122,18 @@ This example is created to get the reader familiar with the synax of GridKit and
 <p>Also, a numpy warning is raised because we devide by zero for some cells.
 These turn into NaN-values.
 This is remedied in the script by replacing each NaN-value with 0 afterwards.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit.io</span> <span class="kn">import</span> <span class="n">read_geotiff</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">read_raster</span>
+
 <span class="c1"># Read in the bands required to determine the NDVI</span>
-<span class="n">band_4</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="s2">&quot;../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
-<span class="n">band_8</span> <span class="o">=</span> <span class="n">read_geotiff</span><span class="p">(</span><span class="s2">&quot;../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+<span class="n">band_4</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span>
+    <span class="s2">&quot;../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+<span class="n">band_8</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span>
+    <span class="s2">&quot;../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -140,8 +145,8 @@ In this case the dtype is increased to <cite>int32</cite>, by calling <code clas
 If this is not done, the script will run, but the resulting values will be incorrect.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Determine the NDVI</span>
-<span class="n">ndvi</span> <span class="o">=</span> <span class="p">(</span><span class="n">band_8</span> <span class="o">-</span> <span class="n">band_4</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">band_8</span> <span class="o">+</span> <span class="n">band_4</span><span class="p">)</span>
-<span class="n">ndvi</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># fill NaN values resulting from a division by 0</span>
+<span class="n">ndvi</span> <span class="o">=</span> <span class="p">(</span><span class="n">band_8</span> <span class="o">-</span> <span class="n">band_4</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">band_8</span> <span class="o">+</span> <span class="n">band_4</span><span class="p">)</span>
+<span class="n">ndvi</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># fill NaN values resulting from a division by 0</span>
 </pre></div>
 </div>
 <div class="admonition note">
@@ -164,7 +169,7 @@ This decision is of course use case dependent.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_ndvi_001.png" srcset="../../_images/sphx_glr_ndvi_001.png" alt="NDVI of scene in the alps   EPSG:3857" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.038 seconds)</p>
+<img src="../../_images/sphx_glr_ndvi_001.png" srcset="../../_images/sphx_glr_ndvi_001.png" alt="NDVI of scene in the alps   EPSG:3857" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.645 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-ndvi-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/c92eff7c24f20f85c3b25f2e83eff1f1/ndvi.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">ndvi.py</span></code></a></p>
