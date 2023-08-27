@@ -23,7 +23,7 @@ tests_require = [
 ]
 
 docs_require = [
-    "sphinx",
+    "sphinx<7.0.0",
     "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
