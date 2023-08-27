@@ -36,11 +36,11 @@ import geopandas
 import matplotlib.pyplot as plt
 import pandas
 
-from gridkit import read_geotiff
+from gridkit import read_raster
 
 rivers = geopandas.read_file("../../tests/data/streams.gpkg")
 lakes = geopandas.read_file("../../tests/data/lakes.gpkg")
-dem = read_geotiff("../../tests/data/alps_dem.tiff")
+dem = read_raster("../../tests/data/alps_dem.tiff")
 
 water_bodies = pandas.concat([rivers, lakes]).reset_index().to_crs(dem.crs)
 
