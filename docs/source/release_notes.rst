@@ -6,7 +6,7 @@ Release notes
 Version 0.4.2 (August 27, 2023)
 -------------------------------
 Fixes
- - Fix ``to_crs`` on HexGrid and RectGrid (only worked on bounded equivalents)
+ - Fix ``to_crs`` on :class:`.HexGrid` and :class:`.RectGrid` (only worked on bounded equivalents)
 
 Documentation
  - Improved docstrings for ``to_crs`` on :class:`.BaseGrid`,  :class:`.HexGrid`,  :class:`.RectGrid`,  :class:`.BoundedHexGrid` and  :class:`.BoundedRectGrid`
