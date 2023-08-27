@@ -9,10 +9,13 @@ Fixes
  - Fix ``to_crs`` on HexGrid and RectGrid (only worked on bounded equivalents)
 
 Documentation
- - Improved docstrings for to_crs on BaseGrid, HexGrid, RectGrid, BoundedHexGrid and BoundedRectGrid
+ - Improved docstrings for ``to_crs`` on :class:`.BaseGrid`,  :class:`.HexGrid`,  :class:`.RectGrid`,  :class:`.BoundedHexGrid` and  :class:`.BoundedRectGrid`
+ - Add docstrings to :func:`.read_raster` and :func:`.write_raster`
 
- Misc
-  - Move pytest and matplotlib requirements from requirements.txt to tests_require in setup.py
+Misc
+ - Import :class:`.GridIndex`, :func:`.validate_index`, :class:`.BaseGrid`, :class:`.RectGrid`, :class:`.HexGrid`, :class:`.BoundedRectGrid` and :class:`.BoundedHexGrid` as part of gridkit to make for mor conveniet importing (eg `from gridkit import HexGrid`)
+ - Move pytest and matplotlib requirements from requirements.txt to tests_require in setup.py
+ - Rename :func:`.read_geotiff` to :func:`.read_raster`. The former will be deprecated in a future release.
 
 Version 0.4.1 (August 20, 2023)
 -------------------------------

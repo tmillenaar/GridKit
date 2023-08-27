@@ -526,7 +526,7 @@ class HexGrid(BaseGrid):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
 
-        The ``crs`` attribute on the current GeometryArray must be set.
+        The ``crs`` attribute on the current grid must be set.
 
         Parameters
         ----------
@@ -866,7 +866,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will modify the cell size and the bounds accordingly.
 
-        The ``crs`` attribute on the current grid must be set
+        The ``crs`` attribute on the current grid must be set.
 
         Parameters
         ----------
@@ -875,7 +875,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
         resample_method: :class:`str`
-            The resampling method to be used for :meth:`.HexGrid.resample`.
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
 
         Returns
         -------

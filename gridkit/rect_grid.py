@@ -747,7 +747,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
         resample_method: :class:`str`
-            The resampling method to be used for :meth:`.RectGrid.resample`.
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
 
         Returns
         -------

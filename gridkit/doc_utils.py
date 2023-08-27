@@ -42,14 +42,14 @@ def plot_polygons(
 
     Parameters
     ----------
-    geoms: :class:`List[shapely.Polygon]`
+    geoms: List[shapely.Polygon]
         A list of shapely polygons to draw
     values: :class:`numpy.ndarray`
         The values corresponding the the respective ``geoms``.
         These values will be used to color the supplied ``geoms`` according the the supplied ``cmap``.
     cmal: :class:`str`
         The matplitlib complient colormap name to use
-    ax: :class:`matplotlib.axes.Axes` (optional)
+    ax: `matplotlib.axes.Axes` (optional)
         The matplotlib axis object to plot on.
         If an axis object is supplied, the plot will be edited in-place.
         Default: `matplotlib.pyplot`
