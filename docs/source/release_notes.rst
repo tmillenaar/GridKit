@@ -3,6 +3,11 @@
 Release notes
 ================
 
+Version 0.4.3 (August 27, 2023)
+-------------------------------
+Fixes
+ - Pin sphinx version to prevent docs build step from erroring
+
 Version 0.4.2 (August 27, 2023)
 -------------------------------
 Fixes
