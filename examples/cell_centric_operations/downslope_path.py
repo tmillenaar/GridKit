@@ -37,9 +37,9 @@ First let's import the dependencies and read in the DEM.
 import matplotlib.pyplot as plt
 import numpy
 
-from gridkit import read_geotiff
+from gridkit import read_raster
 
-dem = read_geotiff(
+dem = read_raster(
     "../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100)
 )
 

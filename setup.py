@@ -10,18 +10,6 @@ with open("gridkit/version.py") as file:
 with open("requirements.txt") as file:
     install_requires = file.read()
 
-tests_require = [
-    "pytest",
-    "matplotlib",
-    "black",
-    "geopandas",
-    "pytest-cov",
-    "pytest-pylint",
-    "pytest-black",
-    "pylint",
-    "pre-commit",
-]
-
 docs_require = [
     "sphinx<7.0.0",
     "sphinx_rtd_theme",
@@ -29,6 +17,18 @@ docs_require = [
     "sphinxcontrib-plantuml",
     "geopandas",
     "matplotlib",
+]
+
+tests_require = [
+    "pytest",
+    "black",
+    "geopandas",
+    "pytest-cov",
+    "pytest-pylint",
+    "pytest-black",
+    "pylint",
+    "pre-commit",
+    *docs_require,
 ]
 
 setup(

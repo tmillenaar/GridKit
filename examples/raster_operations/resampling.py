@@ -22,9 +22,9 @@ Several grids with different cell shapes are then defined on which the DEM data 
 
 import numpy
 
-from gridkit import HexGrid, RectGrid, read_geotiff
+from gridkit import HexGrid, RectGrid, read_raster
 
-dem = read_geotiff(
+dem = read_raster(
     "../../tests/data/alps_dem.tiff", bounds=(28300, 167300, 28700, 167700)
 )
 print("Original resolution in (dx, dy):", dem.cellsize)
