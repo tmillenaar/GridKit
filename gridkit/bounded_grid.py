@@ -490,8 +490,27 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         return self.update(new_data)
 
     @validate_index
-    def value(self, index, oob_value=None):
-        """Return the value at the given cell index"""
+    def value(self, index=None, oob_value=None):
+        """Return the value at the given cell index.
+
+        Parameters
+        ----------
+        index: :class:`.GridIndex` (optional)
+            The index of the cell(s) of which to return the value.
+            If not supplied, all values will be returned in a flattened array.
+        oob_value: :class:`float` (optional)
+            The value assigned to values that are 'out of bounds'.
+            I.e. the value assigned to ``index`` entries not covered by the data.
+            Default: numpy.nan
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The values at the supplied `index` locations
+        """
+
+        if index is None:
+            index = self.indices
 
         # Convert grid-ids into numpy-ids
         np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
