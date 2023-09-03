@@ -1,4 +1,7 @@
 """
+
+.. _example partial overlap:
+
 Partial overlap
 ===============
 
