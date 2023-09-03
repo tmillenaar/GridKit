@@ -1,4 +1,7 @@
 """
+
+.. _example ndvi:
+
 NDVI
 ====
 

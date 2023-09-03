@@ -3,6 +3,16 @@
 Release notes
 ================
 
+Version 0.4.6 (September 4, 2023)
+-------------------------------
+Features
+ - Make 'index' argument optional in :meth:`.BoundedGrid.value`
+
+Documentation
+ - Add example :ref:`partial_overlap.py <example partial overlap>`
+ - Update the way docs are build in the :ref:`contributing guide <contributing>`
+ - Improve docstring of :meth:`.BoundedGrid.value`
+
 Version 0.4.5 (August 27, 2023)
 -------------------------------
 Fixes

@@ -75,8 +75,8 @@ Run the doctests
 
 And build the documentation locally using Sphinx
 
-``python3 setup.py build_sphinx``
+``build-sphinx docs/source build/sphinx/html``
 
-The docs are by default stored locally in ``build/sphinx/html/``
+The docs are then stored locally in ``./build/sphinx/html/``
 
 

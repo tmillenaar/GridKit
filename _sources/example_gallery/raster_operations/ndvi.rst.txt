@@ -18,6 +18,8 @@
 .. _sphx_glr_example_gallery_raster_operations_ndvi.py:
 
 
+.. _example ndvi:
+
 NDVI
 ====
 
@@ -36,7 +38,7 @@ Also, a numpy warning is raised because we devide by zero for some cells.
 These turn into NaN-values.
 This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-34
+.. GENERATED FROM PYTHON SOURCE LINES 24-37
 
 .. code-block:: default
 
@@ -60,7 +62,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-42
+.. GENERATED FROM PYTHON SOURCE LINES 38-45
 
 .. warning ::
    The source data is defined in `int16`, which is consequently also the numpy dtype after reading.
@@ -70,7 +72,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
    If this is not done, the script will run, but the resulting values will be incorrect.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-48
+.. GENERATED FROM PYTHON SOURCE LINES 46-51
 
 .. code-block:: default
 
@@ -86,7 +88,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-56
+.. GENERATED FROM PYTHON SOURCE LINES 52-59
 
 .. note ::
    If, for any cell, the denominator (band_8 + band_4) is zero, Numpy raises a warning.
@@ -96,7 +98,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
    This decision is of course use case dependent.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-68
+.. GENERATED FROM PYTHON SOURCE LINES 60-71
 
 .. code-block:: default
 
@@ -126,7 +128,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.645 seconds)
+   **Total running time of the script:** (0 minutes 5.400 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_ndvi.py:
