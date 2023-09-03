@@ -490,8 +490,11 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         return self.update(new_data)
 
     @validate_index
-    def value(self, index, oob_value=None):
+    def value(self, index=None, oob_value=None):
         """Return the value at the given cell index"""
+
+        if index is None:
+            index = self.indices
 
         # Convert grid-ids into numpy-ids
         np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
