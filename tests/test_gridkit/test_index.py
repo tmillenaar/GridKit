@@ -3,7 +3,21 @@ import operator
 import numpy
 import pytest
 
-from gridkit.index import GridIndex, validate_index
+from gridkit.index import GridIndex, concat, validate_index
+
+
+@pytest.mark.parametrize(
+    "indices, expected",
+    (
+        (([], [1, 2]), [1, 2]),
+        (([-3, 3], [1, 2]), [[-3, 3], [1, 2]]),
+        (([-3, 3], [[-3, 3], [1, 2]]), [[-3, 3], [-3, 3], [1, 2]]),
+        (([[-3, 3], [1, 2]], [], [-3, 3]), [[-3, 3], [1, 2], [-3, 3]]),
+    ),
+)
+def test_concat(indices, expected):
+    concatenated_ids = concat(indices)
+    numpy.testing.assert_allclose(concatenated_ids.index, expected)
 
 
 def test_unique():
