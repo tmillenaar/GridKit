@@ -1,6 +1,6 @@
 import inspect
 from functools import wraps
-from typing import Union
+from typing import List, Tuple, Union
 
 import numpy
 
@@ -36,6 +36,23 @@ def validate_index(func):
         return func(*new_args, **new_kwargs)
 
     return wrapper
+
+
+def concat(grid_ids: Union[List, Tuple]):
+    """Concatenate supplied GridIndex instances into one.
+    Duplicate indices are allowed.
+    If duplicates are not desired for your usecase,
+    consider calling :meth:`.GridIndex.unique` after concatenating.
+
+    Parameters
+    ----------
+    grid_ids: :class: List
+        A list of GridIndex isntances to concatenate
+    """
+    combined_id = GridIndex([])
+    for index in grid_ids:
+        combined_id = combined_id.append(index)
+    return combined_id
 
 
 def _normal_op(op):
@@ -340,7 +357,9 @@ class GridIndex(metaclass=_IndexMeta):
         ..
 
         """
-        if self.index.size == 0:
+        if index.index.size == 0:
+            result = self.index.copy()
+        elif self.index.size == 0:
             result = index.index.copy()
         else:
             if self.index.ndim == 1:
