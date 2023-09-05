@@ -378,7 +378,8 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     @property
     def height(self):
-        """
+        """Raster height
+
         Returns
         -------
         :class:`int`
@@ -565,6 +566,30 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     def percentile(self, value):
         return numpy.percentile(self, value)
+
+    def _data_slice_from_bounds(self, bounds):
+        if not self.are_bounds_aligned(bounds):
+            raise ValueError(
+                f"Cannot create slice from unaligned bounds {tuple(bounds)}"
+            )
+
+        difference_left = round(abs((self.bounds[0] - bounds[0]) / self.dx))
+        difference_right = round(abs((self.bounds[2] - bounds[2]) / self.dx))
+        slice_x = slice(
+            difference_left,
+            self.width
+            - difference_right,  # add one for upper bound of slice is exclusive
+        )
+
+        difference_bottom = round(abs((self.bounds[1] - bounds[1]) / self.dy))
+        difference_top = round(abs((self.bounds[3] - bounds[3]) / self.dy))
+        slice_y = slice(
+            difference_top,
+            self.height
+            - difference_bottom,  # add one for upper bound of slice is exclusive
+        )
+
+        return slice_y, slice_x
 
     def interp_nodata(self, method="linear", in_place=False):
         """Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.
