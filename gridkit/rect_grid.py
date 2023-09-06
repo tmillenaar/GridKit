@@ -651,30 +651,6 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         # cropped_data = self._data[slice_x, slice_y]
         return self.update(cropped_data, bounds=new_bounds)
 
-    def _data_slice_from_bounds(self, bounds):
-        if not self.are_bounds_aligned(bounds):
-            raise ValueError(
-                f"Cannot create slice from unaligned bounds {tuple(bounds)}"
-            )
-
-        difference_left = round(abs((self.bounds[0] - bounds[0]) / self.dx))
-        difference_right = round(abs((self.bounds[2] - bounds[2]) / self.dx))
-        slice_x = slice(
-            difference_left,
-            self.width
-            - difference_right,  # add one for upper bound of slice is exclusive
-        )
-
-        difference_bottom = round(abs((self.bounds[1] - bounds[1]) / self.dy))
-        difference_top = round(abs((self.bounds[3] - bounds[3]) / self.dy))
-        slice_y = slice(
-            difference_top,
-            self.height
-            - difference_bottom,  # add one for upper bound of slice is exclusive
-        )
-
-        return slice_y, slice_x
-
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
             index = self.indices()
