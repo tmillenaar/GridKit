@@ -56,6 +56,7 @@ sphinx_gallery_conf = {
     'gallery_dirs': 'example_gallery',  # path to where to save gallery generated output
     'filename_pattern': '^((?!sgskip).)*$',
     'remove_config_comments': True, # remove comments like: # sphinx_gallery_thumbnail_number = -1
+    'nested_sections': False,
 }
 
 # Add any paths that contain templates here, relative to this directory.
