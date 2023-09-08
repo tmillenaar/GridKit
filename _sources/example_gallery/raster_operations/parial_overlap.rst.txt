@@ -124,7 +124,7 @@ It is hard to see from these three separate images which parts of the slices ove
 If we visualize the ``count`` per cell, we can get a better idea on the distribution of the data.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-77
+.. GENERATED FROM PYTHON SOURCE LINES 69-78
 
 .. code-block:: default
 
@@ -134,6 +134,7 @@ If we visualize the ``count`` per cell, we can get a better idea on the distribu
     dem_count = gridkit.count(dem_slices)
 
     plt.imshow(dem_count, extent=dem_count.mpl_extent)
+    plt.colorbar()
     plt.show()
 
 
@@ -148,14 +149,14 @@ If we visualize the ``count`` per cell, we can get a better idea on the distribu
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-82
+.. GENERATED FROM PYTHON SOURCE LINES 79-83
 
 Now we have an idea on what the spatial distribution of the data looks like,
 let's take the mean of the datasets to combine them into one.
 For each cell, this will take the mean value of all grids that cover it.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-89
+.. GENERATED FROM PYTHON SOURCE LINES 84-91
 
 .. code-block:: default
 
@@ -163,6 +164,7 @@ For each cell, this will take the mean value of all grids that cover it.
     dem_mean = gridkit.mean(dem_slices)
 
     plt.imshow(dem_mean, cmap="terrain", extent=dem_mean.mpl_extent)
+    plt.colorbar()
     plt.show()
 
 
@@ -177,7 +179,7 @@ For each cell, this will take the mean value of all grids that cover it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 92-97
 
 Beautiful, The data is merged!
 
@@ -185,7 +187,7 @@ In this case of course all values of the slices are the same, so the seams are p
 We can see the seems if we offset the values of the different slices a bit.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-103
+.. GENERATED FROM PYTHON SOURCE LINES 98-106
 
 .. code-block:: default
 
@@ -193,6 +195,7 @@ We can see the seems if we offset the values of the different slices a bit.
     dem_mean = gridkit.mean([dem1 - 100, dem2, dem3 + 100])
 
     plt.imshow(dem_mean, cmap="terrain", extent=dem_mean.mpl_extent)
+    plt.colorbar()
     plt.show()
 
 
@@ -208,7 +211,7 @@ We can see the seems if we offset the values of the different slices a bit.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-116
+.. GENERATED FROM PYTHON SOURCE LINES 107-119
 
 Now the seams become visible.
 If this is a problem for your dataset,
@@ -223,7 +226,7 @@ but also remove high-frequency signal from your data.
 When merging tiles therefore, a tradeoff will need to be reached that will differ per usecase.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-127
+.. GENERATED FROM PYTHON SOURCE LINES 120-131
 
 .. code-block:: default
 
@@ -234,6 +237,7 @@ When merging tiles therefore, a tradeoff will need to be reached that will diffe
     dem_filtered = dem_mean.update(filtered_data)
 
     plt.imshow(dem_filtered, cmap="terrain", extent=dem_mean.mpl_extent)
+    plt.colorbar()
     plt.show()
 
 
@@ -249,7 +253,7 @@ When merging tiles therefore, a tradeoff will need to be reached that will diffe
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-146
+.. GENERATED FROM PYTHON SOURCE LINES 132-150
 
 .. Tip ::
 
@@ -273,7 +277,7 @@ In that scenario the resulting product will have the nodata_value of the first g
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.708 seconds)
+   **Total running time of the script:** (0 minutes 0.905 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_parial_overlap.py:

@@ -73,6 +73,13 @@ These examples highlight operations where specific cells are targeted.
     </div>
 
 
+.. toctree::
+   :hidden:
+
+   /example_gallery/cell_centric_operations/downslope_path
+   /example_gallery/cell_centric_operations/selecting_cells
+
+
 Grid definitions
 ================
 
@@ -105,6 +112,12 @@ These examples highlight the different ways grids can be constructed and manipul
 .. raw:: html
 
     </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/grid_definitions/hex_grids
 
 
 Raster operations
@@ -210,6 +223,16 @@ These examples show how traditional raster data can be analysed and modified usi
     </div>
 
 
+.. toctree::
+   :hidden:
+
+   /example_gallery/raster_operations/ndvi
+   /example_gallery/raster_operations/parial_overlap
+   /example_gallery/raster_operations/resampling
+   /example_gallery/raster_operations/coordinate_transformations
+   /example_gallery/raster_operations/elevation_distribution_per_land_cover
+
+
 Vector data interactions
 ========================
 
@@ -281,13 +304,10 @@ The following examples highlight the interactions between vector data and regula
 
 .. toctree::
    :hidden:
-   :includehidden:
 
-
-   /example_gallery/cell_centric_operations/index.rst
-   /example_gallery/grid_definitions/index.rst
-   /example_gallery/raster_operations/index.rst
-   /example_gallery/vector_synergy/index.rst
+   /example_gallery/vector_synergy/aggregate
+   /example_gallery/vector_synergy/intersect_geometries
+   /example_gallery/vector_synergy/interpolate_from_points
 
 
 .. only:: html

@@ -72,6 +72,7 @@ import gridkit
 dem_count = gridkit.count(dem_slices)
 
 plt.imshow(dem_count, extent=dem_count.mpl_extent)
+plt.colorbar()
 plt.show()
 
 # %%
@@ -84,6 +85,7 @@ plt.show()
 dem_mean = gridkit.mean(dem_slices)
 
 plt.imshow(dem_mean, cmap="terrain", extent=dem_mean.mpl_extent)
+plt.colorbar()
 plt.show()
 
 # %%
@@ -97,6 +99,7 @@ plt.show()
 dem_mean = gridkit.mean([dem1 - 100, dem2, dem3 + 100])
 
 plt.imshow(dem_mean, cmap="terrain", extent=dem_mean.mpl_extent)
+plt.colorbar()
 plt.show()
 
 
@@ -121,6 +124,7 @@ filtered_data = gaussian_filter(dem_mean, sigma=1)
 dem_filtered = dem_mean.update(filtered_data)
 
 plt.imshow(dem_filtered, cmap="terrain", extent=dem_mean.mpl_extent)
+plt.colorbar()
 plt.show()
 
 

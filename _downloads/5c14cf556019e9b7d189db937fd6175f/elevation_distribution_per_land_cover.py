@@ -74,21 +74,14 @@ landuse = read_raster(
 fig, axes = plt.subplots(2, constrained_layout=True)
 
 # Plot DEM
-mpl_extent = (dem.bounds[0], dem.bounds[2], dem.bounds[1], dem.bounds[3])
-im_dem = axes[0].imshow(dem, cmap="gist_earth", extent=mpl_extent, aspect="auto")
+im_dem = axes[0].imshow(dem, cmap="gist_earth", extent=dem.mpl_extent, aspect="auto")
 fig.colorbar(im_dem, ax=axes[0], fraction=0.04, pad=0.01, label="Elevation [m]")
 axes[0].set_ylabel("lat")
 axes[0].set_title("Elevation [m]", fontsize=10)
 
 # Plot Landuse
-mpl_extent = (
-    landuse.bounds[0],
-    landuse.bounds[2],
-    landuse.bounds[1],
-    landuse.bounds[3],
-)
 im_landuse = axes[1].imshow(
-    landuse, cmap="tab20c_r", extent=mpl_extent, aspect="auto", vmin=0, vmax=50
+    landuse, cmap="tab20c_r", extent=landuse.mpl_extent, aspect="auto", vmin=0, vmax=50
 )
 fig.colorbar(im_landuse, ax=axes[1], fraction=0.04, pad=0.01, label="Landuse value")
 axes[1].set_xlabel("lon")
@@ -119,22 +112,30 @@ plt.show()
 # ``landuse == 1`` will return the IDs of all cells where the land cover value is equal to 1.
 # Since the landuse dataset has been resampled onto the grid of the DEM, the grids are 'aligned'.
 # This means we can simply use the IDs obtained from the landuse dataset to obtain the values of the DEM.
-# When these two steps are combined in one line, it looks like this:
+# First we obtain all ids in a dict. Then we loop through the dict and get the values from the ``dem`` grid
+# using the ids obtains through the ``landuse`` grid.
 #
 
-# Determine elevation for 'broad-leaved', 'mixed' and 'coniferous' forests, with landuse vales 23, 24 ,25, respectively
-broad_leaved_forest_heights = dem.value(landuse == 23)
-conifer_forest_heights = dem.value(landuse == 24)
-mixed_forest_heights = dem.value(landuse == 25)
-grass_and_shrub_heights = dem.value(numpy.vstack([landuse == 26, landuse == 29]))
-bare_rock_heights = dem.value(landuse == 31)
-glacier_heights = dem.value(landuse == 34)
+from gridkit import index
 
+# Determine elevation for the landuses of interest.
+ids_per_landuse = dict(
+    grass_and_shrub=index.concat([landuse == 26, landuse == 29]),
+    bare_rock=landuse == 31,
+    glacier=landuse == 34,
+    conifer_forest=landuse == 24,
+    mixed_forest=landuse == 25,
+    broad_leaved_forest=landuse == 23,
+)
 
 # %%
 #
 # .. Tip ::
-#    Since the ``GridIndex`` returned by the comparison operation is based on ``numpy.ndarray``, we can combine them using numpy's vstack.
+#    Here the grass and shrub ids are combined using index.concat.
+#    Since the ``GridIndex`` returned by the comparison operation is based on ``numpy.ndarray``,
+#    this is similar to calling ``numpy.vstack([landuse == 26, landuse == 29])``.
+#    Naturally, the former will return a GridIndex and the latter a numpy ndarray.
+#    ``dem.value`` accepts either, so in this usecsae the two methods are equally viable.
 #
 # Plotting the histogram distribution of the various land covers gives the following plot:
 #
@@ -142,54 +143,18 @@ glacier_heights = dem.value(landuse == 34)
 # Plot forest histograms
 fig, ax = plt.subplots(1)
 bins = list(range(dem.min(), dem.max(), 50))
-ax.hist(
-    grass_and_shrub_heights,
-    bins=bins,
-    color="palegreen",
-    alpha=0.5,
-    label="Grass and shrubs",
-    orientation="horizontal",
+colors = iter(
+    ["palegreen", "lightsalmon", "lightseagreen", "darkgreen", "yellowgreen", "orange"]
 )
-ax.hist(
-    bare_rock_heights,
-    bins=bins,
-    color="lightsalmon",
-    alpha=0.5,
-    label="Bare rock",
-    orientation="horizontal",
-)
-ax.hist(
-    glacier_heights,
-    bins=bins,
-    color="lightseagreen",
-    alpha=0.5,
-    label="Glaciers and perma-snow",
-    orientation="horizontal",
-)
-ax.hist(
-    conifer_forest_heights,
-    bins=bins,
-    color="darkgreen",
-    alpha=0.5,
-    label="Coniferous forest",
-    orientation="horizontal",
-)
-ax.hist(
-    mixed_forest_heights,
-    bins=bins,
-    color="yellowgreen",
-    alpha=0.5,
-    label="Mixed forest",
-    orientation="horizontal",
-)
-ax.hist(
-    broad_leaved_forest_heights,
-    bins=bins,
-    color="orange",
-    alpha=0.5,
-    label="Broad-leaved forest",
-    orientation="horizontal",
-)
+for name, ids in ids_per_landuse.items():
+    ax.hist(
+        dem.value(ids),
+        bins=bins,
+        color=next(colors),
+        alpha=0.5,
+        label=name.replace("_", " "),
+        orientation="horizontal",
+    )
 ax.legend()
 ax.set_xlabel("Nr. of cells per elevation bin")
 ax.set_ylabel("Elevation [m]")
