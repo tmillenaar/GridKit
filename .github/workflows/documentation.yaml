@@ -34,7 +34,7 @@ jobs:
         else
           version="${GITHUB_REF/refs\/tags\//}"
         fi
-        sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"$version|" ./gridkit/version.py
+        sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${version}\"|" ./gridkit/version.py
         cat ./gridkit/version.py
         python3 -c "import gridkit; print(gridkit.__version__)"
         sphinx-build docs/source build/sphinx/html -v
