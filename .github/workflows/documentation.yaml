@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - '*'
+  workflow_dispatch:
+    inputs:
+      custom_tag:
+        description: 'Custom tag to be displayed in doc as the gridkit version'
+        required: true
 
 jobs:
   build-and-deploy:
@@ -22,11 +27,16 @@ jobs:
       run: |
         pip install ./[doc]
 
-    - name: Set the gridkit version to that of the tag
-      run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
-
     - name: Build Sphinx documentation
       run: |
+        if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
+          version="${{ github.event.inputs.custom_tag }}"
+        else
+          version="${GITHUB_REF/refs\/tags\//}"
+        fi
+        sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"$version|" ./gridkit/version.py
+        cat ./gridkit/version.py
+        python3 -c "import gridkit; print(gridkit.__version__)"
         sphinx-build docs/source build/sphinx/html -v
 
     - name: Deploy to Github Pages
