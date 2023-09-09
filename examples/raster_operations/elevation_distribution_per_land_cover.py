@@ -1,4 +1,7 @@
 """
+
+.. _example elevation distribution landcover:
+
 Combining land cover and DEM
 ============================
 
