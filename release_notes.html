@@ -56,6 +56,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-7-september-10-2023">Version 0.4.7 (September 10, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-6-september-4-2023">Version 0.4.6 (September 4, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-5-august-27-2023">Version 0.4.5 (August 27, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-4-4-august-27-2023">Version 0.4.4 (August 27, 2023)</a></li>
@@ -98,6 +99,31 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<section id="version-0-4-7-september-10-2023">
+<h2>Version 0.4.7 (September 10, 2023)<a class="headerlink" href="#version-0-4-7-september-10-2023" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.concat" title="gridkit.index.concat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">concat()</span></code></a> for combining <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> objects</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Fixed problems related to slicing ‘flat’ <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> objects</p></li>
+<li><p>Swap formerly incorrect <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.height" title="gridkit.hex_grid.BoundedHexGrid.height"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.height()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.width" title="gridkit.hex_grid.BoundedHexGrid.width"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.width()</span></code></a> for ‘flat’ <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> objects</p></li>
+<li><p>Fixed nesting issue in menu navigation</p></li>
+<li><p>Add colorbars to example <a class="reference internal" href="example_gallery/raster_operations/parial_overlap.html#example-partial-overlap"><span class="std std-ref">partial_overlap.py</span></a></p></li>
+<li><p>Simplify example <a class="reference internal" href="example_gallery/raster_operations/elevation_distribution_per_land_cover.html#example-elevation-distribution-landcover"><span class="std std-ref">elevation_distribution_per_landcover.py</span></a></p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Add basic tests for statistical functions <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum" title="gridkit._statistical_functions.sum"><code class="xref py py-func docutils literal notranslate"><span class="pre">sum()</span></code></a>, <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean" title="gridkit._statistical_functions.mean"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>CICD</dt><dd><ul class="simple">
+<li><p>Allow for manual triggering of documentation pipeline</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-4-6-september-4-2023">
 <h2>Version 0.4.6 (September 4, 2023)<a class="headerlink" href="#version-0-4-6-september-4-2023" title="Permalink to this heading"></a></h2>
 <dl class="simple">

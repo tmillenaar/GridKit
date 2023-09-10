@@ -18,6 +18,8 @@
 .. _sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py:
 
 
+.. _example elevation distribution landcover:
+
 Combining land cover and DEM
 ============================
 
@@ -50,7 +52,7 @@ We can make use of this to read out a crop of the same area form different files
     In the current implementation, the furthest extent of the paralellogram define what data to crop.
     This means that more data is read when the bounds are warped more severely after the transformation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-57
+.. GENERATED FROM PYTHON SOURCE LINES 39-60
 
 .. code-block:: default
 
@@ -82,7 +84,7 @@ We can make use of this to read out a crop of the same area form different files
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-71
+.. GENERATED FROM PYTHON SOURCE LINES 61-74
 
 The resampling ``method`` 'nearest' was used to keep the land cover values discrete.
 
@@ -98,7 +100,7 @@ The resampling ``method`` 'nearest' was used to keep the land cover values discr
 To get a feel for the area, I will plot the datasets side by side.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-93
+.. GENERATED FROM PYTHON SOURCE LINES 75-96
 
 .. code-block:: default
 
@@ -135,7 +137,7 @@ To get a feel for the area, I will plot the datasets side by side.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-118
+.. GENERATED FROM PYTHON SOURCE LINES 97-121
 
 To get a rough feeling for the land cover plot,
 the orange shades roughly correspond to snow, ice and bare rock
@@ -162,7 +164,7 @@ First we obtain all ids in a dict. Then we loop through the dict and get the val
 using the ids obtains through the ``landuse`` grid.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-131
+.. GENERATED FROM PYTHON SOURCE LINES 121-134
 
 .. code-block:: default
 
@@ -186,7 +188,7 @@ using the ids obtains through the ``landuse`` grid.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-141
+.. GENERATED FROM PYTHON SOURCE LINES 135-144
 
 .. Tip ::
    Here the grass and shrub ids are combined using index.concat.
@@ -198,7 +200,7 @@ using the ids obtains through the ``landuse`` grid.
 Plotting the histogram distribution of the various land covers gives the following plot:
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-163
+.. GENERATED FROM PYTHON SOURCE LINES 145-166
 
 .. code-block:: default
 
@@ -238,7 +240,7 @@ Plotting the histogram distribution of the various land covers gives the followi
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.082 seconds)
+   **Total running time of the script:** (0 minutes 2.831 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_elevation_distribution_per_land_cover.py:

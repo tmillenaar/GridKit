@@ -3,8 +3,26 @@
 Release notes
 ================
 
+Version 0.4.7 (September 10, 2023)
+----------------------------------
+Features
+ - :meth:`~gridkit.index.concat` for combining :class:`.GridIndex` objects
+
+Documentation
+ - Fixed problems related to slicing 'flat' :class:`.BoundedHexGrid` objects
+ - Swap formerly incorrect :meth:`.BoundedHexGrid.height` and :meth:`.BoundedHexGrid.width` for 'flat' :class:`.BoundedHexGrid` objects
+ - Fixed nesting issue in menu navigation
+ - Add colorbars to example :ref:`partial_overlap.py <example partial overlap>`
+ - Simplify example :ref:`elevation_distribution_per_landcover.py <example elevation distribution landcover>`
+
+Misc
+ - Add basic tests for statistical functions :func:`~gridkit._statistical_functions.sum`, :func:`~gridkit._statistical_functions.mean`
+
+CICD
+ - Allow for manual triggering of documentation pipeline
+
 Version 0.4.6 (September 4, 2023)
--------------------------------
+---------------------------------
 Features
  - Make 'index' argument optional in :meth:`.BoundedGrid.value`
 

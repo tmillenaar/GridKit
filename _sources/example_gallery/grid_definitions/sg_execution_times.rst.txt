@@ -6,8 +6,8 @@
 
 Computation times
 =================
-**00:00.544** total execution time for **example_gallery_grid_definitions** files:
+**00:00.495** total execution time for **example_gallery_grid_definitions** files:
 
 +----------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``) | 00:00.544 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``) | 00:00.495 | 0.0 MB |
 +----------------------------------------------------------------------------------+-----------+--------+
