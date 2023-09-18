@@ -64,7 +64,30 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def to_bounded(self):
+    def to_bounded(self, bounds, fill_value=numpy.nan):
+        """Create a bounded version of this grid where the data in the bounds is filled with the supplied `fill_value`
+
+        Parameters
+        ----------
+        bounds: :class:`tuple`
+            The bounds of the area of interest in (minx, miny, maxx, maxy).
+            The bounds need to be aligned to the grid.
+            See :meth:`.BaseGrid.align_bounds`
+        fill_value: :class:`numpy.dtype` (optional)
+            The value to assign to the newly created array that fills the supplied bounds.
+            Default: numpy.nan
+
+        Returns
+        -------
+        :class:`.BoundedHexGrid` or :class:`.BoundedRectGrid`
+            A bounded version of the current grid where the data is filled with `fill_value`.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_bounded`
+        :meth:`.RectGrid.to_bounded`
+        :meth:`.HexGrid.to_bounded`
+        """
         pass
 
     @abc.abstractmethod

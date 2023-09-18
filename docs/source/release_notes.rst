@@ -3,6 +3,11 @@
 Release notes
 ================
 
+Version 0.4.8 (September 18, 2023)
+----------------------------------
+Features
+ - Add methods :meth:`.RectGrid.to_bounded` and :meth:`.HexGrid.to_bounded` to turn an infinite grid into a bounded grid.
+
 Version 0.4.7 (September 10, 2023)
 ----------------------------------
 Features
