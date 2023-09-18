@@ -219,3 +219,20 @@ def test_resample(
 
     numpy.testing.assert_allclose(resampled.data, expected_result)
     numpy.testing.assert_allclose(resampled.bounds, expected_bounds)
+
+
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_to_bounded(shape):
+    grid = HexGrid(size=1.5, shape=shape)
+    grid.crs = 4326
+    bounds = (1, 1, 5, 5)
+    bounds = grid.align_bounds(bounds)
+    result = grid.to_bounded(bounds)
+
+    assert isinstance(result, BoundedHexGrid)
+    assert result.data.shape == (4, 4)
+    assert grid.size == result.size
+    assert grid.crs.is_exact_same(result.crs)
+    assert bounds == result.bounds
+    assert grid.shape == result.shape
+    assert numpy.all(numpy.isnan(result.data))

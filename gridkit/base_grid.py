@@ -64,6 +64,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def to_bounded(self):
+        pass
+
+    @abc.abstractmethod
     def relative_neighbours(
         self, depth=1, connect_corners=False, include_selected=False
     ):
