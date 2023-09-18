@@ -59,6 +59,17 @@ class HexGrid(BaseGrid):
         """
         return self._size
 
+    def to_bounded(self, bounds, fill_value=numpy.nan):
+        _, shape = self.cells_in_bounds(bounds)
+        data = numpy.full(shape=shape, fill_value=fill_value)
+        return self.bounded_cls(
+            data=data,
+            bounds=bounds,
+            nodata_value=fill_value,
+            shape=self.shape,
+            crs=self.crs,
+        )
+
     def relative_neighbours(
         self, depth=1, *, index, include_selected=False, connect_corners=False
     ) -> numpy.ndarray:

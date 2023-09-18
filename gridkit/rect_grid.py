@@ -27,6 +27,16 @@ class RectGrid(BaseGrid):
         """The cellsize in y-direction"""
         return self.__dy
 
+    def to_bounded(self, bounds, fill_value=numpy.nan):
+        _, shape = self.cells_in_bounds(bounds)
+        data = numpy.full(shape=shape, fill_value=fill_value)
+        return self.bounded_cls(
+            data=data,
+            bounds=bounds,
+            nodata_value=fill_value,
+            crs=self.crs,
+        )
+
     def relative_neighbours(
         self, depth=1, connect_corners=False, include_selected=False, index=None
     ):

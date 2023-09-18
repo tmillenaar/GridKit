@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from gridkit.rect_grid import RectGrid
+from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
 @pytest.mark.parametrize(
@@ -286,3 +286,19 @@ def test_neighbours_multiple_indices(
         [-1, 0], connect_corners=connect_corners, include_selected=include_selected
     )
     numpy.testing.assert_allclose(neighbours_one_point, expected_cell_ids[0])
+
+
+def test_to_bounded():
+    grid = RectGrid(dx=1.5, dy=1.5)
+    grid.crs = 4326
+    bounds = (1, 1, 5, 5)
+    bounds = grid.align_bounds(bounds)
+    result = grid.to_bounded(bounds)
+
+    assert isinstance(result, BoundedRectGrid)
+    assert result.data.shape == (4, 4)
+    assert grid.dx == result.dx
+    assert grid.dy == result.dy
+    assert grid.crs.is_exact_same(result.crs)
+    assert bounds == result.bounds
+    assert numpy.all(numpy.isnan(result.data))
