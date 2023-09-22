@@ -239,21 +239,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def parent_grid_class(self):
         pass
 
-    def rotate(self) -> float:
-        raise NotImplementedError()
-
-    def rotation(self) -> float:
-        raise NotImplementedError()
-
-    def resample(self) -> float:
-        raise NotImplementedError()
-
-    def to_vector_file(self) -> float:
-        raise NotImplementedError()
-
-    def aggregate(self) -> float:
-        pass
-
     def are_bounds_aligned(self, bounds, separate=False):
         is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(
             val, cellsize
