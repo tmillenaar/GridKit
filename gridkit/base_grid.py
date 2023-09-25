@@ -325,7 +325,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
                 geom_bounds[2] + self.dx,
                 geom_bounds[3] + self.dy,
             )
-            cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
+            cells_in_bounds = self.cells_in_bounds(geom_bounds).ravel()
             if (
                 len(cells_in_bounds) == 0
             ):  # happens only if point or line lies on an edge
@@ -333,7 +333,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
                     min(self.dx, self.dy) / 10
                 )  # buffer may never reach further then a single cell size
                 geom_bounds = self.align_bounds(geom.bounds, mode="expand")
-                cells_in_bounds = self.cells_in_bounds(geom_bounds)[0]
+                cells_in_bounds = self.cells_in_bounds(geom_bounds).ravel()
 
             cell_shapes = self.to_shapely(cells_in_bounds)
             mask = [geom.intersects(cell) for cell in cell_shapes]
@@ -420,9 +420,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
             max(coords[1]),
         )
         aligned_bounds = self.align_bounds(bounds, mode="expand")
-        ids, shape = self.cells_in_bounds(aligned_bounds)
+        ids = self.cells_in_bounds(aligned_bounds)
         interp_values = numpy.full(
-            shape=shape, fill_value=nodata_value, dtype=values.dtype
+            shape=ids.shape, fill_value=nodata_value, dtype=values.dtype
         )
 
         interp_func = method_lut[method]
@@ -434,7 +434,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         )
         centroids = self.centroid(ids)
 
-        interp_values.ravel()[:] = interpolator(centroids)
+        interp_values[:] = interpolator(centroids)
         grid_kwargs = dict(
             data=interp_values,
             bounds=aligned_bounds,

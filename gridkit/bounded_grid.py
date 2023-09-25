@@ -150,11 +150,11 @@ class _BoundedGridMeta(type):
 
             # create combined grid, spanning both inputs
             combined_bounds = left.combined_bounds(right)
-            _, shape = left.cells_in_bounds(
+            ids = left.cells_in_bounds(
                 combined_bounds
             )  # TODO: split ids and shape outputs into different methods
             combined_data = numpy.full(
-                shape,
+                ids.shape,
                 fill_value=dtype.type(0) if nodata_value is None else nodata_value,
                 dtype=dtype,
             )
@@ -420,8 +420,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
                 f"Mask shape {mask.shape} does not match data shape {self._data.shape}"
             )
 
-        ids, shape = self.cells_in_bounds(self.bounds)
-        ids = ids.index.reshape([*shape, 2])
+        ids = self.cells_in_bounds(self.bounds)
         return GridIndex(ids[mask])
 
     def shared_bounds(self, other):
@@ -465,7 +464,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
     @property
     def indices(self):
         """Return the indices within the bounds of the data"""
-        return self.cells_in_bounds(self.bounds)[0]
+        return self.cells_in_bounds(self.bounds)
 
     def assign(
         self, data, *, anchor=None, bounds=None, in_place=True, assign_nodata=True
@@ -557,7 +556,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         np_id = np_id[:, sample_mask]
         values[sample_mask] = self._data[np_id[1], np_id[0]]
 
-        return values.reshape(index.index.shape[:-1])
+        return values.reshape(index.shape)
 
     def nodata(self):
         if self.nodata_value is None:
@@ -632,7 +631,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         interp_func = method_lut[method]
         values = self.data.ravel()
         nodata_mask = values == self.nodata_value
-        points = self.centroid()
+        points = self.centroid().reshape(-1, 2)
         interpolator = interp_func(
             points[~nodata_mask],
             values[~nodata_mask],
@@ -730,7 +729,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         # Align using "contract" for we cannot sample outside of the original bounds
         new_bounds = alignment_grid.align_bounds(bounds, mode="contract")
 
-        new_ids, new_shape = alignment_grid.cells_in_bounds(bounds=new_bounds)
+        new_ids, shape = alignment_grid.cells_in_bounds(
+            bounds=new_bounds, return_cell_count=True
+        )
 
         new_points = alignment_grid.centroid(new_ids)
 
@@ -738,11 +739,18 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             transformer = Transformer.from_crs(
                 alignment_grid.crs, self.crs, always_xy=True
             )
-            transformed_points = transformer.transform(*new_points.T)
-            new_points = numpy.vstack(transformed_points).T
+            original_shape = new_points.shape
+            raveled_new_points = new_points.reshape(-1, 2)
+            transformed_points = transformer.transform(*raveled_new_points.T)
+            new_points = numpy.vstack(transformed_points).T.reshape(original_shape)
 
         value = self.interpolate(new_points, method=method)
-        value = value.reshape(new_shape)
+
+        # If value id 1D, turn into 2D
+        # Take into account if the 1D line of cells runs in x or y direction
+        if 1 in shape:
+            empty_axis = 0 if shape[0] == 1 else 1
+            value = numpy.expand_dims(value, axis=empty_axis)
 
         nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
 

@@ -182,6 +182,10 @@ class GridIndex(metaclass=_IndexMeta):
         self.index[..., 1] = value
         return self
 
+    @property
+    def shape(self):
+        return self.index.shape[:-1]
+
     def unique(self, **kwargs):
         """The unique IDs contained in the index. Remove duplicate IDs.
 

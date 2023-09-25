@@ -36,20 +36,18 @@ def test_centroid(shape, indices, expected_centroids):
             "pointy",
             (-2, -2, 2, 2),
             [
-                [-1, 0],
-                [0, 0],
-                [-2, -1],
-                [-1, -1],
+                [[-1, 0], [0, 0]],
+                [[-2, -1], [-1, -1]],
             ],
             (2, 2),
         ],
-        ["pointy", (-2, -2, 3, 2), [[-1, 0], [0, 0], [-2, -1], [-1, -1]], (2, 2)],
-        ["pointy", (-2, 0, 2, 5), [[-2, 1], [-1, 1], [-1, 0], [0, 0]], (2, 2)],
-        ["pointy", (-2, 0, 3, 5), [[-2, 1], [-1, 1], [-1, 0], [0, 0]], (2, 2)],
-        ["flat", (-2, -2, 2, 2), [[-1, -1], [-1, -2], [0, 0], [0, -1]], (2, 2)],
-        ["flat", (-2, -2, 2, 3), [[-1, -1], [-1, -2], [0, 0], [0, -1]], (2, 2)],
-        ["flat", (0, -2, 5, 2), [[0, 0], [0, -1], [1, -1], [1, -2]], (2, 2)],
-        ["flat", (0, -2, 5, 3), [[0, 0], [0, -1], [1, -1], [1, -2]], (2, 2)],
+        ["pointy", (-2, -2, 3, 2), [[[-1, 0], [0, 0]], [[-2, -1], [-1, -1]]], (2, 2)],
+        ["pointy", (-2, 0, 2, 5), [[[-2, 1], [-1, 1]], [[-1, 0], [0, 0]]], (2, 2)],
+        ["pointy", (-2, 0, 3, 5), [[[-2, 1], [-1, 1]], [[-1, 0], [0, 0]]], (2, 2)],
+        ["flat", (-2, -2, 2, 2), [[[-1, -1], [-1, -2]], [[0, 0], [0, -1]]], (2, 2)],
+        ["flat", (-2, -2, 2, 3), [[[-1, -1], [-1, -2]], [[0, 0], [0, -1]]], (2, 2)],
+        ["flat", (0, -2, 5, 2), [[[0, 0], [0, -1]], [[1, -1], [1, -2]]], (2, 2)],
+        ["flat", (0, -2, 5, 3), [[[0, 0], [0, -1]], [[1, -1], [1, -2]]], (2, 2)],
         ["flat", (-2, 0, 2, 2), [[-1, -1], [0, 0]], (2, 1)],
         ["flat", (-2, 0, 2, 3), [[-1, -1], [0, 0]], (2, 1)],
         ["flat", (-2, 2, 2, 5), [[-1, 0], [0, 1]], (2, 1)],
@@ -59,7 +57,10 @@ def test_centroid(shape, indices, expected_centroids):
 def test_cells_in_bounds(shape, bounds, expected_ids, expected_shape):
     grid = HexGrid(size=3, shape=shape)
     aligned_bounds = grid.align_bounds(bounds, mode="nearest")
-    ids, shape = grid.cells_in_bounds(aligned_bounds)
+    ids = grid.cells_in_bounds(aligned_bounds)
+    numpy.testing.assert_allclose(ids, expected_ids)
+
+    ids, shape = grid.cells_in_bounds(aligned_bounds, return_cell_count=True)
     numpy.testing.assert_allclose(ids, expected_ids)
     numpy.testing.assert_allclose(shape, expected_shape)
 

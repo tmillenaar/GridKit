@@ -9,7 +9,7 @@ def test_data_ravel_order():
     grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
 
     value = grid.value(grid.cell_at_point(grid.centroid()))
-    numpy.testing.assert_equal(value, data.ravel())
+    numpy.testing.assert_equal(value, data)
 
 
 def test_data_mutability():
@@ -333,7 +333,7 @@ def test_centroid():
     data = numpy.array([[0, 1], [2, 3]])
     grid = rect_grid.BoundedRectGrid(data, bounds=(-2, 0, 0, 2))
 
-    expected_centroids = [[-1.5, 1.5], [-0.5, 1.5], [-1.5, 0.5], [-0.5, 0.5]]
+    expected_centroids = [[[-1.5, 1.5], [-0.5, 1.5]], [[-1.5, 0.5], [-0.5, 0.5]]]
     numpy.testing.assert_equal(grid.centroid(), expected_centroids)
 
     # test using ids
@@ -544,16 +544,16 @@ def test_grid_id_to_numpy_id(
         flat=basic_bounded_flat_grid,
     )
     grid = grid_lut[shape]
-    np_ids = grid.grid_id_to_numpy_id(grid.indices.T)
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
     numpy.testing.assert_allclose(numpy.array(np_ids), expected_ids)
 
     # also check for error when supplying nd-index
     with pytest.raises(ValueError):
-        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]]])
+        result = grid.grid_id_to_numpy_id([[[1, 2], [1, 2]], [[10, 20], [10, 20]]])
 
 
 @pytest.mark.parametrize("shape", ["rect", "pointy", "flat"])
-def test_grid_id_to_numpy_id(
+def test_grid_id_to_numpy_id_back_and_forth(
     basic_bounded_rect_grid, basic_bounded_pointy_grid, basic_bounded_flat_grid, shape
 ):
     grid_lut = dict(
@@ -562,6 +562,6 @@ def test_grid_id_to_numpy_id(
         flat=basic_bounded_flat_grid,
     )
     grid = grid_lut[shape]
-    np_ids = grid.grid_id_to_numpy_id(grid.indices)
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
-    numpy.testing.assert_allclose(grid_ids, grid.indices)
+    numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())

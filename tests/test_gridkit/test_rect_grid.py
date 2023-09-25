@@ -60,19 +60,16 @@ def test_cells_in_bounds():
 
     expected_ids = numpy.array(
         [
-            [-6.0, 1.0],
-            [-5.0, 1.0],
-            [-4.0, 1.0],
-            [-6.0, 0.0],
-            [-5.0, 0.0],
-            [-4.0, 0.0],
+            [[-6.0, 1.0], [-5.0, 1.0], [-4.0, 1.0]],
+            [[-6.0, 0.0], [-5.0, 0.0], [-4.0, 0.0]],
         ]
     )
 
     aligned_bounds = grid.align_bounds(bounds, mode="expand")
-    ids, shape = grid.cells_in_bounds(aligned_bounds)
+    ids, shape = grid.cells_in_bounds(aligned_bounds, return_cell_count=True)
     numpy.testing.assert_allclose(ids, expected_ids)
     assert shape == (2, 3)
+    assert ids.shape == shape
 
 
 def test_crs():
@@ -156,7 +153,9 @@ def test_nodata_value(basic_bounded_rect_grid):
     grid = grid.update(numpy.ones((grid.height, grid.width)))
     assert grid.nodata_value == 6  # make sure nodata is inhertied after update
     grid.nodata_value = 1
-    numpy.testing.assert_allclose(grid.nodata(), grid.cells_in_bounds(grid.bounds)[0])
+    numpy.testing.assert_allclose(
+        grid.nodata(), grid.cells_in_bounds(grid.bounds).ravel()
+    )
 
 
 @pytest.mark.parametrize("method", ["nearest", "linear", "cubic"])

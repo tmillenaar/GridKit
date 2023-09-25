@@ -28,7 +28,7 @@ class RectGrid(BaseGrid):
         return self.__dy
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
-        _, shape = self.cells_in_bounds(bounds)
+        _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
         data = numpy.full(shape=shape, fill_value=fill_value)
         return self.bounded_cls(
             data=data,
@@ -511,19 +511,19 @@ class RectGrid(BaseGrid):
             dx=abs(new_dx), dy=abs(new_dy), offset=new_offset, crs=crs
         )
 
-    def cells_in_bounds(self, bounds):
-        """
+    def cells_in_bounds(self, bounds, return_cell_count: bool = False):
+        """Cells contained within a bounding box.
+
         Parameters
         ----------
         bounds: :class:`tuple`
-        align_mode: :class:`str`
-            Specifies when to consider a cell included in the bounds. Options:
-             - contains
-               select cells fully contained in the specified bounds
-             - contains_center
-               select cells of which the center is contained in the specified bounds
-             - intersects
-               select cells partially or fully contained in the specified bounds
+        return_cell_count: :class:`bool`
+            Return a tuple containing the nr of cells in x and y direction inside the provided bounds
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The indices of the cells contained in the bounds
         """
 
         if not self.are_bounds_aligned(bounds):
@@ -555,7 +555,8 @@ class RectGrid(BaseGrid):
         # ids[1] = numpy.tile(ids_y[::-1], len(ids_x)) # invert y for ids are calculated from origin, not form the top of the bounding box
         ids[1] = numpy.repeat(ids_y, len(ids_x))
 
-        return GridIndex(ids.T), shape
+        ids = GridIndex(ids.T.reshape((*shape, 2)))
+        return (ids, shape) if return_cell_count else ids
 
     @property
     def parent_grid_class(self):
@@ -568,6 +569,12 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             raise ValueError(
                 f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
             )
+        data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
+        if data.ndim != 2:
+            raise ValueError(
+                f"Expected a 2D numpy array, got data with shape {data.shape}"
+            )
+
         dx = (bounds[2] - bounds[0]) / data.shape[1]
         dy = (bounds[3] - bounds[1]) / data.shape[0]
 
@@ -579,6 +586,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             0 if numpy.isclose(offset_x, dx) else offset_x,
             0 if numpy.isclose(offset_y, dy) else offset_y,
         )
+
         super(BoundedRectGrid, self).__init__(
             data, *args, dx=dx, dy=dy, bounds=bounds, offset=offset, **kwargs
         )
@@ -622,13 +630,13 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             Multidimensional array containing the longitude and latitude of the center of each cell respectively,
             in (width, height, lonlat)
         """
-        if index is not None:
-            return super(BoundedRectGrid, self).centroid(index=index)
-        # get grid in shape (latlon, width, height)
-        latlon = numpy.meshgrid(self.lon, self.lat, sparse=False, indexing="xy")
-
-        # return grid in shape (width, height, lonlat)
-        return numpy.array([latlon[0].ravel(), latlon[1].ravel()]).T
+        if index is None:
+            if not hasattr(self, "indices"):
+                raise ValueError(
+                    "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
+                )
+            index = self.indices
+        return super(BoundedRectGrid, self).centroid(index=index)
 
     def intersecting_cells(self, other):
         raise NotImplementedError()
