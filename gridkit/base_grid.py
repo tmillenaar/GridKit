@@ -8,7 +8,7 @@ import scipy
 import shapely
 from pyproj import CRS, Transformer
 
-from gridkit.index import GridIndex
+from gridkit.index import GridIndex, validate_index
 
 
 class BaseGrid(metaclass=abc.ABCMeta):
@@ -340,6 +340,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             intersecting_cells.extend(cells_in_bounds[mask])
         return GridIndex(intersecting_cells).unique()
 
+    @validate_index
     def to_shapely(self, index, as_multipolygon: bool = False):
         """Represent the cells as Shapely Polygons
 
@@ -355,12 +356,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :meth:`.BoundedRectGrid.to_shapely`
         :meth:`.BoundedHexGrid.to_shapely`
         """
-        index = numpy.array(index)
-        if len(index.shape) == 1:
-            index = numpy.expand_dims(index, 0)
-        vertices = self.cell_corners(index)
+        cell_arr_shape = index.shape
+        vertices = self.cell_corners(index.ravel())
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
-        return shapely.geometry.MultiPolygon(polygons) if as_multipolygon else polygons
+        if as_multipolygon:
+            return shapely.geometry.MultiPolygon(polygons)
+        return numpy.array(polygons).reshape(cell_arr_shape)
 
     def interp_from_points(
         self, points, values, method="linear", nodata_value=numpy.nan

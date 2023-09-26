@@ -670,7 +670,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             new_ids = self.cell_at_point(sample_points)
             return self.value(new_ids)
         elif method == "bilinear" or method == "linear":
-            return self._bilinear_interpolation(sample_points)
+            return_shape = sample_points.shape[:-1]
+            result = self._bilinear_interpolation(sample_points.reshape(-1, 2))
+            return result.reshape(return_shape)
         raise ValueError(f"Resampling method '{method}' is not supported.")
 
     def resample(self, alignment_grid, method="nearest"):

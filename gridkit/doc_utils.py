@@ -59,6 +59,10 @@ def plot_polygons(
     None
 
     """
+    # ravel geoms if necessary
+    if isinstance(geoms, numpy.ndarray):
+        geoms = geoms.ravel()
+
     # create colormap that matches our values
     cmap = getattr(pl.cm, cmap)
     vmin = numpy.nanmin(values)

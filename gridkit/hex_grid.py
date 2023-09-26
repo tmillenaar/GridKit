@@ -480,13 +480,15 @@ class HexGrid(BaseGrid):
 
         return GridIndex(result)
 
+    @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         """Return corners in (cells, corners, xy)"""
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
             )
-        centroids = self.centroid(index).T
+        cell_shape = index.shape
+        centroids = self.centroid(index.ravel()).T
 
         if len(centroids.shape) == 1:
             corners = numpy.empty((6, 2))
@@ -503,7 +505,7 @@ class HexGrid(BaseGrid):
         if len(centroids.shape) > 1:
             corners = numpy.moveaxis(corners, 2, 0)
 
-        return corners
+        return corners.reshape((*cell_shape, 6, 2))
 
     def is_aligned_with(self, other):
         if not isinstance(other, BaseGrid):
