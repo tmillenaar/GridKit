@@ -150,7 +150,7 @@ class _BoundedGridMeta(type):
 
             # create combined grid, spanning both inputs
             combined_bounds = left.combined_bounds(right)
-            ids, shape = left.cells_in_bounds(
+            _, shape = left.cells_in_bounds(
                 combined_bounds, return_cell_count=True
             )  # TODO: split ids and shape outputs into different methods
             combined_data = numpy.full(

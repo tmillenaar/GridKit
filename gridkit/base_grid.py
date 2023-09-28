@@ -239,6 +239,23 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def parent_grid_class(self):
         pass
 
+    @abc.abstractmethod
+    def cells_in_bounds(self, bounds, return_cell_count: bool = False):
+        """Cells contained within a bounding box.
+
+        Parameters
+        ----------
+        bounds: :class:`tuple`
+            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)
+        return_cell_count: :class:`bool`
+            Return a tuple containing the nr of cells in x and y direction inside the provided bounds
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The indices of the cells contained in the bounds
+        """
+
     def are_bounds_aligned(self, bounds, separate=False):
         is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(
             val, cellsize
@@ -418,9 +435,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
             points[~nodata_mask],
             values[~nodata_mask],
         )
-        centroids = self.centroid(ids)
+        centroids = self.centroid(ids.ravel())
 
-        interp_values.ravel()[:] = interpolator(centroids.ravel())
+        interp_values.ravel()[:] = interpolator(centroids)
         grid_kwargs = dict(
             data=interp_values,
             bounds=aligned_bounds,

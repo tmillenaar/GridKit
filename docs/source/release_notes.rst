@@ -3,6 +3,20 @@
 Release notes
 ================
 
+Version 0.5.0 (October 01, 2023)
+----------------------------------
+Features
+ - Make return argument `shape` optional in :meth:`.BaseGrid.cells_in_bounds` by adding the `return_cell_shape` argument (default False)
+ - Structure the :class:`.GridIndex` returned by :meth:`.BaseGrid.cells_in_bounds` in the shape of the grid (2D)
+ - Now the return shape of :meth:`.BaseGrid.to_shapely` is the same as the input shape of the `index` argument (if `as_multipolygon` is `False`)
+ - Allow :meth:`.BoundedRectGrid.centroid` to be called without specifying the `index` argument, use the cells in it's bounds by default
+ - Better error when `index` is not supplied to `centroid` method on grids that are not bounded
+
+Misc
+ - Remove placeholder methods that no longer fit the curent API
+ - Add tests for :meth:`.BaseGrid.to_shapely`
+ - Add tests for :meth:`.BaseGrid.cell_corners`
+
 Version 0.4.8 (September 18, 2023)
 ----------------------------------
 Features

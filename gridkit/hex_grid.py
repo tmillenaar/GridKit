@@ -1012,6 +1012,10 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
     def centroid(self, index=None):
         if index is None:
+            if not hasattr(self, "indices"):
+                raise ValueError(
+                    "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
+                )
             index = self.indices
         return super(BoundedHexGrid, self).centroid(index)
 
