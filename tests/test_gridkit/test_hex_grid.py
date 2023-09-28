@@ -1,5 +1,6 @@
 import numpy
 import pytest
+import shapely
 
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 
@@ -237,3 +238,63 @@ def test_to_bounded(shape):
     assert bounds == result.bounds
     assert grid.shape == result.shape
     assert numpy.all(numpy.isnan(result.data))
+
+
+@pytest.mark.parametrize("as_mp", [True, False])
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_to_shapely(as_mp, shape):
+    grid = HexGrid(size=1.5, shape=shape)
+    ids = [[-3, 2], [3, -6]]
+    geoms = grid.to_shapely(ids, as_multipolygon=as_mp)
+
+    if as_mp:
+        assert isinstance(geoms, shapely.geometry.MultiPolygon)
+        geoms = geoms.geoms
+
+    centroids = [[geom.centroid.x, geom.centroid.y] for geom in geoms]
+    numpy.testing.assert_allclose(centroids, grid.centroid(ids))
+
+    for geom in geoms:
+        numpy.testing.assert_allclose(geom.area, grid.dx * grid.dy)
+        # Is is not beautiful how dx*dy also gives the area of the hexagon?
+        # The bits outside the rectangle perfectly compensate for the missing bits inside the rectangle
+
+
+@pytest.mark.parametrize(
+    "shape, expected_corners",
+    [
+        [
+            "flat",
+            numpy.array(
+                [
+                    [-2.38156986, 4.5],
+                    [-2.81458256, 5.25],
+                    [-3.68060797, 5.25],
+                    [-4.11362067, 4.5],
+                    [-3.68060797, 3.75],
+                    [-2.81458256, 3.75],
+                ]
+            ),
+        ],
+        [
+            "pointy",
+            numpy.array(
+                [
+                    [-3.0, 2.81458256],
+                    [-3.0, 3.68060797],
+                    [-3.75, 4.11362067],
+                    [-4.5, 3.68060797],
+                    [-4.5, 2.81458256],
+                    [-3.75, 2.38156986],
+                ]
+            ),
+        ],
+    ],
+)
+def test_cell_corners(shape, expected_corners):
+    grid = HexGrid(size=1.5, shape=shape)
+    ids = [[-3, 2], [-3, 2]]
+
+    corners = grid.cell_corners(ids)
+    for cell_corners in corners:
+        numpy.testing.assert_allclose(cell_corners, expected_corners)

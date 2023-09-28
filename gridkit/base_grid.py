@@ -421,9 +421,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
             max(coords[1]),
         )
         aligned_bounds = self.align_bounds(bounds, mode="expand")
-        ids = self.cells_in_bounds(aligned_bounds)
+        ids, shape = self.cells_in_bounds(aligned_bounds, return_cell_count=True)
         interp_values = numpy.full(
-            shape=ids.shape, fill_value=nodata_value, dtype=values.dtype
+            shape=shape, fill_value=nodata_value, dtype=values.dtype
         )
 
         interp_func = method_lut[method]
@@ -435,7 +435,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         )
         centroids = self.centroid(ids)
 
-        interp_values[:] = interpolator(centroids)
+        interp_values.ravel()[:] = interpolator(centroids.ravel())
         grid_kwargs = dict(
             data=interp_values,
             bounds=aligned_bounds,

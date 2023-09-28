@@ -30,11 +30,11 @@ def _empty_combined_grid(grids, value=numpy.nan):
         )
 
     combined_bounds = total_bounds(grids)
-    ids = grids[0].cells_in_bounds(
-        combined_bounds
+    _, shape = grids[0].cells_in_bounds(
+        combined_bounds, return_cell_count=True
     )  # TODO: split ids and shape outputs into different methods
     combined_data = numpy.full(  # data shape is y,x
-        ids.shape,
+        shape,
         value,
         dtype=float,  # Fixme: don't hardcode dtype. This if workaround for working with NaNs
     )

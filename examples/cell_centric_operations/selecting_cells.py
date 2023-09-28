@@ -75,7 +75,7 @@ def plot_shapes(shapes, color, fill=False, **kwargs):
 
 # %%
 #
-# Let's use this to plot our grids in the same image so we can compare theme
+# Let's use this to plot our grids in the same image so we can compare them.
 plot_shapes(fine_shapes, linewidth=1, color="purple")
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 
