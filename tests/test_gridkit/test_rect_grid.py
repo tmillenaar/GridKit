@@ -1,5 +1,6 @@
 import numpy
 import pytest
+import shapely
 
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
@@ -60,19 +61,16 @@ def test_cells_in_bounds():
 
     expected_ids = numpy.array(
         [
-            [-6.0, 1.0],
-            [-5.0, 1.0],
-            [-4.0, 1.0],
-            [-6.0, 0.0],
-            [-5.0, 0.0],
-            [-4.0, 0.0],
+            [[-6.0, 1.0], [-5.0, 1.0], [-4.0, 1.0]],
+            [[-6.0, 0.0], [-5.0, 0.0], [-4.0, 0.0]],
         ]
     )
 
     aligned_bounds = grid.align_bounds(bounds, mode="expand")
-    ids, shape = grid.cells_in_bounds(aligned_bounds)
+    ids, shape = grid.cells_in_bounds(aligned_bounds, return_cell_count=True)
     numpy.testing.assert_allclose(ids, expected_ids)
     assert shape == (2, 3)
+    assert ids.shape == shape
 
 
 def test_crs():
@@ -156,7 +154,9 @@ def test_nodata_value(basic_bounded_rect_grid):
     grid = grid.update(numpy.ones((grid.height, grid.width)))
     assert grid.nodata_value == 6  # make sure nodata is inhertied after update
     grid.nodata_value = 1
-    numpy.testing.assert_allclose(grid.nodata(), grid.cells_in_bounds(grid.bounds)[0])
+    numpy.testing.assert_allclose(
+        grid.nodata(), grid.cells_in_bounds(grid.bounds).ravel()
+    )
 
 
 @pytest.mark.parametrize("method", ["nearest", "linear", "cubic"])
@@ -302,3 +302,35 @@ def test_to_bounded():
     assert grid.crs.is_exact_same(result.crs)
     assert bounds == result.bounds
     assert numpy.all(numpy.isnan(result.data))
+
+
+@pytest.mark.parametrize("as_mp", [True, False])
+def test_to_shapely(as_mp):
+    grid = RectGrid(dx=1.5, dy=1.5)
+    ids = [[-3, 2], [3, -6]]
+    geoms = grid.to_shapely(ids, as_multipolygon=as_mp)
+
+    if as_mp:
+        assert isinstance(geoms, shapely.geometry.MultiPolygon)
+        geoms = geoms.geoms
+
+    centroids = [[geom.centroid.x, geom.centroid.y] for geom in geoms]
+    numpy.testing.assert_allclose(centroids, grid.centroid(ids))
+    for geom in geoms:
+        numpy.testing.assert_allclose(geom.area, grid.dx * grid.dy)
+
+
+def test_cell_corners():
+    grid = RectGrid(dx=1.5, dy=1.5)
+    ids = [[-3, 2], [3, -6]]
+
+    corners = grid.cell_corners(ids)
+
+    expected_corners = numpy.array(
+        [
+            [[-4.5, 3.0], [-3.0, 3.0], [-3.0, 4.5], [-4.5, 4.5]],
+            [[4.5, -9.0], [6.0, -9.0], [6.0, -7.5], [4.5, -7.5]],
+        ]
+    )
+
+    numpy.testing.assert_allclose(corners, expected_corners)

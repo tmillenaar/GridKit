@@ -111,9 +111,11 @@ fig_flat, ax_flat = plt.subplots()
 fig_pointy, ax_pointy = plt.subplots()
 
 # populate the figures with colored polygons
-for geom, color in zip(hexdem_flat.to_shapely(), get_colors(hexdem_flat.data)):
+for geom, color in zip(hexdem_flat.to_shapely().ravel(), get_colors(hexdem_flat.data)):
     ax_flat.fill(*geom.exterior.xy, alpha=1.0, color=color)
-for geom, color in zip(hexdem_pointy.to_shapely(), get_colors(hexdem_pointy.data)):
+for geom, color in zip(
+    hexdem_pointy.to_shapely().ravel(), get_colors(hexdem_pointy.data)
+):
     ax_pointy.fill(*geom.exterior.xy, alpha=1.0, color=color)
 
 plt.show()

@@ -60,7 +60,7 @@ class HexGrid(BaseGrid):
         return self._size
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
-        _, shape = self.cells_in_bounds(bounds)
+        _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
         data = numpy.full(shape=shape, fill_value=fill_value)
         return self.bounded_cls(
             data=data,
@@ -315,6 +315,10 @@ class HexGrid(BaseGrid):
 
         """
         cell = self.cell_at_point(point)
+        original_shape = cell.shape
+        cell = cell.ravel()
+
+        point = numpy.reshape(point, cell.index.shape)
         centroid = self.centroid(cell)
         distance_vector = point - centroid
         azimuth = numpy.arctan2(*distance_vector.T) * 180 / numpy.pi
@@ -377,8 +381,15 @@ class HexGrid(BaseGrid):
             mask_odd = numpy.logical_and(mask, odd_cells_mask)
             nearby_cells[shift_odd, mask_odd, consistent_axis] += 1
 
+        # turn into shape: points(n), neighbours(3), xy(2)
+        # points(n) will be unraveled later if multiple points were provided
         nearby_cells = numpy.swapaxes(nearby_cells, 0, 1)
-        return nearby_cells[0] if len(nearby_cells) == 1 else nearby_cells
+
+        if len(nearby_cells) == 1:
+            return nearby_cells[0]
+        # return shape: points(...), neighbours(3), xy(2)
+        # where points(...) can be any nd (unraveled) shape
+        return nearby_cells.reshape((*original_shape, 3, 2))
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
@@ -469,13 +480,15 @@ class HexGrid(BaseGrid):
 
         return GridIndex(result)
 
+    @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         """Return corners in (cells, corners, xy)"""
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
             )
-        centroids = self.centroid(index).T
+        cell_shape = index.shape
+        centroids = self.centroid(index.ravel()).T
 
         if len(centroids.shape) == 1:
             corners = numpy.empty((6, 2))
@@ -492,7 +505,7 @@ class HexGrid(BaseGrid):
         if len(centroids.shape) > 1:
             corners = numpy.moveaxis(corners, 2, 0)
 
-        return corners
+        return corners.reshape((*cell_shape, 6, 2))
 
     def is_aligned_with(self, other):
         if not isinstance(other, BaseGrid):
@@ -591,13 +604,20 @@ class HexGrid(BaseGrid):
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
 
-    def cells_in_bounds(self, bounds):
+    def cells_in_bounds(self, bounds, return_cell_count: bool = False):
         """Cells contained within a bounding box.
 
         Parameters
         ----------
         bounds: :class:`tuple`
             The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)
+        return_cell_count: :class:`bool`
+            Return a tuple containing the nr of cells in x and y direction inside the provided bounds
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The indices of the cells contained in the bounds
         """
         # TODO: Simplify function. Conceptually hard to follow and not very DRY
         if not self.are_bounds_aligned(bounds):
@@ -651,7 +671,10 @@ class HexGrid(BaseGrid):
             if nr_cells_flat != 0
             else (0, 0)
         )
-        return GridIndex(ids), shape
+
+        ids = GridIndex(ids.reshape((*shape, 2)))
+
+        return (ids, shape) if return_cell_count else ids
 
     @property
     def parent_grid_class(self):
@@ -663,6 +686,11 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
             raise ValueError(
                 f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
+            )
+
+        if data.ndim != 2:
+            raise ValueError(
+                f"Expected a 2D numpy array, got data with shape {data.shape}"
             )
 
         if shape == "pointy":
@@ -854,6 +882,11 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             projected = _project(point - p1, [p3 - p1, p2 - p1])
             return numpy.linalg.norm((projected - (point - p1)) / numpy.linalg.norm(ad))
 
+        if not isinstance(sample_points, numpy.ndarray):
+            sample_points = numpy.array(sample_points)
+        original_shape = sample_points.shape
+        sample_points = sample_points.reshape(-1, 2)
+
         all_nearby_cells = self.cells_near_point(
             sample_points
         )  # (points, nearby_cells, xy)
@@ -873,7 +906,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             values[idx] = numpy.sum(weights * self.value(nearby_cells))
 
         # TODO: remove rows and cols with nans around the edge after bilinear
-        return values
+        return values.reshape(*original_shape[:-1])
 
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.

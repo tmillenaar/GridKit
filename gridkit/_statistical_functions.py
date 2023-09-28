@@ -31,7 +31,7 @@ def _empty_combined_grid(grids, value=numpy.nan):
 
     combined_bounds = total_bounds(grids)
     _, shape = grids[0].cells_in_bounds(
-        combined_bounds
+        combined_bounds, return_cell_count=True
     )  # TODO: split ids and shape outputs into different methods
     combined_data = numpy.full(  # data shape is y,x
         shape,
@@ -47,10 +47,10 @@ def count(grids):
     combined_grid = empty_grid.copy()
     for grid in grids:
         if grid.nodata_value is None:
-            value_ids = combined_grid.cells_in_bounds(grid.bounds)[0]
+            value_ids = combined_grid.cells_in_bounds(grid.bounds)
         else:
             value_ids = grid != grid.nodata_value
-        numpy_ids = combined_grid.grid_id_to_numpy_id(value_ids)
+        numpy_ids = combined_grid.grid_id_to_numpy_id(value_ids.ravel())
         combined_grid._data[numpy_ids] += 1
     return combined_grid
 
