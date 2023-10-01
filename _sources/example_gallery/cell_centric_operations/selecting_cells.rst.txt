@@ -85,11 +85,11 @@ let's center our are of interest around zero as well.
     bounds = (-7, -7, 7, 7)
 
     fine_bounds = fine_grid.align_bounds(bounds)
-    fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)[0]
+    fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)
     fine_shapes = fine_grid.to_shapely(fine_cell_ids, as_multipolygon=True)
 
     coarse_bounds = coarse_grid.align_bounds(bounds)
-    coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)[0]
+    coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)
     coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids, as_multipolygon=True)
 
 
@@ -129,10 +129,9 @@ Now let's define a plotting function that can either plot the outline of each ce
 
 Let's use this to plot our grids in the same image so we can compare them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-88
+.. GENERATED FROM PYTHON SOURCE LINES 79-87
 
 .. code-block:: default
-
 
     plot_shapes(fine_shapes, linewidth=1, color="purple")
     plot_shapes(coarse_shapes, linewidth=2, color="orange")
@@ -154,7 +153,7 @@ Let's use this to plot our grids in the same image so we can compare them.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-96
+.. GENERATED FROM PYTHON SOURCE LINES 88-95
 
 The grids seem to align nicely. Also, there are exactly three purple cells
 between two orange cell edges, as intended.
@@ -164,7 +163,7 @@ Secondly we have the neighbours of these center cells and lastly we have the pur
 vertices of the orange cells.
 Let's start by coloring in the center cells.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-110
+.. GENERATED FROM PYTHON SOURCE LINES 96-109
 
 .. code-block:: default
 
@@ -193,11 +192,11 @@ Let's start by coloring in the center cells.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-112
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 Next, let's use these center cells to find their neighbours and color them too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-133
+.. GENERATED FROM PYTHON SOURCE LINES 112-132
 
 .. code-block:: default
 
@@ -233,12 +232,12 @@ Next, let's use these center cells to find their neighbours and color them too.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-136
+.. GENERATED FROM PYTHON SOURCE LINES 133-135
 
 Lastly, let's find coordinates of the vertices of the orange cells.
 We then find what purple cells are a these coordinates and color them as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-153
+.. GENERATED FROM PYTHON SOURCE LINES 136-152
 
 .. code-block:: default
 
@@ -270,14 +269,14 @@ We then find what purple cells are a these coordinates and color them as well.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-155
+.. GENERATED FROM PYTHON SOURCE LINES 153-154
 
 Now the purple grid is colored, based on it's relation to the orange grid.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.779 seconds)
+   **Total running time of the script:** (0 minutes 1.651 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_selecting_cells.py:

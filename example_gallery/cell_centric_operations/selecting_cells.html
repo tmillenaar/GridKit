@@ -141,11 +141,11 @@ let’s center our are of interest around zero as well.</p>
 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
 
 <span class="n">fine_bounds</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
-<span class="n">fine_cell_ids</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">fine_bounds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">fine_cell_ids</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">fine_bounds</span><span class="p">)</span>
 <span class="n">fine_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">fine_cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">coarse_bounds</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
-<span class="n">coarse_cell_ids</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">coarse_bounds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">coarse_cell_ids</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">coarse_bounds</span><span class="p">)</span>
 <span class="n">coarse_shapes</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -229,7 +229,7 @@ We then find what purple cells are a these coordinates and color them as well.</
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_selecting_cells_004.png" srcset="../../_images/sphx_glr_selecting_cells_004.png" alt="selecting cells" class = "sphx-glr-single-img"/><p>Now the purple grid is colored, based on it’s relation to the orange grid.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.779 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.651 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-selecting-cells-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/60ba7da1d9290f63d9b9b6c1ec6c22a6/selecting_cells.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">selecting_cells.py</span></code></a></p>

@@ -31,7 +31,7 @@ bounds = (-20, -20, 20, 20)
 def get_shapes_in_bounds(grid, bounds):
     """Return the cells of a grid in the specified bounds as a multipolygon"""
     aligned_bounds = grid.align_bounds(bounds)
-    cell_ids, _ = grid.cells_in_bounds(aligned_bounds)
+    cell_ids = grid.cells_in_bounds(aligned_bounds)
     return grid.to_shapely(cell_ids, as_multipolygon=True)
 
 

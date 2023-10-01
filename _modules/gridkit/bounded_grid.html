@@ -234,7 +234,7 @@
             <span class="c1"># create combined grid, spanning both inputs</span>
             <span class="n">combined_bounds</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">combined_bounds</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span>
-                <span class="n">combined_bounds</span>
+                <span class="n">combined_bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>  <span class="c1"># TODO: split ids and shape outputs into different methods</span>
             <span class="n">combined_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
                 <span class="n">shape</span><span class="p">,</span>
@@ -503,8 +503,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Mask shape </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match data shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
-        <span class="n">ids</span> <span class="o">=</span> <span class="n">ids</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
 
 <div class="viewcode-block" id="BoundedGrid.shared_bounds"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.shared_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">shared_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -548,7 +547,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the indices within the bounds of the data&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BoundedGrid.assign"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.assign">[docs]</a>    <span class="k">def</span> <span class="nf">assign</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">assign_nodata</span><span class="o">=</span><span class="kc">True</span>
@@ -640,7 +639,7 @@
         <span class="n">np_id</span> <span class="o">=</span> <span class="n">np_id</span><span class="p">[:,</span> <span class="n">sample_mask</span><span class="p">]</span>
         <span class="n">values</span><span class="p">[</span><span class="n">sample_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">np_id</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">np_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
 
-        <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedGrid.nodata"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.nodata">[docs]</a>    <span class="k">def</span> <span class="nf">nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -715,7 +714,7 @@
         <span class="n">interp_func</span> <span class="o">=</span> <span class="n">method_lut</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
         <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
         <span class="n">nodata_mask</span> <span class="o">=</span> <span class="n">values</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span>
-        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">interpolator</span> <span class="o">=</span> <span class="n">interp_func</span><span class="p">(</span>
             <span class="n">points</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
             <span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
@@ -754,7 +753,9 @@
             <span class="n">new_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">new_ids</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;bilinear&quot;</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bilinear_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
+            <span class="n">return_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bilinear_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">return_shape</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resampling method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedGrid.resample"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
@@ -813,7 +814,9 @@
         <span class="c1"># Align using &quot;contract&quot; for we cannot sample outside of the original bounds</span>
         <span class="n">new_bounds</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;contract&quot;</span><span class="p">)</span>
 
-        <span class="n">new_ids</span><span class="p">,</span> <span class="n">new_shape</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">)</span>
+        <span class="n">new_ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span>
+            <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
         <span class="n">new_points</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">new_ids</span><span class="p">)</span>
 
@@ -821,11 +824,18 @@
             <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span>
                 <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
-            <span class="n">transformed_points</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="o">*</span><span class="n">new_points</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-            <span class="n">new_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">transformed_points</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">original_shape</span> <span class="o">=</span> <span class="n">new_points</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">raveled_new_points</span> <span class="o">=</span> <span class="n">new_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">transformed_points</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="o">*</span><span class="n">raveled_new_points</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">new_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">transformed_points</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">original_shape</span><span class="p">)</span>
 
         <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">new_points</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
+
+        <span class="c1"># If value id 1D, turn into 2D</span>
+        <span class="c1"># Take into account if the 1D line of cells runs in x or y direction</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">:</span>
+            <span class="n">empty_axis</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">empty_axis</span><span class="p">)</span>
 
         <span class="n">nodata_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
 

@@ -200,7 +200,7 @@ First, let's create a function that determines the colors for our polygons.
 
 Now let's create two new figures and populate these with the colored shapes of the two downsampled hexagon grids.
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-121
+.. GENERATED FROM PYTHON SOURCE LINES 108-123
 
 .. code-block:: default
 
@@ -210,9 +210,11 @@ Now let's create two new figures and populate these with the colored shapes of t
     fig_pointy, ax_pointy = plt.subplots()
 
     # populate the figures with colored polygons
-    for geom, color in zip(hexdem_flat.to_shapely(), get_colors(hexdem_flat.data)):
+    for geom, color in zip(hexdem_flat.to_shapely().ravel(), get_colors(hexdem_flat.data)):
         ax_flat.fill(*geom.exterior.xy, alpha=1.0, color=color)
-    for geom, color in zip(hexdem_pointy.to_shapely(), get_colors(hexdem_pointy.data)):
+    for geom, color in zip(
+        hexdem_pointy.to_shapely().ravel(), get_colors(hexdem_pointy.data)
+    ):
         ax_pointy.fill(*geom.exterior.xy, alpha=1.0, color=color)
 
     plt.show()
@@ -241,7 +243,7 @@ Now let's create two new figures and populate these with the colored shapes of t
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-130
+.. GENERATED FROM PYTHON SOURCE LINES 124-132
 
 This example can of course also be used to upsample your data.
 
@@ -255,7 +257,7 @@ This example can of course also be used to upsample your data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.083 seconds)
+   **Total running time of the script:** (0 minutes 2.975 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_resampling.py:

@@ -426,24 +426,20 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.cells_in_bounds">
-<span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cells_in_bounds" title="Permalink to this definition"></a></dt>
-<dd><dl class="field-list simple">
+<span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_cell_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.cells_in_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>Cells contained within a bounding box.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – </p></li>
-<li><p><strong>align_mode</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <dl class="simple">
-<dt>Specifies when to consider a cell included in the bounds. Options:</dt><dd><ul>
-<li><p>contains
-select cells fully contained in the specified bounds</p></li>
-<li><p>contains_center
-select cells of which the center is contained in the specified bounds</p></li>
-<li><p>intersects
-select cells partially or fully contained in the specified bounds</p></li>
+<li><p><strong>return_cell_count</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Return a tuple containing the nr of cells in x and y direction inside the provided bounds</p></li>
 </ul>
 </dd>
-</dl>
-</p></li>
-</ul>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The indices of the cells contained in the bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>

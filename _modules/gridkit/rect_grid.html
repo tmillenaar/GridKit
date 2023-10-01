@@ -111,7 +111,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dy</span>
 
 <div class="viewcode-block" id="RectGrid.to_bounded"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_bounded">[docs]</a>    <span class="k">def</span> <span class="nf">to_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
@@ -594,19 +594,19 @@
             <span class="n">dx</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">new_dx</span><span class="p">),</span> <span class="n">dy</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">new_dy</span><span class="p">),</span> <span class="n">offset</span><span class="o">=</span><span class="n">new_offset</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="RectGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RectGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        bounds: :class:`tuple`</span>
-<span class="sd">        align_mode: :class:`str`</span>
-<span class="sd">            Specifies when to consider a cell included in the bounds. Options:</span>
-<span class="sd">             - contains</span>
-<span class="sd">               select cells fully contained in the specified bounds</span>
-<span class="sd">             - contains_center</span>
-<span class="sd">               select cells of which the center is contained in the specified bounds</span>
-<span class="sd">             - intersects</span>
-<span class="sd">               select cells partially or fully contained in the specified bounds</span>
+<span class="sd">        return_cell_count: :class:`bool`</span>
+<span class="sd">            Return a tuple containing the nr of cells in x and y direction inside the provided bounds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.GridIndex`</span>
+<span class="sd">            The indices of the cells contained in the bounds</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
@@ -638,7 +638,8 @@
         <span class="c1"># ids[1] = numpy.tile(ids_y[::-1], len(ids_x)) # invert y for ids are calculated from origin, not form the top of the bounding box</span>
         <span class="n">ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">ids_y</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids_x</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="n">shape</span></div>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_cell_count</span> <span class="k">else</span> <span class="n">ids</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -651,6 +652,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected a 2D numpy array, got data with shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -662,6 +669,7 @@
             <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_x</span><span class="p">,</span> <span class="n">dx</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_x</span><span class="p">,</span>
             <span class="mi">0</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">offset_y</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="k">else</span> <span class="n">offset_y</span><span class="p">,</span>
         <span class="p">)</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">BoundedRectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
@@ -705,13 +713,13 @@
 <span class="sd">            Multidimensional array containing the longitude and latitude of the center of each cell respectively,</span>
 <span class="sd">            in (width, height, lonlat)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedRectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
-        <span class="c1"># get grid in shape (latlon, width, height)</span>
-        <span class="n">latlon</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
-
-        <span class="c1"># return grid in shape (width, height, lonlat)</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">latlon</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">latlon</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span></div>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;indices&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedRectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BoundedRectGrid.intersecting_cells"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.intersecting_cells">[docs]</a>    <span class="k">def</span> <span class="nf">intersecting_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>

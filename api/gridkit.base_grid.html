@@ -311,29 +311,24 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.rotate">
-<span class="sig-name descname"><span class="pre">rotate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.rotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotate" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.rotation">
-<span class="sig-name descname"><span class="pre">rotation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.rotation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotation" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.resample" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.to_vector_file">
-<span class="sig-name descname"><span class="pre">to_vector_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.to_vector_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.to_vector_file" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.aggregate">
-<span class="sig-name descname"><span class="pre">aggregate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.aggregate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.aggregate" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cells_in_bounds">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_cell_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cells_in_bounds" title="Permalink to this definition"></a></dt>
+<dd><p>Cells contained within a bounding box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)</p></li>
+<li><p><strong>return_cell_count</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Return a tuple containing the nr of cells in x and y direction inside the provided bounds</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The indices of the cells contained in the bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.are_bounds_aligned">

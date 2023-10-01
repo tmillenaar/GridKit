@@ -52,11 +52,11 @@ coarse_grid = HexGrid(
 bounds = (-7, -7, 7, 7)
 
 fine_bounds = fine_grid.align_bounds(bounds)
-fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)[0]
+fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)
 fine_shapes = fine_grid.to_shapely(fine_cell_ids, as_multipolygon=True)
 
 coarse_bounds = coarse_grid.align_bounds(bounds)
-coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)[0]
+coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)
 coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids, as_multipolygon=True)
 
 # %%
@@ -76,7 +76,6 @@ def plot_shapes(shapes, color, fill=False, **kwargs):
 # %%
 #
 # Let's use this to plot our grids in the same image so we can compare them.
-
 plot_shapes(fine_shapes, linewidth=1, color="purple")
 plot_shapes(coarse_shapes, linewidth=2, color="orange")
 

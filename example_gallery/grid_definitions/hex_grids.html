@@ -124,7 +124,7 @@ and how they compare to one another.</p>
 <span class="k">def</span> <span class="nf">get_shapes_in_bounds</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the cells of a grid in the specified bounds as a multipolygon&quot;&quot;&quot;</span>
     <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
-    <span class="n">cell_ids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">)</span>
+    <span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 
@@ -213,7 +213,7 @@ we also obtain interesting patterns.</p>
 </div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.762 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.496 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/67186b4128a685058ed8c30092023ec6/hex_grids.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">hex_grids.py</span></code></a></p>

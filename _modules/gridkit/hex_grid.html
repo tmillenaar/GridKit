@@ -143,7 +143,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
 
 <div class="viewcode-block" id="HexGrid.to_bounded"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_bounded">[docs]</a>    <span class="k">def</span> <span class="nf">to_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">fill_value</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
@@ -398,6 +398,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+        <span class="n">original_shape</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="n">centroid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
         <span class="n">distance_vector</span> <span class="o">=</span> <span class="n">point</span> <span class="o">-</span> <span class="n">centroid</span>
         <span class="n">azimuth</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="o">*</span><span class="n">distance_vector</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">*</span> <span class="mi">180</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span>
@@ -460,8 +464,15 @@
             <span class="n">mask_odd</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">odd_cells_mask</span><span class="p">)</span>
             <span class="n">nearby_cells</span><span class="p">[</span><span class="n">shift_odd</span><span class="p">,</span> <span class="n">mask_odd</span><span class="p">,</span> <span class="n">consistent_axis</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
+        <span class="c1"># turn into shape: points(n), neighbours(3), xy(2)</span>
+        <span class="c1"># points(n) will be unraveled later if multiple points were provided</span>
         <span class="n">nearby_cells</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">nearby_cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">nearby_cells</span></div>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">nearby_cells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># return shape: points(...), neighbours(3), xy(2)</span>
+        <span class="c1"># where points(...) can be any nd (unraveled) shape</span>
+        <span class="k">return</span> <span class="n">nearby_cells</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">original_shape</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="HexGrid.cell_at_point"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point">[docs]</a>    <span class="k">def</span> <span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Index of the cell containing the supplied point(s).</span>
@@ -552,13 +563,15 @@
 
         <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HexGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners">[docs]</a>    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="HexGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners">[docs]</a>    <span class="nd">@validate_index</span>
+    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return corners in (cells, corners, xy)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `corners`.&quot;</span>
             <span class="p">)</span>
-        <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">cell_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">T</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
@@ -575,7 +588,7 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">centroids</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">corners</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">moveaxis</span><span class="p">(</span><span class="n">corners</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">corners</span></div>
+        <span class="k">return</span> <span class="n">corners</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">cell_shape</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="HexGrid.is_aligned_with"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.is_aligned_with">[docs]</a>    <span class="k">def</span> <span class="nf">is_aligned_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
@@ -674,13 +687,20 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">new_offset</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HexGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
+<div class="viewcode-block" id="HexGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        bounds: :class:`tuple`</span>
 <span class="sd">            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)</span>
+<span class="sd">        return_cell_count: :class:`bool`</span>
+<span class="sd">            Return a tuple containing the nr of cells in x and y direction inside the provided bounds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.GridIndex`</span>
+<span class="sd">            The indices of the cells contained in the bounds</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Simplify function. Conceptually hard to follow and not very DRY</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
@@ -734,7 +754,10 @@
             <span class="k">if</span> <span class="n">nr_cells_flat</span> <span class="o">!=</span> <span class="mi">0</span>
             <span class="k">else</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="p">),</span> <span class="n">shape</span></div>
+
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_cell_count</span> <span class="k">else</span> <span class="n">ids</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -746,6 +769,11 @@
         <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected a 2D numpy array, got data with shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
@@ -937,6 +965,11 @@
             <span class="n">projected</span> <span class="o">=</span> <span class="n">_project</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="p">[</span><span class="n">p3</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">projected</span> <span class="o">-</span> <span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">))</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ad</span><span class="p">))</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sample_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
+        <span class="n">original_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">sample_points</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
         <span class="n">all_nearby_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">(</span>
             <span class="n">sample_points</span>
         <span class="p">)</span>  <span class="c1"># (points, nearby_cells, xy)</span>
@@ -956,7 +989,7 @@
             <span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">))</span>
 
         <span class="c1"># TODO: remove rows and cols with nans around the edge after bilinear</span>
-        <span class="k">return</span> <span class="n">values</span>
+        <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">original_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
 <div class="viewcode-block" id="BoundedHexGrid.to_crs"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs">[docs]</a>    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
@@ -1062,6 +1095,10 @@
 
 <div class="viewcode-block" id="BoundedHexGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;indices&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+                <span class="p">)</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 

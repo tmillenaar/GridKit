@@ -142,6 +142,10 @@
 <span class="sd">    None</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ravel geoms if necessary</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">geoms</span> <span class="o">=</span> <span class="n">geoms</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
     <span class="c1"># create colormap that matches our values</span>
     <span class="n">cmap</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">cm</span><span class="p">,</span> <span class="n">cmap</span><span class="p">)</span>
     <span class="n">vmin</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
