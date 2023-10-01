@@ -59,6 +59,22 @@ class HexGrid(BaseGrid):
         """
         return self._size
 
+    @property
+    def _regular_axis(self):
+        return 1 if self._shape == "flat" else 0
+
+    @property
+    def _irregular_axis(self):
+        return 0 if self._shape == "flat" else 1
+
+    @property
+    def _stepsize_regular_axis(self):
+        return self.dy if self._shape == "flat" else self.dx
+
+    @property
+    def _stepsize_irregular_axis(self):
+        return self.dx if self._shape == "flat" else self.dy
+
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
         data = numpy.full(shape=shape, fill_value=fill_value)
@@ -178,27 +194,25 @@ class HexGrid(BaseGrid):
             row_length = depth + i + 1
             row_slice = slice(start_slice, start_slice + row_length)
             max_val = int(numpy.floor(row_length / 2))
-            if self._shape == "pointy":
-                pointy_axis = 1
-                flat_axis = 0
-            elif self._shape == "flat":
-                pointy_axis = 0
-                flat_axis = 1
 
             if (i % 2 == 0) == (depth % 2 == 0):
-                neighbours[:, row_slice, flat_axis] = range(-max_val, max_val + 1)
+                neighbours[:, row_slice, self._regular_axis] = range(
+                    -max_val, max_val + 1
+                )
             else:
-                odd_mask = index[:, pointy_axis] % 2 != 0
-                neighbours[odd_mask, row_slice, flat_axis] = range(
+                odd_mask = index[:, self._irregular_axis] % 2 != 0
+                neighbours[odd_mask, row_slice, self._regular_axis] = range(
                     -max_val + 1, max_val + 1
                 )
-                neighbours[~odd_mask, row_slice, flat_axis] = range(-max_val, max_val)
-            neighbours[:, row_slice, pointy_axis] = row
+                neighbours[~odd_mask, row_slice, self._regular_axis] = range(
+                    -max_val, max_val
+                )
+            neighbours[:, row_slice, self._irregular_axis] = row
             start_slice += row_length
 
         # mirror top half to bottom half (leaving the center row be)
         neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][::-1]
-        neighbours[:, start_slice:, pointy_axis] *= -1
+        neighbours[:, start_slice:, self._irregular_axis] *= -1
 
         if include_selected is False:
             center_cell = int(numpy.floor(neighbours.shape[1] / 2))
@@ -332,10 +346,6 @@ class HexGrid(BaseGrid):
             cell = numpy.expand_dims(cell, axis=0)
         az_ranges = [(0, 60), (60, 120), (120, 180), (180, 240), (240, 300), (300, 360)]
         if self._shape == "flat":
-            inconsistent_axis = (
-                0  # TODO: Make consistent and inconsisten axis a property of self
-            )
-            consistent_axis = 1
             shift_odd_cells = [1, slice(1, 3), 2, 1, slice(1, 3), 2]
             nearby_cells_relative_idx = [
                 [[1, 0], [0, 1]],
@@ -346,8 +356,6 @@ class HexGrid(BaseGrid):
                 [[0, 1], [-1, 0]],
             ]
         elif self._shape == "pointy":
-            inconsistent_axis = 1
-            consistent_axis = 0
             azimuth += (
                 30  # it is easier to work with ranges starting at 0 rather than -30
             )
@@ -366,7 +374,7 @@ class HexGrid(BaseGrid):
         nearby_cells = numpy.repeat(
             numpy.expand_dims(cell, axis=0), 3, axis=0
         )  # shape: neighbours(3), points(n), xy(2)
-        odd_cells_mask = cell[:, inconsistent_axis] % 2 == 1
+        odd_cells_mask = cell[:, self._irregular_axis] % 2 == 1
 
         # make sure azimuth is inbetween 0 and 360, and not between -180 and 180
         azimuth[azimuth <= 0] += 360
@@ -379,7 +387,7 @@ class HexGrid(BaseGrid):
             nearby_cells[1, mask] += cells[0]
             nearby_cells[2, mask] += cells[1]
             mask_odd = numpy.logical_and(mask, odd_cells_mask)
-            nearby_cells[shift_odd, mask_odd, consistent_axis] += 1
+            nearby_cells[shift_odd, mask_odd, self._regular_axis] += 1
 
         # turn into shape: points(n), neighbours(3), xy(2)
         # points(n) will be unraveled later if multiple points were provided
@@ -413,56 +421,57 @@ class HexGrid(BaseGrid):
         point = numpy.expand_dims(point, axis=0).T if len(point.shape) == 1 else point.T
 
         # approach adapted after https://stackoverflow.com/a/7714148
-        if self._shape == "pointy":
-            flat_axis = 0
-            pointy_axis = 1
-            flat_stepsize = self.dx
-            pointy_stepsize = self.dy
-        elif self._shape == "flat":
-            flat_axis = 1
-            pointy_axis = 0
-            flat_stepsize = self.dy
-            pointy_stepsize = self.dx
-        else:
-            raise ValueError(
-                f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{self._shape}'"
-            )
 
         ids_pointy = numpy.floor(
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            / pointy_stepsize
+            (
+                point[self._irregular_axis]
+                - self.offset[self._irregular_axis]
+                - self.r / 4
+            )
+            / self._stepsize_irregular_axis
         )
         even = ids_pointy % 2 == 0
         ids_flat = numpy.empty_like(ids_pointy)
         ids_flat[~even] = numpy.floor(
-            (point[flat_axis][~even] - self.offset[flat_axis] - flat_stepsize / 2)
-            / flat_stepsize
+            (
+                point[self._regular_axis][~even]
+                - self.offset[self._regular_axis]
+                - self._stepsize_regular_axis / 2
+            )
+            / self._stepsize_regular_axis
         )
         ids_flat[even] = numpy.floor(
-            (point[flat_axis][even] - self.offset[flat_axis]) / flat_stepsize
+            (point[self._regular_axis][even] - self.offset[self._regular_axis])
+            / self._stepsize_regular_axis
         )
 
         # Finetune ambiguous points
         # Points at the top of the cell can be in this cell or in the cell to the top right or top left
         rel_loc_y = (
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            % pointy_stepsize
+            (
+                point[self._irregular_axis]
+                - self.offset[self._irregular_axis]
+                - self.r / 4
+            )
+            % self._stepsize_irregular_axis
         ) + self.r / 4
-        rel_loc_x = (point[flat_axis] - self.offset[flat_axis]) % flat_stepsize
-        top_left_even = rel_loc_x / (flat_stepsize / self.r) < (
+        rel_loc_x = (
+            point[self._regular_axis] - self.offset[self._regular_axis]
+        ) % self._stepsize_regular_axis
+        top_left_even = rel_loc_x / (self._stepsize_regular_axis / self.r) < (
             rel_loc_y - self.r * 5 / 4
         )
-        top_right_even = (self.r * 1.25 - rel_loc_y) <= (rel_loc_x - flat_stepsize) / (
-            flat_stepsize / self.r
-        )
-        top_right_odd = (rel_loc_x - flat_stepsize / 2) / (flat_stepsize / self.r) <= (
-            rel_loc_y - self.r * 5 / 4
-        )
-        top_right_odd &= rel_loc_x >= flat_stepsize / 2
-        top_left_odd = (self.r * 1.25 - rel_loc_y) < (rel_loc_x - flat_stepsize / 2) / (
-            flat_stepsize / self.r
-        )
-        top_left_odd &= rel_loc_x < flat_stepsize / 2
+        top_right_even = (self.r * 1.25 - rel_loc_y) <= (
+            rel_loc_x - self._stepsize_regular_axis
+        ) / (self._stepsize_regular_axis / self.r)
+        top_right_odd = (rel_loc_x - self._stepsize_regular_axis / 2) / (
+            self._stepsize_regular_axis / self.r
+        ) <= (rel_loc_y - self.r * 5 / 4)
+        top_right_odd &= rel_loc_x >= self._stepsize_regular_axis / 2
+        top_left_odd = (self.r * 1.25 - rel_loc_y) < (
+            rel_loc_x - self._stepsize_regular_axis / 2
+        ) / (self._stepsize_regular_axis / self.r)
+        top_left_odd &= rel_loc_x < self._stepsize_regular_axis / 2
 
         ids_pointy[top_left_even & even] += 1
         ids_pointy[top_right_even & even] += 1
