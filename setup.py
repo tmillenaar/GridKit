@@ -22,7 +22,7 @@ docs_require = [
 tests_require = [
     "pytest",
     "black",
-    "geopandas",
+    "dask_geopandas",
     "pytest-cov",
     "pytest-pylint",
     "pytest-black",
