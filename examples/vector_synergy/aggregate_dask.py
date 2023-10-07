@@ -1,8 +1,8 @@
 """
 .. _example aggregate_dask:
 
-Aggregate from points: Tiled
-============================
+Tiled aggregation from points with Dask
+=======================================
 
 Group points into grid cells in a tiled manner, using Dask.
 
