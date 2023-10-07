@@ -240,6 +240,20 @@ def test_to_bounded(shape):
     assert numpy.all(numpy.isnan(result.data))
 
 
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_to_shapely_1_cell(shape):
+    grid = HexGrid(size=1.5, shape=shape)
+    id_ = [-3, 2]
+    geom = grid.to_shapely(id_)
+
+    centroid = [geom.centroid.x, geom.centroid.y]
+    numpy.testing.assert_allclose(centroid, grid.centroid(id_))
+
+    numpy.testing.assert_allclose(geom.area, grid.dx * grid.dy)
+    # Is is not beautiful how dx*dy also gives the area of the hexagon?
+    # The bits outside the rectangle perfectly compensate for the missing bits inside the rectangle
+
+
 @pytest.mark.parametrize("as_mp", [True, False])
 @pytest.mark.parametrize("shape", ["flat", "pointy"])
 def test_to_shapely(as_mp, shape):

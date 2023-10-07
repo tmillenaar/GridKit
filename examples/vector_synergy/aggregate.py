@@ -6,6 +6,10 @@ Aggregate from points
 
 Group points into grid cells
 
+.. Note ::
+
+    For a tiled implementation of this approach using Dask, see example :ref:`aggregate_dask.py <example aggregate_dask>`
+
 TL;DR
 -----
 

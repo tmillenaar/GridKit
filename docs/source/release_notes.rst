@@ -3,6 +3,14 @@
 Release notes
 ================
 
+Version 0.5.1 (October 08, 2023)
+----------------------------------
+Fixes
+ - :meth:`.BaseGrid.to_shapely()` now returns single Polygon if a single GridIndex was supplied
+
+Documentation
+ - Add example :ref:`aggregate_dask.py <example aggregate_dask>`
+
 Version 0.5.0 (October 01, 2023)
 ----------------------------------
 Features
