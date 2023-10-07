@@ -360,6 +360,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
         cell_arr_shape = index.shape
         vertices = self.cell_corners(index.ravel())
+        if index.index.ndim == 1:
+            return shapely.geometry.Polygon(vertices)
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
         if as_multipolygon:
             return shapely.geometry.MultiPolygon(polygons)
