@@ -15,14 +15,13 @@ docs_require = [
     "sphinx_rtd_theme",
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
-    "geopandas",
+    "dask_geopandas",
     "matplotlib",
 ]
 
 tests_require = [
     "pytest",
     "black",
-    "dask_geopandas",
     "pytest-cov",
     "pytest-pylint",
     "pytest-black",
