@@ -25,6 +25,10 @@ Aggregate from points
 
 Group points into grid cells
 
+.. Note ::
+
+    For a tiled implementation of this approach using Dask, see example :ref:`aggregate_dask.py <example aggregate_dask>`
+
 TL;DR
 -----
 
@@ -72,7 +76,7 @@ The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
 I'll plot the input here to show what it looks like.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-74
+.. GENERATED FROM PYTHON SOURCE LINES 61-78
 
 .. code-block:: default
 
@@ -105,14 +109,14 @@ I'll plot the input here to show what it looks like.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-80
+.. GENERATED FROM PYTHON SOURCE LINES 80-84
 
 Relate points to grid cells
 ---------------------------
 
 Now we can create a grid and aggregate our points onto that grid.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-87
+.. GENERATED FROM PYTHON SOURCE LINES 85-91
 
 .. code-block:: default
 
@@ -129,7 +133,7 @@ Now we can create a grid and aggregate our points onto that grid.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-96
+.. GENERATED FROM PYTHON SOURCE LINES 92-100
 
 Count the points per cell
 -------------------------
@@ -140,7 +144,7 @@ We can then do statistics on these bins. In our case we will count the number of
 For convenience, I will use a panda's groupby functionality for this.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-104
+.. GENERATED FROM PYTHON SOURCE LINES 101-108
 
 .. code-block:: default
 
@@ -158,14 +162,14 @@ For convenience, I will use a panda's groupby functionality for this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-109
+.. GENERATED FROM PYTHON SOURCE LINES 109-113
 
 Visualize the results
 ---------------------
 
 Now we have the number of points per cell, let's obtain the corresponding cell shapes from the grid object and plot them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-115
+.. GENERATED FROM PYTHON SOURCE LINES 114-119
 
 .. code-block:: default
 
@@ -189,7 +193,7 @@ Now we have the number of points per cell, let's obtain the corresponding cell s
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.583 seconds)
+   **Total running time of the script:** (0 minutes 0.614 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate.py:

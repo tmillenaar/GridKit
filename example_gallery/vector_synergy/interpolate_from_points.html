@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="API reference" href="../../api_reference.html" />
-    <link rel="prev" title="Geometry intersections" href="intersect_geometries.html" /> 
+    <link rel="prev" title="Tiled aggregation from points with Dask" href="aggregate_dask.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -59,6 +59,7 @@
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="aggregate.html">Aggregate from points</a></li>
 <li class="toctree-l3"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aggregate_dask.html">Tiled aggregation from points with Dask</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Interpolate from points</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
 </ul>
@@ -188,7 +189,7 @@ Note how the BoundedGrid has nodata values at the border in the “linear” and
 The bounds of the grid are automatically chosen to align with the supplied grid and accommodate all points.
 Cells of which the center is not within the convex hull of the data,
 but are within the selected bounds, get a <cite>nodata_value</cite> as specified in <code class="docutils literal notranslate"><span class="pre">interp_from_points</span></code> (default numpy.nan).</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.545 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.612 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-interpolate-from-points-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/7f197c98109c883f05271f16938ceeb6/interpolate_from_points.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">interpolate_from_points.py</span></code></a></p>
@@ -205,7 +206,7 @@ but are within the selected bounds, get a <cite>nodata_value</cite> as specified
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="intersect_geometries.html" class="btn btn-neutral float-left" title="Geometry intersections" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="aggregate_dask.html" class="btn btn-neutral float-left" title="Tiled aggregation from points with Dask" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../api_reference.html" class="btn btn-neutral float-right" title="API reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

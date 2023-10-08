@@ -282,6 +282,23 @@ The following examples highlight the interactions between vector data and regula
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Group points into grid cells in a tiled manner, using Dask.">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_aggregate_dask_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Tiled aggregation from points with Dask</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
 
 .. only:: html
@@ -307,6 +324,7 @@ The following examples highlight the interactions between vector data and regula
 
    /example_gallery/vector_synergy/aggregate
    /example_gallery/vector_synergy/intersect_geometries
+   /example_gallery/vector_synergy/aggregate_dask
    /example_gallery/vector_synergy/interpolate_from_points
 
 

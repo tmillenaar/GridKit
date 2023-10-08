@@ -67,6 +67,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aggregate_dask.html">Tiled aggregation from points with Dask</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interpolate_from_points.html">Interpolate from points</a></li>
 </ul>
 </li>
@@ -111,6 +112,10 @@ to download the full example code</p>
 <section class="sphx-glr-example-title" id="aggregate-from-points">
 <span id="example-aggregate"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-py"></span><h1>Aggregate from points<a class="headerlink" href="#aggregate-from-points" title="Permalink to this heading"></a></h1>
 <p>Group points into grid cells</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For a tiled implementation of this approach using Dask, see example <a class="reference internal" href="aggregate_dask.html#example-aggregate-dask"><span class="std std-ref">aggregate_dask.py</span></a></p>
+</div>
 <section id="tl-dr">
 <h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">pandas</span>
@@ -196,7 +201,7 @@ For convenience, I will use a panda’s groupby functionality for this.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.583 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.614 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4d73bd6bf6fc9c41c92bd89a0a7cb573/aggregate.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">aggregate.py</span></code></a></p>
