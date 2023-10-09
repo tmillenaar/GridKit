@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
-use numpy::PyArray2;
+use numpy::{PyArray2, PyArray3};
 use numpy::PyReadonlyArray2;
-use numpy::ndarray::{Array2};
+use numpy::ndarray::{Array2, Array3};
 use numpy::{ToPyArray};
 
 #[pyclass]
@@ -26,6 +26,33 @@ impl PointyHexGrid {
     }
     fn dy(&self) -> f64 {
         (3. / 2.) * self.radius()
+    }
+
+    fn relative_neighbours<'py>(
+        &self,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: i64,
+        include_selected: bool,
+        connect_corners: bool,
+    ) -> Py<PyArray3<i64>>{
+        let mut nr_neighbours: usize = 1;
+        for i in 1..(depth+1) {
+            nr_neighbours = nr_neighbours + 6 * i as usize;
+        }
+
+        println!("Nr neighbours {}", nr_neighbours);
+        let mut cells = Array3::<i64>::zeros((index.shape()[0], nr_neighbours,2));
+
+        let mut start_slice = 0
+        for (i, row) in (0..depth+1).rev().enumerate() {
+            println!("{}, {}", i, row);
+            let row_length: i64 = depth + i as i64 + 1;
+            let max_val: i64 = (row_length as f64 / 2.).floor();
+            // if (i % 2 == 0) == (depth % 2 == 0):\
+            // neighbours[:, start_slice..start_slice+row_length, 0] = range(-max_val, max_val + 1)
+        }
+        let py = index.py();
+        cells.to_pyarray(py).to_owned()
     }
 
     fn cell_at_locations<'py>(&self, points: PyReadonlyArray2<'py, f64>) -> Py<PyArray2<i64>> {
