@@ -1,139 +1,91 @@
 use pyo3::prelude::*;
-use numpy::{PyArray2, PyArray3};
-use numpy::PyReadonlyArray2;
-use numpy::ndarray::{Array2, Array3};
-use numpy::{ToPyArray};
+use numpy::{IntoPyArray, PyArray2, PyArray3, PyReadonlyArray2};
+
+use pyo3::{pymodule, types::PyModule, PyResult, Python};
+
+mod tri_grid;
 
 #[pyclass]
-struct PointyHexGrid {
+struct PyTriGrid {
     cellsize: f64,
+    _grid: tri_grid::TriGrid,
 }
 
 #[pymethods]
-impl PointyHexGrid {
+impl PyTriGrid {
 
     #[new]
     fn new(cellsize: f64) -> Self {
-        PointyHexGrid{
+        let _grid = tri_grid::TriGrid { cellsize };
+        PyTriGrid{
             cellsize,
+            _grid,
         }
     }
+
+    fn cell_height(&self) -> f64 {
+        self._grid.cell_height()
+    }
+
     fn radius(&self) -> f64 {
-        self.cellsize / (3_f64).sqrt()
+        self._grid.radius()
     }
+
+    fn cell_width(&self) -> f64 {
+        self._grid.cell_width()
+    }
+
     fn dx(&self) -> f64 {
-        self.cellsize
+        self._grid.dx()
     }
+
     fn dy(&self) -> f64 {
-        (3. / 2.) * self.radius()
+        self._grid.dy()
     }
 
-    fn relative_neighbours<'py>(
+    fn centroid<'py>(
         &self,
+        py: Python<'py>,
         index: PyReadonlyArray2<'py, i64>,
-        depth: i64,
-        include_selected: bool,
-        connect_corners: bool,
-    ) -> Py<PyArray3<i64>>{
-        let mut nr_neighbours: usize = 1;
-        for i in 1..(depth+1) {
-            nr_neighbours = nr_neighbours + 6 * i as usize;
-        }
-
-        println!("Nr neighbours {}", nr_neighbours);
-        let mut cells = Array3::<i64>::zeros((index.shape()[0], nr_neighbours,2));
-
-        let mut start_slice = 0
-        for (i, row) in (0..depth+1).rev().enumerate() {
-            println!("{}, {}", i, row);
-            let row_length: i64 = depth + i as i64 + 1;
-            let max_val: i64 = (row_length as f64 / 2.).floor();
-            // if (i % 2 == 0) == (depth % 2 == 0):\
-            // neighbours[:, start_slice..start_slice+row_length, 0] = range(-max_val, max_val + 1)
-        }
-        let py = index.py();
-        cells.to_pyarray(py).to_owned()
+    ) -> &'py PyArray2<f64> {
+        let index = index.as_array();
+        self._grid.centroid(&index).into_pyarray(py)
     }
 
-    fn cell_at_locations<'py>(&self, points: PyReadonlyArray2<'py, f64>) -> Py<PyArray2<i64>> {
-        let shape = points.dims();
-        // let mut cells = unsafe { Array2::<i64>::uninitialized(shape) };
-        let mut cells = Array2::<i64>::zeros(shape);
-
-        for i in 0..shape[0] {
-            let (x, y) = self.cell_at_location(*points.get((i, 0)).unwrap(), *points.get((i, 1)).unwrap());
-            cells[(i, 0)] = x;
-            cells[(i, 1)] = y;
-        }
-
-        let py = points.py();
-        cells.to_pyarray(py).to_owned()
+    fn cell_corners<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+    ) -> &'py PyArray3<f64> {
+        
+        let index = index.as_array();
+        self._grid.cell_corners(&index).into_pyarray(py)
     }
 
-    fn cell_at_location(&self, x: f64, y: f64) -> (i64, i64) {
-        // determine initial id_y
-        let mut id_y = ((y - self.radius() / 4.) / self.dy()).floor();
-        let is_offset = id_y % 2. != 0.;
-        let mut id_x: f64;
-
-        // determine initial id_x
-        if is_offset == true {
-            id_x = (x - self.dx() / 2.) / self.dx();
-        } else {
-            id_x = x / self.dx();
-        }
-        id_x = id_x.floor();
-
-        // refine id_x and id_y
-        // Example: points at the top of the cell can be in this cell or in the cell to the top right or top left
-        let rel_loc_y = (y - self.radius() / 4.) % self.dy() + self.radius() / 4.;
-        let rel_loc_x = x % self.dx();
-
-        let mut in_top_left: bool;
-        let mut in_top_right: bool;
-        if is_offset == true {
-            in_top_left = (self.radius() * 1.25 - rel_loc_y)
-                < ((rel_loc_x - 0.5 * self.dx()) / (self.dx() / self.radius()));
-            in_top_left = in_top_left && (rel_loc_x < (0.5 * self.dx()));
-            in_top_right = (rel_loc_x - 0.5 * self.dx()) / (self.dx() / self.radius())
-                <= (rel_loc_y - self.radius() * 1.25);
-            in_top_right = in_top_right && rel_loc_x >= (0.5 * self.dx());
-            if in_top_left == true {
-                id_y = id_y + 1.;
-                id_x = id_x + 1.;
-            }
-            else if in_top_right == true {
-                id_y = id_y + 1.;
-            }
-        } else {
-            in_top_left =
-                rel_loc_x / (self.dx() / self.radius()) < (rel_loc_y - self.radius() * 5. / 4.);
-            in_top_right = (self.radius() * 1.25 - rel_loc_y)
-                <= (rel_loc_x - self.dx()) / (self.dx() / self.radius());
-            if in_top_left == true {
-                id_y = id_y + 1.;
-                id_x = id_x - 1.;
-            }
-            else if in_top_right == true {
-                id_y = id_y + 1.;
-            }
-        }
-
-        (id_x as i64, id_y as i64)
+    fn cell_at_point<'py>(
+        &self,
+        py: Python<'py>,
+        points: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray2<i64> {
+        
+        let points = points.as_array();
+        self._grid.cell_at_point(&points).into_pyarray(py)
     }
-}
 
-
-/// Formats the sum of two numbers as string.
-#[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
+    fn cells_in_bounds<'py>(
+        &self,
+        py: Python<'py>,
+        bounds: (f64, f64, f64, f64),
+    ) -> &'py PyArray2<i64> {
+        self._grid.cells_in_bounds(&bounds).into_pyarray(py)
+    }
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn gridkit_rs(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
-    m.add_class::<PointyHexGrid>()?;
+    m.add_class::<PyTriGrid>()?;
     Ok(())
 }
+
+
