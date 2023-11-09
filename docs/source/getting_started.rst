@@ -3,6 +3,28 @@
 Getting Started
 ================
 
+Quick example
+-------------
+As a quick demonstration a grid and two points are created.
+Then the grid cells that cover those points will be obtained
+and finally the polygon description of these cells will be obtained.
+
+.. code-block:: python
+
+   >>> from gridkit import HexGrid
+   >>> grid = HexGrid(size=5)
+   >>> points = [[2, 7], [-6, 2]]
+   >>> cell_ids = grid.cell_at_point(points)
+   >>> geoms = grid.to_shapely(cell_ids)
+   >>> geoms
+   array([<POLYGON ((2.5 5.052, 2.5 7.939, 0 9.382, -2.5 7.939, -2.5 5.052, 0 3.608, 2...>,
+         <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>],
+         dtype=object)
+
+..
+
+More elaborate examples can be found in the :ref:`Example gallery <example_gallery>`
+
 What is GridKit?
 ----------------
 
