@@ -11,6 +11,28 @@ from gridkit.index import GridIndex, validate_index
 
 
 class RectGrid(BaseGrid):
+    """Abstraction that represents an infinite grid with square cell shape.
+
+    Initialization parameters
+    -------------------------
+    dx: :class:`float`
+        The spacing between two cell centroids in horizontal direction
+    dy: :class:`float`
+        The spacing between two cell centroids in vertical direction
+    offset: `Tuple(float, float)` (optional)
+        The offset in dx and dy.
+        Shifts the whole grid by the specified amount.
+        The shift is always reduced to be maximum one cell size.
+        If the supplied shift is larger,
+        a shift will be performed such that the new center is a multiple of dx or dy away.
+        Default: (0,0)
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+    """
+
     def __init__(self, *args, dx, dy, **kwargs):
         self.__dx = dx
         self.__dy = dy
@@ -60,7 +82,7 @@ class RectGrid(BaseGrid):
             If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.
             This escalates in combination with `depth` where indices in a square shape around the cell are returned
             when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.
-        index: :class:`numpy.ndarray`
+        index: `numpy.ndarray`
             The index is mostly relevant for hexagonal grids.
             For a square grid the relative neighbours are independent on the location on the grid.
             Here it is only used for the return length.
@@ -168,7 +190,7 @@ class RectGrid(BaseGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The longitude and latitude of the center of each cell.
             Axes order if multiple indices are specified: (points, xy), else (xy).
 
@@ -342,7 +364,7 @@ class RectGrid(BaseGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The index of the cell containing the point(s).
             If a single point is supplied, the index is returned as a 1d array of length 2.
             If multiple points are supplied, the indices are returned as Nx2 ndarrays.
@@ -564,6 +586,20 @@ class RectGrid(BaseGrid):
 
 
 class BoundedRectGrid(BoundedGrid, RectGrid):
+    """
+    Initialization parameters
+    -------------------------
+    data: `numpy.ndarray`
+        A 2D ndarray containing the data
+    bounds: :class:Tuple(float, float, float, float)
+        The extend of the data in minx, miny, maxx, maxy.
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+    """
+
     def __init__(self, data, *args, bounds, **kwargs):
         if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
             raise ValueError(
@@ -601,7 +637,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             1D-Array of size `width`, containing the longitudinal values from left to right
         """
         return numpy.linspace(
@@ -614,7 +650,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             1D-Array of size `height`, containing the latitudinal values from top to bottom
         """
         return numpy.linspace(
@@ -626,7 +662,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             Multidimensional array containing the longitude and latitude of the center of each cell respectively,
             in (width, height, lonlat)
         """
@@ -696,12 +732,12 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
 
         Parameters
         ----------
-        sample_points: :class:`numpy.ndarray`
+        sample_points: `numpy.ndarray`
             The coordinates of the points at which to sample the data
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The interpolated values at the supplied points
 
         See also

@@ -1,4 +1,5 @@
 import warnings
+from typing import Literal
 
 import numpy
 from pyproj import CRS, Transformer
@@ -11,6 +12,32 @@ from gridkit.rect_grid import RectGrid
 
 
 class HexGrid(BaseGrid):
+    """Abstraction that represents an infinite grid with hexagonal cell shape.
+
+    Initialization parameters
+    -------------------------
+    size: :class:`float`
+        The spacing between two cells in horizontal direction if ``shape`` is "pointy",
+        or in vertical direction if ``shape`` is "flat".
+    shape: `Literal["pointy", "flat"]`
+        The shape of the layout of the grid.
+        If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
+        If ``shape`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.
+    offset: `Tuple(float, float)` (optional)
+        The offset in dx and dy.
+        Shifts the whole grid by the specified amount.
+        The shift is always reduced to be maximum one cell size.
+        If the supplied shift is larger,
+        a shift will be performed such that the new center is a multiple of dx or dy away.
+        Default: (0,0)
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+
+    """
+
     def __init__(self, *args, size, shape="pointy", **kwargs):
         self._size = size
         self._radius = size / 3**0.5
@@ -82,7 +109,7 @@ class HexGrid(BaseGrid):
             If `depth=1` the direct neighbours are returned.
             If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
             `depth=3` returns yet another layer of neighbours, and so forth.
-        index: :class:`numpy.ndarray`
+        index: `numpy.ndarray`
             The index of the cell of which the relative neighbours are desired.
             This is mostly relevant because in hexagonal grids the neighbouring indices differ
             when dealing with odd or even indices.
@@ -221,7 +248,7 @@ class HexGrid(BaseGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The longitude and latitude of the center of each cell.
             Axes order if multiple indices are specified: (points, xy), else (xy).
 
@@ -403,7 +430,7 @@ class HexGrid(BaseGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The index of the cell containing the point(s).
             If a single point is supplied, the index is returned as a 1d array of length 2.
             If multiple points are supplied, the indices are returned as Nx2 ndarrays.
@@ -554,7 +581,7 @@ class HexGrid(BaseGrid):
 
         Parameters
         ----------
-        crs Union[int, str, pyproj.CRS]
+        crs: Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
@@ -682,6 +709,24 @@ class HexGrid(BaseGrid):
 
 
 class BoundedHexGrid(BoundedGrid, HexGrid):
+    """
+    Initialization parameters
+    -------------------------
+    data: `numpy.ndarray`
+        A 2D ndarray containing the data
+    bounds: `Tuple(float, float, float, float)`
+        The extend of the data in minx, miny, maxx, maxy.
+    shape: `Literal["pointy", "flat"]`
+        The shape of the cells in the grid.
+        If ``shape`` is "pointy", the hexagons will be standing upright on a point with the flat sides to the left and right.
+        If ``shape`` is "flat", the hexagons will be flat side up and below and pointy side on the left and right.
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+    """
+
     def __init__(self, data, *args, bounds, shape="flat", **kwargs):
         if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
             raise ValueError(
@@ -759,7 +804,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             1D-Array of size `width`, containing the longitudinal values from left to right
         """
         return numpy.linspace(
@@ -772,7 +817,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             1D-Array of size `height`, containing the latitudinal values from top to bottom
         """
         return numpy.linspace(
@@ -841,12 +886,12 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
         Parameters
         ----------
-        sample_points: :class:`numpy.ndarray`
+        sample_points: `numpy.ndarray`
             The coordinates of the points at which to sample the data
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        `numpy.ndarray`
             The interpolated values at the supplied points
 
         See also
@@ -949,7 +994,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
         Parameters
         ----------
-        np_index: :class:`numpy.ndarray`
+        np_index: `numpy.ndarray`
             The numpy indices to convert
 
         Returns
