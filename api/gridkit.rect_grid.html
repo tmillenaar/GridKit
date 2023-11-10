@@ -110,6 +110,27 @@
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.rect_grid.</span></span><span class="sig-name descname"><span class="pre">RectGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dy</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p>
+<p>Abstraction that represents an infinite grid with square cell shape.</p>
+<section id="initialization-parameters">
+<h2>Initialization parameters<a class="headerlink" href="#initialization-parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>dx: <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The spacing between two cell centroids in horizontal direction</p>
+</dd>
+<dt>dy: <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The spacing between two cell centroids in vertical direction</p>
+</dd>
+<dt>offset: <cite>Tuple(float, float)</cite> (optional)</dt><dd><p>The offset in dx and dy.
+Shifts the whole grid by the specified amount.
+The shift is always reduced to be maximum one cell size.
+If the supplied shift is larger,
+a shift will be performed such that the new center is a multiple of dx or dy away.
+Default: (0,0)</p>
+</dd>
+<dt>crs: <cite>pyproj.CRS</cite> (optional)</dt><dd><p>The coordinate reference system of the grid.
+The value can be anything accepted by pyproj.CRS.from_user_input(),
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+Default: None</p>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.dx">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.rect_grid.RectGrid.dx" title="Permalink to this definition"></a></dt>
@@ -132,7 +153,7 @@
 <li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounds of the area of interest in (minx, miny, maxx, maxy).
 The bounds need to be aligned to the grid.
 See <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.align_bounds" title="gridkit.base_grid.BaseGrid.align_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.align_bounds()</span></code></a></p></li>
-<li><p><strong>fill_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
+<li><p><strong>fill_value</strong> (<cite>numpy.dtype</cite> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
 Default: numpy.nan</p></li>
 </ul>
 </dd>
@@ -169,7 +190,7 @@ If <cite>connect_corners</cite> is True, the 4 cells directly touching the cell 
 If <cite>connect_corners</cite> is True, the 8 cells surrounding the cell are considered neighbours.
 This escalates in combination with <cite>depth</cite> where indices in a square shape around the cell are returned
 when <cite>connect_corners</cite> is True, and indices in a diamond shape around the cell are returned when <cite>connect_corners</cite> is False.</p></li>
-<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The index is mostly relevant for hexagonal grids.
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index is mostly relevant for hexagonal grids.
 For a square grid the relative neighbours are independent on the location on the grid.
 Here it is only used for the return length.
 If 10 cells are supplied to <cite>index</cite>, the relative neighbours are returned 10 times.
@@ -242,7 +263,7 @@ Mutliple indices can be specified at once in the form of a list of indices or an
 Axes order if multiple indices are specified: (points, xy), else (xy).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied. <cite>index</cite> can only be <cite>None</cite> in classes that contain data.</p>
@@ -351,7 +372,7 @@ If a single point is supplied, the index is returned as a 1d array of length 2.
 If multiple points are supplied, the indices are returned as Nx2 ndarrays.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -449,12 +470,26 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_grid_class</span></span><a class="headerlink" href="#gridkit.rect_grid.RectGrid.parent_grid_class" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.rect_grid.</span></span><span class="sig-name descname"><span class="pre">BoundedRectGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#BoundedRectGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>, <a class="reference internal" href="#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a></p>
+<section id="id1">
+<h2>Initialization parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>data: <cite>numpy.ndarray</cite></dt><dd><p>A 2D ndarray containing the data</p>
+</dd>
+<dt>bounds: :class:Tuple(float, float, float, float)</dt><dd><p>The extend of the data in minx, miny, maxx, maxy.</p>
+</dd>
+<dt>crs: <cite>pyproj.CRS</cite> (optional)</dt><dd><p>The coordinate reference system of the grid.
+The value can be anything accepted by pyproj.CRS.from_user_input(),
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+Default: None</p>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.rect_grid.BoundedRectGrid.nr_cells">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nr_cells</span></span><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.nr_cells" title="Permalink to this definition"></a></dt>
@@ -478,7 +513,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd class="field-odd"><p>1D-Array of size <cite>width</cite>, containing the longitudinal values from left to right</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -492,7 +527,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd class="field-odd"><p>1D-Array of size <cite>height</cite>, containing the latitudinal values from top to bottom</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -507,7 +542,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 in (width, height, lonlat)</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -632,6 +667,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#gridkit.rect_grid.BoundedRectGrid.sum" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 </section>

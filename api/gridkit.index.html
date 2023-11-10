@@ -272,7 +272,7 @@ This updates the .index attribute in-place as would an append on a python list.<
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The cell_ids to append to the current index</p></li>
-<li><p><strong>in_place</strong> (:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>bool`(optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
+<li><p><strong>in_place</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
 Returns a copy if False.
 Note: This does not improve performance as you might expect form a true in-place operation.
 The copy is made regardless since the data stored in the GridIndex is based on a numpy
@@ -313,7 +313,7 @@ As noted at the <code class="docutils literal notranslate"><span class="pre">in_
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>index</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The cell ids to remove from <code class="docutils literal notranslate"><span class="pre">self</span></code></p></li>
-<li><p><strong>in_place</strong> (:class:<a href="#id3"><span class="problematic" id="id4">`</span></a>bool`(optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
+<li><p><strong>in_place</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
 Returns a copy if False.
 Note: This does not improve performance as you might expect form a true in-place operation.
 The copy is made regardless since the data stored in the GridIndex is based on a numpy
@@ -329,24 +329,8 @@ The <code class="docutils literal notranslate"><span class="pre">in-place</span>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">start_index</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">start_index</span><span class="o">.</span><span class="n">index</span>
-<span class="go">array([[0, 1],</span>
-<span class="go">       [2, 3],</span>
-<span class="go">       [0, 1]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced_index</span> <span class="o">=</span> <span class="n">start_index</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reduced_index</span><span class="o">.</span><span class="n">index</span>
-<span class="go">array([2, 3])</span>
-</pre></div>
-</div>
 <p>Alternatively, by specifying <code class="docutils literal notranslate"><span class="pre">in_place=True</span></code> the original object can be updated.
 As noted at the <code class="docutils literal notranslate"><span class="pre">in_place</span></code> parameter description, this does not result in performance gains.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">start_index</span><span class="o">.</span><span class="n">delete</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="go">&lt;gridkit.index.GridIndex object at ...&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">start_index</span><span class="o">.</span><span class="n">index</span>
-<span class="go">array([2, 3])</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py method">

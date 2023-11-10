@@ -110,6 +110,30 @@
 <dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.hex_grid.</span></span><span class="sig-name descname"><span class="pre">HexGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pointy'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p>
+<p>Abstraction that represents an infinite grid with hexagonal cell shape.</p>
+<section id="initialization-parameters">
+<h2>Initialization parameters<a class="headerlink" href="#initialization-parameters" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>size: <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></dt><dd><p>The spacing between two cells in horizontal direction if <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “pointy”,
+or in vertical direction if <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “flat”.</p>
+</dd>
+<dt>shape: <cite>Literal[“pointy”, “flat”]</cite></dt><dd><p>The shape of the layout of the grid.
+If <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “pointy” the cells will be pointy side up and the regular axis will be in horizontal direction.
+If <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “flat”, the cells will be flat side up and the regular axis will be in vertical direction.</p>
+</dd>
+<dt>offset: <cite>Tuple(float, float)</cite> (optional)</dt><dd><p>The offset in dx and dy.
+Shifts the whole grid by the specified amount.
+The shift is always reduced to be maximum one cell size.
+If the supplied shift is larger,
+a shift will be performed such that the new center is a multiple of dx or dy away.
+Default: (0,0)</p>
+</dd>
+<dt>crs: <cite>pyproj.CRS</cite> (optional)</dt><dd><p>The coordinate reference system of the grid.
+The value can be anything accepted by pyproj.CRS.from_user_input(),
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+Default: None</p>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid.dx">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.hex_grid.HexGrid.dx" title="Permalink to this definition"></a></dt>
@@ -152,7 +176,7 @@ This is the same as dx for a flat grid and the same as dy for a pointy grid.</p>
 <li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounds of the area of interest in (minx, miny, maxx, maxy).
 The bounds need to be aligned to the grid.
 See <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.align_bounds" title="gridkit.base_grid.BaseGrid.align_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.align_bounds()</span></code></a></p></li>
-<li><p><strong>fill_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
+<li><p><strong>fill_value</strong> (<cite>numpy.dtype</cite> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
 Default: numpy.nan</p></li>
 </ul>
 </dd>
@@ -180,7 +204,7 @@ Default: numpy.nan</p></li>
 If <cite>depth=1</cite> the direct neighbours are returned.
 If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
 <cite>depth=3</cite> returns yet another layer of neighbours, and so forth.</p></li>
-<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The index of the cell of which the relative neighbours are desired.
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index of the cell of which the relative neighbours are desired.
 This is mostly relevant because in hexagonal grids the neighbouring indices differ
 when dealing with odd or even indices.</p></li>
 <li><p><strong>include_selected</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to include the specified cell in the return array.
@@ -260,7 +284,7 @@ Mutliple indices can be specified at once in the form of a list of indices or an
 Axes order if multiple indices are specified: (points, xy), else (xy).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied. <cite>index</cite> can only be <cite>None</cite> in classes that contain data.</p>
@@ -335,7 +359,7 @@ If a single point is supplied, the index is returned as a 1d array of length 2.
 If multiple points are supplied, the indices are returned as Nx2 ndarrays.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -359,17 +383,9 @@ This will update the cell size and the origin offset.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current grid must be set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Union</strong><strong>[</strong><strong>int</strong> (<em>crs</em>) – The value can be anything accepted
+<dd class="field-odd"><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
 by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-<li><p><strong>str</strong> – The value can be anything accepted
-by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-<li><p><strong>pyproj.CRS</strong><strong>]</strong> – The value can be anything accepted
-by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-</ul>
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the grid with modified cell spacing to match the specified CRS</p>
@@ -414,12 +430,30 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_grid_class</span></span><a class="headerlink" href="#gridkit.hex_grid.HexGrid.parent_grid_class" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.hex_grid.</span></span><span class="sig-name descname"><span class="pre">BoundedHexGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'flat'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>, <a class="reference internal" href="#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a></p>
+<section id="id1">
+<h2>Initialization parameters<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>data: <cite>numpy.ndarray</cite></dt><dd><p>A 2D ndarray containing the data</p>
+</dd>
+<dt>bounds: <cite>Tuple(float, float, float, float)</cite></dt><dd><p>The extend of the data in minx, miny, maxx, maxy.</p>
+</dd>
+<dt>shape: <cite>Literal[“pointy”, “flat”]</cite></dt><dd><p>The shape of the cells in the grid.
+If <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “pointy”, the hexagons will be standing upright on a point with the flat sides to the left and right.
+If <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “flat”, the hexagons will be flat side up and below and pointy side on the left and right.</p>
+</dd>
+<dt>crs: <cite>pyproj.CRS</cite> (optional)</dt><dd><p>The coordinate reference system of the grid.
+The value can be anything accepted by pyproj.CRS.from_user_input(),
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+Default: None</p>
+</dd>
+</dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.height">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.height" title="Permalink to this definition"></a></dt>
@@ -471,7 +505,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd class="field-odd"><p>1D-Array of size <cite>width</cite>, containing the longitudinal values from left to right</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -485,7 +519,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd class="field-odd"><p>1D-Array of size <cite>height</cite>, containing the latitudinal values from top to bottom</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -560,7 +594,7 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dd><p>Turn numpy indices that select values from self.data into a GridIndex instance that represents those same cells and can be used on the Grid object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>np_index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The numpy indices to convert</p>
+<dd class="field-odd"><p><strong>np_index</strong> (<cite>numpy.ndarray</cite>) – The numpy indices to convert</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The GridIndex representation of the cells</p>
@@ -611,7 +645,7 @@ Mutliple indices can be specified at once in the form of a list of indices or an
 Axes order if multiple indices are specified: (points, xy), else (xy).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied. <cite>index</cite> can only be <cite>None</cite> in classes that contain data.</p>
@@ -679,6 +713,7 @@ Axes order if multiple indices are specified: (points, xy), else (xy).</p>
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.update" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+</section>
 </dd></dl>
 
 </section>

@@ -112,7 +112,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`pyproj.CRS`</span>
+<span class="sd">        `pyproj.CRS`</span>
 <span class="sd">            None if the CRS is not set, and to set the value it</span>
 <span class="sd">            :getter: Returns a ``pyproj.CRS`` or None. When setting, the value</span>
 <span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
@@ -156,7 +156,7 @@
 <span class="sd">            The bounds of the area of interest in (minx, miny, maxx, maxy).</span>
 <span class="sd">            The bounds need to be aligned to the grid.</span>
 <span class="sd">            See :meth:`.BaseGrid.align_bounds`</span>
-<span class="sd">        fill_value: :class:`numpy.dtype` (optional)</span>
+<span class="sd">        fill_value: `numpy.dtype` (optional)</span>
 <span class="sd">            The value to assign to the newly created array that fills the supplied bounds.</span>
 <span class="sd">            Default: numpy.nan</span>
 
@@ -185,7 +185,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        index: :class:`numpy.ndarray`</span>
+<span class="sd">        index: `numpy.ndarray`</span>
 <span class="sd">            The index of the cell(s) of which to get the neighbours.</span>
 <span class="sd">        depth: :class:`int` Default: 1</span>
 <span class="sd">            Determines the number of neighbours that are returned.</span>
@@ -267,10 +267,10 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        index: :class:`numpy.ndarray`</span>
+<span class="sd">        index: `numpy.ndarray`</span>
 <span class="sd">            The indices of the cells of interest. Each id contains an `x` and `y` value.</span>
 <span class="sd">        as_poly: :class:`bool`</span>
-<span class="sd">            Toggle that determines whether to return a :class:`numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).</span>
+<span class="sd">            Toggle that determines whether to return a `numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -292,7 +292,7 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        crs Union[int, str, pyproj.CRS]</span>
+<span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
 <span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
@@ -431,9 +431,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        index: :class:`numpy.ndarray`</span>
+<span class="sd">        index: `numpy.ndarray`</span>
 <span class="sd">            The indices of the cells to convert to Shapely Polygons</span>
-<span class="sd">        as_multipolygon: :class:`numpy.ndarray`</span>
+<span class="sd">        as_multipolygon: `numpy.ndarray`</span>
 <span class="sd">            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False</span>
 
 <span class="sd">        See also</span>
@@ -465,9 +465,9 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        point: :class:`numpy.ndarray`</span>
+<span class="sd">        point: `numpy.ndarray`</span>
 <span class="sd">            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</span>
-<span class="sd">        values: :class:`numpy.ndarray`</span>
+<span class="sd">        values: `numpy.ndarray`</span>
 <span class="sd">            The values corresponding to the supplied `points`, used as input for interpolation</span>
 <span class="sd">        method: :class:`str`</span>
 <span class="sd">            The interpolation method to be used. Options are (&quot;nearest&quot;, &quot;linear&quot;, &quot;cubic&quot;). Default: &quot;linear&quot;.</span>

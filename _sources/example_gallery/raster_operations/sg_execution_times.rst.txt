@@ -6,16 +6,16 @@
 
 Computation times
 =================
-**00:13.071** total execution time for **example_gallery_raster_operations** files:
+**00:15.079** total execution time for **example_gallery_raster_operations** files:
 
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``ndvi.py``)                                                                   | 00:05.642 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``ndvi.py``)                                                                   | 00:06.985 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_resampling.py` (``resampling.py``)                                                       | 00:02.966 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_resampling.py` (``resampling.py``)                                                       | 00:03.301 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``elevation_distribution_per_land_cover.py``) | 00:02.888 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``elevation_distribution_per_land_cover.py``) | 00:03.192 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_parial_overlap.py` (``parial_overlap.py``)                                               | 00:00.850 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_parial_overlap.py` (``parial_overlap.py``)                                               | 00:00.893 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_raster_operations_coordinate_transformations.py` (``coordinate_transformations.py``)                       | 00:00.726 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_raster_operations_coordinate_transformations.py` (``coordinate_transformations.py``)                       | 00:00.708 | 0.0 MB |
 +-------------------------------------------------------------------------------------------------------------------------------------------+-----------+--------+

@@ -52,6 +52,7 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-example">Quick example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-is-gridkit">What is GridKit?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-gridkit-is-not">What GridKit is not</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#infinite-grids-the-fundamentals">Infinite grids, the fundamentals</a><ul>
@@ -95,6 +96,24 @@
              
   <section id="getting-started">
 <span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<section id="quick-example">
+<h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this heading"></a></h2>
+<p>As a quick demonstration a grid and two points are created.
+Then the grid cells that cover those points will be obtained
+and finally the polygon description of these cells will be obtained.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geoms</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geoms</span>
+<span class="go">array([&lt;POLYGON ((2.5 5.052, 2.5 7.939, 0 9.382, -2.5 7.939, -2.5 5.052, 0 3.608, 2...&gt;,</span>
+<span class="go">      &lt;POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...&gt;],</span>
+<span class="go">      dtype=object)</span>
+</pre></div>
+</div>
+<p>More elaborate examples can be found in the <a class="reference internal" href="example_gallery/index.html#example-gallery"><span class="std std-ref">Example gallery</span></a></p>
+</section>
 <section id="what-is-gridkit">
 <h2>What is GridKit?<a class="headerlink" href="#what-is-gridkit" title="Permalink to this heading"></a></h2>
 <p>GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids.</p>

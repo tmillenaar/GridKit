@@ -122,7 +122,7 @@ Coordinate Reference System of the geometry objects. Can be anything accepted by
 such as an authority string (eg “EPSG:4326”) or a WKT string.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">pyproj.CRS</span></code></p>
+<dd class="field-even"><p><cite>pyproj.CRS</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -162,7 +162,7 @@ such as an authority string (eg “EPSG:4326”) or a WKT string.</p>
 <li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounds of the area of interest in (minx, miny, maxx, maxy).
 The bounds need to be aligned to the grid.
 See <a class="reference internal" href="#gridkit.base_grid.BaseGrid.align_bounds" title="gridkit.base_grid.BaseGrid.align_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.align_bounds()</span></code></a></p></li>
-<li><p><strong>fill_value</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.dtype</span></code> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
+<li><p><strong>fill_value</strong> (<cite>numpy.dtype</cite> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
 Default: numpy.nan</p></li>
 </ul>
 </dd>
@@ -192,7 +192,7 @@ The argument ‘depth’ can be used to include cells from further away.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The index of the cell(s) of which to get the neighbours.</p></li>
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index of the cell(s) of which to get the neighbours.</p></li>
 <li><p><strong>depth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> Default: 1) – Determines the number of neighbours that are returned.
 If <cite>depth=1</cite> the direct neighbours are returned.
 If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
@@ -249,8 +249,8 @@ in which case the cell itself often should also be included.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p></li>
-<li><p><strong>as_poly</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggle that determines whether to return a <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> (False) or a <code class="xref py py-class docutils literal notranslate"><span class="pre">shapely.MultiPolygon</span></code> (True).</p></li>
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p></li>
+<li><p><strong>as_poly</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Toggle that determines whether to return a <cite>numpy.ndarray</cite> (False) or a <code class="xref py py-class docutils literal notranslate"><span class="pre">shapely.MultiPolygon</span></code> (True).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -275,17 +275,9 @@ This will update the cell size and the origin offset.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current grid must be set.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>Union</strong><strong>[</strong><strong>int</strong> (<em>crs</em>) – The value can be anything accepted
+<dd class="field-odd"><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
 by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-<li><p><strong>str</strong> – The value can be anything accepted
-by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-<li><p><strong>pyproj.CRS</strong><strong>]</strong> – The value can be anything accepted
-by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
-such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
-</ul>
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -352,8 +344,8 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The indices of the cells to convert to Shapely Polygons</p></li>
-<li><p><strong>as_multipolygon</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False</p></li>
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The indices of the cells to convert to Shapely Polygons</p></li>
+<li><p><strong>as_multipolygon</strong> (<cite>numpy.ndarray</cite>) – Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False</p></li>
 </ul>
 </dd>
 </dl>
@@ -378,8 +370,8 @@ are sampled in order to obtain values at arbitrary location.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>point</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</p></li>
-<li><p><strong>values</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The values corresponding to the supplied <cite>points</cite>, used as input for interpolation</p></li>
+<li><p><strong>point</strong> (<cite>numpy.ndarray</cite>) – A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</p></li>
+<li><p><strong>values</strong> (<cite>numpy.ndarray</cite>) – The values corresponding to the supplied <cite>points</cite>, used as input for interpolation</p></li>
 <li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The interpolation method to be used. Options are (“nearest”, “linear”, “cubic”). Default: “linear”.</p></li>
 </ul>
 </dd>

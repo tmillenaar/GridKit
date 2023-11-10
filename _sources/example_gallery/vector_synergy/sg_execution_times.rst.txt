@@ -6,14 +6,14 @@
 
 Computation times
 =================
-**00:09.442** total execution time for **example_gallery_vector_synergy** files:
+**00:09.894** total execution time for **example_gallery_vector_synergy** files:
 
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py` (``intersect_geometries.py``)       | 00:06.164 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py` (``intersect_geometries.py``)       | 00:06.737 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py` (``interpolate_from_points.py``) | 00:01.612 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py` (``interpolate_from_points.py``) | 00:01.726 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py` (``aggregate_dask.py``)                   | 00:01.053 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py` (``aggregate_dask.py``)                   | 00:00.815 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+
-| :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py` (``aggregate.py``)                             | 00:00.614 | 0.0 MB |
+| :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py` (``aggregate.py``)                             | 00:00.617 | 0.0 MB |
 +------------------------------------------------------------------------------------------------------------+-----------+--------+

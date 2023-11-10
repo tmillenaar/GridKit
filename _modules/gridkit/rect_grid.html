@@ -94,6 +94,28 @@
 
 
 <div class="viewcode-block" id="RectGrid"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid">[docs]</a><span class="k">class</span> <span class="nc">RectGrid</span><span class="p">(</span><span class="n">BaseGrid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstraction that represents an infinite grid with square cell shape.</span>
+
+<span class="sd">    Initialization parameters</span>
+<span class="sd">    -------------------------</span>
+<span class="sd">    dx: :class:`float`</span>
+<span class="sd">        The spacing between two cell centroids in horizontal direction</span>
+<span class="sd">    dy: :class:`float`</span>
+<span class="sd">        The spacing between two cell centroids in vertical direction</span>
+<span class="sd">    offset: `Tuple(float, float)` (optional)</span>
+<span class="sd">        The offset in dx and dy.</span>
+<span class="sd">        Shifts the whole grid by the specified amount.</span>
+<span class="sd">        The shift is always reduced to be maximum one cell size.</span>
+<span class="sd">        If the supplied shift is larger,</span>
+<span class="sd">        a shift will be performed such that the new center is a multiple of dx or dy away.</span>
+<span class="sd">        Default: (0,0)</span>
+<span class="sd">    crs: `pyproj.CRS` (optional)</span>
+<span class="sd">        The coordinate reference system of the grid.</span>
+<span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
+<span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dx</span> <span class="o">=</span> <span class="n">dx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dy</span> <span class="o">=</span> <span class="n">dy</span>
@@ -143,7 +165,7 @@
 <span class="sd">            If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.</span>
 <span class="sd">            This escalates in combination with `depth` where indices in a square shape around the cell are returned</span>
 <span class="sd">            when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.</span>
-<span class="sd">        index: :class:`numpy.ndarray`</span>
+<span class="sd">        index: `numpy.ndarray`</span>
 <span class="sd">            The index is mostly relevant for hexagonal grids.</span>
 <span class="sd">            For a square grid the relative neighbours are independent on the location on the grid.</span>
 <span class="sd">            Here it is only used for the return length.</span>
@@ -251,7 +273,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            The longitude and latitude of the center of each cell.</span>
 <span class="sd">            Axes order if multiple indices are specified: (points, xy), else (xy).</span>
 
@@ -425,7 +447,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            The index of the cell containing the point(s).</span>
 <span class="sd">            If a single point is supplied, the index is returned as a 1d array of length 2.</span>
 <span class="sd">            If multiple points are supplied, the indices are returned as Nx2 ndarrays.</span>
@@ -647,6 +669,20 @@
 
 
 <div class="viewcode-block" id="BoundedRectGrid"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid">[docs]</a><span class="k">class</span> <span class="nc">BoundedRectGrid</span><span class="p">(</span><span class="n">BoundedGrid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialization parameters</span>
+<span class="sd">    -------------------------</span>
+<span class="sd">    data: `numpy.ndarray`</span>
+<span class="sd">        A 2D ndarray containing the data</span>
+<span class="sd">    bounds: :class:Tuple(float, float, float, float)</span>
+<span class="sd">        The extend of the data in minx, miny, maxx, maxy.</span>
+<span class="sd">    crs: `pyproj.CRS` (optional)</span>
+<span class="sd">        The coordinate reference system of the grid.</span>
+<span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
+<span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -684,7 +720,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `width`, containing the longitudinal values from left to right</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
@@ -697,7 +733,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `height`, containing the latitudinal values from top to bottom</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
@@ -709,7 +745,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            Multidimensional array containing the longitude and latitude of the center of each cell respectively,</span>
 <span class="sd">            in (width, height, lonlat)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -779,12 +815,12 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        sample_points: :class:`numpy.ndarray`</span>
+<span class="sd">        sample_points: `numpy.ndarray`</span>
 <span class="sd">            The coordinates of the points at which to sample the data</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        :class:`numpy.ndarray`</span>
+<span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            The interpolated values at the supplied points</span>
 
 <span class="sd">        See also</span>
