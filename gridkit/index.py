@@ -320,7 +320,7 @@ class GridIndex(metaclass=_IndexMeta):
         ----------
         index: :class:`GridIndex`
             The cell_ids to append to the current index
-        in_place: :class:`bool`(optional, default False )
+        in_place: :class:`bool` (optional, default False )
             Updates the index of ``self`` if True.
             Returns a copy if False.
             Note: This does not improve performance as you might expect form a true in-place operation.
@@ -384,7 +384,7 @@ class GridIndex(metaclass=_IndexMeta):
         ----------
         index: :class:`GridIndex`
             The cell ids to remove from ``self``
-        in_place: :class:`bool`(optional, default False )
+        in_place: :class:`bool` (optional, default False )
             Updates the index of ``self`` if True.
             Returns a copy if False.
             Note: This does not improve performance as you might expect form a true in-place operation.
@@ -400,7 +400,7 @@ class GridIndex(metaclass=_IndexMeta):
         Examples
         --------
 
-        .. code-block:: python
+        .. code-block::python
 
             >>> start_index = GridIndex([[0,1], [2,3], [0,1]])
             >>> start_index.index
@@ -416,7 +416,7 @@ class GridIndex(metaclass=_IndexMeta):
         Alternatively, by specifying ``in_place=True`` the original object can be updated.
         As noted at the ``in_place`` parameter description, this does not result in performance gains.
 
-        .. code-block:: python
+        .. code-block::python
 
             >>> start_index.delete([0,1], in_place=True)
             <gridkit.index.GridIndex object at ...>

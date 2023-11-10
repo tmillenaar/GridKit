@@ -29,7 +29,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        :class:`pyproj.CRS`
+        `pyproj.CRS`
             None if the CRS is not set, and to set the value it
             :getter: Returns a ``pyproj.CRS`` or None. When setting, the value
             Coordinate Reference System of the geometry objects. Can be anything accepted by
@@ -73,7 +73,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             The bounds of the area of interest in (minx, miny, maxx, maxy).
             The bounds need to be aligned to the grid.
             See :meth:`.BaseGrid.align_bounds`
-        fill_value: :class:`numpy.dtype` (optional)
+        fill_value: `numpy.dtype` (optional)
             The value to assign to the newly created array that fills the supplied bounds.
             Default: numpy.nan
 
@@ -102,7 +102,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        index: :class:`numpy.ndarray`
+        index: `numpy.ndarray`
             The index of the cell(s) of which to get the neighbours.
         depth: :class:`int` Default: 1
             Determines the number of neighbours that are returned.
@@ -184,10 +184,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        index: :class:`numpy.ndarray`
+        index: `numpy.ndarray`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
         as_poly: :class:`bool`
-            Toggle that determines whether to return a :class:`numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).
+            Toggle that determines whether to return a `numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).
 
         Returns
         -------
@@ -209,7 +209,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        crs Union[int, str, pyproj.CRS]
+        crs: Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
@@ -348,9 +348,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        index: :class:`numpy.ndarray`
+        index: `numpy.ndarray`
             The indices of the cells to convert to Shapely Polygons
-        as_multipolygon: :class:`numpy.ndarray`
+        as_multipolygon: `numpy.ndarray`
             Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False
 
         See also
@@ -382,9 +382,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        point: :class:`numpy.ndarray`
+        point: `numpy.ndarray`
             A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]
-        values: :class:`numpy.ndarray`
+        values: `numpy.ndarray`
             The values corresponding to the supplied `points`, used as input for interpolation
         method: :class:`str`
             The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".
