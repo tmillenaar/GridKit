@@ -30,7 +30,7 @@ jobs:
         run: pip install gridkit_rs/target/wheels/*.whl
 
       - name: Run pytest
-        run: python -m pytest tests --cov
+        run: python -m pytest tests --cov --verbose
 
       - name: Run doctest
         run: python -m pytest gridkit/ --doctest-modules

@@ -1,10 +1,9 @@
-from gridkit_rs import PyTriGrid
-
 from gridkit.base_grid import BaseGrid
 from gridkit.index import GridIndex, validate_index
+from gridkit_rs import PyTriGrid
+
 
 class TriGrid(BaseGrid):
-
     def __init__(self, *args, size, shape="pointy", **kwargs):
         self._size = size
         self._radius = size / 3**0.5
@@ -43,23 +42,23 @@ class TriGrid(BaseGrid):
         This is the same as dx for a flat grid and the same as dy for a pointy grid.
         """
         return self._size
-    
+
     @validate_index
     def centroid(self, index):
         index = index.index[None] if index.index.ndim == 1 else index.index
         return self._grid.centroid(index=index).squeeze()
-    
+
     @validate_index
     def cell_corners(self, index):
         index = index.index[None] if index.index.ndim == 1 else index.index
         return self._grid.cell_corners(index=index.index).squeeze()
-    
+
     def cell_at_point(self, point):
         return GridIndex(self._grid.cell_at_point(point))
-    
+
     def cells_in_bounds(self, bounds):
         return GridIndex(self._grid.cells_in_bounds(bounds))
-    
+
     def cells_in_bounds_py(self, bounds, return_cell_count: bool = False):
         """Cells contained within a bounding box.
 
@@ -90,8 +89,8 @@ class TriGrid(BaseGrid):
         right_top = (bounds[2] - self.dx / 4, bounds[3] - self.dy / 4)
         right_bottom = (bounds[2] - self.dx / 4, bounds[1] + self.dy / 4)
 
-
         import numpy
+
         # translate the coordinates of the corner cells into indices
         left_top_id, left_bottom_id, right_top_id, right_bottom_id = self.cell_at_point(
             numpy.stack([left_top, left_bottom, right_top, right_bottom])
@@ -133,21 +132,21 @@ class TriGrid(BaseGrid):
         ids = GridIndex(ids.reshape((*shape, 2)))
 
         return (ids, shape) if return_cell_count else ids
-    
+
     def cells_near_point(self):
         raise NotImplementedError()
-    
+
     def is_aligned_with(self):
         raise NotImplementedError()
-    
+
     def parent_grid_class(self):
         raise NotImplementedError()
-    
+
     def relative_neighbours(self):
         raise NotImplementedError()
-    
+
     def to_bounded(self):
         raise NotImplementedError()
-    
+
     def to_crs(self):
         raise NotImplementedError()

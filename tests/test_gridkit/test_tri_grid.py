@@ -1,7 +1,8 @@
-import numpy 
+import numpy
 import pytest
 
 from gridkit import TriGrid
+
 
 @pytest.mark.parametrize(
     "shape, indices, expected_centroids",
@@ -11,11 +12,7 @@ from gridkit import TriGrid
         [
             "pointy",
             [(0, 0), (1, -1), (1, 1)],
-            [
-                [-0.75, -0.8660254 ],
-                [ 0.75, -3.46410162],
-                [ 0.75,  1.73205081]
-            ],
+            [[-0.75, -0.8660254], [0.75, -3.46410162], [0.75, 1.73205081]],
         ],
     ],
 )
