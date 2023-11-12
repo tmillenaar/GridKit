@@ -23,6 +23,12 @@ jobs:
       - name: Install dependencies
         run: pip install ./[test]
 
+      - name: Build rust package as wheel
+        run: maturin build --manifest-path=./gridkit_rs/Cargo.toml
+
+      - name: Install wheel of rust module
+        run: pip install gridkit_rs/target/wheels/*.whl
+
       - name: Run pytest
         run: python -m pytest tests --cov
 

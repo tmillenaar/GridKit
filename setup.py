@@ -22,6 +22,8 @@ docs_require = [
 tests_require = [
     "pytest",
     "black",
+    "geopandas",
+    "maturin",
     "pytest-cov",
     "pytest-pylint",
     "pytest-black",
