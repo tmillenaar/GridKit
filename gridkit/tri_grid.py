@@ -51,7 +51,7 @@ class TriGrid(BaseGrid):
     @validate_index
     def cell_corners(self, index):
         index = index.index[None] if index.index.ndim == 1 else index.index
-        return self._grid.cell_corners(index=index.index).squeeze()
+        return self._grid.cell_corners(index=index).squeeze()
 
     def cell_at_point(self, point):
         return GridIndex(self._grid.cell_at_point(point))
