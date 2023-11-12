@@ -38,7 +38,25 @@ def test_centroid(shape, indices, expected_centroids):
     ],
 )
 def test_cell_corners(indices, expected_centroids):
-    # TODO: test for different shapes when implemented
     grid = TriGrid(size=3)
     centroids = grid.cell_corners(indices)
     numpy.testing.assert_allclose(centroids, expected_centroids)
+
+
+@pytest.mark.parametrize(
+    "points, expected_ids",
+    (
+        [
+            (-2.2, 5.7),
+            [-3, 5],
+        ],
+        [
+            [(-0.3, -7.5), (3.6, -8.3)],
+            [[0, -6], [5, -6]],
+        ],
+    ),
+)
+def test_cell_at_point(points, expected_ids):
+    grid = TriGrid(size=1.4)
+    ids = grid.cell_at_point(points)
+    numpy.testing.assert_allclose(ids, expected_ids)

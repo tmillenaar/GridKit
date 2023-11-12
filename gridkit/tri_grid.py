@@ -1,3 +1,5 @@
+import numpy
+
 from gridkit.base_grid import BaseGrid
 from gridkit.index import GridIndex, validate_index
 from gridkit_rs import PyTriGrid
@@ -54,6 +56,8 @@ class TriGrid(BaseGrid):
         return self._grid.cell_corners(index=index).squeeze()
 
     def cell_at_point(self, point):
+        point = numpy.array(point)
+        point = point[None] if point.ndim == 1 else point
         return GridIndex(self._grid.cell_at_point(point))
 
     def cells_in_bounds(self, bounds):
