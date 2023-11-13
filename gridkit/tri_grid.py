@@ -60,81 +60,9 @@ class TriGrid(BaseGrid):
         point = point[None] if point.ndim == 1 else point
         return GridIndex(self._grid.cell_at_point(point))
 
-    def cells_in_bounds(self, bounds):
-        return GridIndex(self._grid.cells_in_bounds(bounds))
-
-    def cells_in_bounds_py(self, bounds, return_cell_count: bool = False):
-        """Cells contained within a bounding box.
-
-        Parameters
-        ----------
-        bounds: :class:`tuple`
-            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)
-        return_cell_count: :class:`bool`
-            Return a tuple containing the nr of cells in x and y direction inside the provided bounds
-
-        Returns
-        -------
-        :class:`.GridIndex`
-            The indices of the cells contained in the bounds
-        """
-        # TODO: Simplify function. Conceptually hard to follow and not very DRY
-        if not self.are_bounds_aligned(bounds):
-            raise ValueError(
-                f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
-            )
-
-        if not self.are_bounds_aligned(bounds):
-            bounds = self.align_bounds(bounds, mode="expand")
-
-        # get coordinates of two diagonally opposing corner-cells
-        left_top = (bounds[0] + self.dx / 4, bounds[3] - self.dy / 4)
-        left_bottom = (bounds[0] + self.dx / 4, bounds[1] + self.dy / 4)
-        right_top = (bounds[2] - self.dx / 4, bounds[3] - self.dy / 4)
-        right_bottom = (bounds[2] - self.dx / 4, bounds[1] + self.dy / 4)
-
-        import numpy
-
-        # translate the coordinates of the corner cells into indices
-        left_top_id, left_bottom_id, right_top_id, right_bottom_id = self.cell_at_point(
-            numpy.stack([left_top, left_bottom, right_top, right_bottom])
-        ).index
-
-        if self._shape == "pointy":
-            nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
-        elif self._shape == "flat":
-            nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
-
-        ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
-        ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
-        if self._shape == "flat":
-            ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="ij")
-            ids_y_full = numpy.fliplr(ids_y_full)
-        else:
-            ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="xy")
-            ids_y_full = numpy.flipud(ids_y_full)
-        ids = numpy.vstack([ids_x_full.ravel(), ids_y_full.ravel()]).T
-
-        # determine what cells are outside of bounding box
-        centroids = self.centroid(ids).T
-        error_margin = numpy.finfo(
-            numpy.float32
-        ).eps  # expect problems with machine precision since some cells are on the bounds by design
-        oob_mask = centroids[0] < (bounds[0] - error_margin)
-        oob_mask |= centroids[1] < (bounds[1] - error_margin)
-        oob_mask |= centroids[0] >= (bounds[2] - error_margin)
-        oob_mask |= centroids[1] >= (bounds[3] - error_margin)
-
-        ids = ids[~oob_mask]
-
-        shape = (
-            (int(numpy.ceil(ids.shape[0] / nr_cells_flat)), nr_cells_flat)
-            if nr_cells_flat != 0
-            else (0, 0)
-        )
-
-        ids = GridIndex(ids.reshape((*shape, 2)))
-
+    def cells_in_bounds(self, bounds, return_cell_count=False):
+        ids, shape = self._grid.cells_in_bounds(bounds)
+        ids = GridIndex(ids)
         return (ids, shape) if return_cell_count else ids
 
     def cells_near_point(self):

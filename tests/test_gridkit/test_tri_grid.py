@@ -63,7 +63,7 @@ def test_cell_at_point(points, expected_ids):
 
 
 @pytest.mark.parametrize(
-    "bounds, expected_ids",
+    "bounds, expected_ids, expected_shape",
     (
         [
             (-2.2, -3, 2.3, 2.1),
@@ -93,6 +93,7 @@ def test_cell_at_point(points, expected_ids):
                 [2, -1],
                 [3, -1],
             ],
+            (6, 4),
         ],
         [
             (2.2, 3, 5.3, 6.1),
@@ -113,6 +114,7 @@ def test_cell_at_point(points, expected_ids):
                 [7, 3],
                 [8, 3],
             ],
+            (5, 3),
         ],
         [
             (-5.3, -6.1, -2.2, -3),
@@ -133,11 +135,19 @@ def test_cell_at_point(points, expected_ids):
                 [-4, -4],
                 [-3, -4],
             ],
+            (5, 3),
         ],
     ),
 )
-def test_cells_in_bounds(bounds, expected_ids):
+@pytest.mark.parametrize("return_cell_count", [True, False])
+def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count):
     grid = TriGrid(size=1.4)
     bounds = grid.align_bounds(bounds, "nearest")
-    ids = grid.cells_in_bounds(bounds)
-    numpy.testing.assert_allclose(ids, expected_ids)
+    result = grid.cells_in_bounds(bounds, return_cell_count=return_cell_count)
+    if return_cell_count is False:
+        numpy.testing.assert_allclose(result, expected_ids)
+    else:
+        ids, shape = result
+        numpy.testing.assert_allclose(ids, expected_ids)
+        numpy.testing.assert_allclose(shape, expected_shape)
+        assert len(ids) == shape[0] * shape[1]

@@ -76,8 +76,9 @@ impl PyTriGrid {
         &self,
         py: Python<'py>,
         bounds: (f64, f64, f64, f64),
-    ) -> &'py PyArray2<i64> {
-        self._grid.cells_in_bounds(&bounds).into_pyarray(py)
+    ) -> (&'py PyArray2<i64>, (usize, usize)) {
+        let (bounds, shape) = self._grid.cells_in_bounds(&bounds); 
+        (bounds.into_pyarray(py), shape)
     }
 }
 

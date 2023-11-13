@@ -132,7 +132,7 @@ impl TriGrid {
     pub fn cells_in_bounds(
         &self,
         bounds: &(f64, f64, f64, f64),
-    ) -> Array2<i64> {
+    ) -> (Array2<i64>, (usize, usize)) {
         
         // Get ids of the cells at diagonally opposing corners of the bounds
         // TODO: allow calling of cell_at_point with single point (tuple or 1d array)
@@ -173,7 +173,7 @@ impl TriGrid {
 
 
 
-        index
+        (index, (nr_cells_x, nr_cells_y))
     }
 
 }
