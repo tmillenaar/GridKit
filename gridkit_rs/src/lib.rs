@@ -15,8 +15,8 @@ struct PyTriGrid {
 impl PyTriGrid {
 
     #[new]
-    fn new(cellsize: f64) -> Self {
-        let _grid = tri_grid::TriGrid { cellsize };
+    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
+        let _grid = tri_grid::TriGrid { cellsize, offset };
         PyTriGrid{
             cellsize,
             _grid,

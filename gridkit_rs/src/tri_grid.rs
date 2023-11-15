@@ -5,13 +5,15 @@ fn iseven(val: i64) -> bool {
 }
 pub struct TriGrid {
     pub cellsize: f64,
+    pub offset: (f64, f64),
 }
 
 impl TriGrid {
 
-    pub fn new(cellsize: f64) -> Self {
+    pub fn new(cellsize: f64, offset: (f64, f64)) -> Self {
         TriGrid{
             cellsize,
+            offset,
         }
     }
 
@@ -42,8 +44,8 @@ impl TriGrid {
         let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
         
         for cell_id in 0..centroids.shape()[0] {
-            centroids[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] as f64 * self.dx() - (self.dx() / 2.);
-            centroids[Ix2(cell_id, 1)] = index[Ix2(cell_id, 1)] as f64 * self.dy() - (self.dy() / 2.);
+            centroids[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] as f64 * self.dx() - (self.dx() / 2.) + self.offset.0;
+            centroids[Ix2(cell_id, 1)] = index[Ix2(cell_id, 1)] as f64 * self.dy() - (self.dy() / 2.) + self.offset.1;
     
             let vertical_offset = self.radius() - 0.5 * self.dy();
             if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
@@ -88,11 +90,12 @@ impl TriGrid {
     ) -> Array2<i64> {
         let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
         for cell_id in 0..points.shape()[0] {
-            index[Ix2(cell_id, 0)] = (1. + (points[Ix2(cell_id, 0)]) / self.dx()).floor() as i64;
-            index[Ix2(cell_id, 1)] = (1. + points[Ix2(cell_id, 1)] / self.dy()).floor() as i64;
 
-            let rel_loc_x: f64 = (points[Ix2(cell_id, 0)].abs()) % self.dx();
-            let rel_loc_y: f64 = points[Ix2(cell_id, 1)].abs() % self.dy();
+            index[Ix2(cell_id, 0)] = (1. + (points[Ix2(cell_id, 0)] - self.offset.0 ) / self.dx()).floor() as i64;
+            index[Ix2(cell_id, 1)] = (1. + (points[Ix2(cell_id, 1)] - self.offset.1 ) / self.dy()).floor() as i64;
+
+            let rel_loc_x: f64 = ((points[Ix2(cell_id, 0)] - self.offset.0).abs()) % self.dx();
+            let rel_loc_y: f64 = ((points[Ix2(cell_id, 1)] - self.offset.1).abs()) % self.dy();
 
             let mut downward_cell = iseven(index[Ix2(cell_id, 0)]) != iseven(index[Ix2(cell_id, 1)]);
             if index[Ix2(cell_id, 1)] > 0 {

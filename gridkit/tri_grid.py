@@ -6,15 +6,15 @@ from gridkit_rs import PyTriGrid
 
 
 class TriGrid(BaseGrid):
-    def __init__(self, *args, size, shape="pointy", **kwargs):
+    def __init__(self, *args, size, shape="pointy", offset=(0,0), **kwargs):
         self._size = size
         self._radius = size / 3**0.5
 
-        self._grid = PyTriGrid(cellsize=size)
+        self._grid = PyTriGrid(cellsize=size, offset=offset)
 
         self._shape = shape
         self.bounded_cls = None
-        super(TriGrid, self).__init__(*args, **kwargs)
+        super(TriGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -72,7 +72,7 @@ class TriGrid(BaseGrid):
         raise NotImplementedError()
 
     def parent_grid_class(self):
-        raise NotImplementedError()
+        raise TriGrid
 
     def relative_neighbours(self):
         raise NotImplementedError()
