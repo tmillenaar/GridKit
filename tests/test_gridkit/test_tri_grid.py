@@ -16,10 +16,12 @@ from gridkit import TriGrid
         ],
     ],
 )
-def test_centroid(shape, indices, expected_centroids):
+@pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
+def test_centroid(shape, indices, offset, expected_centroids):
     # TODO: test for different shapes when implemented
-    grid = TriGrid(size=3)
+    grid = TriGrid(size=3, offset=offset)
     centroids = grid.centroid(indices)
+    centroids -= offset
     numpy.testing.assert_allclose(centroids, expected_centroids)
 
 
@@ -37,10 +39,12 @@ def test_centroid(shape, indices, expected_centroids):
         ],
     ],
 )
-def test_cell_corners(indices, expected_centroids):
-    grid = TriGrid(size=3)
-    centroids = grid.cell_corners(indices)
-    numpy.testing.assert_allclose(centroids, expected_centroids)
+@pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
+def test_cell_corners(indices, offset, expected_centroids):
+    grid = TriGrid(size=3, offset=offset)
+    corners = grid.cell_corners(indices)
+    corners -= offset
+    numpy.testing.assert_allclose(corners, expected_centroids, atol=1e-15)
 
 
 @pytest.mark.parametrize(
@@ -56,8 +60,11 @@ def test_cell_corners(indices, expected_centroids):
         ],
     ),
 )
-def test_cell_at_point(points, expected_ids):
-    grid = TriGrid(size=1.4)
+@pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
+def test_cell_at_point(points, offset, expected_ids):
+    points = numpy.array(points)
+    points += offset
+    grid = TriGrid(size=1.4, offset=offset)
     ids = grid.cell_at_point(points)
     numpy.testing.assert_allclose(ids, expected_ids)
 
