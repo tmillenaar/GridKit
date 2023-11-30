@@ -418,7 +418,6 @@ class RectGrid(BaseGrid):
 
     @validate_index
     def cell_corners(self, index: GridIndex = None) -> numpy.ndarray:
-        """Return corners in (cells, corners, xy)"""
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
