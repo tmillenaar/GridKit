@@ -12,6 +12,25 @@ from gridkit.index import GridIndex, validate_index
 
 
 class BaseGrid(metaclass=abc.ABCMeta):
+    """Abstraction base class that represents an infinite grid.
+
+    Initialization parameters
+    -------------------------
+    offset: `Tuple(float, float)` (optional)
+        The offset in dx and dy.
+        Shifts the whole grid by the specified amount.
+        The shift is always reduced to be maximum one cell size.
+        If the supplied shift is larger,
+        a shift will be performed such that the new center is a multiple of dx or dy away.
+        Default: (0,0)
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        If None, no CRS is set.
+        Default: None
+    """
+
     def __init__(self, offset=(0, 0), crs=None):
         # limit offset to be positive and max 1 cell-size
         offset_x, offset_y = offset[0], offset[1]
@@ -45,22 +64,29 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def dx(self) -> float:
+        """The distance in x-direction between two adjacent cell centers."""
         pass
 
     @abc.abstractmethod
     def dy(self) -> float:
+        """The distance in y-direction between two adjacent cell centers."""
         pass
 
     @property
     def offset(self) -> float:
+        """The offset off the grid in dx and dy.
+        The offset is never larger than the size of a single grid cell.
+        The offset represents the shift from the origin (0,0)."""
         return self._offset
 
     @abc.abstractmethod
-    def centroid(self) -> float:
+    def centroid(self, index) -> float:
+        """Coordinates at the center of the cell(s) specified by `index`."""
         pass
 
     @abc.abstractmethod
-    def cells_near_point(self) -> float:
+    def cells_near_point(self, point) -> float:
+        """The 3 to 4 cells nearest to a point, often used in interpolation at the location of the point."""
         pass
 
     @abc.abstractmethod
@@ -177,27 +203,36 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def cell_corners(
-        self, index: numpy.ndarray, as_poly: bool = False
-    ) -> numpy.ndarray:
-        """Determine the corners of the cells as specified by `index`.
+    def cell_corners(self, index: numpy.ndarray) -> numpy.ndarray:
+        """Coordinates of the cell corners as specified by `index`.
 
         Parameters
         ----------
         index: `numpy.ndarray`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
-        as_poly: :class:`bool`
-            Toggle that determines whether to return a `numpy.ndarray` (False) or a :class:`shapely.MultiPolygon` (True).
 
         Returns
         -------
-        :class:`tuple`
+        :class:`~.index.GridIndex`
             The ID of the cell in (x,y)
         """
         pass
 
     @abc.abstractmethod
     def is_aligned_with(self, other):
+        """
+        Returns True if grids are algined and False if they are not.
+        Grids are considered to be aligned when:
+         - they are the same type of grid
+         - the CRS is the same
+         - the cell_size is the same
+         - the offset from origin is the same
+
+        Returns
+        -------
+        :class:`bool`
+            Whether or not the grids are aligned
+        """
         pass
 
     @abc.abstractmethod
