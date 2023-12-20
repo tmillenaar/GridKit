@@ -444,6 +444,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         vertices = self.cell_corners(index.ravel())
         if index.index.ndim == 1:
             return shapely.geometry.Polygon(vertices)
+        if vertices.ndim == 2:
+            vertices = vertices[numpy.newaxis]
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
 
         if len(polygons) == 1:
