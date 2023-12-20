@@ -2,6 +2,7 @@ import numpy
 import pytest
 
 from gridkit import TriGrid
+from gridkit.index import GridIndex
 
 
 @pytest.mark.parametrize(
@@ -158,3 +159,46 @@ def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count
         numpy.testing.assert_allclose(ids, expected_ids)
         numpy.testing.assert_allclose(shape, expected_shape)
         assert len(ids) == shape[0] * shape[1]
+
+@pytest.mark.parametrize("index", [
+    [0,0], # test single cell
+    [[-6,3],[4,-1],[5,4],[-5,-4]], # up
+    [[-5,3],[3,-3],[4,4],[-6,-6]], # down
+])
+@pytest.mark.parametrize("depth", range(1,7))
+@pytest.mark.parametrize("include_selected", [True, False])
+@pytest.mark.parametrize("connect_corners", [True, False])
+def test_neighbours(index, depth, include_selected, connect_corners):
+    grid = TriGrid(size=1.4)
+    all_neighbours = grid.neighbours(index, depth=depth, include_selected=include_selected, connect_corners=connect_corners)
+    all_relative_neighbours = grid.relative_neighbours(index, depth=depth, include_selected=include_selected, connect_corners=connect_corners)
+
+    nr_neighbours_factor = 4 if connect_corners else 1
+    expected_nr_neighbours = include_selected + sum([nr_neighbours_factor * 3 * (i + 1) for i in range(depth)])
+    
+    def verify_neighbours(index, neighbours, relative_neigbours):
+        # Compare neighbours and relative_neighbours
+        numpy.testing.assert_allclose(neighbours - index, relative_neigbours)
+
+        # Make sure include_selected targets the center cell appropriately
+        if include_selected:
+            assert GridIndex([0,0]) in relative_neigbours
+        else:
+            assert GridIndex([0,0]) not in relative_neigbours
+
+        # Make sure the number of neighbours is as expected
+        assert len(neighbours) == expected_nr_neighbours
+        # Make sure there are no duplicate ids
+        assert len(relative_neigbours.unique()) == len(relative_neigbours)
+        # Make sure all cells are at least within the expected radius
+        # Best would be to check the actual indices, but the arrays get too large to comfortably put in a test definition
+        expected_furthest_cell_distance = (1 + 2*depth) if connect_corners else depth
+        assert numpy.all(abs(relative_neigbours.index.sum(axis=1)) <= expected_furthest_cell_distance)
+
+    if all_neighbours.index.ndim == 2:
+        verify_neighbours(index, all_neighbours, all_relative_neighbours)
+    else:
+        for (cell_index, cell_neigbours, cell_relative_neigbours) in zip(index, all_neighbours.index, all_relative_neighbours.index):
+            # FIXME: looping over GridIndex should take n-dimensionality into account,
+            #        currently looping over raveled index
+            verify_neighbours(cell_index, GridIndex(cell_neigbours), GridIndex(cell_relative_neigbours))
