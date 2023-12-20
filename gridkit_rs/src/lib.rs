@@ -1,5 +1,5 @@
-use pyo3::prelude::*;
 use numpy::{IntoPyArray, PyArray2, PyArray3, PyReadonlyArray2};
+use pyo3::prelude::*;
 
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
 
@@ -13,14 +13,10 @@ struct PyTriGrid {
 
 #[pymethods]
 impl PyTriGrid {
-
     #[new]
     fn new(cellsize: f64, offset: (f64, f64)) -> Self {
         let _grid = tri_grid::TriGrid { cellsize, offset };
-        PyTriGrid{
-            cellsize,
-            _grid,
-        }
+        PyTriGrid { cellsize, _grid }
     }
 
     fn cell_height(&self) -> f64 {
@@ -57,7 +53,6 @@ impl PyTriGrid {
         py: Python<'py>,
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray3<f64> {
-        
         let index = index.as_array();
         self._grid.cell_corners(&index).into_pyarray(py)
     }
@@ -67,7 +62,6 @@ impl PyTriGrid {
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
-        
         let points = points.as_array();
         self._grid.cell_at_point(&points).into_pyarray(py)
     }
@@ -77,8 +71,48 @@ impl PyTriGrid {
         py: Python<'py>,
         bounds: (f64, f64, f64, f64),
     ) -> (&'py PyArray2<i64>, (usize, usize)) {
-        let (bounds, shape) = self._grid.cells_in_bounds(&bounds); 
+        let (bounds, shape) = self._grid.cells_in_bounds(&bounds);
         (bounds.into_pyarray(py), shape)
+    }
+
+    fn relative_neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: i64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        }
+    }
+
+    fn neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: i64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        }
     }
 }
 
@@ -88,5 +122,3 @@ fn gridkit_rs(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyTriGrid>()?;
     Ok(())
 }
-
-
