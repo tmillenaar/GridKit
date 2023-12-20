@@ -47,7 +47,9 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def centroid(self, index):
-        index = index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
         return self._grid.centroid(index=index).squeeze()
 
     @validate_index
@@ -78,16 +80,30 @@ class TriGrid(BaseGrid):
     def relative_neighbours(
         self, index=None, depth=1, connect_corners=False, include_selected=False
     ):
-        index = index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
-        result = self._grid.relative_neighbours(index, depth=depth, connect_corners=connect_corners, include_selected=include_selected)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        result = self._grid.relative_neighbours(
+            index,
+            depth=depth,
+            connect_corners=connect_corners,
+            include_selected=include_selected,
+        )
         return GridIndex(result)
 
     @validate_index
     def neighbours(
         self, index=None, depth=1, connect_corners=False, include_selected=False
     ):
-        index = index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
-        result = self._grid.neighbours(index, depth=depth, connect_corners=connect_corners, include_selected=include_selected)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        result = self._grid.neighbours(
+            index,
+            depth=depth,
+            connect_corners=connect_corners,
+            include_selected=include_selected,
+        )
         return GridIndex(result)
 
     def to_bounded(self):
