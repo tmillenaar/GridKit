@@ -234,11 +234,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             Whether or not the grids are aligned
         """
         if not isinstance(other, BaseGrid):
-            raise ValueError(f"Expected a (child of) BaseGrid, got {type(other)}")
+            raise TypeError(f"Expected a (child of) BaseGrid, got {type(other)}")
         aligned = True
         reason = ""
         reasons = []
-        if not type(other.parent_grid_class) == type(self.parent_grid_class):
+        if not other.parent_grid_class == self.parent_grid_class:
             aligned = False
             return (
                 False,

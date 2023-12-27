@@ -2,6 +2,7 @@ import numpy
 import pytest
 import shapely
 
+from gridkit import RectGrid
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 
 
@@ -331,6 +332,13 @@ def test_is_aligned_with():
     assert not is_aligned
     assert "CRS" in reason
 
+    grid.crs = 4326
+    other_grid = HexGrid(size=1.2, crs=3857)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+    grid.crs = None  # reset crs for next tests
+
     other_grid = HexGrid(size=1.2, offset=(0, 1))
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
@@ -350,3 +358,12 @@ def test_is_aligned_with():
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
     assert all(attr in reason for attr in ["CRS", "shape", "cellsize", "offset"])
+
+    with pytest.raises(TypeError):
+        other_grid = 1
+        is_aligned, reason = grid.is_aligned_with(other_grid)
+
+    other_grid = RectGrid(dx=1, dy=1)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "Grid type is not the same" in reason
