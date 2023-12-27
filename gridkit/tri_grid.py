@@ -70,11 +70,9 @@ class TriGrid(BaseGrid):
     def cells_near_point(self):
         raise NotImplementedError()
 
-    def is_aligned_with(self):
-        raise NotImplementedError()
-
+    @property
     def parent_grid_class(self):
-        raise TriGrid
+        return TriGrid
 
     @validate_index
     def relative_neighbours(
