@@ -2,6 +2,7 @@ import numpy
 import pytest
 import shapely
 
+from gridkit import HexGrid
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
@@ -334,3 +335,57 @@ def test_cell_corners():
     )
 
     numpy.testing.assert_allclose(corners, expected_corners)
+
+
+def test_is_aligned_with():
+    grid = RectGrid(dx=1.2, dy=1.2)
+
+    is_aligned, reason = grid.is_aligned_with(grid)
+    assert is_aligned
+    assert reason == ""
+
+    other_grid = RectGrid(dx=1.2, dy=1.3)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "cellsize" in reason
+
+    other_grid = RectGrid(dx=1.3, dy=1.2)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "cellsize" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+
+    grid.crs = 4326
+    other_grid = RectGrid(dx=1.2, dy=1.2, crs=3857)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+    grid.crs = None  # reset crs for next tests
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, offset=(0, 1))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, offset=(1, 0))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.1, offset=(1, 1), crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert all(attr in reason for attr in ["CRS", "cellsize", "offset"])
+
+    with pytest.raises(TypeError):
+        other_grid = 1
+        is_aligned, reason = grid.is_aligned_with(other_grid)
+
+    other_grid = HexGrid(size=1)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "Grid type is not the same" in reason

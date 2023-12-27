@@ -2,6 +2,7 @@ import numpy
 import pytest
 import shapely
 
+from gridkit import RectGrid
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 
 
@@ -312,3 +313,57 @@ def test_cell_corners(shape, expected_corners):
     corners = grid.cell_corners(ids)
     for cell_corners in corners:
         numpy.testing.assert_allclose(cell_corners, expected_corners)
+
+
+def test_is_aligned_with():
+    grid = HexGrid(size=1.2, shape="pointy")
+
+    is_aligned, reason = grid.is_aligned_with(grid)
+    assert is_aligned
+    assert reason == ""
+
+    other_grid = HexGrid(size=1.3)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "cellsize" in reason
+
+    other_grid = HexGrid(size=1.2, crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+
+    grid.crs = 4326
+    other_grid = HexGrid(size=1.2, crs=3857)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+    grid.crs = None  # reset crs for next tests
+
+    other_grid = HexGrid(size=1.2, offset=(0, 1))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = HexGrid(size=1.2, offset=(1, 0))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = HexGrid(size=1.2, shape="flat")
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "shape" in reason
+
+    other_grid = HexGrid(size=1.1, shape="flat", offset=(1, 1), crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert all(attr in reason for attr in ["CRS", "shape", "cellsize", "offset"])
+
+    with pytest.raises(TypeError):
+        other_grid = 1
+        is_aligned, reason = grid.is_aligned_with(other_grid)
+
+    other_grid = RectGrid(dx=1, dy=1)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "Grid type is not the same" in reason

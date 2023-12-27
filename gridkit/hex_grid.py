@@ -534,45 +534,6 @@ class HexGrid(BaseGrid):
 
         return corners.reshape((*cell_shape, 6, 2))
 
-    def is_aligned_with(self, other):
-        if not isinstance(other, BaseGrid):
-            raise ValueError(f"Expected a (child of) BaseGrid, got {type(other)}")
-        aligned = True
-        reason = ""
-        reasons = []
-        if not other.parent_grid_class == self.parent_grid_class:
-            aligned = False
-            return (
-                False,
-                f"Grid type is not the same. This is a {self.parent_grid_class}, the other is a {other.parent_grid_class}",
-            )
-
-        if self.crs is None and other.crs is None:
-            pass
-        elif self.crs is None:
-            aligned = False
-            reasons.append("CRS")
-        elif not self.crs.is_exact_same(other.crs):
-            aligned = False
-            reasons.append("CRS")
-
-        if not numpy.isclose(self.dx, other.dx) or not numpy.isclose(self.dy, other.dy):
-            aligned = False
-            reasons.append("cellsize")
-
-        if not all(
-            numpy.isclose(self.offset, other.offset, atol=1e-7)
-        ):  # FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid
-            aligned = False
-            reasons.append("offset")
-
-        reason = (
-            f"The following attributes are not the same: {reasons}"
-            if reasons
-            else reason
-        )
-        return aligned, reason
-
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
