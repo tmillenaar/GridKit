@@ -334,3 +334,41 @@ def test_cell_corners():
     )
 
     numpy.testing.assert_allclose(corners, expected_corners)
+
+
+def test_is_aligned_with():
+    grid = RectGrid(dx=1.2, dy=1.2)
+    
+    is_aligned, reason = grid.is_aligned_with(grid)
+    assert is_aligned
+    assert reason == ""
+
+    other_grid = RectGrid(dx=1.2, dy=1.3)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "cellsize" in reason
+
+    other_grid = RectGrid(dx=1.3, dy=1.2)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "cellsize" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "CRS" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, offset = (0,1))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.2, offset = (1,0))
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert "offset" in reason
+
+    other_grid = RectGrid(dx=1.2, dy=1.1, offset=(1,1), crs=4326)
+    is_aligned, reason = grid.is_aligned_with(other_grid)
+    assert not is_aligned
+    assert all(attr in reason for attr in ["CRS", "cellsize", "offset"])

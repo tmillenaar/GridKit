@@ -272,7 +272,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             reasons.append("offset")
 
         if getattr(self, "shape", "") != getattr(other, "shape", ""):
-            aligned == False
+            aligned = False
             reasons.append("shape")
 
         reason = (
