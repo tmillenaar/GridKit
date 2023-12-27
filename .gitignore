@@ -3,3 +3,4 @@ dist/*
 gridkit/__pycache__/*
 *__pycache__*
 *gridkit/__pycache__*
+*gridkit_rs/Cargo.lock

@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from gridkit import TriGrid, RectGrid
+from gridkit import RectGrid, TriGrid
 from gridkit.index import GridIndex
 
 
@@ -226,6 +226,7 @@ def test_neighbours(index, depth, include_selected, connect_corners):
                 GridIndex(cell_neigbours),
                 GridIndex(cell_relative_neigbours),
             )
+
 
 def test_is_aligned_with():
     grid = TriGrid(size=1.2, shape="pointy")
