@@ -218,7 +218,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
         pass
 
-    @abc.abstractmethod
     def is_aligned_with(self, other):
         """
         Returns True if grids are algined and False if they are not.
@@ -227,13 +226,61 @@ class BaseGrid(metaclass=abc.ABCMeta):
          - the CRS is the same
          - the cell_size is the same
          - the offset from origin is the same
+         - the cell shape is the same
 
         Returns
         -------
         :class:`bool`
             Whether or not the grids are aligned
         """
-        pass
+        if not isinstance(other, BaseGrid):
+            raise ValueError(f"Expected a (child of) BaseGrid, got {type(other)}")
+        aligned = True
+        reason = ""
+        reasons = []
+        if not type(other.parent_grid_class) == type(self.parent_grid_class):
+            aligned = False
+            return (
+                False,
+                f"Grid type is not the same. This is a {self.parent_grid_class}, the other is a {other.parent_grid_class}",
+            )
+
+        if self.crs is None and other.crs is None:
+            pass
+        elif self.crs is None:
+            aligned = False
+            reasons.append("CRS")
+        elif not self.crs.is_exact_same(other.crs):
+            aligned = False
+            reasons.append("CRS")
+
+        try:
+            if not numpy.isclose(self.size, other.size):
+                aligned = False
+                reasons.append("cellsize")
+        except AttributeError:
+            if not numpy.isclose(self.dx, other.dx) or not numpy.isclose(
+                self.dy, other.dy
+            ):
+                aligned = False
+                reasons.append("cellsize")
+
+        if not all(
+            numpy.isclose(self.offset, other.offset, atol=1e-7)
+        ):  # FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid
+            aligned = False
+            reasons.append("offset")
+
+        if getattr(self, "shape", "") != getattr(other, "shape", ""):
+            aligned == False
+            reasons.append("shape")
+
+        reason = (
+            f"The following attributes are not the same: {reasons}"
+            if reasons
+            else reason
+        )
+        return aligned, reason
 
     @abc.abstractmethod
     def to_crs(self, crs):
@@ -398,6 +445,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if index.index.ndim == 1:
             return shapely.geometry.Polygon(vertices)
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
+
+        if len(polygons) == 1:
+            return polygons[0]
         if as_multipolygon:
             return shapely.geometry.MultiPolygon(polygons)
         return numpy.array(polygons).reshape(cell_arr_shape)
