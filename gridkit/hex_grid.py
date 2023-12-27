@@ -534,7 +534,6 @@ class HexGrid(BaseGrid):
 
         return corners.reshape((*cell_shape, 6, 2))
 
-
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
