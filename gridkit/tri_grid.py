@@ -177,6 +177,6 @@ class TriGrid(BaseGrid):
         point_end = transformer.transform(
             self.dx / 2, self.dy
         )  # likely different for shape='flat'
-        size = numpy.linalg.norm(point_end)
+        size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
