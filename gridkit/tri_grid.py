@@ -73,8 +73,16 @@ class TriGrid(BaseGrid):
         ids = GridIndex(ids)
         return (ids, shape) if return_cell_count else ids
 
-    def cells_near_point(self):
-        raise NotImplementedError()
+    def cells_near_point(self, point):
+        point = numpy.array(point, dtype="float64")
+        point = point[None] if point.ndim == 1 else point
+        ids = self._grid.cells_near_point(point)
+        return GridIndex(ids)
+
+    @validate_index
+    def is_cell_upright(self, index):
+        index = index.index[None] if index.index.ndim == 1 else index.index
+        return self._grid.is_cell_upright(index=index).squeeze()
 
     @property
     def parent_grid_class(self):

@@ -1,4 +1,4 @@
-use numpy::{IntoPyArray, PyArray2, PyArray3, PyReadonlyArray2};
+use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray2};
 use pyo3::prelude::*;
 
 use pyo3::{pymodule, types::PyModule, PyResult, Python};
@@ -113,6 +113,26 @@ impl PyTriGrid {
                 .direct_neighbours(&index, depth, include_selected, true)
                 .into_pyarray(py)
         }
+    }
+
+    fn cells_near_point<'py>(
+        &self,
+        py: Python<'py>,
+        point: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray3<i64> {
+        self._grid
+            .cells_near_point(&point.as_array())
+            .into_pyarray(py)
+    }
+
+    fn is_cell_upright<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+    ) -> &'py PyArray1<bool> {
+        self._grid
+            .is_cell_upright(&index.as_array())
+            .into_pyarray(py)
     }
 }
 

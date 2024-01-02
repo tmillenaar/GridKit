@@ -359,4 +359,94 @@ impl TriGrid {
 
         relative_neighbours
     }
+
+    pub fn cells_near_point(&self, point: &ArrayView2<f64>) -> Array3<i64> {
+        let mut nearby_cells = Array3::<i64>::zeros((point.shape()[0], 6, 2));
+        // TODO:
+        // Condense this into a single loop
+        let cell_ids = self.cell_at_point(point);
+        let corners = self.cell_corners(&cell_ids.view());
+
+        // Define arguments to be used when determining the minimum distance
+        let mut min_dist: f64 = 0.;
+        let mut nearest_corner_id: usize = 0;
+        for cell_id in 0..corners.shape()[0] {
+            // - compute id of min distance
+            for corner_id in 0..corners.shape()[1] {
+                let x = corners[Ix3(cell_id, corner_id, 0)];
+                let y = corners[Ix3(cell_id, corner_id, 1)];
+                let dx = point[Ix2(cell_id, 0)] - x;
+                let dy = point[Ix2(cell_id, 1)] - y;
+                let distance = (dx.powi(2) + dy.powi(2)).powf(0.5);
+                if corner_id == 0 {
+                    nearest_corner_id = corner_id;
+                    min_dist = distance;
+                } else if distance < min_dist {
+                    nearest_corner_id = corner_id;
+                    min_dist = distance;
+                }
+            }
+
+            // Define the relative ids of the nearby points with respect to the cell that contains the point
+            // The nearby cells will depend on which corner of the cell the point is located at, and
+            // whether the cell is pointing up or down.
+            let rel_nearby_cells: Array2<i64>;
+            if self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]) {
+                match nearest_corner_id {
+                    0 => {
+                        rel_nearby_cells =
+                            array![[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0],];
+                    }
+                    1 => {
+                        rel_nearby_cells =
+                            array![[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1],];
+                    }
+                    2 => {
+                        rel_nearby_cells =
+                            array![[-2, 0], [-1, 0], [0, 0], [-2, -1], [-1, -1], [0, -1],];
+                    }
+                    _ => {
+                        panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                    }
+                }
+            } else {
+                // Triangle points upright
+                match nearest_corner_id {
+                    0 => {
+                        rel_nearby_cells =
+                            array![[-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1],];
+                    }
+                    1 => {
+                        rel_nearby_cells = array![[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0],];
+                    }
+                    2 => {
+                        rel_nearby_cells =
+                            array![[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0],];
+                    }
+                    _ => {
+                        panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                    }
+                }
+            }
+            // Insert ids into return array for current cell_id
+            nearby_cells
+                .slice_mut(s![cell_id, .., ..])
+                .assign(&(rel_nearby_cells + cell_ids.slice(s![cell_id, ..]))); // Try inserting slice?
+        }
+
+        nearby_cells
+    }
+
+    fn _is_cell_upright(&self, id_x: i64, id_y: i64) -> bool {
+        iseven(id_x) != iseven(id_y)
+    }
+
+    pub fn is_cell_upright(&self, index: &ArrayView2<i64>) -> Array1<bool> {
+        let mut cells = Array1::<bool>::from_elem(index.shape()[0], false);
+        for cell_id in 0..cells.shape()[0] {
+            cells[Ix1(cell_id)] =
+                self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+        }
+        cells
+    }
 }

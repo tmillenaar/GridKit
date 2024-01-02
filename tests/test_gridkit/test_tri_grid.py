@@ -281,3 +281,147 @@ def test_is_aligned_with():
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
     assert "Grid type is not the same" in reason
+
+
+def test_is_cell_upright():
+    grid = TriGrid(size=1)
+
+    cells = numpy.arange(6) - 3
+    xx, yy = numpy.meshgrid(cells, cells)
+    cells = numpy.stack([xx.ravel(), yy.ravel()]).T
+    expected_results = [
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+        False,
+        True,
+        False,
+        True,
+        False,
+        True,
+        True,
+        False,
+        True,
+        False,
+        True,
+        False,
+    ]
+    # test single cell as input
+    result = grid.is_cell_upright(cells[0])
+    numpy.testing.assert_allclose(result, expected_results[0])
+    # test mulit-cell input
+    result = grid.is_cell_upright(cells)
+    numpy.testing.assert_allclose(result, expected_results)
+
+
+@pytest.mark.parametrize(
+    "points, expected_nearby_ids",
+    [
+        # Quadrant 1 (++)
+        (
+            [
+                [2.6, 1.5],
+                [2.3, 1.75],
+                [2, 1.5],
+                [2, 1],
+                [2.3, 1],
+                [2.6, 1.1],
+            ],
+            [
+                [3, 2],
+                [4, 2],
+                [5, 2],
+                [3, 1],
+                [4, 1],
+                [5, 1],
+            ],
+        ),
+        # Quadrant 2 (-+)
+        (
+            [
+                [-2, 1.5],
+                [-2.5, 1.75],
+                [-2.8, 1.5],
+                [-2.8, 1],
+                [-2.5, 1],
+                [-2, 1],
+            ],
+            [
+                [-5, 2],
+                [-4, 2],
+                [-3, 2],
+                [-5, 1],
+                [-4, 1],
+                [-3, 1],
+            ],
+        ),
+        # Quadrant 3 (--)
+        (
+            [
+                [-2.2, -0.5],
+                [-2.5, -0.3],
+                [-2.8, -0.5],
+                [-2.8, -1],
+                [-2.5, -1],
+                [-2, -1],
+            ],
+            [
+                [-5, 0],
+                [-4, 0],
+                [-3, 0],
+                [-5, -1],
+                [-4, -1],
+                [-3, -1],
+            ],
+        ),
+        # Quadrant 4 (+-)
+        (
+            [
+                [2.6, -0.5],
+                [2.3, -0.5],
+                [2, -0.5],
+                [2, -1],
+                [2.3, -1],
+                [2.6, -1],
+            ],
+            [
+                [3, 0],
+                [4, 0],
+                [5, 0],
+                [3, -1],
+                [4, -1],
+                [5, -1],
+            ],
+        ),
+    ],
+)
+def test_cells_near_point(points, expected_nearby_ids):
+    grid = TriGrid(size=1.2, offset=(0.2, 0.3))
+    nearby_ids = grid.cells_near_point(points)
+    # Test single point input
+    numpy.testing.assert_allclose(nearby_ids[0], expected_nearby_ids)
+    # Test for all points
+    expected_nearby_ids_extended = numpy.empty(shape=(len(points), 6, 2))
+    expected_nearby_ids_extended[:] = expected_nearby_ids
+    numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
