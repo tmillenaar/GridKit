@@ -6,6 +6,15 @@ from gridkit.index import GridIndex
 
 
 @pytest.mark.parametrize(
+    "size, expected_radius",
+    [(1, 0.5773502691896257), (1.2, 0.6928203230275508), (3.1, 1.78978583448784)],
+)
+def test_radius(size, expected_radius):
+    grid = TriGrid(size=size)
+    numpy.testing.assert_allclose(grid.r, expected_radius)
+
+
+@pytest.mark.parametrize(
     "shape, indices, expected_centroids",
     [
         ["pointy", (-1, -1), [-2.25, -3.46410162]],
@@ -228,6 +237,26 @@ def test_neighbours(index, depth, include_selected, connect_corners):
             )
 
 
+def test_to_crs():
+    grid = TriGrid(size=3, crs=None)
+    # Expect error when `to_crs` is called on a grid where the CRS is not set
+    with pytest.raises(ValueError):
+        grid.to_crs(4326)
+
+    grid = TriGrid(size=3, crs=3857)
+    grid_degrees = grid.to_crs(4326)
+    # Check cell size has changed after changing crs
+    numpy.testing.assert_allclose(
+        [grid_degrees.dx, grid_degrees.dy],
+        [1.214595681909695e-05, 2.1037414317213582e-05],
+    )
+    # Make sure original grid is unaffected
+    numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5, 2.598076211353316])
+    # Make sure nothing changed when setting to current CRS
+    new_grid = grid.to_crs(3857)
+    numpy.testing.assert_allclose([new_grid.dx, new_grid.dy], [1.5, 2.598076211353316])
+
+
 def test_is_aligned_with():
     grid = TriGrid(size=1.2, shape="pointy")
 
@@ -290,37 +319,37 @@ def test_is_cell_upright():
     xx, yy = numpy.meshgrid(cells, cells)
     cells = numpy.stack([xx.ravel(), yy.ravel()]).T
     expected_results = [
-        False,
+        False,  # 1st row
         True,
         False,
         True,
         False,
         True,
-        True,
+        True,  # 2nd row
         False,
         True,
         False,
         True,
         False,
-        False,
+        False,  # 3rd row
         True,
         False,
         True,
         False,
         True,
-        True,
+        True,  # 4rth row
         False,
         True,
         False,
         True,
         False,
-        False,
+        False,  # 5th row
         True,
         False,
         True,
         False,
         True,
-        True,
+        True,  # 6th row
         False,
         True,
         False,
