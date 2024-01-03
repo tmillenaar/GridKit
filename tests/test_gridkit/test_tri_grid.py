@@ -7,7 +7,7 @@ from gridkit.index import GridIndex
 
 @pytest.mark.parametrize(
     "size, expected_radius",
-    [(1, 0.5773502691896257), (1.2, 0.6928203230275508), (3.1, 1.78978583448784)],
+    [(0.5, 0.5773502691896257), (0.6, 0.6928203230275508), (1.55, 1.78978583448784)],
 )
 def test_radius(size, expected_radius):
     grid = TriGrid(size=size)
@@ -29,7 +29,7 @@ def test_radius(size, expected_radius):
 @pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
 def test_centroid(shape, indices, offset, expected_centroids):
     # TODO: test for different shapes when implemented
-    grid = TriGrid(size=3, offset=offset)
+    grid = TriGrid(size=1.5, offset=offset)
     centroids = grid.centroid(indices)
     centroids -= offset
     numpy.testing.assert_allclose(centroids, expected_centroids)
@@ -51,7 +51,7 @@ def test_centroid(shape, indices, offset, expected_centroids):
 )
 @pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
 def test_cell_corners(indices, offset, expected_centroids):
-    grid = TriGrid(size=3, offset=offset)
+    grid = TriGrid(size=1.5, offset=offset)
     corners = grid.cell_corners(indices)
     corners -= offset
     numpy.testing.assert_allclose(corners, expected_centroids, atol=1e-15)
@@ -74,7 +74,7 @@ def test_cell_corners(indices, offset, expected_centroids):
 def test_cell_at_point(points, offset, expected_ids):
     points = numpy.array(points)
     points += offset
-    grid = TriGrid(size=1.4, offset=offset)
+    grid = TriGrid(size=0.7, offset=offset)
     ids = grid.cell_at_point(points)
     numpy.testing.assert_allclose(ids, expected_ids)
 
@@ -158,7 +158,7 @@ def test_cell_at_point(points, offset, expected_ids):
 )
 @pytest.mark.parametrize("return_cell_count", [True, False])
 def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count):
-    grid = TriGrid(size=1.4)
+    grid = TriGrid(size=0.7)
     bounds = grid.align_bounds(bounds, "nearest")
     result = grid.cells_in_bounds(bounds, return_cell_count=return_cell_count)
     if return_cell_count is False:
@@ -182,7 +182,7 @@ def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count
 @pytest.mark.parametrize("include_selected", [True, False])
 @pytest.mark.parametrize("connect_corners", [True, False])
 def test_neighbours(index, depth, include_selected, connect_corners):
-    grid = TriGrid(size=1.4)
+    grid = TriGrid(size=0.7)
     all_neighbours = grid.neighbours(
         index,
         depth=depth,
@@ -238,17 +238,18 @@ def test_neighbours(index, depth, include_selected, connect_corners):
 
 
 def test_to_crs():
-    grid = TriGrid(size=3, crs=None)
+    grid = TriGrid(size=1.5, crs=None)
     # Expect error when `to_crs` is called on a grid where the CRS is not set
     with pytest.raises(ValueError):
         grid.to_crs(4326)
 
-    grid = TriGrid(size=3, crs=3857)
+    grid = TriGrid(size=1.5, crs=3857)
     grid_degrees = grid.to_crs(4326)
+
     # Check cell size has changed after changing crs
     numpy.testing.assert_allclose(
         [grid_degrees.dx, grid_degrees.dy],
-        [1.214595681909695e-05, 2.1037414317213582e-05],
+        [2.42919136381939e-05, 4.2074828634427165e-05],
     )
     # Make sure original grid is unaffected
     numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5, 2.598076211353316])
@@ -446,7 +447,7 @@ def test_is_cell_upright():
     ],
 )
 def test_cells_near_point(points, expected_nearby_ids):
-    grid = TriGrid(size=1.2, offset=(0.2, 0.3))
+    grid = TriGrid(size=0.6, offset=(0.2, 0.3))
     nearby_ids = grid.cells_near_point(points)
     # Test single point input
     numpy.testing.assert_allclose(nearby_ids[0], expected_nearby_ids)

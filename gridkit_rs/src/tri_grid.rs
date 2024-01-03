@@ -14,7 +14,7 @@ impl TriGrid {
     }
 
     pub fn cell_height(&self) -> f64 {
-        self.cellsize * (3_f64).sqrt() / 2.
+        self.cellsize * (3_f64).sqrt()
     }
 
     pub fn radius(&self) -> f64 {
@@ -22,11 +22,11 @@ impl TriGrid {
     }
 
     pub fn cell_width(&self) -> f64 {
-        self.cellsize
+        self.cellsize * 2.
     }
 
     pub fn dx(&self) -> f64 {
-        self.cellsize / 2.
+        self.cellsize
     }
 
     pub fn dy(&self) -> f64 {
