@@ -112,7 +112,6 @@ occurrences = df.groupby("cell_id").count()
 #
 # Now we have the number of points per cell, let's obtain the corresponding cell shapes from the grid object and plot them.
 geoms = grid.to_shapely(occurrences.index.to_list())
-
-plot_polygons(geoms, occurrences, "Oranges")
+plot_polygons(geoms, colors=occurrences["nr_points"], cmap="Oranges")
 plt.title("Number of points per cell")
 plt.show()
