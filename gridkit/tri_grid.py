@@ -51,6 +51,22 @@ class TriGrid(BaseGrid):
         """
         return self._size
 
+    @property
+    def offset(self) -> float:
+        """The offset off the grid in dx and dy.
+        The offset is never larger than the size of a single grid cell.
+        The offset represents the shift from the origin (0,0)."""
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) or not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        self._offset = value
+        # TODO: implement a generalize update method that takes the PyTriGrid into account
+        self._grid = PyTriGrid(cellsize=self.size, offset=value)
+
     @validate_index
     def centroid(self, index):
         index = (
@@ -69,6 +85,10 @@ class TriGrid(BaseGrid):
         return GridIndex(self._grid.cell_at_point(point))
 
     def cells_in_bounds(self, bounds, return_cell_count=False):
+        if not self.are_bounds_aligned(bounds):
+            raise ValueError(
+                f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
+            )
         ids, shape = self._grid.cells_in_bounds(bounds)
         ids = GridIndex(ids)
         return (ids, shape) if return_cell_count else ids
