@@ -97,8 +97,9 @@ class HexGrid(BaseGrid):
             crs=self.crs,
         )
 
+    @validate_index
     def relative_neighbours(
-        self, depth=1, *, index, include_selected=False, connect_corners=False
+        self, index, depth=1, include_selected=False, connect_corners=False
     ) -> numpy.ndarray:
         """The relative indices of the neighbouring cells.
 
@@ -188,9 +189,10 @@ class HexGrid(BaseGrid):
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
 
-        index = numpy.array(index)
-        if len(index.shape) == 1:
-            index = index[numpy.newaxis]
+        original_shape = index.shape
+        index = numpy.array(index.ravel())
+        if index.ndim == 1:
+            index = index[None]
 
         nr_neighbours = (
             sum(6 * numpy.arange(1, depth + 1)) + 1
@@ -231,7 +233,8 @@ class HexGrid(BaseGrid):
             center_cell = int(numpy.floor(neighbours.shape[1] / 2))
             neighbours = numpy.delete(neighbours, center_cell, 1)
 
-        return GridIndex(neighbours if len(neighbours) > 1 else neighbours[0])
+        neighbours = neighbours.reshape(*original_shape, *neighbours.shape[-2:])
+        return GridIndex(neighbours.squeeze())
 
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
@@ -437,7 +440,9 @@ class HexGrid(BaseGrid):
 
         """
         point = numpy.array(point)
-        point = numpy.expand_dims(point, axis=0).T if len(point.shape) == 1 else point.T
+        point = numpy.expand_dims(point, axis=0) if len(point.shape) == 1 else point
+        original_shape = point.shape
+        point = point.reshape(-1, 2).T
 
         # approach adapted after https://stackoverflow.com/a/7714148
         if self._shape == "pointy":
@@ -505,6 +510,7 @@ class HexGrid(BaseGrid):
         elif self._shape == "flat":
             result = numpy.array([ids_pointy, ids_flat], dtype="int").T
 
+        result = result.reshape(original_shape)
         return GridIndex(result)
 
     @validate_index
@@ -612,9 +618,6 @@ class HexGrid(BaseGrid):
             raise ValueError(
                 f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
             )
-
-        if not self.are_bounds_aligned(bounds):
-            bounds = self.align_bounds(bounds, mode="expand")
 
         # get coordinates of two diagonally opposing corner-cells
         left_top = (bounds[0] + self.dx / 4, bounds[3] - self.dy / 4)

@@ -79,6 +79,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
         The offset represents the shift from the origin (0,0)."""
         return self._offset
 
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) or not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        self._offset = value
+
     @abc.abstractmethod
     def centroid(self, index) -> float:
         """Coordinates at the center of the cell(s) specified by `index`."""
@@ -122,6 +129,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
     ):
         pass
 
+    @validate_index
     def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
         """The indices of the neighbouring cells.
         The argument 'depth' can be used to include cells from further away.
@@ -168,8 +176,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :py:meth:`.RectGrid.relative_neighbours`
         :py:meth:`.HexGrid.relative_neighbours`
         """
-        if not isinstance(index, numpy.ndarray):
-            index = numpy.array(index)
+        original_shape = index.shape
+        index = index.ravel()
 
         neighbours = self.relative_neighbours(
             depth=depth,
@@ -178,13 +186,17 @@ class BaseGrid(metaclass=abc.ABCMeta):
             index=index,
         )
 
-        if len(index.shape) == 1:
+        if len(index.index.shape) == 1:
             return neighbours + index
 
         # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
         neighbours = numpy.swapaxes(neighbours, 0, 1)
         neighbours = neighbours + index
-        return GridIndex(numpy.swapaxes(neighbours, 0, 1))
+        neighbours = numpy.swapaxes(neighbours, 0, 1)
+
+        return GridIndex(
+            neighbours.reshape(*original_shape, *neighbours.shape[-2:]).squeeze()
+        )
 
     @abc.abstractmethod
     def cell_at_point(self, point: numpy.ndarray) -> tuple:
