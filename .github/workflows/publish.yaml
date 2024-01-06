@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
@@ -26,8 +26,13 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
+          sccache: "true"
           manylinux: auto
+      - name: Test installing wheel
+        run: |
+          cd ..
+          pip install --force-reinstall --verbose dist/*.whl
+          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -55,6 +60,11 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+      - name: Test installing wheel
+        run: |
+          cd ..
+          pip install --force-reinstall --verbose dist/*.whl
+          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -81,6 +91,11 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
+      - name: Test installing wheel
+        run: |
+          cd ..
+          pip install --force-reinstall --verbose dist/*.whl
+          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -100,6 +115,11 @@ jobs:
         with:
           command: sdist
           args: --out dist
+      - name: Test installing wheel
+        run: |
+          cd ..
+          pip install --force-reinstall --verbose dist/*.tar.gz
+          python -c "import gridkit"
       - name: Upload sdist
         uses: actions/upload-artifact@v3
         with:
