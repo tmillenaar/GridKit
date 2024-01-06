@@ -27,12 +27,8 @@ import numpy
 from gridkit import read_raster
 
 # Read in the bands required to determine the NDVI
-band_4 = read_raster(
-    "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B04_(Raw).tiff"
-).astype("int32")
-band_8 = read_raster(
-    "../../tests/data/2022-07-08-00:00_2022-07-08-23:59_Sentinel-2_L2A_B08_(Raw).tiff"
-).astype("int32")
+band_4 = read_raster("../../tests/data/20220708_S2_L2A_B04_raw.tiff").astype("int32")
+band_8 = read_raster("../../tests/data/20220708_S2_L2A_B08_raw.tiff").astype("int32")
 
 # %%
 #
