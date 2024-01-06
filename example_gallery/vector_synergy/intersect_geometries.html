@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Geometry intersections &mdash; GridKit 0.1.0.dev documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <title>Geometry intersections &mdash; GridKit v0.6.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0e73a448"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=bd562c4a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -39,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.dev
+                v0.6.0.dev1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -132,7 +134,7 @@ Try to avoid this if possible.</p>
 This allows us to obtain the intersecting cells in one function call.
 Of course it is also an option to obtain the intersecting cell IDs for the strams and lakes separately and combine them after using <cite>numpy.vstack</cite>.
 With that approach it might be worthwhile to call a <cite>numpy.unique</cite> on axis 0 afterwards to remove duplicate IDs.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 
@@ -154,7 +156,7 @@ With that approach it might be worthwhile to call a <cite>numpy.unique</cite> on
 For that reason, the dem is cropped to the extent of the water bodies with a little buffer.
 Since <code class="docutils literal notranslate"><span class="pre">intersect_geometries</span></code> does it’s own cropping, cropping the grid before <code class="docutils literal notranslate"><span class="pre">intersect_geometries</span></code> does not increase performance.
 A plot showing DEM, the geometries (orange) and the selected cells (red) is then generated as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">water_bodies</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">water_bodies</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">buffer_cells</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">water_bodies</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">water_bodies</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">buffer_cells</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">generate_plot</span><span class="p">():</span>
@@ -183,19 +185,19 @@ A plot showing DEM, the geometries (orange) and the selected cells (red) is then
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_intersect_geometries_001.png" srcset="../../_images/sphx_glr_intersect_geometries_001.png" alt="intersect geometries" class = "sphx-glr-single-img"/><p>A zoom-in of a section of the plot allows us to see more clearly what cells are selected.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">generate_plot</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">generate_plot</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">30040</span><span class="p">,</span> <span class="mi">30160</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">167230</span><span class="p">,</span> <span class="mi">167325</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_intersect_geometries_002.png" srcset="../../_images/sphx_glr_intersect_geometries_002.png" alt="intersect geometries" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.737 seconds)</p>
+<img src="../../_images/sphx_glr_intersect_geometries_002.png" srcset="../../_images/sphx_glr_intersect_geometries_002.png" alt="intersect geometries" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.421 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-intersect-geometries-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/4facd33fff251a2787651dca9f4d4c29/intersect_geometries.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">intersect_geometries.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4f897756f108f82a8f2e7e9c3eb00ccd/intersect_geometries.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">intersect_geometries.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/4facd33fff251a2787651dca9f4d4c29/intersect_geometries.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">intersect_geometries.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

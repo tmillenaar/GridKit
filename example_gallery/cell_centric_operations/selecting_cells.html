@@ -1,29 +1,31 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cell selection using other grids &mdash; GridKit 0.1.0.dev documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <title>Cell selection using other grids &mdash; GridKit v0.6.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0e73a448"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=bd562c4a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Hexagon grids" href="../grid_definitions/hex_grids.html" />
+    <link rel="next" title="Triangles in hexagons" href="../grid_definitions/triangles_in_hexes.html" />
     <link rel="prev" title="Downslope path" href="downslope_path.html" /> 
 </head>
 
@@ -39,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.dev
+                v0.6.0.dev1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -119,9 +121,11 @@ This may sound abstract, but in this example images will be provided to show wha
 <p>For two grids to overlap in predictable ways, we need to be mindful of our grid definitions.</p>
 <p>Let’s create two grids, both centered around zero,
 where one grid’s cells are exactly three times larger than the other grid’s cells.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<span class="kn">from</span> <span class="nn">gridkit.doc_utils</span> <span class="kn">import</span> <span class="n">plot_polygons</span>
 
 <span class="c1"># create a grids</span>
 <span class="n">fine_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
@@ -137,32 +141,21 @@ First, let’s plot the outlines of the two grids so we can verify our grids ind
 To plot the outlines we can select an area of interest and represent the cells in this area as polygons.
 These polygons can then be plotted. Since the grids were defined to be centered around zero,
 let’s center our are of interest around zero as well.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define an area of interest, slightly larger than what we want to plot</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># define an area of interest, slightly larger than what we want to plot</span>
 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
 
 <span class="n">fine_bounds</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
 <span class="n">fine_cell_ids</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">fine_bounds</span><span class="p">)</span>
-<span class="n">fine_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">fine_cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">fine_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">fine_cell_ids</span><span class="p">)</span>
 
 <span class="n">coarse_bounds</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
 <span class="n">coarse_cell_ids</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">coarse_bounds</span><span class="p">)</span>
-<span class="n">coarse_shapes</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">coarse_shapes</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now let’s define a plotting function that can either plot the outline of each cell or fill it with a color.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-
-<span class="k">def</span> <span class="nf">plot_shapes</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple function to plot polygons with matplotlib&quot;&quot;&quot;</span>
-    <span class="n">plot_func</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">fill</span> <span class="k">if</span> <span class="n">fill</span> <span class="k">else</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span>
-    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">shapes</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
-        <span class="n">plot_func</span><span class="p">(</span><span class="o">*</span><span class="n">geom</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Let’s use this to plot our grids in the same image so we can compare them.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_shapes</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<p>Let’s plot our grids in the same image so we can compare them.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">plot_polygons</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
@@ -176,13 +169,14 @@ The first category contains the purple cells at the center of each of the orange
 Secondly we have the neighbours of these center cells and lastly we have the purple cells at the
 vertices of the orange cells.
 Let’s start by coloring in the center cells.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coarse_centroids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">geom</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">xy</span> <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">coarse_shapes</span><span class="o">.</span><span class="n">geoms</span><span class="p">])</span>
-<span class="n">center_cells</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">coarse_centroids</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">])</span>
-<span class="n">center_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">center_cells</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])</span>
+<span class="n">coarse_centroids</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">)</span>
+<span class="n">center_cells</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">coarse_centroids</span><span class="p">)</span>
+<span class="n">center_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">center_cells</span><span class="p">)</span>
 
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
@@ -190,20 +184,16 @@ Let’s start by coloring in the center cells.</p>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_selecting_cells_002.png" srcset="../../_images/sphx_glr_selecting_cells_002.png" alt="selecting cells" class = "sphx-glr-single-img"/><p>Next, let’s use these center cells to find their neighbours and color them too.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">center_neighbour_cells</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span>
-    <span class="n">center_cells</span>
-<span class="p">)</span>  <span class="c1"># returns axes (&#39;inital_cells&#39;, &#39;neighbours&#39;, &#39;xy&#39;) with shape (42, 6, 2)</span>
-<span class="n">center_neighbour_cells</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">center_neighbour_cells</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-<span class="p">)</span>  <span class="c1"># flatten cell_ids to axes (&#39;all_neigbours&#39;, &#39;xy&#39;) with shape (252, 2)</span>
-<span class="n">center_neighbour_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span>
-    <span class="n">center_neighbour_cells</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># return axes (&#39;inital_cells&#39;, &#39;neighbours&#39;, &#39;xy&#39;) with shape (42, 6, 2)</span>
+<span class="n">center_neighbour_cells</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">center_cells</span><span class="p">)</span>
+<span class="c1"># flatten cell_ids to axes (&#39;all_neigbours&#39;, &#39;xy&#39;) with shape (252, 2)</span>
+<span class="n">center_neighbour_cells</span> <span class="o">=</span> <span class="n">center_neighbour_cells</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">center_neighbour_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">center_neighbour_cells</span><span class="p">)</span>
 
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">center_neighbour_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;sandybrown&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">center_neighbour_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;sandybrown&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
@@ -212,16 +202,16 @@ Let’s start by coloring in the center cells.</p>
 </div>
 <img src="../../_images/sphx_glr_selecting_cells_003.png" srcset="../../_images/sphx_glr_selecting_cells_003.png" alt="selecting cells" class = "sphx-glr-single-img"/><p>Lastly, let’s find coordinates of the vertices of the orange cells.
 We then find what purple cells are a these coordinates and color them as well.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span> <span class="o">=</span> <span class="n">coarse_grid</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">(</span><span class="n">coarse_cell_ids</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
 <span class="n">vertices_cells</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
-<span class="n">vertices_cells</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">vertices_cells</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># drop duplicate ids</span>
-<span class="n">vertices_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">vertices_cells</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">vertices_cells</span> <span class="o">=</span> <span class="n">vertices_cells</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>  <span class="c1"># drop duplicate ids</span>
+<span class="n">vertices_shapes</span> <span class="o">=</span> <span class="n">fine_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">vertices_cells</span><span class="p">)</span>
 
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">center_neighbour_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;sandybrown&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">vertices_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;darkcyan&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-<span class="n">plot_shapes</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">center_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;limegreen&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">center_neighbour_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;sandybrown&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">vertices_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;darkcyan&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">fine_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">coarse_shapes</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">)</span>
@@ -229,13 +219,13 @@ We then find what purple cells are a these coordinates and color them as well.</
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_selecting_cells_004.png" srcset="../../_images/sphx_glr_selecting_cells_004.png" alt="selecting cells" class = "sphx-glr-single-img"/><p>Now the purple grid is colored, based on it’s relation to the orange grid.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.859 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.823 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-selecting-cells-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/60ba7da1d9290f63d9b9b6c1ec6c22a6/selecting_cells.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">selecting_cells.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/e56ee4c08ca9bb1ff6ca1b3543f04262/selecting_cells.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">selecting_cells.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/60ba7da1d9290f63d9b9b6c1ec6c22a6/selecting_cells.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">selecting_cells.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -247,7 +237,7 @@ We then find what purple cells are a these coordinates and color them as well.</
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="downslope_path.html" class="btn btn-neutral float-left" title="Downslope path" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../grid_definitions/hex_grids.html" class="btn btn-neutral float-right" title="Hexagon grids" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../grid_definitions/triangles_in_hexes.html" class="btn btn-neutral float-right" title="Triangles in hexagons" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

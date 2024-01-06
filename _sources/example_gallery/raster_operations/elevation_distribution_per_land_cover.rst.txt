@@ -54,7 +54,7 @@ We can make use of this to read out a crop of the same area form different files
 
 .. GENERATED FROM PYTHON SOURCE LINES 39-60
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     import numpy
@@ -102,7 +102,7 @@ To get a feel for the area, I will plot the datasets side by side.
 
 .. GENERATED FROM PYTHON SOURCE LINES 75-96
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Initialize figure for plotting the dem and landuse datasets
@@ -166,7 +166,7 @@ using the ids obtains through the ``landuse`` grid.
 
 .. GENERATED FROM PYTHON SOURCE LINES 121-134
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from gridkit import index
@@ -202,7 +202,7 @@ Plotting the histogram distribution of the various land covers gives the followi
 
 .. GENERATED FROM PYTHON SOURCE LINES 145-166
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Plot forest histograms
@@ -240,7 +240,7 @@ Plotting the histogram distribution of the various land covers gives the followi
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.192 seconds)
+   **Total running time of the script:** (0 minutes 2.357 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_elevation_distribution_per_land_cover.py:
@@ -249,16 +249,13 @@ Plotting the histogram distribution of the various land covers gives the followi
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: elevation_distribution_per_land_cover.ipynb <elevation_distribution_per_land_cover.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: elevation_distribution_per_land_cover.py <elevation_distribution_per_land_cover.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: elevation_distribution_per_land_cover.ipynb <elevation_distribution_per_land_cover.ipynb>`
 
 
 .. only:: html

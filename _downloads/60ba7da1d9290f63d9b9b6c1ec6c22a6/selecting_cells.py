@@ -28,9 +28,11 @@ where one grid's cells are exactly three times larger than the other grid's cell
 
 # sphinx_gallery_thumbnail_number = -1
 
+import matplotlib.pyplot as plt
 import numpy
 
 from gridkit import HexGrid
+from gridkit.doc_utils import plot_polygons
 
 # create a grids
 fine_grid = HexGrid(size=1, shape="pointy")
@@ -53,31 +55,17 @@ bounds = (-7, -7, 7, 7)
 
 fine_bounds = fine_grid.align_bounds(bounds)
 fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)
-fine_shapes = fine_grid.to_shapely(fine_cell_ids, as_multipolygon=True)
+fine_shapes = fine_grid.to_shapely(fine_cell_ids)
 
 coarse_bounds = coarse_grid.align_bounds(bounds)
 coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)
-coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids, as_multipolygon=True)
+coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids)
 
 # %%
 #
-# Now let's define a plotting function that can either plot the outline of each cell or fill it with a color.
-
-import matplotlib.pyplot as plt
-
-
-def plot_shapes(shapes, color, fill=False, **kwargs):
-    """Simple function to plot polygons with matplotlib"""
-    plot_func = plt.fill if fill else plt.plot
-    for geom in shapes.geoms:
-        plot_func(*geom.exterior.xy, color=color, **kwargs)
-
-
-# %%
-#
-# Let's use this to plot our grids in the same image so we can compare them.
-plot_shapes(fine_shapes, linewidth=1, color="purple")
-plot_shapes(coarse_shapes, linewidth=2, color="orange")
+# Let's plot our grids in the same image so we can compare them.
+plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
+plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -94,13 +82,14 @@ plt.show()
 # vertices of the orange cells.
 # Let's start by coloring in the center cells.
 
-coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])
-center_cells = fine_grid.cell_at_point(coarse_centroids[:, :, 0])
-center_shapes = fine_grid.to_shapely(center_cells, as_multipolygon=True)
+# coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])
+coarse_centroids = coarse_grid.centroid(coarse_cell_ids)
+center_cells = fine_grid.cell_at_point(coarse_centroids)
+center_shapes = fine_grid.to_shapely(center_cells)
 
-plot_shapes(fine_shapes, linewidth=1, color="purple")
-plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
-plot_shapes(coarse_shapes, linewidth=2, color="orange")
+plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
+plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
+plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -110,20 +99,16 @@ plt.show()
 #
 # Next, let's use these center cells to find their neighbours and color them too.
 
-center_neighbour_cells = fine_grid.neighbours(
-    center_cells
-)  # returns axes ('inital_cells', 'neighbours', 'xy') with shape (42, 6, 2)
-center_neighbour_cells = (
-    center_neighbour_cells.ravel()
-)  # flatten cell_ids to axes ('all_neigbours', 'xy') with shape (252, 2)
-center_neighbour_shapes = fine_grid.to_shapely(
-    center_neighbour_cells, as_multipolygon=True
-)
+# return axes ('inital_cells', 'neighbours', 'xy') with shape (42, 6, 2)
+center_neighbour_cells = fine_grid.neighbours(center_cells)
+# flatten cell_ids to axes ('all_neigbours', 'xy') with shape (252, 2)
+center_neighbour_cells = center_neighbour_cells.ravel()
+center_neighbour_shapes = fine_grid.to_shapely(center_neighbour_cells)
 
-plot_shapes(fine_shapes, linewidth=1, color="purple")
-plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
-plot_shapes(center_neighbour_shapes, fill=True, color="sandybrown", alpha=0.6)
-plot_shapes(coarse_shapes, linewidth=2, color="orange")
+plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
+plot_polygons(center_neighbour_shapes, fill=True, colors="sandybrown", alpha=0.6)
+plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
+plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -136,14 +121,14 @@ plt.show()
 
 vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1, 2))
 vertices_cells = fine_grid.cell_at_point(vertices)
-vertices_cells = numpy.unique(vertices_cells, axis=0)  # drop duplicate ids
-vertices_shapes = fine_grid.to_shapely(vertices_cells, as_multipolygon=True)
+vertices_cells = vertices_cells.unique()  # drop duplicate ids
+vertices_shapes = fine_grid.to_shapely(vertices_cells)
 
-plot_shapes(fine_shapes, linewidth=1, color="purple")
-plot_shapes(center_shapes, fill=True, color="limegreen", alpha=0.6)
-plot_shapes(center_neighbour_shapes, fill=True, color="sandybrown", alpha=0.6)
-plot_shapes(vertices_shapes, fill=True, color="darkcyan", alpha=0.6)
-plot_shapes(coarse_shapes, linewidth=2, color="orange")
+plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
+plot_polygons(center_neighbour_shapes, fill=True, colors="sandybrown", alpha=0.6)
+plot_polygons(vertices_shapes, fill=True, colors="darkcyan", alpha=0.6)
+plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
+plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)

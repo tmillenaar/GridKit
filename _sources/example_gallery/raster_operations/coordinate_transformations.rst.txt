@@ -41,7 +41,7 @@ To demonstrate this, let's create a grid in WGS84 (epsg code 4326) and transform
 
 .. GENERATED FROM PYTHON SOURCE LINES 23-48
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -88,7 +88,7 @@ Now let's transform the grid's cell centers
 
 .. GENERATED FROM PYTHON SOURCE LINES 54-72
 
-.. code-block:: default
+.. code-block:: Python
 
     from pyproj.transformer import CRS, Transformer
 
@@ -132,7 +132,7 @@ To demonstrate this principle, let's plot the straight grid as red dots on top o
 
 .. GENERATED FROM PYTHON SOURCE LINES 81-93
 
-.. code-block:: default
+.. code-block:: Python
 
 
     grid_utm = grid_wgs84.to_crs(utm_epsg)  # resample using to_crs
@@ -168,7 +168,7 @@ Let's plot the new grid with the transformed WGS84 cell locations on top to see 
 
 .. GENERATED FROM PYTHON SOURCE LINES 100-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
     plt.imshow(grid_utm, extent=grid_utm.mpl_extent)
@@ -196,7 +196,7 @@ This does lead to artifacts at the boundaries.
 
 .. GENERATED FROM PYTHON SOURCE LINES 111-118
 
-.. code-block:: default
+.. code-block:: Python
 
 
     grid_utm = grid_wgs84.to_crs(utm_epsg, resample_method="bilinear")
@@ -225,7 +225,7 @@ Any time ``source_grid.resample(target_grid)`` is called, the CRS of the grids a
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.708 seconds)
+   **Total running time of the script:** (0 minutes 0.578 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_coordinate_transformations.py:
@@ -234,16 +234,13 @@ Any time ``source_grid.resample(target_grid)`` is called, the CRS of the grids a
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: coordinate_transformations.ipynb <coordinate_transformations.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: coordinate_transformations.py <coordinate_transformations.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: coordinate_transformations.ipynb <coordinate_transformations.ipynb>`
 
 
 .. only:: html

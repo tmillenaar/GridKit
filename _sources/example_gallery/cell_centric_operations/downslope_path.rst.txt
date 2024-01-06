@@ -51,7 +51,7 @@ First let's import the dependencies and read in the DEM.
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-45
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -81,7 +81,7 @@ Next, set up the recursive function and the required empty lists.
 
 .. GENERATED FROM PYTHON SOURCE LINES 53-81
 
-.. code-block:: default
+.. code-block:: Python
 
     visited_cells = []
     all_neighbours = []
@@ -124,7 +124,7 @@ Determine the starting cell and call the function
 
 .. GENERATED FROM PYTHON SOURCE LINES 83-87
 
-.. code-block:: default
+.. code-block:: Python
 
     start_cell_id = dem.cell_at_point((29330, 167848))
     downslope_path(tuple(start_cell_id.index))
@@ -147,7 +147,7 @@ For each cell along the path we plot the polygon as a square. This looks better 
 
 .. GENERATED FROM PYTHON SOURCE LINES 94-114
 
-.. code-block:: default
+.. code-block:: Python
 
 
     im = plt.imshow(dem, extent=dem.mpl_extent)
@@ -190,7 +190,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.404 seconds)
+   **Total running time of the script:** (0 minutes 1.181 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_downslope_path.py:
@@ -199,16 +199,13 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: downslope_path.ipynb <downslope_path.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: downslope_path.py <downslope_path.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: downslope_path.ipynb <downslope_path.ipynb>`
 
 
 .. only:: html

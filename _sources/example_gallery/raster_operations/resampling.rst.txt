@@ -38,7 +38,7 @@ Several grids with different cell shapes are then defined on which the DEM data 
 
 .. GENERATED FROM PYTHON SOURCE LINES 20-31
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -88,7 +88,7 @@ To make sure it worked we can print out the cellsize after resampling
 
 .. GENERATED FROM PYTHON SOURCE LINES 53-56
 
-.. code-block:: default
+.. code-block:: Python
 
     rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.crs), method="bilinear")
     print("Downsampled resolution in (dx, dy):", dem.cellsize)
@@ -112,7 +112,7 @@ Let's plot the data to see what it looks like after downsampling
 
 .. GENERATED FROM PYTHON SOURCE LINES 59-66
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -144,7 +144,7 @@ This way we will have a roughly equal number of cells covering the area.
 
 .. GENERATED FROM PYTHON SOURCE LINES 74-82
 
-.. code-block:: default
+.. code-block:: Python
 
 
     hexdem_flat = dem.resample(
@@ -170,7 +170,7 @@ First, let's create a function that determines the colors for our polygons.
 
 .. GENERATED FROM PYTHON SOURCE LINES 88-105
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pylab as pl
@@ -202,7 +202,7 @@ Now let's create two new figures and populate these with the colored shapes of t
 
 .. GENERATED FROM PYTHON SOURCE LINES 108-123
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # define two new figures
@@ -257,7 +257,7 @@ This example can of course also be used to upsample your data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.301 seconds)
+   **Total running time of the script:** (0 minutes 2.662 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_resampling.py:
@@ -266,16 +266,13 @@ This example can of course also be used to upsample your data.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: resampling.ipynb <resampling.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: resampling.py <resampling.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: resampling.ipynb <resampling.ipynb>`
 
 
 .. only:: html

@@ -38,7 +38,7 @@ We sample the equation at pseudo-random locations.
 
 .. GENERATED FROM PYTHON SOURCE LINES 21-32
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -64,7 +64,7 @@ This input data looks as follows:
 
 .. GENERATED FROM PYTHON SOURCE LINES 36-44
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -92,7 +92,7 @@ Now we can create a grid and interpolate onto that grid.
 
 .. GENERATED FROM PYTHON SOURCE LINES 47-55
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from gridkit import HexGrid
@@ -117,7 +117,7 @@ Here we try each method and plot them next to each other to compare.
 
 .. GENERATED FROM PYTHON SOURCE LINES 60-94
 
-.. code-block:: default
+.. code-block:: Python
 
     from gridkit.doc_utils import plot_polygons
 
@@ -176,7 +176,7 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.726 seconds)
+   **Total running time of the script:** (0 minutes 1.529 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_interpolate_from_points.py:
@@ -185,16 +185,13 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: interpolate_from_points.ipynb <interpolate_from_points.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: interpolate_from_points.py <interpolate_from_points.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: interpolate_from_points.ipynb <interpolate_from_points.ipynb>`
 
 
 .. only:: html

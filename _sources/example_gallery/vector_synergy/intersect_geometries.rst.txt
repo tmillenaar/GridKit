@@ -51,7 +51,7 @@ With that approach it might be worthwhile to call a `numpy.unique` on axis 0 aft
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-48
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import geopandas
@@ -85,7 +85,7 @@ A plot showing DEM, the geometries (orange) and the selected cells (red) is then
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-84
 
-.. code-block:: default
+.. code-block:: Python
 
 
     dem = dem.crop(water_bodies.total_bounds, bounds_crs=water_bodies.crs, buffer_cells=20)
@@ -133,7 +133,7 @@ A zoom-in of a section of the plot allows us to see more clearly what cells are 
 
 .. GENERATED FROM PYTHON SOURCE LINES 86-91
 
-.. code-block:: default
+.. code-block:: Python
 
 
     ax = generate_plot()
@@ -155,7 +155,7 @@ A zoom-in of a section of the plot allows us to see more clearly what cells are 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.737 seconds)
+   **Total running time of the script:** (0 minutes 5.421 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_intersect_geometries.py:
@@ -164,16 +164,13 @@ A zoom-in of a section of the plot allows us to see more clearly what cells are 
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: intersect_geometries.ipynb <intersect_geometries.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: intersect_geometries.py <intersect_geometries.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: intersect_geometries.ipynb <intersect_geometries.ipynb>`
 
 
 .. only:: html

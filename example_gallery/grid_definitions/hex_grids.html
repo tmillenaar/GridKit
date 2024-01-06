@@ -1,30 +1,32 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hexagon grids &mdash; GridKit 0.1.0.dev documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <title>Hexagon grids &mdash; GridKit v0.6.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0e73a448"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=bd562c4a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="NDVI" href="../raster_operations/ndvi.html" />
-    <link rel="prev" title="Cell selection using other grids" href="../cell_centric_operations/selecting_cells.html" /> 
+    <link rel="prev" title="Triangles in hexagons" href="triangles_in_hexes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.dev
+                v0.6.0.dev1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -55,6 +57,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="triangles_in_hexes.html">Triangles in hexagons</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Hexagon grids</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#shifting-grids">Shifting grids</a></li>
@@ -112,7 +115,7 @@ to download the full example code</p>
 The goal of this exercise is to familiarize the reader with the various configurations of hexagonal grids
 and how they compare to one another.</p>
 <p>Let’s create a grid and obtain the polygons in some area of interest.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
 
 <span class="c1"># create a grid</span>
 <span class="n">main_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
@@ -133,7 +136,7 @@ and how they compare to one another.</p>
 </div>
 <p>Now we have shapes representing some of the cells in the grid.
 Let’s plot the shapes to see what we are dealing with.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 
 <span class="k">def</span> <span class="nf">plot_shapes</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -155,7 +158,7 @@ We can modify this using the ‘offset’.</p>
 <h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Permalink to this heading"></a></h2>
 <p>Let’s shift the whole grid vertically to center it around coordinate (0,0)
 Also, let’s zoom in a bit to the center</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">main_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 
 <span class="c1"># plot the cell outlines</span>
@@ -171,7 +174,7 @@ If we shift the grid a deliberate amount so that it has a vertex on the center,
 it creates interesting patterns with respect to the grid we just created.
 For this we need to shift it half a ‘dx’ horizontally and one radius (distance from center to corner) vertically,
 with respect to the main grid.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shifted_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">shifted_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
     <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="n">shifted_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">shifted_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
@@ -193,7 +196,7 @@ is that we can use the already available <cite>dx</cite>, <cite>dy</cite> and <c
 <h2>Grid sizes<a class="headerlink" href="#grid-sizes" title="Permalink to this heading"></a></h2>
 <p>Finally, let’s play with the size of the grid. If we keep the grids centered around zero but vary the size,
 we also obtain interesting patterns.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
     <span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span>
 <span class="p">)</span>
 <span class="n">third_size_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span>
@@ -213,13 +216,13 @@ we also obtain interesting patterns.</p>
 </div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.546 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.424 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/67186b4128a685058ed8c30092023ec6/hex_grids.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">hex_grids.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a7ba0282faa773492ac8af4740356e0/hex_grids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hex_grids.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/67186b4128a685058ed8c30092023ec6/hex_grids.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">hex_grids.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -230,7 +233,7 @@ See <a class="reference internal" href="../cell_centric_operations/selecting_cel
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../cell_centric_operations/selecting_cells.html" class="btn btn-neutral float-left" title="Cell selection using other grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="triangles_in_hexes.html" class="btn btn-neutral float-left" title="Triangles in hexagons" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../raster_operations/ndvi.html" class="btn btn-neutral float-right" title="NDVI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -16,6 +16,7 @@ Submodules:
    gridkit.index
    gridkit.io
    gridkit.rect_grid
+   gridkit.tri_grid
    gridkit.version
 
 .. automodule:: gridkit

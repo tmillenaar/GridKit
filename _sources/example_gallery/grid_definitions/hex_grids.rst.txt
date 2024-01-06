@@ -36,7 +36,7 @@ Let's create a grid and obtain the polygons in some area of interest.
 
 .. GENERATED FROM PYTHON SOURCE LINES 19-39
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -72,7 +72,7 @@ Let's plot the shapes to see what we are dealing with.
 
 .. GENERATED FROM PYTHON SOURCE LINES 44-58
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
 
@@ -113,7 +113,7 @@ Also, let's zoom in a bit to the center
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-79
 
-.. code-block:: default
+.. code-block:: Python
 
 
     main_grid._offset = (0, main_grid.dy / 2)
@@ -148,7 +148,7 @@ with respect to the main grid.
 
 .. GENERATED FROM PYTHON SOURCE LINES 86-99
 
-.. code-block:: default
+.. code-block:: Python
 
 
     shifted_grid = HexGrid(
@@ -190,7 +190,7 @@ we also obtain interesting patterns.
 
 .. GENERATED FROM PYTHON SOURCE LINES 111-129
 
-.. code-block:: default
+.. code-block:: Python
 
 
     half_size_grid = HexGrid(
@@ -230,7 +230,7 @@ See :ref:`example selecting cells` for a example where this is done.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.546 seconds)
+   **Total running time of the script:** (0 minutes 0.424 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_hex_grids.py:
@@ -239,16 +239,13 @@ See :ref:`example selecting cells` for a example where this is done.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: hex_grids.ipynb <hex_grids.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: hex_grids.py <hex_grids.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: hex_grids.ipynb <hex_grids.ipynb>`
 
 
 .. only:: html

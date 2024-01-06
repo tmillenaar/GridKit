@@ -1,0 +1,9 @@
+
+tri_grid
+================
+
+.. automodule:: gridkit.tri_grid
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:

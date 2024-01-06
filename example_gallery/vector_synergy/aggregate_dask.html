@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tiled aggregation from points with Dask &mdash; GridKit 0.1.0.dev documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <title>Tiled aggregation from points with Dask &mdash; GridKit v0.6.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0e73a448"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=bd562c4a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -39,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.dev
+                v0.6.0.dev1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -145,7 +147,7 @@ you will likely obtain your dask array in a way that
 does not involve first loading the whole array into memory like I do here.
 I will print <code class="docutils literal notranslate"><span class="pre">npartitions</span></code> to show the number of chunks the array is divided in
 (spoiler, it will be 2000/500 = 4).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dask</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dask</span>
 <span class="kn">import</span> <span class="nn">dask.array</span>
 <span class="kn">import</span> <span class="nn">dask.dataframe</span>
 
@@ -165,7 +167,7 @@ I will print <code class="docutils literal notranslate"><span class="pre">nparti
 <p>Now we can create a grid and determine the cell associated to each point.
 No advanced knowledge of Dask is required to follow this example.
 It suffices to know that ‘map_blocks’ and ‘map_partitions’ will apply the supplied function to all chunks.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask_geopandas.geohash</span> <span class="kn">import</span> <span class="n">encode_geohash</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dask_geopandas.geohash</span> <span class="kn">import</span> <span class="n">encode_geohash</span>
 
 <span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
 
@@ -181,7 +183,7 @@ We need a way to convert the x and y values of the index into a single number
 that can then be used in Dask’s groupby method.
 Fortunately, dask_geopandas already solved this prpblem by creating a spatial index function.
 Here I will use that function to create a geohash we can use to group.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x_id&quot;</span><span class="p">,</span> <span class="s2">&quot;y_id&quot;</span><span class="p">])</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;x_id&quot;</span><span class="p">,</span> <span class="s2">&quot;y_id&quot;</span><span class="p">])</span>
 <span class="n">df</span><span class="p">[</span><span class="s2">&quot;geohash&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span>
     <span class="k">lambda</span> <span class="n">df</span><span class="p">:</span> <span class="n">encode_geohash</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">as_string</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="p">)</span>
@@ -204,7 +206,7 @@ Dask Name: assign, 8 graph layers
 <p>Notice how the DataFrame based on the cell_ids has separate columns for x and y values
 (which was the reason for creating the geohash in the first place).
 I will keep these values for they can be used after the groupby to reconstruct the grid indices.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;geohash&quot;</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grouped</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;geohash&quot;</span><span class="p">)</span>
 <span class="n">occurrences</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -222,7 +224,7 @@ suffice it to say that the size of the data is significantly reduced after the g
 Also, for the sake of the example I will plot the data with matplotlib.
 If this was indeed on your mind, nice, stay sharp ;)</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">first</span><span class="p">()[[</span><span class="s2">&quot;x_id&quot;</span><span class="p">,</span> <span class="s2">&quot;y_id&quot;</span><span class="p">]]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">index</span> <span class="o">=</span> <span class="n">grouped</span><span class="o">.</span><span class="n">first</span><span class="p">()[[</span><span class="s2">&quot;x_id&quot;</span><span class="p">,</span> <span class="s2">&quot;y_id&quot;</span><span class="p">]]</span>
 <span class="n">polygons</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">map_partitions</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;geoms&quot;</span><span class="p">:</span> <span class="nb">object</span><span class="p">})</span>
 <span class="n">geoms</span><span class="p">,</span> <span class="n">points_per_cell</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">polygons</span><span class="p">,</span> <span class="n">occurrences</span><span class="o">.</span><span class="n">nr_points</span><span class="p">)</span>
 </pre></div>
@@ -232,20 +234,20 @@ If this was indeed on your mind, nice, stay sharp ;)</p>
 <h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Permalink to this heading"></a></h2>
 <p>Note how the results are identical to the pandas version.
 The input data was the same so this should indeed be the case.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="n">plot_polygons</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">points_per_cell</span><span class="p">,</span> <span class="s2">&quot;Blues&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Number of points per cell&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.815 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.838 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-dask-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/5b5ca4e06d8cd9e19cfe42e3418b29ec/aggregate_dask.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">aggregate_dask.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/38f8786a96f33fa721d3497600e2357d/aggregate_dask.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate_dask.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5b5ca4e06d8cd9e19cfe42e3418b29ec/aggregate_dask.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">aggregate_dask.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

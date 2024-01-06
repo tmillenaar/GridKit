@@ -94,6 +94,23 @@ These examples highlight the different ways grids can be constructed and manipul
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="Aligning different types of grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_triangles_in_hexes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Triangles in hexagons</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Adjusting shapes and sizes">
 
 .. only:: html
@@ -117,6 +134,7 @@ These examples highlight the different ways grids can be constructed and manipul
 .. toctree::
    :hidden:
 
+   /example_gallery/grid_definitions/triangles_in_hexes
    /example_gallery/grid_definitions/hex_grids
 
 

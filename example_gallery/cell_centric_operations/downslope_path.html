@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Downslope path &mdash; GridKit 0.1.0.dev documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-binder.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-dataframe.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/sg_gallery-rendered-html.css" type="text/css" />
+  <title>Downslope path &mdash; GridKit v0.6.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0e73a448"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=bd562c4a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -39,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                0.1.0.dev
+                v0.6.0.dev1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -130,7 +132,7 @@ The path can therefore be best conceptualized as a stram, possibly with small la
 <p>The loop stops when NaNs are encountered, which happens when the border of the DEM crop is reached.
 This is of course assuming there are no nodata_values in the DEM.</p>
 <p>First let’s import the dependencies and read in the DEM.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">read_raster</span>
@@ -146,7 +148,7 @@ This is of course assuming there are no nodata_values in the DEM.</p>
 <p>Python’s recursion limit can be reached with this approach for paths longer than shown here.
 While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may want to reconsider the approach and use a while-loop instead of recursion.</p>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">visited_cells</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">visited_cells</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">all_neighbours</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">neighbour_values</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -175,7 +177,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 </pre></div>
 </div>
 <p>Determine the starting cell and call the function</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
 <span class="n">downslope_path</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">start_cell_id</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -184,7 +186,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <h2>Results<a class="headerlink" href="#results" title="Permalink to this heading"></a></h2>
 <p>Let’s plot the path on the DEM</p>
 <p>For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;longitude&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;latitude&quot;</span><span class="p">)</span>
@@ -207,13 +209,13 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
 or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.404 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.181 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/df89e8dce4f564036c6eab559331be35/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a495658098a2a10d0a6d919a5b81ba21/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/df89e8dce4f564036c6eab559331be35/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
