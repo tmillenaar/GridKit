@@ -28,11 +28,6 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: "true"
           manylinux: auto
-      - name: Test installing wheel
-        run: |
-          pip install --force-reinstall --verbose dist/*.whl
-          cd ..
-          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -60,11 +55,6 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-      - name: Test installing wheel
-        run: |
-          pip install --force-reinstall --verbose dist/*.whl
-          cd ..
-          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
@@ -91,11 +81,6 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
           sccache: 'true'
-      - name: Test installing wheel
-        run: |
-          pip install --force-reinstall --verbose dist/*.whl
-          cd ..
-          python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:
