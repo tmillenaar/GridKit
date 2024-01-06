@@ -18,7 +18,7 @@ jobs:
           python-version: '3.8'
 
       - name: Install dependencies
-        run: pip install ./[build,test]
+        run: pip install -e ./[test]
 
       - name: Run pytest
         run: python -m pytest tests --cov --verbose

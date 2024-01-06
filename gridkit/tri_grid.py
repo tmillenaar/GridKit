@@ -2,8 +2,8 @@ import numpy
 from pyproj import CRS, Transformer
 
 from gridkit.base_grid import BaseGrid
+from gridkit.gridkit_rs import PyTriGrid
 from gridkit.index import GridIndex, validate_index
-from gridkit_rs import PyTriGrid
 
 
 class TriGrid(BaseGrid):
