@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install ./[doc]
+        pip install ./[build,doc]
 
     - name: Build Sphinx documentation
       run: |

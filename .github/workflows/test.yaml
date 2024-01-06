@@ -17,17 +17,8 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Upgrade pip, setuptools, wheel
-        run: pip install --upgrade pip setuptools wheel
-
       - name: Install dependencies
-        run: pip install ./[test]
-
-      - name: Build rust package as wheel
-        run: maturin build --manifest-path=./gridkit_rs/Cargo.toml
-
-      - name: Install wheel of rust module
-        run: pip install gridkit_rs/target/wheels/*.whl
+        run: pip install ./[build,test]
 
       - name: Run pytest
         run: python -m pytest tests --cov --verbose
