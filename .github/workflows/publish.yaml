@@ -30,8 +30,8 @@ jobs:
           manylinux: auto
       - name: Test installing wheel
         run: |
-          cd ..
           pip install --force-reinstall --verbose dist/*.whl
+          cd ..
           python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
@@ -62,8 +62,8 @@ jobs:
           sccache: 'true'
       - name: Test installing wheel
         run: |
-          cd ..
           pip install --force-reinstall --verbose dist/*.whl
+          cd ..
           python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
@@ -93,8 +93,8 @@ jobs:
           sccache: 'true'
       - name: Test installing wheel
         run: |
-          cd ..
           pip install --force-reinstall --verbose dist/*.whl
+          cd ..
           python -c "import gridkit"
       - name: Upload wheels
         uses: actions/upload-artifact@v3
@@ -115,10 +115,10 @@ jobs:
         with:
           command: sdist
           args: --out dist
-      - name: Test installing wheel
+      - name: Test installing dist
         run: |
-          cd ..
           pip install --force-reinstall --verbose dist/*.tar.gz
+          cd ..
           python -c "import gridkit"
       - name: Upload sdist
         uses: actions/upload-artifact@v3
