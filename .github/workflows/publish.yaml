@@ -20,8 +20,11 @@ jobs:
       - name: Install dependencies
         run: pip install --upgrade setuptools wheel twine
 
-      - name: Set the gridkit version to that of the tag
+      - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
 
       - name: Build distribution packages
         run: python setup.py sdist bdist_wheel
