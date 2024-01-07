@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.6.0.dev4 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=e55fb2f4"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=0c39efb2"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0.dev4
+                v0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -264,7 +264,7 @@ So the 3rd element in the list will be <cite>1*6 + 2*6 + 3*6 = 36</cite>.</p>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.base_grid.BaseGrid.neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.neighbours()</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a></p>
+<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.base_grid.BaseGrid.neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.neighbours()</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.relative_neighbours" title="gridkit.tri_grid.TriGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.relative_neighbours()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -272,15 +272,12 @@ So the 3rd element in the list will be <cite>1*6 + 2*6 + 3*6 = 36</cite>.</p>
 <dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid.centroid">
 <span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid.centroid" title="Permalink to this definition"></a></dt>
 <dd><p>Coordinates at the center of the cell(s) specified by <cite>index</cite>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The two values that make up an <cite>index</cite> are expected to be integers, and will be cast as such.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – Index of the cell of which the centroid is to be calculated.
 The index consists of two integers specifying the nth cell in x- and y-direction.
-Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.</p>
+Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
+where N is the number of cells.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The longitude and latitude of the center of each cell.
@@ -370,7 +367,21 @@ If multiple points are supplied, the indices are returned as Nx2 ndarrays.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid.cell_corners">
 <span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid.cell_corners" title="Permalink to this definition"></a></dt>
-<dd><p>Return corners in (cells, corners, xy)</p>
+<dd><p>Coordinates of the cell corners as specified by <cite>index</cite>.</p>
+<p>:param <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>: The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – A list of coordinates in (x,y) specifying each of the corners.
+If an ND index is supplied, the returned array will be of the same shpae,
+but with an extra axis containing the corners.
+The last axis is always of size 2 (x,y).
+The second to last axis is the length of the corners.
+The other axis are in the shape of the supplied index.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -535,7 +546,21 @@ Default: None</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.cell_corners">
 <span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.cell_corners" title="Permalink to this definition"></a></dt>
-<dd><p>Return corners in (cells, corners, xy)</p>
+<dd><p>Coordinates of the cell corners as specified by <cite>index</cite>.</p>
+<p>:param <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>: The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – A list of coordinates in (x,y) specifying each of the corners.
+If an ND index is supplied, the returned array will be of the same shpae,
+but with an extra axis containing the corners.
+The last axis is always of size 2 (x,y).
+The second to last axis is the length of the corners.
+The other axis are in the shape of the supplied index.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -628,15 +653,12 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <dt class="sig sig-object py" id="gridkit.hex_grid.BoundedHexGrid.centroid">
 <span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#BoundedHexGrid.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.BoundedHexGrid.centroid" title="Permalink to this definition"></a></dt>
 <dd><p>Coordinates at the center of the cell(s) specified by <cite>index</cite>.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The two values that make up an <cite>index</cite> are expected to be integers, and will be cast as such.</p>
-</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – Index of the cell of which the centroid is to be calculated.
 The index consists of two integers specifying the nth cell in x- and y-direction.
-Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.</p>
+Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
+where N is the number of cells.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The longitude and latitude of the center of each cell.

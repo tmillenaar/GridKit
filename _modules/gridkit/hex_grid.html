@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.hex_grid &mdash; GridKit v0.6.0.dev4 documentation</title>
+  <title>gridkit.hex_grid &mdash; GridKit v0.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=e55fb2f4"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0c39efb2"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0.dev4
+                v0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -269,6 +269,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        :py:meth:`.BaseGrid.neighbours`</span>
 <span class="sd">        :py:meth:`.RectGrid.relative_neighbours`</span>
+<span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -324,15 +325,13 @@
 <div class="viewcode-block" id="HexGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid">[docs]</a>    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by `index`.</span>
 
-<span class="sd">        .. Warning ::</span>
-<span class="sd">            The two values that make up an `index` are expected to be integers, and will be cast as such.</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        index: :class:`tuple`</span>
 <span class="sd">            Index of the cell of which the centroid is to be calculated.</span>
 <span class="sd">            The index consists of two integers specifying the nth cell in x- and y-direction.</span>
-<span class="sd">            Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.</span>
+<span class="sd">            Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,</span>
+<span class="sd">            where N is the number of cells.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -600,7 +599,6 @@
 
 <div class="viewcode-block" id="HexGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners">[docs]</a>    <span class="nd">@validate_index</span>
     <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return corners in (cells, corners, xy)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `corners`.&quot;</span>

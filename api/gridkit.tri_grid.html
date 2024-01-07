@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>tri_grid &mdash; GridKit v0.6.0.dev4 documentation</title>
+  <title>tri_grid &mdash; GridKit v0.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=e55fb2f4"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=0c39efb2"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0.dev4
+                v0.6.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -110,7 +110,7 @@
 <span id="tri-grid"></span><h1>tri_grid<a class="headerlink" href="#module-gridkit.tri_grid" title="Permalink to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.tri_grid.</span></span><span class="sig-name descname"><span class="pre">TriGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pointy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.tri_grid.</span></span><span class="sig-name descname"><span class="pre">TriGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p>
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.dx">
@@ -131,24 +131,17 @@
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.shape">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#gridkit.tri_grid.TriGrid.shape" title="Permalink to this definition"></a></dt>
-<dd><p>The shape of the grid as supplied when initiating the class.
-This can be either “flat” or “pointy” referring to the top of the cells.</p>
-</dd></dl>
-
-<dl class="py property">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.size">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.tri_grid.TriGrid.size" title="Permalink to this definition"></a></dt>
 <dd><p>The size of the cell as supplied when initiating the class.
-This is the same as dx for a flat grid and the same as dy for a pointy grid.</p>
+The size is equivalent to dx, which is half a cell edge length.</p>
 </dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.offset">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.tri_grid.TriGrid.offset" title="Permalink to this definition"></a></dt>
 <dd><p>The offset off the grid in dx and dy.
-The offset is never larger than the size of a single grid cell.
+The offset is never larger than the (dx, dy) of a single grid cell.
 The offset represents the shift from the origin (0,0).</p>
 </dd></dl>
 
@@ -156,21 +149,42 @@ The offset represents the shift from the origin (0,0).</p>
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.centroid">
 <span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.centroid" title="Permalink to this definition"></a></dt>
 <dd><p>Coordinates at the center of the cell(s) specified by <cite>index</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – Index of the cell of which the centroid is to be calculated.
+The index consists of two integers specifying the nth cell in x- and y-direction.
+Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
+where N is the number of cells.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The longitude and latitude of the center of each cell.
+Axes order if multiple indices are specified: (points, xy), else (xy).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied. <cite>index</cite> can only be <cite>None</cite> in classes that contain data.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.cell_corners">
 <span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.cell_corners" title="Permalink to this definition"></a></dt>
 <dd><p>Coordinates of the cell corners as specified by <cite>index</cite>.</p>
+<p>:param <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>: The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> – A list of coordinates in (x,y) specifying each of the corners.
+If an ND index is supplied, the returned array will be of the same shpae,
+but with an extra axis containing the corners.
+The last axis is always of size 2 (x,y).
+The second to last axis is the length of the corners.
+The other axis are in the shape of the supplied index.</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The ID of the cell in (x,y)</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
 </dd>
 </dl>
 </dd></dl>
@@ -215,13 +229,30 @@ The offset represents the shift from the origin (0,0).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.cells_near_point">
 <span class="sig-name descname"><span class="pre">cells_near_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.cells_near_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.cells_near_point" title="Permalink to this definition"></a></dt>
-<dd><p>The 3 to 4 cells nearest to a point, often used in interpolation at the location of the point.</p>
+<dd><p>The cells nearest to a point, often used in interpolation at the location of the point.
+For a TriGrid there are 6 nearby points.
+For a HexGrid there are 3 nearby points.
+For a RectGrid there are 4 nearby points.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.is_cell_upright">
 <span class="sig-name descname"><span class="pre">is_cell_upright</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.is_cell_upright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.is_cell_upright" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Whether the selected cell points up or down.
+True if the cell points up, False if the cell points down.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<cite>GridIndex</cite>) – The index of the cell(s) of interest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A boolean value reflecting whether the cell is upright or not.
+Or a 1d array containing the boolean values for each cell.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite> or <cite>bool</cite></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.parent_grid_class">
@@ -231,7 +262,32 @@ The offset represents the shift from the origin (0,0).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.relative_neighbours">
 <span class="sig-name descname"><span class="pre">relative_neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.relative_neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.relative_neighbours" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The relative indices of the neighbouring cells.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> Default: 1) – Determines the number of neighbours that are returned.
+If <cite>depth=1</cite> the direct neighbours are returned.
+If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
+<cite>depth=3</cite> returns yet another layer of neighbours, and so forth.</p></li>
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index of the cell of which the relative neighbours are desired.
+This is mostly relevant because in hexagonal grids the neighbouring indices differ
+when dealing with odd or even indices.</p></li>
+<li><p><strong>include_selected</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to include the specified cell in the return array.
+Even though the specified cell can never be a neighbour of itself,
+this can be useful when for example a weighted average of the neighbours is desired
+in which case the cell itself often should also be included.</p></li>
+<li><p><strong>connect_corners</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to consider cells that touch corners but not sides as neighbours.
+Each cell has 3 neighbours if connect_corners is False,
+and 9 neighbours if connect_corners is True.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.base_grid.BaseGrid.neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.neighbours()</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a></p>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.neighbours">
@@ -270,7 +326,7 @@ in which case the cell itself often should also be included.</p></li>
 <p>For more detailed examples:</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
-<p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a></p>
+<p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="#gridkit.tri_grid.TriGrid.relative_neighbours" title="gridkit.tri_grid.TriGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.relative_neighbours()</span></code></a></p>
 </div>
 </dd></dl>
 
