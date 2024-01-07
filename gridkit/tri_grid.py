@@ -7,18 +7,12 @@ from gridkit.index import GridIndex, validate_index
 
 
 class TriGrid(BaseGrid):
-    def __init__(self, *args, size, shape="pointy", offset=(0, 0), **kwargs):
+    def __init__(self, *args, size, offset=(0, 0), **kwargs):
         self._size = size
         self._radius = size / 3**0.5
 
-        if shape != "pointy":
-            raise NotImplementedError(
-                "Only 'pointy' is supported for the `shape` argument of `TriGrid`"
-            )
-
         self._grid = PyTriGrid(cellsize=size, offset=offset)
 
-        self._shape = shape
         self.bounded_cls = None
         super(TriGrid, self).__init__(*args, offset=offset, **kwargs)
 
@@ -38,23 +32,16 @@ class TriGrid(BaseGrid):
         return self._grid.radius()
 
     @property
-    def shape(self) -> str:
-        """The shape of the grid as supplied when initiating the class.
-        This can be either "flat" or "pointy" referring to the top of the cells.
-        """
-        return self._shape
-
-    @property
     def size(self) -> float:
         """The size of the cell as supplied when initiating the class.
-        This is the same as dx for a flat grid and the same as dy for a pointy grid.
+        The size is equivalent to dx, which is half a cell edge length.
         """
         return self._size
 
     @property
     def offset(self) -> float:
         """The offset off the grid in dx and dy.
-        The offset is never larger than the size of a single grid cell.
+        The offset is never larger than the (dx, dy) of a single grid cell.
         The offset represents the shift from the origin (0,0)."""
         return self._offset
 
@@ -69,6 +56,32 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def centroid(self, index):
+        """Coordinates at the center of the cell(s) specified by `index`.
+
+        Parameters
+        ----------
+        index: :class:`tuple`
+            Index of the cell of which the centroid is to be calculated.
+            The index consists of two integers specifying the nth cell in x- and y-direction.
+            Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
+            where N is the number of cells.
+
+        Returns
+        -------
+        `numpy.ndarray`
+            The longitude and latitude of the center of each cell.
+            Axes order if multiple indices are specified: (points, xy), else (xy).
+
+        Raises
+        ------
+        ValueError
+            No `index` parameter was supplied. `index` can only be `None` in classes that contain data.
+
+        """
+        if index is None:
+            raise ValueError(
+                "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
+            )
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
@@ -101,6 +114,20 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def is_cell_upright(self, index):
+        """Whether the selected cell points up or down.
+        True if the cell points up, False if the cell points down.
+
+        Parameters
+        ----------
+        index: `GridIndex`
+            The index of the cell(s) of interest
+
+        Returns
+        -------
+        `numpy.ndarray` or `bool`
+            A boolean value reflecting whether the cell is upright or not.
+            Or a 1d array containing the boolean values for each cell.
+        """
         index = index.index[None] if index.index.ndim == 1 else index.index
         return self._grid.is_cell_upright(index=index).squeeze()
 
@@ -112,6 +139,35 @@ class TriGrid(BaseGrid):
     def relative_neighbours(
         self, index=None, depth=1, connect_corners=False, include_selected=False
     ):
+        """The relative indices of the neighbouring cells.
+
+        Parameters
+        ----------
+        depth: :class:`int` Default: 1
+            Determines the number of neighbours that are returned.
+            If `depth=1` the direct neighbours are returned.
+            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
+            `depth=3` returns yet another layer of neighbours, and so forth.
+        index: `numpy.ndarray`
+            The index of the cell of which the relative neighbours are desired.
+            This is mostly relevant because in hexagonal grids the neighbouring indices differ
+            when dealing with odd or even indices.
+        include_selected: :class:`bool` Default: False
+            Whether to include the specified cell in the return array.
+            Even though the specified cell can never be a neighbour of itself,
+            this can be useful when for example a weighted average of the neighbours is desired
+            in which case the cell itself often should also be included.
+        connect_corners: :class:`bool` Default: False
+            Whether to consider cells that touch corners but not sides as neighbours.
+            Each cell has 3 neighbours if connect_corners is False,
+            and 9 neighbours if connect_corners is True.
+
+        See also
+        --------
+        :py:meth:`.BaseGrid.neighbours`
+        :py:meth:`.RectGrid.relative_neighbours`
+        :py:meth:`.HexGrid.relative_neighbours`
+        """
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )

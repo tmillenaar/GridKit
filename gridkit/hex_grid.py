@@ -184,6 +184,7 @@ class HexGrid(BaseGrid):
         --------
         :py:meth:`.BaseGrid.neighbours`
         :py:meth:`.RectGrid.relative_neighbours`
+        :py:meth:`.TriGrid.relative_neighbours`
         """
 
         if depth < 1:
@@ -239,15 +240,13 @@ class HexGrid(BaseGrid):
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
 
-        .. Warning ::
-            The two values that make up an `index` are expected to be integers, and will be cast as such.
-
         Parameters
         ----------
         index: :class:`tuple`
             Index of the cell of which the centroid is to be calculated.
             The index consists of two integers specifying the nth cell in x- and y-direction.
-            Mutliple indices can be specified at once in the form of a list of indices or an Nx2 ndarray.
+            Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
+            where N is the number of cells.
 
         Returns
         -------
@@ -515,7 +514,6 @@ class HexGrid(BaseGrid):
 
     @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
-        """Return corners in (cells, corners, xy)"""
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `corners`."

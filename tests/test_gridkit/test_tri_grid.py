@@ -15,19 +15,18 @@ def test_radius(size, expected_radius):
 
 
 @pytest.mark.parametrize(
-    "shape, indices, expected_centroids",
+    "indices, expected_centroids",
     [
-        ["pointy", (-1, -1), [-2.25, -3.46410162]],
-        ["pointy", (-1, 1), [-2.25, 1.73205081]],
+        [(-1, -1), [-2.25, -3.46410162]],
+        [(-1, 1), [-2.25, 1.73205081]],
         [
-            "pointy",
             [(0, 0), (1, -1), (1, 1)],
             [[-0.75, -0.8660254], [0.75, -3.46410162], [0.75, 1.73205081]],
         ],
     ],
 )
 @pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
-def test_centroid(shape, indices, offset, expected_centroids):
+def test_centroid(indices, offset, expected_centroids):
     # TODO: test for different shapes when implemented
     grid = TriGrid(size=1.5, offset=offset)
     centroids = grid.centroid(indices)
@@ -259,7 +258,7 @@ def test_to_crs():
 
 
 def test_is_aligned_with():
-    grid = TriGrid(size=1.2, shape="pointy")
+    grid = TriGrid(size=1.2)
 
     is_aligned, reason = grid.is_aligned_with(grid)
     assert is_aligned

@@ -93,7 +93,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def cells_near_point(self, point) -> float:
-        """The 3 to 4 cells nearest to a point, often used in interpolation at the location of the point."""
+        """The cells nearest to a point, often used in interpolation at the location of the point.
+        For a TriGrid there are 6 nearby points.
+        For a HexGrid there are 3 nearby points.
+        For a RectGrid there are 4 nearby points.
+        """
         pass
 
     @abc.abstractmethod
@@ -175,6 +179,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         --------
         :py:meth:`.RectGrid.relative_neighbours`
         :py:meth:`.HexGrid.relative_neighbours`
+        :py:meth:`.TriGrid.relative_neighbours`
         """
         original_shape = index.shape
         index = index.ravel()
@@ -220,13 +225,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        index: `numpy.ndarray`
+        :class:`~.index.GridIndex`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
 
         Returns
         -------
-        :class:`~.index.GridIndex`
-            The ID of the cell in (x,y)
+        index: `numpy.ndarray`
+            A list of coordinates in (x,y) specifying each of the corners.
+            If an ND index is supplied, the returned array will be of the same shpae,
+            but with an extra axis containing the corners.
+            The last axis is always of size 2 (x,y).
+            The second to last axis is the length of the corners.
+            The other axis are in the shape of the supplied index.
         """
         pass
 
