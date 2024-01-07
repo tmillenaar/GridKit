@@ -3,8 +3,31 @@
 Release notes
 ================
 
+Version 0.6.0 (January 07, 2024)
+--------------------------------
+Features
+ - Add :class:`.TriGrid` (Only base variant, BoundedTriGrid is yet to come)
+
+Fixes
+ - :meth:`.BaseGrid.to_shapely` now properly handles ND input
+ - :meth:`.HexGrid.relative_neighbours` now properly handles ND input
+
+Documentation
+ - Add example :ref:`triangles_in_hexes.py <example triangles in hexes>`
+ - :func:`.doc_utils.plot_polygons` used in examples now plots both lines and filled polygons
+
+Misc
+ - Add Rust bindings using the maturin package
+ - Renamed the test rasters used in example :ref:`ndvi.py <example ndvi>` because Windows failed on special characters in the name
+ - Put index as first argument instead of second in :meth:`.HexGrid.relative_neighbours`
+
+CICD
+ - Retire setup.py in favour of pyproject.toml
+ - Build package using maturin
+ - Test deploy for linux, macos and windows before uploading the sdist to PyPi
+
 Version 0.5.1 (October 08, 2023)
-----------------------------------
+--------------------------------
 Fixes
  - :meth:`.BaseGrid.to_shapely()` now returns single Polygon if a single GridIndex was supplied
 
@@ -12,7 +35,7 @@ Documentation
  - Add example :ref:`aggregate_dask.py <example aggregate_dask>`
 
 Version 0.5.0 (October 01, 2023)
-----------------------------------
+--------------------------------
 Features
  - Make return argument `shape` optional in :meth:`.BaseGrid.cells_in_bounds` by adding the `return_cell_shape` argument (default False)
  - Structure the :class:`.GridIndex` returned by :meth:`.BaseGrid.cells_in_bounds` in the shape of the grid (2D)
