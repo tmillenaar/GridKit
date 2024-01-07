@@ -79,6 +79,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
         The offset represents the shift from the origin (0,0)."""
         return self._offset
 
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) or not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        self._offset = value
+
     @abc.abstractmethod
     def centroid(self, index) -> float:
         """Coordinates at the center of the cell(s) specified by `index`."""
@@ -86,7 +93,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def cells_near_point(self, point) -> float:
-        """The 3 to 4 cells nearest to a point, often used in interpolation at the location of the point."""
+        """The cells nearest to a point, often used in interpolation at the location of the point.
+        For a TriGrid there are 6 nearby points.
+        For a HexGrid there are 3 nearby points.
+        For a RectGrid there are 4 nearby points.
+        """
         pass
 
     @abc.abstractmethod
@@ -122,6 +133,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
     ):
         pass
 
+    @validate_index
     def neighbours(self, index, depth=1, connect_corners=False, include_selected=False):
         """The indices of the neighbouring cells.
         The argument 'depth' can be used to include cells from further away.
@@ -167,9 +179,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
         --------
         :py:meth:`.RectGrid.relative_neighbours`
         :py:meth:`.HexGrid.relative_neighbours`
+        :py:meth:`.TriGrid.relative_neighbours`
         """
-        if not isinstance(index, numpy.ndarray):
-            index = numpy.array(index)
+        original_shape = index.shape
+        index = index.ravel()
 
         neighbours = self.relative_neighbours(
             depth=depth,
@@ -178,13 +191,17 @@ class BaseGrid(metaclass=abc.ABCMeta):
             index=index,
         )
 
-        if len(index.shape) == 1:
+        if len(index.index.shape) == 1:
             return neighbours + index
 
         # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
         neighbours = numpy.swapaxes(neighbours, 0, 1)
         neighbours = neighbours + index
-        return GridIndex(numpy.swapaxes(neighbours, 0, 1))
+        neighbours = numpy.swapaxes(neighbours, 0, 1)
+
+        return GridIndex(
+            neighbours.reshape(*original_shape, *neighbours.shape[-2:]).squeeze()
+        )
 
     @abc.abstractmethod
     def cell_at_point(self, point: numpy.ndarray) -> tuple:
@@ -208,13 +225,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Parameters
         ----------
-        index: `numpy.ndarray`
+        :class:`~.index.GridIndex`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
 
         Returns
         -------
-        :class:`~.index.GridIndex`
-            The ID of the cell in (x,y)
+        index: `numpy.ndarray`
+            A list of coordinates in (x,y) specifying each of the corners.
+            If an ND index is supplied, the returned array will be of the same shpae,
+            but with an extra axis containing the corners.
+            The last axis is always of size 2 (x,y).
+            The second to last axis is the length of the corners.
+            The other axis are in the shape of the supplied index.
         """
         pass
 
@@ -444,6 +466,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         vertices = self.cell_corners(index.ravel())
         if index.index.ndim == 1:
             return shapely.geometry.Polygon(vertices)
+        if vertices.ndim == 2:
+            vertices = vertices[numpy.newaxis]
         polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
 
         if len(polygons) == 1:

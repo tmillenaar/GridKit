@@ -147,6 +147,7 @@ class RectGrid(BaseGrid):
         --------
         :py:meth:`.BaseGrid.neighbours`
         :py:meth:`.HexGrid.relative_neighbours`
+        :py:meth:`.TriGrid.relative_neighbours`
         """
 
         if depth < 1:

@@ -17,14 +17,11 @@ jobs:
         with:
           python-version: '3.8'
 
-      - name: Upgrade pip, setuptools, wheel
-        run: pip install --upgrade pip setuptools wheel
-
       - name: Install dependencies
-        run: pip install ./[test]
+        run: pip install -e ./[test]
 
       - name: Run pytest
-        run: python -m pytest tests --cov
+        run: python -m pytest tests --cov --verbose
 
       - name: Run doctest
         run: python -m pytest gridkit/ --doctest-modules

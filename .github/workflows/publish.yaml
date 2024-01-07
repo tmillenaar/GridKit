@@ -5,30 +5,130 @@ on:
       - '*'
 
 jobs:
-  publish:
+  linux:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        target: [x86_64, x86, aarch64, armv7, s390x, ppc64le]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+      - name: Set the gridkit version in version.py to that of the tag
+        run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+          sccache: "true"
+          manylinux: auto
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        target: [x64, x86]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-
-      - name: Install dependencies
-        run: pip install --upgrade setuptools wheel twine
-
-      - name: Set the gridkit version to that of the tag
-        run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
-
-      - name: Build distribution packages
-        run: python setup.py sdist bdist_wheel
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.1
+          architecture: ${{ matrix.target }}
+      - name: Set the gridkit version in version.py to that of the tag
+        run: (Get-Content -Path .\gridkit\version.py -Raw) -replace '\"[0-9]+\.[0-9]+\.[0-9]+.+', ('"{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\gridkit\version.py ; Get-Content .\gridkit\version.py
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: (Get-Content -Path .\pyproject.toml -Raw) -replace 'version = "[0-9]+\.[0-9]+\.[0-9]+.+', ('version = "{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\pyproject.toml ; Get-Content .\pyproject.toml
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
         with:
-          user: __token__
-          password: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
-          packages: dist/*
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+          sccache: 'true'
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        target: [x86_64, aarch64]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - name: Set the gridkit version in version.py to that of the tag
+        run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter
+          sccache: 'true'
+      - name: Upload wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set the gridkit version in version.py to that of the tag
+        run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+      - name: Build sdist
+        uses: PyO3/maturin-action@v1
+        with:
+          command: sdist
+          args: --out dist
+      - name: Test installing dist
+        run: |
+          pip install --force-reinstall --verbose dist/*.tar.gz
+          cd ..
+          python -c "import gridkit"
+      - name: Upload sdist
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheels
+          path: dist
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: "startsWith(github.ref, 'refs/tags/')"
+    needs: [linux, windows, macos, sdist]
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: wheels
+      - name: Set the gridkit version in version.py to that of the tag
+        run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+      - name: Set the gridkit version in pyproject.toml to that of the tag
+        run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+      - name: Publish to PyPI
+        uses: PyO3/maturin-action@v1
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
+        with:
+          command: upload
+          args: --non-interactive --skip-existing *
+
