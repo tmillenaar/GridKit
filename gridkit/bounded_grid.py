@@ -3,7 +3,7 @@ import functools
 import operator
 import warnings
 from multiprocessing.sharedctypes import Value
-from typing import Literal
+from typing import Tuple
 
 import numpy
 import scipy
@@ -447,6 +447,22 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
 
     @abc.abstractmethod
     def crop(self, new_bounds, bounds_crs=None):
+        """Cut out a slice of data contained within the supplied bounds.
+
+        Parameters
+        ----------
+        new_bounds: `Tuple(minx, miny, maxx, maxy)`
+            The bounds defining the area to crop, in (minx, miny, maxx, maxy).
+        
+        bounds_crs: `pyproj.CRS` (optional)
+            The bounds defining the extent of the cropped data.
+            The value can be anything accepted by `pyproj.CRS.from_user_input()`.
+
+        Returns
+        -------
+        :class: `BoundedGrid`
+            A BoundedGrid containing the data included in the cropped area contained within the bounds.
+        """
         pass
 
     @abc.abstractmethod
