@@ -109,7 +109,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [2, -1],
                 [3, -1],
             ],
-            (6, 4),
+            (4, 6),
         ],
         [
             (2.2, 3, 5.3, 6.1),
@@ -130,7 +130,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [7, 3],
                 [8, 3],
             ],
-            (5, 3),
+            (3, 5),
         ],
         [
             (-5.3, -6.1, -2.2, -3),
@@ -151,7 +151,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [-4, -4],
                 [-3, -4],
             ],
-            (5, 3),
+            (3, 5),
         ],
     ),
 )
@@ -160,6 +160,7 @@ def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count
     grid = TriGrid(size=0.7)
     bounds = grid.align_bounds(bounds, "nearest")
     result = grid.cells_in_bounds(bounds, return_cell_count=return_cell_count)
+    expected_ids = numpy.array(expected_ids).reshape((*expected_shape, 2))
     if return_cell_count is False:
         numpy.testing.assert_allclose(result, expected_ids)
     else:

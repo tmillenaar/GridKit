@@ -453,7 +453,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         ----------
         new_bounds: `Tuple(minx, miny, maxx, maxy)`
             The bounds defining the area to crop, in (minx, miny, maxx, maxy).
-        
+
         bounds_crs: `pyproj.CRS` (optional)
             The bounds defining the extent of the cropped data.
             The value can be anything accepted by `pyproj.CRS.from_user_input()`.

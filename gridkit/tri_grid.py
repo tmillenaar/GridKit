@@ -2,6 +2,8 @@ import numpy
 from pyproj import CRS, Transformer
 
 from gridkit.base_grid import BaseGrid
+from gridkit.bounded_grid import BoundedGrid
+from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.gridkit_rs import PyTriGrid
 from gridkit.index import GridIndex, validate_index
 
@@ -13,7 +15,7 @@ class TriGrid(BaseGrid):
 
         self._grid = PyTriGrid(cellsize=size, offset=offset)
 
-        self.bounded_cls = None
+        self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
@@ -56,36 +58,16 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def centroid(self, index):
-        """Coordinates at the center of the cell(s) specified by `index`.
-
-        Parameters
-        ----------
-        index: :class:`tuple`
-            Index of the cell of which the centroid is to be calculated.
-            The index consists of two integers specifying the nth cell in x- and y-direction.
-            Multiple indices can be specified at once in the form of a list of indices or an Nx2 ndarray,
-            where N is the number of cells.
-
-        Returns
-        -------
-        `numpy.ndarray`
-            The longitude and latitude of the center of each cell.
-            Axes order if multiple indices are specified: (points, xy), else (xy).
-
-        Raises
-        ------
-        ValueError
-            No `index` parameter was supplied. `index` can only be `None` in classes that contain data.
-
-        """
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
+        original_shape = (*index.shape, 2)
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
-        return self._grid.centroid(index=index).squeeze()
+        centroids = self._grid.centroid(index=index)
+        return centroids.reshape(original_shape)
 
     @validate_index
     def cell_corners(self, index):
@@ -103,7 +85,7 @@ class TriGrid(BaseGrid):
                 f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
             )
         ids, shape = self._grid.cells_in_bounds(bounds)
-        ids = GridIndex(ids)
+        ids = GridIndex(ids.reshape((*shape, 2)))
         return (ids, shape) if return_cell_count else ids
 
     def cells_near_point(self, point):
@@ -224,7 +206,7 @@ class TriGrid(BaseGrid):
         Methods:
 
         :meth:`.RectGrid.to_crs`
-        :meth:`.BoundedRectGrid.to_crs`
+        :meth:`.BoundedTriGrid.to_crs`
         :meth:`.BoundedHexGrid.to_crs`
 
         """
@@ -256,3 +238,188 @@ class TriGrid(BaseGrid):
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+
+
+class BoundedTriGrid(BoundedGrid, TriGrid):
+    def __init__(self, data, *args, bounds, **kwargs):
+        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+            raise ValueError(
+                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
+            )
+        data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
+        if data.ndim != 2:
+            raise ValueError(
+                f"Expected a 2D numpy array, got data with shape {data.shape}"
+            )
+
+        dx = (bounds[2] - bounds[0]) / data.shape[1]
+        dy = (bounds[3] - bounds[1]) / data.shape[0]
+
+        offset_x = bounds[0] % dx
+        offset_y = bounds[1] % dy
+        offset_x = dx - offset_x if offset_x < 0 else offset_x
+        offset_y = dy - offset_y if offset_y < 0 else offset_y
+        offset = (
+            0 if numpy.isclose(offset_x, dx) else offset_x,
+            0 if numpy.isclose(offset_y, dy) else offset_y,
+        )
+
+        super(BoundedTriGrid, self).__init__(
+            data, *args, size=dx, bounds=bounds, offset=offset, **kwargs
+        )
+
+    def centroid(self, index=None):
+        if index is None:
+            if not hasattr(self, "indices"):
+                raise ValueError(
+                    "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
+                )
+            index = self.indices
+        return super(BoundedTriGrid, self).centroid(index=index)
+
+    def intersecting_cells(self, other):
+        raise NotImplementedError()
+
+    def crop(self, new_bounds, bounds_crs=None, buffer_cells=0):
+        if bounds_crs is not None:
+            bounds_crs = CRS.from_user_input(bounds_crs)
+            transformer = Transformer.from_crs(bounds_crs, self.crs, always_xy=True)
+            new_bounds = transformer.transform_bounds(*new_bounds)
+
+        if not self.intersects(new_bounds):
+            raise IntersectionError(
+                f"Cannot crop grid with bounds {self.bounds} to {new_bounds} for they do not intersect."
+            )
+        new_bounds = self.shared_bounds(new_bounds)
+
+        new_bounds = self.align_bounds(new_bounds, mode="contract")
+        slice_y, slice_x = self._data_slice_from_bounds(new_bounds)
+        if buffer_cells:
+            slice_x = slice(slice_x.start - buffer_cells, slice_x.stop + buffer_cells)
+            slice_y = slice(slice_y.start - buffer_cells, slice_y.stop + buffer_cells)
+            new_bounds = (
+                new_bounds[0] - buffer_cells * self.dx,
+                new_bounds[1] - buffer_cells * self.dy,
+                new_bounds[2] + buffer_cells * self.dx,
+                new_bounds[3] + buffer_cells * self.dy,
+            )
+        # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
+        cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
+        # cropped_data = self._data[slice_x, slice_y]
+        return self.update(cropped_data, bounds=new_bounds)
+
+    @validate_index
+    def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
+        if index is None:
+            index = self.indices()
+        return super(BoundedTriGrid, self).cell_corners(index=index)
+
+    @validate_index
+    def to_shapely(self, index=None, as_multipolygon: bool = False):
+        """Refer to parent method :meth:`.BaseGrid.to_shapely`
+
+        Difference with parent method:
+            `index` is optional.
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        :meth:`.BoundedHexGrid.to_shapely`
+        """
+        if index is None:
+            index = self.indices
+        return super().to_shapely(index, as_multipolygon)
+
+    def _bilinear_interpolation(self, sample_points):
+        """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation
+        using the 4 cells around the point.
+
+        Parameters
+        ----------
+        sample_points: `numpy.ndarray`
+            The coordinates of the points at which to sample the data
+
+        Returns
+        -------
+        `numpy.ndarray`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.RectGrid.cell_at_point`
+        """
+        raise NotImplementedError()
+        # nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
+        # tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points).index
+
+        # tl_val = self.value(tl_ids, oob_value=nodata_value)
+        # tr_val = self.value(tr_ids, oob_value=nodata_value)
+        # bl_val = self.value(bl_ids, oob_value=nodata_value)
+        # br_val = self.value(br_ids, oob_value=nodata_value)
+
+        # # determine relative location of new point between old cell centers in x and y directions
+        # abs_diff = sample_points - self.centroid(bl_ids)
+        # x_diff = abs_diff[:, 0] / self.dx
+        # y_diff = abs_diff[:, 1] / self.dy
+
+        # top_val = tl_val + (tr_val - tl_val) * x_diff
+        # bot_val = bl_val + (br_val - bl_val) * x_diff
+        # values = bot_val + (top_val - bot_val) * y_diff
+
+        # TODO: remove rows and cols with nans around the edge after bilinear
+        return values
+
+    def to_crs(self, crs, resample_method="nearest"):
+        """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+        This will modify the cell size and the bounds accordingly.
+
+        The ``crs`` attribute on the current grid must be set.
+
+        Parameters
+        ----------
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
+
+        Returns
+        -------
+        :class:`~.rect_grid.BoundedTriGrid`
+            A copy of the grid with modified cell spacing and bounds to match the specified CRS
+
+        See also
+        --------
+        Examples:
+
+        :ref:`Example: coordinate transformations <example coordinate transformations>`
+
+        Methods:
+
+        :meth:`.RectGrid.to_crs`
+        :meth:`.HexGrid.to_crs`
+        :meth:`.BoundedHexGrid.to_crs`
+
+        """
+        new_inf_grid = super(BoundedTriGrid, self).to_crs(crs)
+        return self.resample(new_inf_grid, method=resample_method)
+
+    def numpy_id_to_grid_id(self, np_index):
+        centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
+        index_topleft = self.cell_at_point(centroid_topleft)
+        ids = numpy.array(
+            [index_topleft.x + np_index[1], index_topleft.y - np_index[0]]
+        )
+        return GridIndex(ids.T)
+
+    @validate_index
+    def grid_id_to_numpy_id(self, index):
+        if index.index.ndim > 2:
+            raise ValueError(
+                "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
+            )
+        centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
+        index_topleft = self.cell_at_point(centroid_topleft)
+        return (index_topleft.y - index.y, index.x - index_topleft.x)
