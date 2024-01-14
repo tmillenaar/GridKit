@@ -168,9 +168,8 @@ impl TriGrid {
                 if (centroid[Ix2(0, 0)] > bounds.0) & // x > minx
                    (centroid[Ix2(0, 0)] < bounds.2) & // x < maxx
                    (centroid[Ix2(0, 1)] > bounds.1) & // y > miny
-                   (centroid[Ix2(0, 1)] < bounds.3)
+                   (centroid[Ix2(0, 1)] < bounds.3)   // y < maxy
                 {
-                    // y < maxy
                     index[Ix2(cell_id, 0)] = x;
                     index[Ix2(cell_id, 1)] = y;
                     cell_id += 1;
@@ -178,7 +177,7 @@ impl TriGrid {
             }
         }
 
-        (index, (nr_cells_x, nr_cells_y))
+        (index, (nr_cells_y, nr_cells_x))
     }
 
     pub fn all_neighbours(
