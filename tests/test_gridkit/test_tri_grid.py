@@ -455,3 +455,35 @@ def test_cells_near_point(points, expected_nearby_ids):
     expected_nearby_ids_extended = numpy.empty(shape=(len(points), 6, 2))
     expected_nearby_ids_extended[:] = expected_nearby_ids
     numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
+
+
+def test_bounded_crop(basic_bounded_tri_grid):
+    result = basic_bounded_tri_grid.crop((-0.5, -3, 2, 5))
+    expected_result = numpy.array([[4, 5], [7, 8], [10, 11]])
+    numpy.testing.assert_allclose(result, expected_result)
+
+
+def test_bounded_cell_corners(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+    numpy.testing.assert_allclose(
+        grid.cell_corners(), grid.cell_corners(grid.cells_in_bounds(grid.bounds))
+    )
+
+
+@pytest.mark.parametrize("as_multipolygon", [False, True])
+def test_bounded_to_shapely(basic_bounded_tri_grid, as_multipolygon):
+    grid = basic_bounded_tri_grid
+    geoms1 = grid.to_shapely(as_multipolygon=as_multipolygon)
+    geoms2 = grid.to_shapely(
+        grid.cells_in_bounds(grid.bounds), as_multipolygon=as_multipolygon
+    )
+
+    if as_multipolygon:
+        geoms1 = geoms1.geoms
+        geoms2 = geoms2.geoms
+    else:
+        geoms1 = geoms1.ravel()
+        geoms2 = geoms2.ravel()
+
+    for geom1, geom2 in zip(geoms1, geoms2):
+        assert geom1.wkb == geom2.wkb

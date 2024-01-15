@@ -261,8 +261,8 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
         if not numpy.isclose(dy, dx * 3**0.5):
             raise ValueError(
-                    "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
-                )
+                "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
+            )
 
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
