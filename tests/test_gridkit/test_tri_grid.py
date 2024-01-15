@@ -487,3 +487,10 @@ def test_bounded_to_shapely(basic_bounded_tri_grid, as_multipolygon):
 
     for geom1, geom2 in zip(geoms1, geoms2):
         assert geom1.wkb == geom2.wkb
+
+
+def test_to_bounded(basic_bounded_tri_grid):
+    grid = TriGrid(size=1)
+    bounds = basic_bounded_tri_grid.bounds
+    bounded_grid = grid.to_bounded(bounds)
+    numpy.testing.assert_allclose(bounded_grid.indices, basic_bounded_tri_grid.indices)

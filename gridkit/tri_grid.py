@@ -180,8 +180,15 @@ class TriGrid(BaseGrid):
         )
         return GridIndex(result)
 
-    def to_bounded(self):
-        raise NotImplementedError()
+    def to_bounded(self, bounds, fill_value=numpy.nan):
+        _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
+        data = numpy.full(shape=shape, fill_value=fill_value)
+        return self.bounded_cls(
+            data=data,
+            bounds=bounds,
+            nodata_value=fill_value,
+            crs=self.crs,
+        )
 
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
