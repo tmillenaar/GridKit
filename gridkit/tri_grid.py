@@ -71,8 +71,12 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def cell_corners(self, index):
-        index = index.index[None] if index.index.ndim == 1 else index.index
-        return self._grid.cell_corners(index=index).squeeze()
+        original_shape = (*index.shape, 3, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        corners = self._grid.cell_corners(index=index)
+        return corners.reshape(original_shape)
 
     def cell_at_point(self, point):
         point = numpy.array(point, dtype="float64")
@@ -255,6 +259,11 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         dx = (bounds[2] - bounds[0]) / data.shape[1]
         dy = (bounds[3] - bounds[1]) / data.shape[0]
 
+        if not numpy.isclose(dy, dx * 3**0.5):
+            raise ValueError(
+                    "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
+                )
+
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
         offset_x = dx - offset_x if offset_x < 0 else offset_x
@@ -267,6 +276,11 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         super(BoundedTriGrid, self).__init__(
             data, *args, size=dx, bounds=bounds, offset=offset, **kwargs
         )
+
+        if not self.are_bounds_aligned(bounds):
+            raise AlignmentError(
+                "Something went wrong, the supplied bounds are not aligned with the resulting grid."
+            )
 
     def centroid(self, index=None):
         if index is None:
@@ -311,7 +325,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
     @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
-            index = self.indices()
+            index = self.indices
         return super(BoundedTriGrid, self).cell_corners(index=index)
 
     @validate_index
