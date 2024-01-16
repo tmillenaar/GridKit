@@ -457,9 +457,23 @@ def test_cells_near_point(points, expected_nearby_ids):
     numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
 
 
-def test_bounded_crop(basic_bounded_tri_grid):
-    result = basic_bounded_tri_grid.crop((-0.5, -3, 2, 5))
+@pytest.mark.parametrize("crs", [None, 4326, 3857])
+def test_bounded_crop(basic_bounded_tri_grid, crs):
+    grid = basic_bounded_tri_grid
+    grid.crs = 4326
+    if crs == 3857:
+        bounds = (-55659.9, -334111.1714019596, 222639, 557305.2572745768)
+    else:
+        bounds = (-0.5, -3, 2, 5)
+    result = grid.crop(bounds, bounds_crs=crs)
     expected_result = numpy.array([[4, 5], [7, 8], [10, 11]])
+    numpy.testing.assert_allclose(result, expected_result)
+
+    # test with buffer_cells
+    dy = grid.to_crs(crs).dy if crs else grid.dy
+    bounds = (bounds[0], bounds[1] + 2 * dy, bounds[2], bounds[3])
+    result = grid.crop(bounds, bounds_crs=crs, buffer_cells=2)
+    expected_result = numpy.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]])
     numpy.testing.assert_allclose(result, expected_result)
 
 

@@ -322,14 +322,21 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         new_bounds = self.align_bounds(new_bounds, mode="contract")
         slice_y, slice_x = self._data_slice_from_bounds(new_bounds)
         if buffer_cells:
-            slice_x = slice(slice_x.start - buffer_cells, slice_x.stop + buffer_cells)
-            slice_y = slice(slice_y.start - buffer_cells, slice_y.stop + buffer_cells)
-            new_bounds = (
-                new_bounds[0] - buffer_cells * self.dx,
-                new_bounds[1] - buffer_cells * self.dy,
-                new_bounds[2] + buffer_cells * self.dx,
-                new_bounds[3] + buffer_cells * self.dy,
+            slice_x = slice(
+                max(0, slice_x.start - buffer_cells),
+                min(self.width, slice_x.stop + buffer_cells),
             )
+            slice_y = slice(
+                max(0, slice_y.start - buffer_cells),
+                min(self.height, slice_y.stop + buffer_cells),
+            )
+            new_bounds = (
+                max(new_bounds[0] - buffer_cells * self.dx, self.bounds[0]),
+                max(new_bounds[1] - buffer_cells * self.dy, self.bounds[1]),
+                min(new_bounds[2] + buffer_cells * self.dx, self.bounds[2]),
+                min(new_bounds[3] + buffer_cells * self.dy, self.bounds[3]),
+            )
+            # breakpoint()
         # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
         cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
         # cropped_data = self._data[slice_x, slice_y]
