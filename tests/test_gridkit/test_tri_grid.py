@@ -548,3 +548,10 @@ def test_to_crs(basic_bounded_tri_grid, basic_bounded_rect_grid):
     )
 
     numpy.testing.assert_allclose(grid.data, grid_3857.data)
+
+
+def test_centroid(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+    centroids1 = grid.centroid()
+    centroids2 = grid.centroid(grid.cells_in_bounds(grid.bounds))
+    numpy.testing.assert_allclose(centroids1, centroids2)
