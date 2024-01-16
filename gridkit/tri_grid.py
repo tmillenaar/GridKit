@@ -71,17 +71,23 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def cell_corners(self, index):
-        original_shape = (*index.shape, 3, 2)
+        return_shape = (
+            *index.shape,
+            3,
+            2,
+        )  # already include the axis containing the 3 corners
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
         corners = self._grid.cell_corners(index=index)
-        return corners.reshape(original_shape)
+        return corners.reshape(return_shape)
 
     def cell_at_point(self, point):
         point = numpy.array(point, dtype="float64")
         point = point[None] if point.ndim == 1 else point
-        return GridIndex(self._grid.cell_at_point(point))
+        return_shape = point.shape
+        result = self._grid.cell_at_point(point.reshape(-1, 2))
+        return GridIndex(result.reshape(return_shape))
 
     def cells_in_bounds(self, bounds, return_cell_count=False):
         if not self.are_bounds_aligned(bounds):
@@ -244,7 +250,7 @@ class TriGrid(BaseGrid):
         point_start = transformer.transform(0, 0)
 
         point_end = transformer.transform(
-            self.dx / 2, self.dy
+            self.dx, 0
         )  # likely different for shape='flat'
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 

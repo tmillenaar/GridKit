@@ -494,3 +494,43 @@ def test_to_bounded(basic_bounded_tri_grid):
     bounds = basic_bounded_tri_grid.bounds
     bounded_grid = grid.to_bounded(bounds)
     numpy.testing.assert_allclose(bounded_grid.indices, basic_bounded_tri_grid.indices)
+
+
+def test_numpy_and_grid_ids(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+
+    xx, yy = numpy.meshgrid(
+        numpy.arange(grid.height), numpy.arange(grid.width), indexing="ij"
+    )
+    expected_np_ids = numpy.stack([xx.ravel(), yy.ravel()])
+
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
+    numpy.testing.assert_allclose(np_ids, expected_np_ids)
+
+    grid_ids = grid.numpy_id_to_grid_id(np_ids)
+    numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
+
+
+def test_to_crs(basic_bounded_tri_grid, basic_bounded_rect_grid):
+    grid = basic_bounded_tri_grid
+    grid.crs = 4326
+    grid_3857 = grid.to_crs(3857)
+
+    assert grid_3857.crs.to_epsg() == 3857
+    numpy.testing.assert_allclose(
+        grid_3857.bounds,
+        (
+            -111319.49079327357,
+            -385622.02785329137,
+            222638.98158654713,
+            578433.041779937,
+        ),
+    )
+
+    # make sure the original grid is not modified
+    assert grid.crs.to_epsg() == 4326
+    numpy.testing.assert_allclose(
+        grid.bounds, (-1.0, -3.4641016151377544, 2.0, 5.196152422706632)
+    )
+
+    numpy.testing.assert_allclose(grid.data, grid_3857.data)
