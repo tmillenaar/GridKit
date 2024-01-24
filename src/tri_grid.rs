@@ -205,12 +205,12 @@ impl TriGrid {
             Array3::<i64>::zeros((index.shape()[0], total_nr_neighbours, 2));
 
         let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
-        for row_id in 0..(depth) {
-            nr_cells_per_colum_upward[Ix1(row_id.try_into().unwrap())] =
+        for row_id in 0..depth {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
                 max_nr_cols - 2 * (depth - 1 - row_id);
         }
         for row_id in depth..(nr_rows) {
-            nr_cells_per_colum_upward[Ix1(row_id.try_into().unwrap())] =
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
                 max_nr_cols - 2 * (row_id - depth);
         }
 
@@ -277,11 +277,11 @@ impl TriGrid {
 
         let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
         for row_id in 0..(depth / 2) {
-            nr_cells_per_colum_upward[Ix1(row_id.try_into().unwrap())] =
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
                 max_nr_cols - 2 * (depth / 2 - row_id);
         }
         for row_id in (depth / 2)..(nr_rows) {
-            nr_cells_per_colum_upward[Ix1(row_id.try_into().unwrap())] =
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
                 max_nr_cols - 2 * (row_id - depth / 2);
         }
         let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
