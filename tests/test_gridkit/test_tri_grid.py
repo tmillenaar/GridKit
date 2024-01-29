@@ -525,7 +525,7 @@ def test_numpy_and_grid_ids(basic_bounded_tri_grid):
     numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
 
 
-def test_to_crs(basic_bounded_tri_grid, basic_bounded_rect_grid):
+def test_to_crs(basic_bounded_tri_grid):
     grid = basic_bounded_tri_grid
     grid.crs = 4326
     grid_3857 = grid.to_crs(3857)
