@@ -1,6 +1,7 @@
 import numpy
 from pyproj import CRS, Transformer
 
+from gridkit import _interp
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
@@ -336,7 +337,6 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
                 min(new_bounds[2] + buffer_cells * self.dx, self.bounds[2]),
                 min(new_bounds[3] + buffer_cells * self.dy, self.bounds[3]),
             )
-            # breakpoint()
         # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
         cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
         # cropped_data = self._data[slice_x, slice_y]
@@ -366,43 +366,44 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         return super().to_shapely(index, as_multipolygon)
 
     def _bilinear_interpolation(self, sample_points):
-        """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation
-        using the 4 cells around the point.
+        if not isinstance(sample_points, numpy.ndarray):
+            sample_points = numpy.array(sample_points)
+        original_shape = sample_points.shape
+        if not original_shape[-1] == 2:
+            raise ValueError(
+                f"Expected the last axis of sample_points to have two elements (x,y). Got {original_shape[-1]} elements"
+            )
+        sample_points = sample_points.reshape(-1, 2)
 
-        Parameters
-        ----------
-        sample_points: `numpy.ndarray`
-            The coordinates of the points at which to sample the data
+        values = numpy.empty(len(sample_points), dtype=float)
+        for idx, point in enumerate(sample_points):
+            nearby_cells = self.cells_near_point(point)
+            nearby_centroids = self.centroid(nearby_cells)
+            all_nearby_values = self.value(nearby_cells)
+            mean_centroid = nearby_centroids.mean(axis=0)
+            mean_value = all_nearby_values.mean(axis=0)
+            point_to_centroid_vec = nearby_centroids - point
+            distances = numpy.linalg.norm(point_to_centroid_vec, axis=-1)
+            nearest_data_points = numpy.argsort(distances)
 
-        Returns
-        -------
-        `numpy.ndarray`
-            The interpolated values at the supplied points
+            p1 = nearby_centroids[nearest_data_points[0]]
+            p2 = nearby_centroids[nearest_data_points[1]]
+            p3 = mean_centroid
+            weights = numpy.array(
+                [
+                    _interp.get_linear_weight_triangle(point, p1, p2, p3),
+                    _interp.get_linear_weight_triangle(point, p2, p1, p3),
+                    _interp.get_linear_weight_triangle(point, p3, p2, p1),
+                ]
+            )
+            nearby_values = [
+                all_nearby_values[nearest_data_points[0]],
+                all_nearby_values[nearest_data_points[1]],
+                mean_value,
+            ]
+            values[idx] = numpy.sum(weights * nearby_values)
 
-        See also
-        --------
-        :py:meth:`.RectGrid.cell_at_point`
-        """
-        raise NotImplementedError()
-        # nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        # tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points).index
-
-        # tl_val = self.value(tl_ids, oob_value=nodata_value)
-        # tr_val = self.value(tr_ids, oob_value=nodata_value)
-        # bl_val = self.value(bl_ids, oob_value=nodata_value)
-        # br_val = self.value(br_ids, oob_value=nodata_value)
-
-        # # determine relative location of new point between old cell centers in x and y directions
-        # abs_diff = sample_points - self.centroid(bl_ids)
-        # x_diff = abs_diff[:, 0] / self.dx
-        # y_diff = abs_diff[:, 1] / self.dy
-
-        # top_val = tl_val + (tr_val - tl_val) * x_diff
-        # bot_val = bl_val + (br_val - bl_val) * x_diff
-        # values = bot_val + (top_val - bot_val) * y_diff
-
-        # TODO: remove rows and cols with nans around the edge after bilinear
-        return values
+        return values.reshape(*original_shape[:-1])
 
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
