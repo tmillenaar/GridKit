@@ -1,4 +1,6 @@
 use numpy::ndarray::*;
+use numpy::ndarray::*;
+use crate::interpolate;
 
 fn iseven(val: i64) -> bool {
     val % 2 == 0
@@ -447,5 +449,63 @@ impl TriGrid {
                 self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
         }
         cells
+    }
+
+    pub fn linear_interpolation (
+        &self,
+        sample_points: &ArrayView2<f64>,
+        nearby_value_locations: &ArrayView3<f64>,
+        nearby_values: &ArrayView2<f64>,
+    ) -> Array1<f64> {
+        let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
+        Zip::from(&mut values)
+            .and(sample_points.axis_iter(Axis(0)))
+            .and(nearby_value_locations.axis_iter(Axis(0)))
+            .and(nearby_values.axis_iter(Axis(0)))
+            .for_each(|
+                new_val,
+                point,
+                val_locs,
+                near_vals
+            | {
+                // get 2 nearest point ids
+                let point_to_centroid_vecs = &val_locs - &point;
+                let mut near_pnt_1: usize = 0;
+                let mut near_pnt_2: usize = 0;
+                let mut near_dist_1: f64 = f64::MAX;
+                let mut near_dist_2: f64 = f64::MAX;
+                for (i, vec) in point_to_centroid_vecs.axis_iter(Axis(0)).enumerate() {
+                    let dist = crate::interpolate::vec_norm_1d(&vec);
+                    if (dist < near_dist_1) {
+                        near_dist_2 = near_dist_1;
+                        near_dist_1 = dist;
+                        near_pnt_2 = near_pnt_1;
+                        near_pnt_1 = i;
+                    } else if (dist < near_dist_2) {
+                        near_dist_2 = dist;
+                        near_pnt_2 = i;
+                    }
+                }
+                // mean of 6 (val and centroid)
+                let mean_centroid = val_locs.mean_axis(Axis(0)).unwrap();
+                let mean_val = near_vals.mean().unwrap();
+                let near_pnt_locs =  array![
+                    [val_locs[Ix2(near_pnt_1, 0)], val_locs[Ix2(near_pnt_1, 1)]],
+                    [val_locs[Ix2(near_pnt_2, 0)], val_locs[Ix2(near_pnt_2, 1)]],
+                    [mean_centroid[Ix1(0)], mean_centroid[Ix1(1)]],
+                ];
+                let near_pnt_vals =  array![
+                    near_vals[Ix1(near_pnt_1)],
+                    near_vals[Ix1(near_pnt_2)],
+                    mean_val,
+                ];
+                let weights = crate::interpolate::linear_interp_weights_single_triangle(
+                    &point,
+                    &near_pnt_locs.view()
+                );
+
+                *new_val = (weights * near_pnt_vals).sum();
+            });
+        values
     }
 }
