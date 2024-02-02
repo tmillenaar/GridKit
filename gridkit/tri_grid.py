@@ -367,42 +367,22 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
     def _bilinear_interpolation(self, sample_points):
         if not isinstance(sample_points, numpy.ndarray):
-            sample_points = numpy.array(sample_points)
+            sample_points = numpy.array(sample_points, dtype=float)
+        else:
+            sample_points = sample_points.astype(float)
+
         original_shape = sample_points.shape
         if not original_shape[-1] == 2:
             raise ValueError(
                 f"Expected the last axis of sample_points to have two elements (x,y). Got {original_shape[-1]} elements"
             )
         sample_points = sample_points.reshape(-1, 2)
-
-        values = numpy.empty(len(sample_points), dtype=float)
-        for idx, point in enumerate(sample_points):
-            nearby_cells = self.cells_near_point(point)
-            nearby_centroids = self.centroid(nearby_cells)
-            all_nearby_values = self.value(nearby_cells)
-            mean_centroid = nearby_centroids.mean(axis=0)
-            mean_value = all_nearby_values.mean(axis=0)
-            point_to_centroid_vec = nearby_centroids - point
-            distances = numpy.linalg.norm(point_to_centroid_vec, axis=-1)
-            nearest_data_points = numpy.argsort(distances)
-
-            p1 = nearby_centroids[nearest_data_points[0]]
-            p2 = nearby_centroids[nearest_data_points[1]]
-            p3 = mean_centroid
-            weights = numpy.array(
-                [
-                    _interp.get_linear_weight_triangle(point, p1, p2, p3),
-                    _interp.get_linear_weight_triangle(point, p2, p1, p3),
-                    _interp.get_linear_weight_triangle(point, p3, p2, p1),
-                ]
-            )
-            nearby_values = [
-                all_nearby_values[nearest_data_points[0]],
-                all_nearby_values[nearest_data_points[1]],
-                mean_value,
-            ]
-            values[idx] = numpy.sum(weights * nearby_values)
-
+        nearby_cells = self.cells_near_point(sample_points)
+        nearby_centroids = self.centroid(nearby_cells)
+        nearby_values = self.value(nearby_cells)
+        values = self._grid.linear_interpolation(
+            sample_points, nearby_centroids, nearby_values
+        )
         return values.reshape(*original_shape[:-1])
 
     def to_crs(self, crs, resample_method="nearest"):
