@@ -1,4 +1,5 @@
 import numpy
+import shapely
 from pyproj import CRS, Transformer
 
 from gridkit.base_grid import BaseGrid
@@ -256,3 +257,8 @@ class TriGrid(BaseGrid):
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+
+    @validate_index
+    def to_shapely_rs(self, index):
+        wkb = self._grid.multipolygon_wkb(index.index)
+        return shapely.from_wkb(wkb.hex())

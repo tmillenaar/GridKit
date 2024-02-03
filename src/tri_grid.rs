@@ -451,7 +451,7 @@ impl TriGrid {
         cells
     }
     
-    pub fn to_shapely_as_wkb(
+    pub fn multipolygon_wkb(
         &self,
         index: &ArrayView2<i64>,
     ) -> Vec<u8> {

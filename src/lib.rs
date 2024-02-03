@@ -135,12 +135,12 @@ impl PyTriGrid {
             .into_pyarray(py)
     }
 
-    fn to_shapely_as_wkb<'py>(
+    fn multipolygon_wkb<'py>(
         &self,
         py: Python<'py>,
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyByteArray {
-        let geom_wkb = self._grid.to_shapely_as_wkb(&index.as_array());
+        let geom_wkb = self._grid.multipolygon_wkb(&index.as_array());
         PyByteArray::new(py, &geom_wkb)
     }
 }
