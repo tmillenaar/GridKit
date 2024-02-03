@@ -1,4 +1,5 @@
 use numpy::ndarray::*;
+use crate::shapes;
 
 fn iseven(val: i64) -> bool {
     val % 2 == 0
@@ -448,5 +449,13 @@ impl TriGrid {
                 self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
         }
         cells
+    }
+    
+    pub fn to_shapely_as_wkb(
+        &self,
+        index: &ArrayView2<i64>,
+    ) -> Vec<u8> {
+        let coords = self.cell_corners(index);
+        shapes::coords_to_multipolygon_wkb(&coords.view())
     }
 }

@@ -138,9 +138,9 @@ impl PyTriGrid {
     fn to_shapely_as_wkb<'py>(
         &self,
         py: Python<'py>,
-        coords: PyReadonlyArray2<'py, f64>,
+        index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyByteArray {
-        let geom_wkb = shapes::coords_to_polygon(&coords.as_array());
+        let geom_wkb = self._grid.to_shapely_as_wkb(&index.as_array());
         PyByteArray::new(py, &geom_wkb)
     }
 }
