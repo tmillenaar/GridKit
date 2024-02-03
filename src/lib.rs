@@ -1,9 +1,9 @@
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray2};
 use pyo3::prelude::*;
-
-use pyo3::{pymodule, types::PyModule, PyResult, Python};
+use pyo3::types::*;
 
 mod tri_grid;
+mod shapes;
 
 #[pyclass]
 struct PyTriGrid {
@@ -133,6 +133,15 @@ impl PyTriGrid {
         self._grid
             .is_cell_upright(&index.as_array())
             .into_pyarray(py)
+    }
+
+    fn to_shapely_as_wkb<'py>(
+        &self,
+        py: Python<'py>,
+        coords: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyByteArray {
+        let geom_wkb = shapes::coords_to_polygon(&coords.as_array());
+        PyByteArray::new(py, &geom_wkb)
     }
 }
 
