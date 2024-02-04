@@ -26,7 +26,12 @@ import generate_api_rst
 
 sys.path.insert(0, os.path.abspath("../../gridkit"))
 sys.path.insert(0, os.path.abspath("../source"))
-sys.path.insert(0, os.path.abspath("/home/timo/Documents/projects/venv_gridding_bare/lib/python3.10/site-packages/"))
+sys.path.insert(
+    0,
+    os.path.abspath(
+        "/home/timo/Documents/projects/venv_gridding_bare/lib/python3.10/site-packages/"
+    ),
+)
 import gridkit
 
 # The full version, including alpha/beta/rc tags
@@ -40,7 +45,7 @@ release = version = gridkit.__version__
 extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autodoc",
-    'sphinx.ext.autosummary',
+    "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
@@ -50,13 +55,15 @@ extensions = [
 ]
 
 
-warnings.filterwarnings("ignore", category=RuntimeWarning) # Do not report warnings in gallery
+warnings.filterwarnings(
+    "ignore", category=RuntimeWarning
+)  # Do not report warnings in gallery
 sphinx_gallery_conf = {
-    'examples_dirs': ['../../examples'],   # path to your example scripts
-    'gallery_dirs': 'example_gallery',  # path to where to save gallery generated output
-    'filename_pattern': '^((?!sgskip).)*$',
-    'remove_config_comments': True, # remove comments like: # sphinx_gallery_thumbnail_number = -1
-    'nested_sections': False,
+    "examples_dirs": ["../../examples"],  # path to your example scripts
+    "gallery_dirs": "example_gallery",  # path to where to save gallery generated output
+    "filename_pattern": "^((?!sgskip).)*$",
+    "remove_config_comments": True,  # remove comments like: # sphinx_gallery_thumbnail_number = -1
+    "nested_sections": False,
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -92,8 +99,8 @@ generate_api_rst.gen_api_reference("../../gridkit", "api")
 nitpicky = True
 
 # Populate nitpick_ignore form separate file https://stackoverflow.com/a/30624034
-nitpick_ignore = [] 
-for line in open('nitpick-exceptions.txt'):
+nitpick_ignore = []
+for line in open("nitpick-exceptions.txt"):
     if line.strip() == "" or line.startswith("#"):
         continue
     dtype, target = line.split(None, 1)
@@ -107,12 +114,15 @@ autodoc_default_options = {
 }
 
 
+import gridkit.bounded_grid
+import gridkit.hex_grid
+import gridkit.rect_grid
 # need to assign the names here, otherwise autodoc won't document these classes,
 # and will instead just say 'alias of ...'
 # after https://github.com/slundberg/shap/blob/6af9e1008702fb0fab939bf2154bbf93dfe84a16/docs/conf.py#L380-L394
-import gridkit.rect_grid
-import gridkit.hex_grid
-import gridkit.bounded_grid
+import gridkit.tri_grid
+
+gridkit.tri_grid.BoundedTriGrid.__name__ = "BoundedTriGrid"
 gridkit.rect_grid.BoundedRectGrid.__name__ = "BoundedRectGrid"
 gridkit.hex_grid.BoundedHexGrid.__name__ = "BoundedHexGrid"
 gridkit.bounded_grid.BoundedGrid.__name__ = "BoundedGrid"

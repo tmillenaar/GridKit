@@ -1,9 +1,10 @@
-use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray2};
+use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3};
 use pyo3::prelude::*;
 
-use pyo3::{pymodule, types::PyModule, PyResult, Python};
+use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
 mod tri_grid;
+mod interpolate;
 
 #[pyclass]
 struct PyTriGrid {
@@ -134,11 +135,44 @@ impl PyTriGrid {
             .is_cell_upright(&index.as_array())
             .into_pyarray(py)
     }
+
+    fn linear_interpolation<'py>(
+        &self,
+        py: Python<'py>,
+        sample_point: PyReadonlyArray2<'py, f64>,
+        nearby_value_locations: PyReadonlyArray3<'py, f64>,
+        nearby_values: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray1<f64>  {
+        self._grid.linear_interpolation(
+            &sample_point.as_array(),
+            &nearby_value_locations.as_array(),
+            &nearby_values.as_array(),
+        ).into_pyarray(py)
+    }
 }
 
-/// A Python module implemented in Rust.
+#[pyfunction]
+fn linear_interp_weights_triangles<'py>(
+    py: Python<'py>,
+    sample_point: PyReadonlyArray2<'py, f64>,
+    nearby_value_locations: PyReadonlyArray3<'py, f64>,
+) -> &'py PyArray2<f64> {
+    let weights = interpolate::linear_interp_weights_triangles(
+        &sample_point.as_array(),
+        &nearby_value_locations.as_array(),
+    );
+    return weights.into_pyarray(py)
+}
+
 #[pymodule]
-fn gridkit_rs(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_class::<PyTriGrid>()?;
+fn interp(_py: Python, module: &PyModule) -> PyResult<()> {
+    module.add_function(wrap_pyfunction!(linear_interp_weights_triangles, module)?)?;
+    Ok(())
+}
+
+#[pymodule]
+fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
+    module.add_class::<PyTriGrid>()?;
+    module.add_wrapped(wrap_pymodule!(interp))?;
     Ok(())
 }

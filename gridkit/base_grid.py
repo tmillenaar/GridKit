@@ -88,7 +88,27 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def centroid(self, index) -> float:
-        """Coordinates at the center of the cell(s) specified by `index`."""
+        """Coordinates at the center of the cell(s) specified by ``index``.
+
+        If this method is called on a 'Bounded' class, the ``index`` argument is optional.
+        In such a case the cell IDs of the cells contained in the Bounded product are returned.
+
+        Parameters
+        ----------
+        index: :class:`.GridIndex`
+            The index of the cell(s) of which the centroid is to be obtained.
+
+        Returns
+        -------
+        `numpy.ndarray`
+            Multidimensional array containing the longitude and latitude of the center of each cell respectively,
+            in (width, height, lonlat)
+
+        Raises
+        ------
+        ValueError
+            No `index` parameter was supplied to a grid that does not contain data.
+        """
         pass
 
     @abc.abstractmethod
