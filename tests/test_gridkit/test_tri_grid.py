@@ -555,3 +555,45 @@ def test_centroid(basic_bounded_tri_grid):
     centroids1 = grid.centroid()
     centroids2 = grid.centroid(grid.cells_in_bounds(grid.bounds))
     numpy.testing.assert_allclose(centroids1, centroids2)
+
+
+@pytest.mark.parametrize(
+    "method, expected_result, expected_bounds",
+    (
+        (
+            "nearest",
+            [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [9, 10, 11],
+                [12, 13, 14],
+            ],
+            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
+        ),
+        (
+            "bilinear",
+            [
+                [0.55, 1.25625, 2.45],
+                [-371.9, -79.07916667, -286.8],
+                [6.1, 7.03125, 8.01875],
+                [8.95, 9.91875, 10.83125],
+                [-363.4625, -70.72916667, -278.2375],
+            ],
+            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
+        ),
+    ),
+)
+def test_resample(
+    basic_bounded_tri_grid,
+    method,
+    expected_result,
+    expected_bounds,
+):
+    grid = basic_bounded_tri_grid
+    new_grid = TriGrid(size=0.95)
+
+    resampled = grid.resample(new_grid, method=method)
+
+    numpy.testing.assert_allclose(resampled.data, expected_result)
+    numpy.testing.assert_allclose(resampled.bounds, expected_bounds)

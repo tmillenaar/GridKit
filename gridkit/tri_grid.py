@@ -385,7 +385,11 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
             nearby_centroids = nearby_centroids[None]
             nearby_values = nearby_values[None]
         values = self._grid.linear_interpolation(
-            sample_points, nearby_centroids, nearby_values
+            sample_points,
+            nearby_centroids,
+            nearby_values.astype(
+                float  # FIXME: figure out generics in rust to allow for other dtypes
+            ),
         )
 
         if len(values) == 1:
