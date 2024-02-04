@@ -869,7 +869,6 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         all_nearby_cells = self.cells_near_point(
             sample_points
         )  # (points, nearby_cells, xy)
-        values = numpy.empty(len(sample_points), dtype=float)
         nearby_centroids = self.centroid(all_nearby_cells)
         weights = interp.linear_interp_weights_triangles(
             sample_points, nearby_centroids
