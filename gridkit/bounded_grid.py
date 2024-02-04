@@ -656,7 +656,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         self.data.ravel()[nodata_mask] = filled_values
         return self
 
-    def interpolate(self, sample_points, method="nearest"):
+    def interpolate(self, sample_points, method="nearest", **interp_kwargs):
         """Interpolate the value at the location of ``sample_points``.
 
         Points that are outside of the bounds of the data are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.
@@ -670,7 +670,10 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             Supported methods:
             - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
             - "bilinear", linear interpolation using the four cells surrounding the point
+            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
             Default: "nearest"
+        **interp_kwargs: `dict`
+            The keyword argument passed to the interpolation function corresponding to the specified `method`
 
         Returns
         -------
@@ -690,7 +693,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             result = self._bilinear_interpolation(sample_points.reshape(-1, 2))
             return result.reshape(return_shape)
         elif method == "inverse_distance":
-            return self._inverse_distance_interpolation(sample_points)
+            return self._inverse_distance_interpolation(sample_points, **interp_kwargs)
         raise ValueError(f"Resampling method '{method}' is not supported.")
 
     def _inverse_distance_interpolation(
@@ -745,7 +748,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         result[nan_mask] = numpy.nan
         return result.reshape(original_shape[:-1])
 
-    def resample(self, alignment_grid, method="nearest"):
+    def resample(self, alignment_grid, method="nearest", **interp_kwargs):
         """Resample the grid onto another grid.
         This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
         and determine the value on these location based on the values of the original grid (``self``).
@@ -771,6 +774,8 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
             - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
             Default: "nearest"
+        **interp_kwargs: `dict`
+            The keyword argument passed to the interpolation function corresponding to the specified `method`
 
         Returns
         -------
@@ -817,7 +822,7 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             transformed_points = transformer.transform(*raveled_new_points.T)
             new_points = numpy.vstack(transformed_points).T.reshape(original_shape)
 
-        value = self.interpolate(new_points, method=method)
+        value = self.interpolate(new_points, method=method, **interp_kwargs)
 
         # If value id 1D, turn into 2D
         # Take into account if the 1D line of cells runs in x or y direction
