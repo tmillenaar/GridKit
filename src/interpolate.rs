@@ -50,9 +50,9 @@ pub fn linear_interp_weights_single_triangle(
             &(&p3 - &p1),
         );
         let vec_p1_to_point = sample_point - &p1;
-        let bla = &projected - &vec_p1_to_point;
-        let lab = vec_norm_1d(&median.view());
-        let weight = vec_norm_1d(&(bla / lab).view() );
+        let point_to_projection = &projected - &vec_p1_to_point;
+        let medain_length = vec_norm_1d(&median.view());
+        let weight = vec_norm_1d(&(point_to_projection / medain_length).view() );
         weights[Ix1(nearby_pnt_id)] = weight;
         
         // Shift all nearby point references down
