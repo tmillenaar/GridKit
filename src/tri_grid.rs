@@ -106,7 +106,7 @@ impl TriGrid {
             }
             if downward_cell {
                 // Bottom left of square that belongs to triangle to the left
-                let is_inside = (rel_loc_x / self.dx()) + self.cell_width() / 2.
+                let is_inside = (rel_loc_x / self.dx()) + 0.5
                     > (self.cell_height() - rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { -1 } else { 1 };
@@ -114,7 +114,7 @@ impl TriGrid {
                 }
                 // Bottom right of square that belongs to triangle to the right
                 let is_inside =
-                    (rel_loc_x / self.dx()) - self.cell_width() / 2. < (rel_loc_y) / self.dy();
+                    (rel_loc_x / self.dx()) - 0.5 < (rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { 1 } else { -1 };
                     index[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] + factor;
@@ -122,13 +122,13 @@ impl TriGrid {
             } else {
                 // Top left of square that belongs to triangle to the left
                 let is_inside =
-                    (rel_loc_x / self.dx()) + self.cell_width() / 2. > rel_loc_y / self.dy();
+                    (rel_loc_x / self.dx()) + 0.5 > rel_loc_y / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { -1 } else { 1 };
                     index[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] + factor;
                 }
                 // Top right of square that belongs to triangle to the right
-                let is_inside = (rel_loc_x / self.dx()) - self.cell_width() / 2.
+                let is_inside = (rel_loc_x / self.dx()) - 0.5
                     < (self.cell_height() - rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { 1 } else { -1 };
@@ -382,7 +382,7 @@ impl TriGrid {
                 if corner_id == 0 {
                     nearest_corner_id = corner_id;
                     min_dist = distance;
-                } else if distance < min_dist {
+                } else if distance <= min_dist {
                     nearest_corner_id = corner_id;
                     min_dist = distance;
                 }
@@ -476,12 +476,12 @@ impl TriGrid {
                 let mut near_dist_2: f64 = f64::MAX;
                 for (i, vec) in point_to_centroid_vecs.axis_iter(Axis(0)).enumerate() {
                     let dist = crate::interpolate::vec_norm_1d(&vec);
-                    if (dist < near_dist_1) {
+                    if (dist <= near_dist_1) {
                         near_dist_2 = near_dist_1;
                         near_dist_1 = dist;
                         near_pnt_2 = near_pnt_1;
                         near_pnt_1 = i;
-                    } else if (dist < near_dist_2) {
+                    } else if (dist <= near_dist_2) {
                         near_dist_2 = dist;
                         near_pnt_2 = i;
                     }
@@ -503,8 +503,7 @@ impl TriGrid {
                     &point,
                     &near_pnt_locs.view()
                 );
-
-                *new_val = (weights * near_pnt_vals).sum();
+                *new_val = (&weights * &near_pnt_vals).sum();
             });
         values
     }
