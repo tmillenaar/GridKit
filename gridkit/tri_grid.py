@@ -1,7 +1,6 @@
 import numpy
 from pyproj import CRS, Transformer
 
-from gridkit import _interp
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError

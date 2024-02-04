@@ -4,10 +4,10 @@ from typing import Literal
 import numpy
 from pyproj import CRS, Transformer
 
-from gridkit import _interp
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.gridkit_rs import interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 
@@ -870,19 +870,11 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             sample_points
         )  # (points, nearby_cells, xy)
         values = numpy.empty(len(sample_points), dtype=float)
-        for idx, (point, nearby_cells) in enumerate(
-            zip(sample_points, all_nearby_cells)
-        ):
-            nearby_centroids = self.centroid(nearby_cells)
-            p1, p2, p3 = nearby_centroids
-            weights = numpy.array(
-                [
-                    _interp.get_linear_weight_triangle(point, p1, p2, p3),
-                    _interp.get_linear_weight_triangle(point, p2, p1, p3),
-                    _interp.get_linear_weight_triangle(point, p3, p2, p1),
-                ]
-            )
-            values[idx] = numpy.sum(weights * self.value(nearby_cells))
+        nearby_centroids = self.centroid(all_nearby_cells)
+        weights = interp.linear_interp_weights_triangles(
+            sample_points, nearby_centroids
+        )
+        values = numpy.sum(weights * self.value(all_nearby_cells), axis=1)
         # TODO: remove rows and cols with nans around the edge after bilinear
         return values.reshape(*original_shape[:-1])
 
