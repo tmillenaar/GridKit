@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; GridKit v0.6.0 documentation</title>
+  <title>Index &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=7deca5eb"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -125,6 +125,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmax">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.argmax">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -134,6 +136,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.argmin">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmin">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.argmin">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.assign">assign() (gridkit.bounded_grid.BoundedGrid method)</a>
@@ -150,11 +154,13 @@
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid">BoundedGrid (class in gridkit.bounded_grid)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid">BoundedHexGrid (class in gridkit.hex_grid)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid">BoundedRectGrid (class in gridkit.rect_grid)</a>
+</li>
+      <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid">BoundedTriGrid (class in gridkit.tri_grid)</a>
 </li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.bounds">bounds (gridkit.bounded_grid.BoundedGrid property)</a>
 </li>
@@ -184,6 +190,8 @@
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.cell_corners">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cell_corners">(gridkit.rect_grid.RectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.cell_corners">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
         <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_corners">(gridkit.tri_grid.TriGrid method)</a>
 </li>
@@ -223,6 +231,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.centroid">(gridkit.rect_grid.RectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.centroid">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
         <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.centroid">(gridkit.tri_grid.TriGrid method)</a>
 </li>
       </ul></li>
@@ -246,6 +256,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.crop">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.crop">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.crop">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.crs">crs (gridkit.base_grid.BaseGrid property)</a>
@@ -300,6 +312,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.grid_id_to_numpy_id">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.grid_id_to_numpy_id">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit.index.html#gridkit.index.GridIndex">GridIndex (class in gridkit.index)</a>
@@ -435,6 +449,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.intersecting_cells">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.intersecting_cells">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -487,6 +503,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.max">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.max">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
       </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mean">mean() (gridkit.bounded_grid.BoundedGrid method)</a>
 
@@ -494,6 +512,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.mean">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.mean">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.mean">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
         <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean">(in module gridkit._statistical_functions)</a>
 </li>
@@ -505,6 +525,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.median">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.median">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
       </ul></li>
       <li><a href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.min">min() (gridkit.bounded_grid.BoundedGrid method)</a>
 
@@ -512,6 +534,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.min">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.min">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.min">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -577,6 +601,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.numpy_id_to_grid_id">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.numpy_id_to_grid_id">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -676,6 +702,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.std">(gridkit.rect_grid.BoundedRectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.std">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -685,6 +713,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.sum">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.sum">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.sum">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
         <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum">(in module gridkit._statistical_functions)</a>
 </li>
@@ -716,6 +746,8 @@
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_crs">(gridkit.rect_grid.RectGrid method)</a>
 </li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.to_crs">(gridkit.tri_grid.BoundedTriGrid method)</a>
+</li>
         <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_crs">(gridkit.tri_grid.TriGrid method)</a>
 </li>
       </ul></li>
@@ -727,6 +759,8 @@
         <li><a href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely">(gridkit.hex_grid.BoundedHexGrid method)</a>
 </li>
         <li><a href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_shapely">(gridkit.rect_grid.BoundedRectGrid method)</a>
+</li>
+        <li><a href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.to_shapely">(gridkit.tri_grid.BoundedTriGrid method)</a>
 </li>
       </ul></li>
       <li><a href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.total_bounds">total_bounds() (in module gridkit._statistical_functions)</a>

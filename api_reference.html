@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API reference &mdash; GridKit v0.6.0 documentation</title>
+  <title>API reference &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=7deca5eb"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -309,6 +309,25 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.neighbours"><code class="docutils literal notranslate"><span class="pre">TriGrid.neighbours()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_bounded"><code class="docutils literal notranslate"><span class="pre">TriGrid.to_bounded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">TriGrid.to_crs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.centroid"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.centroid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.intersecting_cells"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.intersecting_cells()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.crop"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.crop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.cell_corners"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.cell_corners()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.to_shapely"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.to_shapely()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.to_crs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.numpy_id_to_grid_id"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.numpy_id_to_grid_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.argmax"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.argmax()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.argmin"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.argmin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.grid_id_to_numpy_id"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.grid_id_to_numpy_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.max"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.mean"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.mean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.median"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.median()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.min"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.min()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.std"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.std()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.sum"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid.sum()</span></code></a></li>
 </ul>
 </li>
 </ul>

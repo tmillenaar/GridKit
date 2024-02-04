@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bounded_grid &mdash; GridKit v0.6.0 documentation</title>
+  <title>bounded_grid &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=7deca5eb"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -236,7 +236,23 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.crop">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds_crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.crop" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Cut out a slice of data contained within the supplied bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>new_bounds</strong> (<cite>Tuple(minx, miny, maxx, maxy)</cite>) – The bounds defining the area to crop, in (minx, miny, maxx, maxy).</p></li>
+<li><p><strong>bounds_crs</strong> (<cite>pyproj.CRS</cite> (optional)) – The bounds defining the extent of the cropped data.
+The value can be anything accepted by <cite>pyproj.CRS.from_user_input()</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A BoundedGrid containing the data included in the cropped area contained within the bounds.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>class: <cite>BoundedGrid</cite></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.intersecting_cells">
@@ -321,7 +337,7 @@ A copy of the grid is made where nodata values are filled if in_place is False.<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.interpolate">
-<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.interpolate" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">interp_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.interpolate" title="Permalink to this definition"></a></dt>
 <dd><p>Interpolate the value at the location of <code class="docutils literal notranslate"><span class="pre">sample_points</span></code>.</p>
 <p>Points that are outside of the bounds of the data are assigned <cite>self.nodata_value</cite>, or ‘NaN’ if no nodata value is set.</p>
 <dl class="field-list simple">
@@ -332,7 +348,9 @@ A copy of the grid is made where nodata values are filled if in_place is False.<
 Supported methods:
 - “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
 - “bilinear”, linear interpolation using the four cells surrounding the point
+- “inverse_distance”, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
 Default: “nearest”</p></li>
+<li><p><strong>**interp_kwargs</strong> (<cite>dict</cite>) – The keyword argument passed to the interpolation function corresponding to the specified <cite>method</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -380,7 +398,7 @@ Default: “nearest”</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.bounded_grid.BoundedGrid.resample">
-<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alignment_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.resample" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alignment_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">interp_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/bounded_grid.html#BoundedGrid.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.bounded_grid.BoundedGrid.resample" title="Permalink to this definition"></a></dt>
 <dd><p>Resample the grid onto another grid.
 This will take the locations of the grid cells of the other grid (here called <code class="docutils literal notranslate"><span class="pre">alignment_grid</span></code>)
 and determine the value on these location based on the values of the original grid (<code class="docutils literal notranslate"><span class="pre">self</span></code>).</p>
@@ -400,11 +418,13 @@ How many nearby cells are selected depends on the selected <code class="docutils
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>alignment_grid</strong> (<a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>) – The grid with the desired attributes on which to resample.</p></li>
-<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’, ‘inverse_distance’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
 Supported methods:
 - “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
-- “bilinear”, linear interpolation using the four cells surrounding the point
+- “bilinear”, linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+- “inverse_distance”, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
 Default: “nearest”</p></li>
+<li><p><strong>**interp_kwargs</strong> (<cite>dict</cite>) – The keyword argument passed to the interpolation function corresponding to the specified <cite>method</cite></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

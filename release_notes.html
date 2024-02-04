@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; GridKit v0.6.0 documentation</title>
+  <title>Release notes &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=7deca5eb"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -40,7 +40,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -58,6 +58,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-7-0-february-04-2024">Version 0.7.0 (February 04, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-6-0-january-07-2024">Version 0.6.0 (January 07, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-5-1-october-08-2023">Version 0.5.1 (October 08, 2023)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-5-0-october-01-2023">Version 0.5.0 (October 01, 2023)</a></li>
@@ -105,6 +106,22 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<section id="version-0-7-0-february-04-2024">
+<h2>Version 0.7.0 (February 04, 2024)<a class="headerlink" href="#version-0-7-0-february-04-2024" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid" title="gridkit.tri_grid.BoundedTriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a></p></li>
+<li><p>Improved performance of linear resampling for <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></p></li>
+<li><p>“inverse_distance” interpolation method for <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a> and <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fixed incorrect cell returned for points in <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_at_point" title="gridkit.tri_grid.TriGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cell_at_point()</span></code></a> near the cell edge</p></li>
+<li><p>Allow for nd input in <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_at_point" title="gridkit.tri_grid.TriGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cell_at_point()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-6-0-january-07-2024">
 <h2>Version 0.6.0 (January 07, 2024)<a class="headerlink" href="#version-0-6-0-january-07-2024" title="Permalink to this heading"></a></h2>
 <dl class="simple">

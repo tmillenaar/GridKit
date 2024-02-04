@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.bounded_grid &mdash; GridKit v0.6.0 documentation</title>
+  <title>gridkit.bounded_grid &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7deca5eb"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -88,7 +88,7 @@
 <span class="kn">import</span> <span class="nn">operator</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">multiprocessing.sharedctypes</span> <span class="kn">import</span> <span class="n">Value</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
@@ -290,9 +290,9 @@
             <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">combined_grid</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
                 <span class="n">numpy</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">combined_grid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="p">)</span>  <span class="c1"># when dividing the dtype changes</span>
-            <span class="n">combined_grid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span>
-                <span class="n">shared_mask_np</span>
-            <span class="p">]</span> <span class="o">=</span> <span class="n">result</span>  <span class="c1"># TODO: find more elegant way of updating data with grid ids as mask</span>
+            <span class="n">combined_grid</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">shared_mask_np</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">result</span>  <span class="c1"># TODO: find more elegant way of updating data with grid ids as mask</span>
+            <span class="p">)</span>
 
             <span class="k">return</span> <span class="n">combined_grid</span>
 
@@ -532,6 +532,22 @@
 
 <div class="viewcode-block" id="BoundedGrid.crop"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.crop">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cut out a slice of data contained within the supplied bounds.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        new_bounds: `Tuple(minx, miny, maxx, maxy)`</span>
+<span class="sd">            The bounds defining the area to crop, in (minx, miny, maxx, maxy).</span>
+
+<span class="sd">        bounds_crs: `pyproj.CRS` (optional)</span>
+<span class="sd">            The bounds defining the extent of the cropped data.</span>
+<span class="sd">            The value can be anything accepted by `pyproj.CRS.from_user_input()`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class: `BoundedGrid`</span>
+<span class="sd">            A BoundedGrid containing the data included in the cropped area contained within the bounds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="BoundedGrid.intersecting_cells"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.intersecting_cells">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
@@ -725,7 +741,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[</span><span class="n">nodata_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">filled_values</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="BoundedGrid.interpolate"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate">[docs]</a>    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_points</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="BoundedGrid.interpolate"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate">[docs]</a>    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_points</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the value at the location of ``sample_points``.</span>
 
 <span class="sd">        Points that are outside of the bounds of the data are assigned `self.nodata_value`, or &#39;NaN&#39; if no nodata value is set.</span>
@@ -739,7 +755,10 @@
 <span class="sd">            Supported methods:</span>
 <span class="sd">            - &quot;nearest&quot;, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
 <span class="sd">            - &quot;bilinear&quot;, linear interpolation using the four cells surrounding the point</span>
+<span class="sd">            - &quot;inverse_distance&quot;, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
 <span class="sd">            Default: &quot;nearest&quot;</span>
+<span class="sd">        **interp_kwargs: `dict`</span>
+<span class="sd">            The keyword argument passed to the interpolation function corresponding to the specified `method`</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -758,9 +777,63 @@
             <span class="n">return_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bilinear_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">return_shape</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;inverse_distance&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inverse_distance_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resampling method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BoundedGrid.resample"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_inverse_distance_interpolation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sample_points</span><span class="p">,</span> <span class="n">max_nr_nans</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">decay_constant</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">sample_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
+        <span class="n">original_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">original_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected the last axis of sample_points to have two elements (x,y). Got </span><span class="si">{</span><span class="n">original_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> elements&quot;</span>
+            <span class="p">)</span>
+        <span class="n">sample_points</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">nearby_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
+
+        <span class="c1"># FIXME: needs to be conform with tri-grid</span>
+        <span class="c1"># nearby_cells = nearby_cells.index.swapaxes(0,1) # for hexagons and rectangles</span>
+
+        <span class="n">nearby_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span>
+        <span class="n">nearby_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span>
+            <span class="n">nearby_cells</span>
+        <span class="p">)</span>  <span class="c1"># shape is (points[N], cells[6], xy[2])</span>
+        <span class="c1"># swap axes to match dimensions to sample points</span>
+        <span class="n">nearby_centroids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span>
+            <span class="n">nearby_centroids</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># shape is (cells[6], points[N], xy[2])</span>
+        <span class="n">point_corner_vec</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">nearby_centroids</span> <span class="o">-</span> <span class="n">sample_points</span>
+        <span class="p">)</span>  <span class="c1"># shape is (cells[6], points[N], xy[2])</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+            <span class="n">point_corner_vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># compute distance over xy vector</span>
+
+        <span class="c1"># TODO: allow for different weighting equations, sch as Shepard&#39;s interpolation with different power parameters</span>
+        <span class="c1"># weights = ((2*self.r) / distances)</span>
+
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">distances</span> <span class="o">/</span> <span class="n">decay_constant</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># breakpoint()</span>
+
+        <span class="c1"># swap axes back to match dimensions to nearby_values</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># shape is (points[N], cells[6])</span>
+
+        <span class="c1"># TODO: determine mask based on number of nans.</span>
+        <span class="c1">#       The edge might have 4 nans and 2 values where the point is outside of the bounds.</span>
+        <span class="c1">#       This might lead to edge effects.</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">nearby_values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nr_nans</span> <span class="o">=</span> <span class="p">(</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">nearby_values</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">nan_mask</span> <span class="o">=</span> <span class="n">nr_nans</span> <span class="o">&gt;</span> <span class="n">max_nr_nans</span>
+        <span class="n">result</span><span class="p">[</span><span class="n">nan_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">original_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<div class="viewcode-block" id="BoundedGrid.resample"><a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample">[docs]</a>    <span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Resample the grid onto another grid.</span>
 <span class="sd">        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)</span>
 <span class="sd">        and determine the value on these location based on the values of the original grid (``self``).</span>
@@ -779,12 +852,15 @@
 <span class="sd">        alignment_grid: :class:`.BaseGrid`</span>
 <span class="sd">            The grid with the desired attributes on which to resample.</span>
 
-<span class="sd">        method: :class:`str`, `&#39;nearest&#39;, &#39;bilinear&#39;`, optional</span>
+<span class="sd">        method: :class:`str`, `&#39;nearest&#39;, &#39;bilinear&#39;, &#39;inverse_distance&#39;`, optional</span>
 <span class="sd">            The interpolation method used to determine the value at the supplied `sample_points`.</span>
 <span class="sd">            Supported methods:</span>
 <span class="sd">            - &quot;nearest&quot;, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
-<span class="sd">            - &quot;bilinear&quot;, linear interpolation using the four cells surrounding the point</span>
+<span class="sd">            - &quot;bilinear&quot;, linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
+<span class="sd">            - &quot;inverse_distance&quot;, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
 <span class="sd">            Default: &quot;nearest&quot;</span>
+<span class="sd">        **interp_kwargs: `dict`</span>
+<span class="sd">            The keyword argument passed to the interpolation function corresponding to the specified `method`</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -831,7 +907,7 @@
             <span class="n">transformed_points</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="o">*</span><span class="n">raveled_new_points</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="n">new_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">transformed_points</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">original_shape</span><span class="p">)</span>
 
-        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">new_points</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">new_points</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">)</span>
 
         <span class="c1"># If value id 1D, turn into 2D</span>
         <span class="c1"># Take into account if the 1D line of cells runs in x or y direction</span>

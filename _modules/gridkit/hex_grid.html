@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.hex_grid &mdash; GridKit v0.6.0 documentation</title>
+  <title>gridkit.hex_grid &mdash; GridKit v0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0c39efb2"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7deca5eb"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.6.0
+                v0.7.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -92,6 +92,7 @@
 <span class="kn">from</span> <span class="nn">gridkit.base_grid</span> <span class="kn">import</span> <span class="n">BaseGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.bounded_grid</span> <span class="kn">import</span> <span class="n">BoundedGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.errors</span> <span class="kn">import</span> <span class="n">AlignmentError</span><span class="p">,</span> <span class="n">IntersectionError</span>
+<span class="kn">from</span> <span class="nn">gridkit.gridkit_rs</span> <span class="kn">import</span> <span class="n">interp</span>
 <span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span><span class="p">,</span> <span class="n">validate_index</span>
 <span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
 
@@ -945,35 +946,6 @@
 <span class="sd">        --------</span>
 <span class="sd">        :py:meth:`.RectGrid.cell_at_point`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># FIXME: speed up (numba)</span>
-        <span class="k">def</span> <span class="nf">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">):</span>
-            <span class="k">def</span> <span class="nf">_project</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">line_points</span><span class="p">):</span>
-<span class="w">                </span><span class="sd">&quot;&quot;&quot;Project &#39;point&#39; onto a line drawn between &#39;line_points[0]&#39; and &#39;line_points[1]&#39;</span>
-<span class="sd">                Credits to https://stackoverflow.com/a/61343727/22128453</span>
-<span class="sd">                &quot;&quot;&quot;</span>
-                <span class="c1"># distance between line_points[0] and line_points[1]</span>
-                <span class="n">line_length</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-
-                <span class="c1"># project point on line extension connecting line_points[0] and line_points[1]</span>
-                <span class="n">t</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
-                        <span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="p">)</span>
-                    <span class="o">/</span> <span class="n">line_length</span>
-                <span class="p">)</span>
-
-                <span class="k">return</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">t</span> <span class="o">*</span> <span class="p">(</span><span class="n">line_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">line_points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
-            <span class="n">side_length</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span><span class="p">)</span>
-            <span class="n">dd</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">+</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-            <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dd</span> <span class="o">-</span> <span class="n">p1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">side_length</span><span class="p">:</span>
-                <span class="n">dd</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">-</span> <span class="p">(</span><span class="n">p2</span> <span class="o">-</span> <span class="n">p3</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-            <span class="n">ad</span> <span class="o">=</span> <span class="n">dd</span> <span class="o">-</span> <span class="n">p1</span>
-
-            <span class="n">projected</span> <span class="o">=</span> <span class="n">_project</span><span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="p">[</span><span class="n">p3</span> <span class="o">-</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span> <span class="o">-</span> <span class="n">p1</span><span class="p">])</span>
-            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">((</span><span class="n">projected</span> <span class="o">-</span> <span class="p">(</span><span class="n">point</span> <span class="o">-</span> <span class="n">p1</span><span class="p">))</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">ad</span><span class="p">))</span>
-
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">sample_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span>
@@ -982,21 +954,12 @@
         <span class="n">all_nearby_cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_near_point</span><span class="p">(</span>
             <span class="n">sample_points</span>
         <span class="p">)</span>  <span class="c1"># (points, nearby_cells, xy)</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_points</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">nearby_cells</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
-            <span class="nb">zip</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">all_nearby_cells</span><span class="p">)</span>
-        <span class="p">):</span>
-            <span class="n">nearby_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">)</span>
-            <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span> <span class="o">=</span> <span class="n">nearby_centroids</span>
-            <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">),</span>
-                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">p3</span><span class="p">),</span>
-                    <span class="n">get_weight</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p1</span><span class="p">),</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-            <span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">nearby_cells</span><span class="p">))</span>
-
+        <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_points</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">nearby_centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">all_nearby_cells</span><span class="p">)</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">linear_interp_weights_triangles</span><span class="p">(</span>
+            <span class="n">sample_points</span><span class="p">,</span> <span class="n">nearby_centroids</span>
+        <span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">all_nearby_cells</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># TODO: remove rows and cols with nans around the edge after bilinear</span>
         <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">original_shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
