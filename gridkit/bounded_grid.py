@@ -205,9 +205,9 @@ class _BoundedGridMeta(type):
             combined_grid = combined_grid.astype(
                 numpy.result_type(combined_grid._data.dtype, result.dtype)
             )  # when dividing the dtype changes
-            combined_grid._data[
-                shared_mask_np
-            ] = result  # TODO: find more elegant way of updating data with grid ids as mask
+            combined_grid._data[shared_mask_np] = (
+                result  # TODO: find more elegant way of updating data with grid ids as mask
+            )
 
             return combined_grid
 
