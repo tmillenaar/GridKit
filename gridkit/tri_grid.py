@@ -380,10 +380,22 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         nearby_cells = self.cells_near_point(sample_points)
         nearby_centroids = self.centroid(nearby_cells)
         nearby_values = self.value(nearby_cells)
+
+        if sample_points.squeeze().ndim == 1:
+            sample_points = sample_points.squeeze()[None]
+            nearby_centroids = nearby_centroids[None]
+            nearby_values = nearby_values[None]
         values = self._grid.linear_interpolation(
             sample_points, nearby_centroids, nearby_values
         )
-        return values.reshape(*original_shape[:-1])
+
+        if len(values) == 1:
+            return values[0]
+        return (
+            values.squeeze().reshape(*original_shape[:-1])
+            if original_shape[:-1]
+            else values
+        )
 
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
