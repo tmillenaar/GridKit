@@ -257,11 +257,6 @@ class TriGrid(BaseGrid):
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
 
-    @validate_index
-    def to_shapely_rs(self, index):
-        wkb = self._grid.multipolygon_wkb(index.index)
-        return shapely.from_wkb(wkb.hex())
-
 
 class BoundedTriGrid(BoundedGrid, TriGrid):
     def __init__(self, data, *args, bounds, **kwargs):

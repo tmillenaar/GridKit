@@ -8,6 +8,7 @@ import scipy
 import shapely
 from pyproj import CRS, Transformer
 
+from gridkit.gridkit_rs import shapes
 from gridkit.index import GridIndex, validate_index
 
 
@@ -488,13 +489,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             return shapely.geometry.Polygon(vertices)
         if vertices.ndim == 2:
             vertices = vertices[numpy.newaxis]
-        polygons = [shapely.geometry.Polygon(cell) for cell in vertices]
-
-        if len(polygons) == 1:
-            return polygons[0]
-        if as_multipolygon:
-            return shapely.geometry.MultiPolygon(polygons)
-        return numpy.array(polygons).reshape(cell_arr_shape)
+        multipoly_wkb = shapes.multipolygon_wkb(vertices)
+        multipoly = shapely.from_wkb(multipoly_wkb.hex())
+        if as_multipolygon == True:
+            return multipoly
+        return numpy.array(multipoly.geoms).reshape(cell_arr_shape)
 
     def interp_from_points(
         self, points, values, method="linear", nodata_value=numpy.nan

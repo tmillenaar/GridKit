@@ -4,7 +4,7 @@ use pyo3::types::*;
 use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
 mod tri_grid;
-mod shapes;
+mod vector_shapes;
 mod interpolate;
 
 #[pyclass]
@@ -137,15 +137,6 @@ impl PyTriGrid {
             .into_pyarray(py)
     }
 
-    fn multipolygon_wkb<'py>(
-        &self,
-        py: Python<'py>,
-        index: PyReadonlyArray2<'py, i64>,
-    ) -> &'py PyByteArray {
-        let geom_wkb = self._grid.multipolygon_wkb(&index.as_array());
-        PyByteArray::new(py, &geom_wkb)
-    }
-
     fn linear_interpolation<'py>(
         &self,
         py: Python<'py>,
@@ -180,9 +171,25 @@ fn interp(_py: Python, module: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
+#[pyfunction]
+fn multipolygon_wkb<'py>(
+    py: Python<'py>,
+    coords: PyReadonlyArray3<'py, f64>,
+) -> &'py PyByteArray {
+    let geom_wkb = vector_shapes::coords_to_multipolygon_wkb(&coords.as_array());
+    PyByteArray::new(py, &geom_wkb)
+}
+
+#[pymodule]
+fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
+    module.add_function(wrap_pyfunction!(multipolygon_wkb, module)?)?;
+    Ok(())
+}
+
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyTriGrid>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
+    module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())
 }

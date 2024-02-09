@@ -1,5 +1,4 @@
 use numpy::ndarray::*;
-use crate::shapes;
 use crate::interpolate;
 
 fn iseven(val: i64) -> bool {
@@ -449,14 +448,6 @@ impl TriGrid {
                 self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
         }
         cells
-    }
-    
-    pub fn multipolygon_wkb(
-        &self,
-        index: &ArrayView2<i64>,
-    ) -> Vec<u8> {
-        let coords = self.cell_corners(index);
-        shapes::coords_to_multipolygon_wkb(&coords.view())
     }
 
     pub fn linear_interpolation (
