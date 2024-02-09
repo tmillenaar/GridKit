@@ -109,7 +109,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [2, -1],
                 [3, -1],
             ],
-            (6, 4),
+            (4, 6),
         ],
         [
             (2.2, 3, 5.3, 6.1),
@@ -130,7 +130,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [7, 3],
                 [8, 3],
             ],
-            (5, 3),
+            (3, 5),
         ],
         [
             (-5.3, -6.1, -2.2, -3),
@@ -151,7 +151,7 @@ def test_cell_at_point(points, offset, expected_ids):
                 [-4, -4],
                 [-3, -4],
             ],
-            (5, 3),
+            (3, 5),
         ],
     ),
 )
@@ -160,6 +160,7 @@ def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count
     grid = TriGrid(size=0.7)
     bounds = grid.align_bounds(bounds, "nearest")
     result = grid.cells_in_bounds(bounds, return_cell_count=return_cell_count)
+    expected_ids = numpy.array(expected_ids).reshape((*expected_shape, 2))
     if return_cell_count is False:
         numpy.testing.assert_allclose(result, expected_ids)
     else:
@@ -454,3 +455,156 @@ def test_cells_near_point(points, expected_nearby_ids):
     expected_nearby_ids_extended = numpy.empty(shape=(len(points), 6, 2))
     expected_nearby_ids_extended[:] = expected_nearby_ids
     numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
+
+
+@pytest.mark.parametrize("crs", [None, 4326, 3857])
+def test_bounded_crop(basic_bounded_tri_grid, crs):
+    grid = basic_bounded_tri_grid
+    grid.crs = 4326
+    if crs == 3857:
+        bounds = (-55659.9, -334111.1714019596, 222639, 557305.2572745768)
+    else:
+        bounds = (-0.5, -3, 2, 5)
+    result = grid.crop(bounds, bounds_crs=crs)
+    expected_result = numpy.array([[4, 5], [7, 8], [10, 11]])
+    numpy.testing.assert_allclose(result, expected_result)
+
+    # test with buffer_cells
+    dy = grid.to_crs(crs).dy if crs else grid.dy
+    bounds = (bounds[0], bounds[1] + 2 * dy, bounds[2], bounds[3])
+    result = grid.crop(bounds, bounds_crs=crs, buffer_cells=2)
+    expected_result = numpy.array([[0, 1, 2], [3, 4, 5], [6, 7, 8], [9, 10, 11]])
+    numpy.testing.assert_allclose(result, expected_result)
+
+
+def test_bounded_cell_corners(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+    numpy.testing.assert_allclose(
+        grid.cell_corners(), grid.cell_corners(grid.cells_in_bounds(grid.bounds))
+    )
+
+
+@pytest.mark.parametrize("as_multipolygon", [False, True])
+def test_bounded_to_shapely(basic_bounded_tri_grid, as_multipolygon):
+    grid = basic_bounded_tri_grid
+    geoms1 = grid.to_shapely(as_multipolygon=as_multipolygon)
+    geoms2 = grid.to_shapely(
+        grid.cells_in_bounds(grid.bounds), as_multipolygon=as_multipolygon
+    )
+
+    if as_multipolygon:
+        geoms1 = geoms1.geoms
+        geoms2 = geoms2.geoms
+    else:
+        geoms1 = geoms1.ravel()
+        geoms2 = geoms2.ravel()
+
+    for geom1, geom2 in zip(geoms1, geoms2):
+        assert geom1.wkb == geom2.wkb
+
+
+def test_to_bounded(basic_bounded_tri_grid):
+    grid = TriGrid(size=1)
+    bounds = basic_bounded_tri_grid.bounds
+    bounded_grid = grid.to_bounded(bounds)
+    numpy.testing.assert_allclose(bounded_grid.indices, basic_bounded_tri_grid.indices)
+
+
+def test_numpy_and_grid_ids(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+
+    xx, yy = numpy.meshgrid(
+        numpy.arange(grid.height), numpy.arange(grid.width), indexing="ij"
+    )
+    expected_np_ids = numpy.stack([xx.ravel(), yy.ravel()])
+
+    np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
+    numpy.testing.assert_allclose(np_ids, expected_np_ids)
+
+    grid_ids = grid.numpy_id_to_grid_id(np_ids)
+    numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
+
+
+def test_to_crs(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+    grid.crs = 4326
+    grid_3857 = grid.to_crs(3857)
+
+    assert grid_3857.crs.to_epsg() == 3857
+    numpy.testing.assert_allclose(
+        grid_3857.bounds,
+        (
+            -111319.49079327357,
+            -385622.02785329137,
+            222638.98158654713,
+            578433.041779937,
+        ),
+    )
+
+    # make sure the original grid is not modified
+    assert grid.crs.to_epsg() == 4326
+    numpy.testing.assert_allclose(
+        grid.bounds, (-1.0, -3.4641016151377544, 2.0, 5.196152422706632)
+    )
+
+    numpy.testing.assert_allclose(grid.data, grid_3857.data)
+
+
+def test_centroid(basic_bounded_tri_grid):
+    grid = basic_bounded_tri_grid
+    centroids1 = grid.centroid()
+    centroids2 = grid.centroid(grid.cells_in_bounds(grid.bounds))
+    numpy.testing.assert_allclose(centroids1, centroids2)
+
+
+@pytest.mark.parametrize(
+    "method, expected_result, expected_bounds",
+    (
+        (
+            "nearest",
+            [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [9, 10, 11],
+                [12, 13, 14],
+            ],
+            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
+        ),
+        (
+            "bilinear",
+            [
+                [0.55, 1.25625, 2.45],
+                [-371.9, -79.07916667, -286.8],
+                [6.1, 7.03125, 8.01875],
+                [8.95, 9.91875, 10.83125],
+                [-363.4625, -70.72916667, -278.2375],
+            ],
+            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
+        ),
+        (
+            "inverse_distance",
+            [
+                [1.00661862e00, 1.13920527e00, 2.61187704e00],
+                [-1.91589670e03, -1.61174343e02, -1.72505596e03],
+                [6.79363706e00, 7.07606798e00, 8.33899655e00],
+                [8.63365569e00, 9.88625995e00, 1.01918447e01],
+                [-1.90876942e03, -1.53685443e02, -1.71776924e03],
+            ],
+            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
+        ),
+    ),
+)
+def test_resample(
+    basic_bounded_tri_grid,
+    method,
+    expected_result,
+    expected_bounds,
+):
+    grid = basic_bounded_tri_grid
+    new_grid = TriGrid(size=0.95)
+
+    resampled = grid.resample(new_grid, method=method)
+
+    numpy.testing.assert_allclose(resampled.data, expected_result)
+    numpy.testing.assert_allclose(resampled.bounds, expected_bounds)

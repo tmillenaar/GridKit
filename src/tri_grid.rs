@@ -1,5 +1,6 @@
 use numpy::ndarray::*;
 use crate::shapes;
+use crate::interpolate;
 
 fn iseven(val: i64) -> bool {
     val % 2 == 0
@@ -105,7 +106,7 @@ impl TriGrid {
             }
             if downward_cell {
                 // Bottom left of square that belongs to triangle to the left
-                let is_inside = (rel_loc_x / self.dx()) + self.cell_width() / 2.
+                let is_inside = (rel_loc_x / self.dx()) + 0.5
                     > (self.cell_height() - rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { -1 } else { 1 };
@@ -113,7 +114,7 @@ impl TriGrid {
                 }
                 // Bottom right of square that belongs to triangle to the right
                 let is_inside =
-                    (rel_loc_x / self.dx()) - self.cell_width() / 2. < (rel_loc_y) / self.dy();
+                    (rel_loc_x / self.dx()) - 0.5 < (rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { 1 } else { -1 };
                     index[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] + factor;
@@ -121,13 +122,13 @@ impl TriGrid {
             } else {
                 // Top left of square that belongs to triangle to the left
                 let is_inside =
-                    (rel_loc_x / self.dx()) + self.cell_width() / 2. > rel_loc_y / self.dy();
+                    (rel_loc_x / self.dx()) + 0.5 > rel_loc_y / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { -1 } else { 1 };
                     index[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] + factor;
                 }
                 // Top right of square that belongs to triangle to the right
-                let is_inside = (rel_loc_x / self.dx()) - self.cell_width() / 2.
+                let is_inside = (rel_loc_x / self.dx()) - 0.5
                     < (self.cell_height() - rel_loc_y) / self.dy();
                 if !is_inside {
                     let factor = if index[Ix2(cell_id, 0)] > 0 { 1 } else { -1 };
@@ -169,9 +170,8 @@ impl TriGrid {
                 if (centroid[Ix2(0, 0)] > bounds.0) & // x > minx
                    (centroid[Ix2(0, 0)] < bounds.2) & // x < maxx
                    (centroid[Ix2(0, 1)] > bounds.1) & // y > miny
-                   (centroid[Ix2(0, 1)] < bounds.3)
+                   (centroid[Ix2(0, 1)] < bounds.3)   // y < maxy
                 {
-                    // y < maxy
                     index[Ix2(cell_id, 0)] = x;
                     index[Ix2(cell_id, 1)] = y;
                     cell_id += 1;
@@ -179,7 +179,7 @@ impl TriGrid {
             }
         }
 
-        (index, (nr_cells_x, nr_cells_y))
+        (index, (nr_cells_y, nr_cells_x))
     }
 
     pub fn all_neighbours(
@@ -382,7 +382,7 @@ impl TriGrid {
                 if corner_id == 0 {
                     nearest_corner_id = corner_id;
                     min_dist = distance;
-                } else if distance < min_dist {
+                } else if distance <= min_dist {
                     nearest_corner_id = corner_id;
                     min_dist = distance;
                 }
@@ -457,5 +457,62 @@ impl TriGrid {
     ) -> Vec<u8> {
         let coords = self.cell_corners(index);
         shapes::coords_to_multipolygon_wkb(&coords.view())
+    }
+
+    pub fn linear_interpolation (
+        &self,
+        sample_points: &ArrayView2<f64>,
+        nearby_value_locations: &ArrayView3<f64>,
+        nearby_values: &ArrayView2<f64>,
+    ) -> Array1<f64> {
+        let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
+        Zip::from(&mut values)
+            .and(sample_points.axis_iter(Axis(0)))
+            .and(nearby_value_locations.axis_iter(Axis(0)))
+            .and(nearby_values.axis_iter(Axis(0)))
+            .for_each(|
+                new_val,
+                point,
+                val_locs,
+                near_vals
+            | {
+                // get 2 nearest point ids
+                let point_to_centroid_vecs = &val_locs - &point;
+                let mut near_pnt_1: usize = 0;
+                let mut near_pnt_2: usize = 0;
+                let mut near_dist_1: f64 = f64::MAX;
+                let mut near_dist_2: f64 = f64::MAX;
+                for (i, vec) in point_to_centroid_vecs.axis_iter(Axis(0)).enumerate() {
+                    let dist = crate::interpolate::vec_norm_1d(&vec);
+                    if (dist <= near_dist_1) {
+                        near_dist_2 = near_dist_1;
+                        near_dist_1 = dist;
+                        near_pnt_2 = near_pnt_1;
+                        near_pnt_1 = i;
+                    } else if (dist <= near_dist_2) {
+                        near_dist_2 = dist;
+                        near_pnt_2 = i;
+                    }
+                }
+                // mean of 6 (val and centroid)
+                let mean_centroid = val_locs.mean_axis(Axis(0)).unwrap();
+                let mean_val = near_vals.mean().unwrap();
+                let near_pnt_locs =  array![
+                    [val_locs[Ix2(near_pnt_1, 0)], val_locs[Ix2(near_pnt_1, 1)]],
+                    [val_locs[Ix2(near_pnt_2, 0)], val_locs[Ix2(near_pnt_2, 1)]],
+                    [mean_centroid[Ix1(0)], mean_centroid[Ix1(1)]],
+                ];
+                let near_pnt_vals =  array![
+                    near_vals[Ix1(near_pnt_1)],
+                    near_vals[Ix1(near_pnt_2)],
+                    mean_val,
+                ];
+                let weights = crate::interpolate::linear_interp_weights_single_triangle(
+                    &point,
+                    &near_pnt_locs.view()
+                );
+                *new_val = (&weights * &near_pnt_vals).sum();
+            });
+        values
     }
 }

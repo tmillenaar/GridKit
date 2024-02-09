@@ -3,6 +3,18 @@
 Release notes
 ================
 
+Version 0.7.0 (February 04, 2024)
+---------------------------------
+Features
+ - Add :class:`.BoundedTriGrid`
+ - Improved performance of linear resampling for :class:`.BoundedHexGrid`
+ - "inverse_distance" interpolation method for :meth:`.BoundedGrid.resample` and :meth:`.BoundedGrid.interpolate`
+
+Fixes
+ - Fixed incorrect cell returned for points in :meth:`.TriGrid.cell_at_point` near the cell edge
+ - Allow for nd input in :meth:`.TriGrid.cell_at_point`
+
+
 Version 0.6.0 (January 07, 2024)
 --------------------------------
 Features
