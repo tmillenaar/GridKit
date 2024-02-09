@@ -1,4 +1,5 @@
 import numpy
+import shapely
 from pyproj import CRS, Transformer
 
 from gridkit.base_grid import BaseGrid

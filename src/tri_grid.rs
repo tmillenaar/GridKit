@@ -1,5 +1,4 @@
 use numpy::ndarray::*;
-use numpy::ndarray::*;
 use crate::interpolate;
 
 fn iseven(val: i64) -> bool {

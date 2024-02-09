@@ -9,5 +9,7 @@ name = "gridkit_rs"
 crate-type = ["cdylib"]
 
 [dependencies]
+geo-types = "0.7.12"
 numpy = "0.19.0"
 pyo3 = "0.19.0"
+wkb = "0.7.1"
