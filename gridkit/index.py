@@ -130,8 +130,17 @@ class GridIndex(metaclass=_IndexMeta):
     """
 
     def __init__(self, index):
-        self.index = numpy.array(index, dtype=int).squeeze()
-        if self.index.shape[-1] != 2 and self.index.size != 0:
+        index = numpy.array(index).squeeze()
+        if index.size == 0:
+            self.index = numpy.array([], dtype="complex128")
+        elif index.dtype == numpy.complex128:
+            self.index = index
+        elif index.ndim == 1:
+            index = index[numpy.newaxis]
+            self.index = index[..., 0] + 1j * index[..., 1]
+        elif index.shape[-1] == 2:
+            self.index = index[..., 0] + 1j * index[..., 1]
+        else:
             raise ValueError(
                 f"The last axis should contain two elements (an x and a y coordinate). Got {self.index.shape[-1]} elements instead."
             )
@@ -165,22 +174,12 @@ class GridIndex(metaclass=_IndexMeta):
     @property
     def x(self):
         """The X-component of the cell-IDs"""
-        return self.index[..., 0]
-
-    @x.setter
-    def x(self, value):
-        self.index[..., 0] = value
-        return self
+        return self.index.real
 
     @property
     def y(self):
         """The Y-component of the cell-IDs"""
-        return self.index[..., 1]
-
-    @y.setter
-    def y(self, value):
-        self.index[..., 1] = value
-        return self
+        return self.index.imag
 
     @property
     def shape(self):
