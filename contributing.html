@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contributing &mdash; GridKit v0.7.0 documentation</title>
+  <title>Contributing &mdash; GridKit v0.7.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=7deca5eb"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=d99421f2"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.7.0
+                v0.7.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -119,6 +119,13 @@ Now let’s create a venv to use.</p>
 Here the <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag will prevent GridKit itself from being installed in the venv and should
 create an ‘easy-install.pth’ file that points to this local repository.</p>
 <p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[doc,test]</span></code></p>
+<p>Since the python code partially uses functions defined in Rust, we first have to compile the rust binary.
+Run the following to compile the Rust binary:</p>
+<p><code class="docutils literal notranslate"><span class="pre">maturin</span> <span class="pre">develop</span> <span class="pre">--release</span></code></p>
+<p>The ‘–release’ flag will do some further optimizations.
+This is optional when testing. The compilation will take slightly longer but the code in the binary will run faster.
+Either way, the binary will get stored in the ./gridkit subfolder and will be called
+‘gridkit_rs.cpython-310-x86_64-linux-gnu.so’ or your platform equivalent.</p>
 </section>
 <section id="code-formatting">
 <h2>Code formatting<a class="headerlink" href="#code-formatting" title="Permalink to this heading"></a></h2>
@@ -126,9 +133,9 @@ create an ‘easy-install.pth’ file that points to this local repository.</p>
 These packages are installed when the <code class="docutils literal notranslate"><span class="pre">[test]</span></code> argument is used during installation (see the command above).
 Pytest-black will test the format of the python files.
 Code that does not pass the test should be reformatted using black</p>
-<p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">black</span> <span class="pre">tests/test_gridkit/</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">black</span> <span class="pre">gridkit</span> <span class="pre">tests/test_gridkit/</span></code></p>
 <p>and isort</p>
-<p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">isort</span> <span class="pre">tests/test_gridkit/</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">python3</span> <span class="pre">-m</span> <span class="pre">isort</span> <span class="pre">gridkit</span> <span class="pre">tests/test_gridkit/</span></code></p>
 <p>It is recommended to install the pre-commit hook, which will check the code format on commit and fix it if needed</p>
 <p><code class="docutils literal notranslate"><span class="pre">pre-commit</span> <span class="pre">install</span></code></p>
 <p>This process should take away a lot of strain around neatly formatting the code and
