@@ -42,6 +42,17 @@ create an 'easy-install.pth' file that points to this local repository.
 
 ``python3 -m pip install -e .[doc,test]``
 
+Since the python code partially uses functions defined in Rust, we first have to compile the rust binary.
+Run the following to compile the Rust binary:
+
+``maturin develop --release``
+
+The '--release' flag will do some further optimizations.
+This is optional when testing. The compilation will take slightly longer but the code in the binary will run faster.
+Either way, the binary will get stored in the ./gridkit subfolder and will be called 
+'gridkit_rs.cpython-310-x86_64-linux-gnu.so' or your platform equivalent.
+
+
 Code formatting
 ---------------
 `black <https://pypi.org/project/black/>`_ and `isort <https://pypi.org/project/isort/>`_ are used for code formatting.
@@ -49,11 +60,11 @@ These packages are installed when the ``[test]`` argument is used during install
 Pytest-black will test the format of the python files.
 Code that does not pass the test should be reformatted using black
 
-``python3 -m black tests/test_gridkit/``
+``python3 -m black gridkit tests/test_gridkit/``
 
 and isort
 
-``python3 -m isort tests/test_gridkit/``
+``python3 -m isort gridkit tests/test_gridkit/``
 
 It is recommended to install the pre-commit hook, which will check the code format on commit and fix it if needed
 

@@ -3,6 +3,18 @@
 Release notes
 ================
 
+
+Version 0.7.1 (February 11, 2024)
+---------------------------------
+Fixes
+ - Remove allocation of unused array
+
+Documentation
+ - Add building of Rust binary to the :ref:`contributing guide <contributing>`
+
+Misc
+ - Improve performance of :meth:`.BaseGrid.to_shapely`
+
 Version 0.7.0 (February 04, 2024)
 ---------------------------------
 Features
