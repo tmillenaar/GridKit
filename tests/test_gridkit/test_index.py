@@ -17,27 +17,29 @@ from gridkit.index import GridIndex, concat, validate_index
 )
 def test_concat(indices, expected):
     concatenated_ids = concat(indices)
-    numpy.testing.assert_allclose(concatenated_ids.index, expected)
+    numpy.testing.assert_allclose(concatenated_ids.xy, expected)
 
 
 def test_unique():
     index_raw = [(1, 2), (2, 1), (1, 1), (1, 2)]
     expected_unique = [(1, 1), (1, 2), (2, 1)]
-    index = GridIndex([index_raw, index_raw])  # duplicate to test nd arrays
+    # duplicate to test nd arrays
+    # nd arrays will be raveled
+    index = GridIndex([index_raw, index_raw])
 
     index_unique = index.unique()
-    numpy.testing.assert_allclose(index_unique, expected_unique)
+    numpy.testing.assert_allclose(index_unique.xy, expected_unique)
 
     index_unique, index_ = index.unique(return_index=True)
-    numpy.testing.assert_allclose(index_unique, expected_unique)
+    numpy.testing.assert_allclose(index_unique.xy, expected_unique)
     numpy.testing.assert_allclose(index_, [2, 0, 1])
 
     index_unique, inverse = index.unique(return_inverse=True)
-    numpy.testing.assert_allclose(index_unique, expected_unique)
+    numpy.testing.assert_allclose(index_unique.xy, expected_unique)
     numpy.testing.assert_allclose(inverse, [1, 2, 0, 1] * 2)
 
     index_unique, counts = index.unique(return_counts=True)
-    numpy.testing.assert_allclose(index_unique, expected_unique)
+    numpy.testing.assert_allclose(index_unique.xy, expected_unique)
     numpy.testing.assert_allclose(counts, [2, 4, 2])
 
 
@@ -46,12 +48,12 @@ def test_intersection():
         [[(1, 2), (2, 1), (1, 1), (1, 2)], [(1, 2), (2, 1), (1, 1), (1, 2)]]
     )
     index2 = GridIndex([(1, 1), (1, 2), (0, 1)])
-    expected_intersection = [(1, 1), (1, 2)]
+    expected_intersection = [1 + 1j, 1 + 2j]
 
     intersection = index1.intersection(index2)
     numpy.testing.assert_allclose(intersection, expected_intersection)
 
-    intersection = index1.intersection(index2.index)
+    intersection = index1.intersection(index2.xy)
     numpy.testing.assert_allclose(intersection, expected_intersection)
 
     empty_intersection = index1.intersection([])
@@ -66,19 +68,19 @@ def test_difference():
 
     # test index1 diff index2
     difference = index1.difference(index2)
-    numpy.testing.assert_allclose(difference, [2, 1])
+    numpy.testing.assert_allclose(difference, 2 + 1j)
 
     # test index2 diff index1
     difference = index2.difference(index1)
-    numpy.testing.assert_allclose(difference, [0, 1])
+    numpy.testing.assert_allclose(difference, 0 + 1j)
 
     # test index1 diff index2.index
     difference = index1.difference(index2.index)
-    numpy.testing.assert_allclose(difference, [2, 1])
+    numpy.testing.assert_allclose(difference, 2 + 1j)
 
     # test index2 diff index1.index
     difference = index2.difference(index1.index)
-    numpy.testing.assert_allclose(difference, [0, 1])
+    numpy.testing.assert_allclose(difference, 0 + 1j)
 
 
 def test_isdisjoint():
@@ -119,80 +121,80 @@ def test_operator():
     index = GridIndex([(0, 1), (-1, 1)])
 
     result = index + 2
-    numpy.testing.assert_allclose(result, [[2, 3], [1, 3]])
+    numpy.testing.assert_allclose(result.xy, [[2, 3], [1, 3]])
 
     result = index - 2
-    numpy.testing.assert_allclose(result, [[-2, -1], [-3, -1]])
+    numpy.testing.assert_allclose(result.xy, [[-2, -1], [-3, -1]])
 
     result = index * 2
-    numpy.testing.assert_allclose(result, [[0, 2], [-2, 2]])
+    numpy.testing.assert_allclose(result.xy, [[0, 2], [-2, 2]])
 
     result = index / 2
-    numpy.testing.assert_allclose(result, [[0, 0], [-0, 0]])
+    numpy.testing.assert_allclose(result.xy, [[0, 0], [-0, 0]])
 
     result = index // 2
-    numpy.testing.assert_allclose(result, [[0, 0], [-1, 0]])
+    numpy.testing.assert_allclose(result.xy, [[0, 0], [-1, 0]])
 
     result = index**2
-    numpy.testing.assert_allclose(result, [[0, 1], [1, 1]])
+    numpy.testing.assert_allclose(result.xy, [[0, 1], [1, 1]])
 
     result = index % 2
-    numpy.testing.assert_allclose(result, [[0, 1], [1, 1]])
+    numpy.testing.assert_allclose(result.xy, [[0, 1], [1, 1]])
 
     result = index >= 2
-    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+    numpy.testing.assert_allclose(result, [[False, False], [False, False]])
 
     result = index <= 2
-    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+    numpy.testing.assert_allclose(result, [[True, True], [True, True]])
 
     result = index > 2
-    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+    numpy.testing.assert_allclose(result, [[False, False], [False, False]])
 
     result = index < 2
-    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+    numpy.testing.assert_allclose(result, [[True, True], [True, True]])
 
 
 def test_reverse_operator():
     index = GridIndex([(0, 1), (-1, 1)])
 
     result = 2 + index
-    numpy.testing.assert_allclose(result, [[2, 3], [1, 3]])
+    numpy.testing.assert_allclose(result.xy, [[2, 3], [1, 3]])
 
     result = 2 - index
-    numpy.testing.assert_allclose(result, [[2, 1], [3, 1]])
+    numpy.testing.assert_allclose(result.xy, [[2, 1], [3, 1]])
 
     result = 2 * index
-    numpy.testing.assert_allclose(result, [[0, 2], [-2, 2]])
+    numpy.testing.assert_allclose(result.xy, [[0, 2], [-2, 2]])
 
     result = 2 / index
     numpy.testing.assert_allclose(
-        result, [[-9223372036854775808, 2], [-2, 2]]
+        result.xy, [[-9223372036854775808, 2], [-2, 2]]
     )  # inf as int is -9223372036854775808
 
     result = 2 // index
     numpy.testing.assert_allclose(
-        result, [[-9223372036854775808, 2], [-2, 2]]
+        result.xy, [[-9223372036854775808, 2], [-2, 2]]
     )  # ind as int is -9223372036854775808
 
     result = 2**index
-    numpy.testing.assert_allclose(result, [[1, 2], [0, 2]])
+    numpy.testing.assert_allclose(result.xy, [[1, 2], [0, 2]])
 
     result = 2 % index
     numpy.testing.assert_allclose(
-        result, [[-9223372036854775808, 0], [0, 0]]
+        result.xy, [[-9223372036854775808, 0], [0, 0]]
     )  # nan as int is -9223372036854775808
 
     result = 2 >= index
-    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+    numpy.testing.assert_allclose(result, [[True, True], [True, True]])
 
     result = 2 <= index
-    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+    numpy.testing.assert_allclose(result, [[False, False], [False, False]])
 
     result = 2 > index
-    numpy.testing.assert_allclose(result, [[1, 1], [1, 1]])
+    numpy.testing.assert_allclose(result, [[True, True], [True, True]])
 
     result = 2 < index
-    numpy.testing.assert_allclose(result, [[0, 0], [0, 0]])
+    numpy.testing.assert_allclose(result, [[False, False], [False, False]])
 
 
 @pytest.mark.parametrize("in_place", [True, False])
@@ -208,7 +210,7 @@ def test_reverse_operator():
 def test_append(index, append_index, expected_result, in_place):
     index = GridIndex(index)
     result = index.append(append_index, in_place=in_place)
-    numpy.testing.assert_allclose(result, expected_result)
+    numpy.testing.assert_allclose(result.xy, expected_result)
 
     if in_place:
         assert id(result) == id(index)
@@ -257,13 +259,13 @@ def test_validate_index(index):
 @pytest.mark.parametrize(
     "partial, index, result",
     [
-        ([1, 2], [1, 2], True),
-        ([1, 2], [2, 1], False),
-        ([1, 2], [[1, 2]], True),
-        ([1, 2], [[[1, 2]]], True),
-        ([1, 2], [[[0, 0], [1, 2]], [[0, 0], [0, 0]]], True),
-        ([1, 2], [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], False),
-        ([0, 0], [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], True),
+        (1 + 2j, [1, 2], True),
+        (1 + 2j, [2, 1], False),
+        (1 + 2j, [[1, 2]], True),
+        (1 + 2j, [[[1, 2]]], True),
+        (1 + 2j, [[[0, 0], [1, 2]], [[0, 0], [0, 0]]], True),
+        (1 + 2j, [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], False),
+        (0 + 0j, [[[0, 0], [2, 1]], [[0, 0], [0, 0]]], True),
     ],
 )
 @validate_index
@@ -278,10 +280,10 @@ def test_isin(partial, index, result):
         (
             [1, 2],
             [1, 2],
-            numpy.array([[], []]).T,
-        ),  # numpy.array([[],[]]).T results in empty array with shape=(0, 2)
+            numpy.array([], dtype="complex128"),
+        ),
         ([[1, 2], [0, 0]], [1, 2], [0, 0]),
-        ([[1, 2], [0, 0]], [[1, 2], [0, 0]], numpy.array([[], []]).T),
+        ([[1, 2], [0, 0]], [[1, 2], [0, 0]], numpy.array([], dtype="complex128")),
         ([[1, 2], [0, 0], [1, 2]], [1, 2], [0, 0]),
     ],
 )

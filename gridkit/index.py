@@ -56,19 +56,19 @@ def concat(grid_ids: Union[List, Tuple]):
 
 
 def _normal_op(op):
-    return lambda l, r: GridIndex(op(l.index.astype(float), r))
+    return lambda l, r: GridIndex(op(l.xy, r).astype(int))
 
 
 def _reverse_op(op):
-    return lambda l, r: GridIndex(op(r, l.index.astype(float)))
+    return lambda l, r: GridIndex(op(r, l.xy).astype(int))
 
 
 class _IndexMeta(type):
     """Metaclass for GridIndex which implements the basic operators"""
 
     def __new__(cls, name, bases, namespace):
+        # mathematical operators
         for op, name_ in (
-            # mathematical operators
             (numpy.add, "add"),
             (numpy.subtract, "sub"),
             (numpy.multiply, "mul"),
@@ -76,32 +76,35 @@ class _IndexMeta(type):
             (numpy.floor_divide, "floordiv"),
             (numpy.power, "pow"),
             (numpy.mod, "mod"),
-            # comparison operators
-            (numpy.greater_equal, "ge"),
-            (numpy.less_equal, "le"),
-            (numpy.greater, "gt"),
-            (numpy.less, "lt"),
         ):
             opname = "__{}__".format(name_)
             opname_reversed = "__r{}__".format(name_)
             namespace[opname] = _normal_op(op)
             namespace[opname_reversed] = _reverse_op(op)
-
+        # comparison operators
         for op, name_ in (
+            (numpy.greater_equal, "ge"),
+            (numpy.less_equal, "le"),
+            (numpy.greater, "gt"),
+            (numpy.less, "lt"),
             (numpy.equal, "eq"),
             (numpy.not_equal, "ne"),
         ):
             opname = "__{}__".format(name_)
             opname_reversed = "__r{}__".format(name_)
-            namespace[opname] = cls._gen_comparisson_op(_normal_op(op))
-            namespace[opname_reversed] = cls._gen_comparisson_op(_reverse_op(op))
+            namespace[opname] = cls._gen_comparisson_op(op)
+            namespace[opname_reversed] = cls._gen_comparisson_op(op)
         return super().__new__(cls, name, bases, namespace)
 
     @staticmethod
     def _gen_comparisson_op(op):
         def comparison_op(left, right):
             if not (isinstance(left, GridIndex) and isinstance(right, GridIndex)):
-                return op
+                if isinstance(left, GridIndex):
+                    left = left.xy
+                if isinstance(right, GridIndex):
+                    right = right.xy
+                return op(left, right)
             if left.index.ndim != right.index.ndim:
                 return False
             return numpy.all(left.ravel().x == right.ravel().x) and numpy.all(
@@ -134,6 +137,8 @@ class GridIndex(metaclass=_IndexMeta):
         if index.size == 0:
             self.index = numpy.array([], dtype="complex128")
         elif index.dtype == numpy.complex128:
+            if index.ndim == 0:
+                index = index[numpy.newaxis]
             self.index = index
         elif index.ndim == 1:
             index = index[numpy.newaxis]
@@ -147,7 +152,7 @@ class GridIndex(metaclass=_IndexMeta):
 
     def __len__(self):
         """The number of indices"""
-        return len(self.ravel().index) if self.index.ndim > 1 else 1
+        return len(self.ravel().index) if self.index.ndim > 1 else len(self.index)
 
     def __iter__(self):
         self._iter_id = 0
@@ -156,7 +161,7 @@ class GridIndex(metaclass=_IndexMeta):
     def __next__(self):
         if self._iter_id == len(self):
             raise StopIteration
-        if self.ravel().index.ndim == 1:
+        if self.ravel().index.ndim == 0:
             id = self
         else:
             id = GridIndex(self.ravel()[self._iter_id])
@@ -164,8 +169,6 @@ class GridIndex(metaclass=_IndexMeta):
         return id
 
     def __getitem__(self, item):
-        if self.index.ndim == 1:
-            return _nd_view(self._1d_view[item])
         return GridIndex(self.index[item])
 
     def __hash__(self):
@@ -182,8 +185,12 @@ class GridIndex(metaclass=_IndexMeta):
         return self.index.imag
 
     @property
+    def xy(self):
+        return numpy.stack([self.x, self.y], axis=-1).squeeze()
+
+    @property
     def shape(self):
-        return self.index.shape[:-1]
+        return self.index.shape
 
     def unique(self, **kwargs):
         """The unique IDs contained in the index. Remove duplicate IDs.
@@ -193,12 +200,13 @@ class GridIndex(metaclass=_IndexMeta):
         **kwargs:
             The keyword arguments to pass to numpy.unique
         """
+        self = self.ravel()
         if kwargs:
             # kwargs to numpy.unique can result in multiple return arguments, return these too
-            unique, *other = numpy.unique(self._1d_view, axis=0, **kwargs)
-            return _nd_view(unique), *other
-        unique = numpy.unique(self._1d_view, axis=0, **kwargs)
-        return _nd_view(unique)
+            unique, *other = numpy.unique(self, **kwargs)
+            return GridIndex(unique), *other
+        unique = numpy.unique(self, **kwargs)
+        return GridIndex(unique)
 
     def intersection(self, other):
         """The intersection of two GridIndex instances. Keep the IDs contained in both.
@@ -210,8 +218,8 @@ class GridIndex(metaclass=_IndexMeta):
         """
         if not isinstance(other, GridIndex):
             other = GridIndex(other)
-        intersection = numpy.intersect1d(self._1d_view, other._1d_view)
-        return _nd_view(intersection)
+        intersection = numpy.intersect1d(self.ravel(), other.ravel())
+        return GridIndex(intersection)
 
     def difference(self, other):
         """The differenceof two GridIndex instances. Keep the IDs contained in ``self`` that are not in ``other``.
@@ -223,8 +231,8 @@ class GridIndex(metaclass=_IndexMeta):
         """
         if not isinstance(other, GridIndex):
             other = GridIndex(other)
-        difference = numpy.setdiff1d(self._1d_view, other._1d_view)
-        return _nd_view(difference)
+        difference = numpy.setdiff1d(self.ravel(), other.ravel())
+        return GridIndex(difference)
 
     def isdisjoint(self, other):
         """True if none of the IDs in ``self`` are in ``other``. False if any ID in ``self`` is also in ``other``.
@@ -234,7 +242,7 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return ~numpy.isin(self._1d_view, other._1d_view).any()
+        return ~numpy.isin(self.ravel(), other.ravel()).any()
 
     def issubset(self, other):
         """True if all of the IDs in ``self`` are in ``other``. False if not all IDs in ``self`` is also in ``other``.
@@ -244,7 +252,7 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return numpy.isin(self._1d_view, other._1d_view).all()
+        return numpy.isin(self.ravel(), other.ravel()).all()
 
     def issuperset(self, other):
         """True if all of the IDs in ``other`` are in ``self``. False if not all IDs in ``other`` is also in ``self``.
@@ -254,7 +262,7 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return numpy.isin(other._1d_view, self._1d_view).all()
+        return numpy.isin(other.ravel(), self.ravel()).all()
 
     def __array__(self, dtype=None):
         return self.index
@@ -308,7 +316,7 @@ class GridIndex(metaclass=_IndexMeta):
         :class:`GridIndex`
             A flattened copy of te index
         """
-        return GridIndex(self.index.reshape((-1, 2)))
+        return GridIndex(self.index.ravel())
 
     @validate_index
     def append(self, index, in_place=False):
@@ -365,10 +373,6 @@ class GridIndex(metaclass=_IndexMeta):
         elif self.index.size == 0:
             result = index.index.copy()
         else:
-            if self.index.ndim == 1:
-                self.index = self.index[numpy.newaxis]
-            if index.index.ndim == 1:
-                index.index = index.index[numpy.newaxis]
             result = numpy.append(self.index, index, axis=0)
         if not in_place:
             return GridIndex(result)
