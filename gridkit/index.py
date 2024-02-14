@@ -136,6 +136,18 @@ class GridIndex(metaclass=_IndexMeta):
                 f"The last axis should contain two elements (an x and a y coordinate). Got {self.index.shape[-1]} elements instead."
             )
 
+    @classmethod
+    def from_index_1d(cls, combined):
+        """Turn 1d-view into GridIndex"""
+        combined = numpy.array(combined)
+        index = numpy.empty(shape=(*combined.shape, 2), dtype="int32")
+        # Extract the first 32 bits
+        index[..., 0] = numpy.int32((combined >> 32) & 0xFFFFFFFF)
+        # Extract the last 32 bits
+        index[..., 1] = numpy.int32(combined & 0xFFFFFFFF)
+
+        return cls(index)
+
     def __len__(self):
         """The number of indices"""
         return len(self.ravel().index) if self.index.ndim > 1 else 1
@@ -156,7 +168,10 @@ class GridIndex(metaclass=_IndexMeta):
 
     def __getitem__(self, item):
         if self.index.ndim == 1:
-            return _nd_view(self._1d_view[item])
+            # There is only one value, on which getitem is not supported
+            # Turn into array so getitem works
+            index_1d = numpy.array([self.index_1d])[item]
+            return GridIndex.from_index_1d(index_1d)
         return GridIndex(self.index[item])
 
     def __hash__(self):
@@ -196,10 +211,10 @@ class GridIndex(metaclass=_IndexMeta):
         """
         if kwargs:
             # kwargs to numpy.unique can result in multiple return arguments, return these too
-            unique, *other = numpy.unique(self._1d_view, axis=0, **kwargs)
-            return _nd_view(unique), *other
-        unique = numpy.unique(self._1d_view, axis=0, **kwargs)
-        return _nd_view(unique)
+            unique, *other = numpy.unique(self.index_1d, **kwargs)
+            return GridIndex.from_index_1d(unique), *other
+        unique = numpy.unique(self.index_1d, **kwargs)
+        return GridIndex.from_index_1d(unique)
 
     def intersection(self, other):
         """The intersection of two GridIndex instances. Keep the IDs contained in both.
@@ -211,8 +226,8 @@ class GridIndex(metaclass=_IndexMeta):
         """
         if not isinstance(other, GridIndex):
             other = GridIndex(other)
-        intersection = numpy.intersect1d(self._1d_view, other._1d_view)
-        return _nd_view(intersection)
+        intersection = numpy.intersect1d(self.index_1d, other.index_1d)
+        return GridIndex.from_index_1d(intersection)
 
     def difference(self, other):
         """The differenceof two GridIndex instances. Keep the IDs contained in ``self`` that are not in ``other``.
@@ -224,8 +239,8 @@ class GridIndex(metaclass=_IndexMeta):
         """
         if not isinstance(other, GridIndex):
             other = GridIndex(other)
-        difference = numpy.setdiff1d(self._1d_view, other._1d_view)
-        return _nd_view(difference)
+        difference = numpy.setdiff1d(self.index_1d, other.index_1d)
+        return GridIndex.from_index_1d(difference)
 
     def isdisjoint(self, other):
         """True if none of the IDs in ``self`` are in ``other``. False if any ID in ``self`` is also in ``other``.
@@ -235,7 +250,7 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return ~numpy.isin(self._1d_view, other._1d_view).any()
+        return ~numpy.isin(self.index_1d, other.index_1d).any()
 
     def issubset(self, other):
         """True if all of the IDs in ``self`` are in ``other``. False if not all IDs in ``self`` is also in ``other``.
@@ -245,7 +260,7 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return numpy.isin(self._1d_view, other._1d_view).all()
+        return numpy.isin(self.index_1d, other.index_1d).all()
 
     def issuperset(self, other):
         """True if all of the IDs in ``other`` are in ``self``. False if not all IDs in ``other`` is also in ``self``.
@@ -255,24 +270,24 @@ class GridIndex(metaclass=_IndexMeta):
         other: :class:`~.GridIndex`
             The GridIndex instance to compare with
         """
-        return numpy.isin(other._1d_view, self._1d_view).all()
+        return numpy.isin(other.index_1d, self.index_1d).all()
 
     def __array__(self, dtype=None):
         return self.index
 
     @property
-    def _1d_view(self):
-        """Create a structured array where each (x,y) pair is seen as a single entitiy"""
-        raveled_index = self.index.reshape((-1, 2))
-        formats = (
-            numpy.full(len(raveled_index), raveled_index.dtype)
-            if raveled_index.shape[0] > 1
-            else 2 * [raveled_index.dtype]
-        )
-        dtype = {"names": ["f0", "f1"], "formats": formats}
-        if raveled_index.flags["F_CONTIGUOUS"]:  # https://stackoverflow.com/a/63196035
-            raveled_index = numpy.require(raveled_index, requirements=["C"])
-        return raveled_index.view(dtype)
+    def index_1d(index):
+        """Turn index based on x,y into a single integer. Assumes x and y are 32-bit integers"""
+        index = numpy.array(index).astype("int64")
+        if index.size == 0:
+            return numpy.array([], dtype="int64")
+
+        index &= 0xFFFFFFFF
+
+        # Combine the integers into a single 64-bit integer
+        combined = numpy.int64((index[..., 0] << 32) | (index[..., 1] & 0xFFFFFFFF))
+
+        return combined
 
     def ravel(self):
         """Flatten a nd-index
@@ -438,11 +453,3 @@ class GridIndex(metaclass=_IndexMeta):
     def copy(self):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())
-
-
-def _nd_view(index):
-    """Turn 1d-view into ndarray"""
-    if index.shape[0] == 0:  # return index if empty
-        result = index
-    result = index.view(int).reshape(-1, 2).squeeze()
-    return GridIndex(result)

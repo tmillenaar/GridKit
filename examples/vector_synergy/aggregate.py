@@ -10,24 +10,6 @@ Group points into grid cells
 
     For a tiled implementation of this approach using Dask, see example :ref:`aggregate_dask.py <example aggregate_dask>`
 
-TL;DR
------
-
-.. code-block:: python
-    :linenos:
-    :emphasize-lines: 5-7
-
-    import pandas
-    from gridkit import HexGrid
-
-    grid = HexGrid(size=1, shape="flat")
-    cell_ids = grid.cell_at_point(points)
-    df = pandas.DataFrame({"nr_points": 0, "grid_id": list(cell_ids)})
-    occurrences = df.groupby("grid_id").count()
-
-..
-
-
 Introduction
 ------------
 
@@ -97,11 +79,13 @@ cell_ids = grid.cell_at_point(points)
 # Each point with the same 'cell_id' will be regarded as being in the same 'bin'.
 # We can then do statistics on these bins. In our case we will count the number of points per bin.
 # For convenience, I will use a panda's groupby functionality for this.
+# Note that :meth:`.GridIndex.index_1d` is used here, and not `GridIndex.index`.
+# In the latter the x and y ids are split, which does not work well with DataFrames.
 #
 import pandas
 
 df = pandas.DataFrame(
-    {"nr_points": 0, "cell_id": list(cell_ids)}
+    {"nr_points": 0, "cell_id": cell_ids.index_1d}
 )  # The 'nr_points' will contain the result after `.count()` is called
 occurrences = df.groupby("cell_id").count()
 
@@ -111,7 +95,13 @@ occurrences = df.groupby("cell_id").count()
 # ---------------------
 #
 # Now we have the number of points per cell, let's obtain the corresponding cell shapes from the grid object and plot them.
-geoms = grid.to_shapely(occurrences.index.to_list())
+# Since we used :meth:`.GridIndex.index_1d`,
+# we will have to convert that back into a GridIndex using :meth:`.GridIndex.from_index_1d`.
+#
+from gridkit import GridIndex
+
+occurrences_ids = GridIndex.from_index_1d(occurrences.index)
+geoms = grid.to_shapely(occurrences_ids)
 plot_polygons(geoms, colors=occurrences["nr_points"].values, cmap="Oranges")
 plt.title("Number of points per cell")
 plt.show()
