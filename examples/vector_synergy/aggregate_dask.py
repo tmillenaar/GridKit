@@ -9,12 +9,14 @@ Group points into grid cells in a tiled manner, using Dask.
 Introduction
 ------------
 
-In example :ref:`aggregate.py <example aggregate>` an approach is demonstrated where points are grouped in cells and averaged per cell.
+In example :ref:`aggregate.py <example aggregate>` an approach is demonstrated where points 
+are grouped in cells and averaged per cell.
 This example does the same, but in a tiled manner.
 Dask is used for the groupby opertaion instead of Pandas.
 The main difference is that Dask divides the data into chunks that can be processed independently.
 This approach is beneficial if data does not comfortably fit into memory.
-A second reason to use this approach is the ability to process different chunks concurrently, which can provide a significant speedup.
+A second reason to use this approach is the ability to process different chunks concurrently,
+which can provide a significant speedup.
 
 .. Note ::
 
@@ -24,12 +26,12 @@ A second reason to use this approach is the ability to process different chunks 
 ..
 
 For a description of the approach used, please refer to :ref:`aggregate.py <example aggregate>`.
-In this example only the differences between the approaches will be highlighted.
+This example mostly highlights the differences between the two approaches.
 
 .. Note ::
 
     Dask uses the terms 'chunks', 'blocks' and 'partitions'.
-    While there are some nuances, in this example these terms will be used interchangably.
+    While there are some nuances, in this example these terms will be used interchangeably.
     I will try to stick with 'chunks' where I can since this is the general term, 
     though you will find references to 'map_blocks()' for Arrays and 'map_partitions()' for DataFrames.
 
@@ -40,7 +42,7 @@ Let's start by generating some points.
 The data will be a set of points scattered around a circle to create 
 a dougnut-like shape.
 I will first generate the points and the turn them into a Dask Array
-using ``dask.array.from_dask``.
+using ``dask.dataframe.from_array``.
 In a scenario where Dask is used because the data is large and memory is limited,
 you will likely obtain your dask array in a way that
 does not involve first loading the whole array into memory like I do here.
@@ -57,8 +59,8 @@ import dask.dataframe
 from gridkit.doc_utils import generate_2d_scatter_doughnut, plot_polygons
 
 points = generate_2d_scatter_doughnut(num_points=2000, radius=4)
-points = dask.array.from_array(points, chunks=500)
-print(points.npartitions)  # show the number of chunks ()
+df = dask.dataframe.from_array(points, columns=["pnt_x", "pnt_y"], chunksize=500)
+print(df.npartitions)  # show the number of chunks
 
 # %%
 #
@@ -68,64 +70,51 @@ print(points.npartitions)  # show the number of chunks ()
 # Now we can create a grid and determine the cell associated to each point.
 # No advanced knowledge of Dask is required to follow this example.
 # It suffices to know that 'map_blocks' and 'map_partitions' will apply the supplied function to all chunks.
+# :meth:`.GridIndex.index_1d` is used because it gives a single number that can be used as
+# a DataFrame index during the groupby operation.
 #
-
-from dask_geopandas.geohash import encode_geohash
-
-from gridkit import HexGrid
+# The column 'nr_points' will contain the nr of points per cell once '.count()' is called on the groupy object
+#
+# .. Note ::
+#
+#    The DataFrame only has a 'pnt_x' and a 'pnt_y' column. which is already the appropriate
+#    shape for ``grid.cell_at_point``. However, ``p[["pnt_x", "pnt_y"]]`` is specified here
+#    to make clear that ``cell_at_point`` expects this pattern and any other columns in the
+#    DataFrame will need to be ignored for this operation.
+#
+from gridkit import GridIndex, HexGrid
 
 grid = HexGrid(size=1, shape="flat")
-cell_ids = points.map_blocks(lambda p: grid.cell_at_point(p).index, dtype=int)
-
-# %%
-#
-# In the example using Pandas, we were able to group by the GridIndex object.
-# There we have one column that contains the grid index.
-# Dask splits the x and y values of the index into two columns,
-# so that approach won't work here.
-# We need a way to convert the x and y values of the index into a single number
-# that can then be used in Dask's groupby method.
-# Fortunately, dask_geopandas already solved this prpblem by creating a spatial index function.
-# Here I will use that function to create a geohash we can use to group.
-#
-
-df = dask.dataframe.from_array(cell_ids, columns=["x_id", "y_id"])
-df["geohash"] = df.map_partitions(
-    lambda df: encode_geohash(df.to_numpy(), as_string=False, precision=grid._size / 2)
+df["cell_id"] = df.map_partitions(
+    lambda p: grid.cell_at_point(p[["pnt_x", "pnt_y"]]).index_1d
 )
-# nr_points will contain the nr of points per cell once '.count()' is called on the groupy object
 df["nr_points"] = 1
 print(df)
 
 # %%
 #
-# Notice how the DataFrame based on the cell_ids has separate columns for x and y values
-# (which was the reason for creating the geohash in the first place).
-# I will keep these values for they can be used after the groupby to reconstruct the grid indices.
+# We can group by the 'cell_id'. That means points with the same 'cell_id' will be combined.
+# 'count()' then gets the number of points for every 'cell_id'.
 #
 
-grouped = df.groupby("geohash")
+grouped = df.groupby("cell_id")
 occurrences = grouped.count()
 
 # %%
 #
 # Now we have the number of points per cell.
 # In order to get the Polygon of each corresponding cell,
-# we were able to use the index in the pandas example to call grid.to_shapely.
-# Since now the index is based on the geohash, the grid index first needs to be obtained in a different way.
-# I will use the x and y columns for that that were created when the cell_ids were converted to the Dask DataFrame.
-# Since all values of x and y should be the same for a given geohash, we can take the 'first' x and y values per geohash.
-# ``dask.compute`` is called to read out the results into a pandas dataframe.
+# 'occurrences.index' can be used, but since it is a 1d index,
+# it first needs to be converted to a normal index using :meth:`.GridIndex.from_index_1d`
 #
 # .. Note ::
 #     If you are wondering why we went through all that effort just to end up with a pandas DataFrame in the end,
 #     suffice it to say that the size of the data is significantly reduced after the groupby.
 #     Also, for the sake of the example I will plot the data with matplotlib.
-#     If this was indeed on your mind, nice, stay sharp ;)
 #
-
-index = grouped.first()[["x_id", "y_id"]]
-polygons = index.map_partitions(grid.to_shapely, meta={"geoms": object})
+polygons = occurrences.index.map_partitions(
+    lambda id: grid.to_shapely(GridIndex.from_index_1d(id)), meta={"geoms": object}
+)
 geoms, points_per_cell = dask.compute(polygons, occurrences.nr_points)
 
 # %%
