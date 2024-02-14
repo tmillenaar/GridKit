@@ -124,11 +124,11 @@ def test_cell_corners(dx, dy, offset, id, expected_corners):
         ),  # point on edge
         (
             shapely.geometry.Point(1, 0),
-            [[0, -1], [0, 0], [1, -1], [1, 0]],
+            [[0, 0], [0, -1], [1, 0], [1, -1]],
         ),  # point on vertex
         (
             shapely.geometry.LineString([[1, -1], [1, 0.5]]),
-            [[0, -2], [0, -1], [0, 0], [1, -2], [1, -1], [1, 0]],
+            [[0, 0], [0, -2], [0, -1], [1, 0], [1, -2], [1, -1]],
         ),  # line on edge
         (
             shapely.geometry.LineString([[0.5, 0.5], [1.5, 0.5], [1.5, 1.5]]),
@@ -144,13 +144,13 @@ def test_cell_corners(dx, dy, offset, id, expected_corners):
             ),
             [  # L shaped polygon covering ten cells
                 [-1, 0],
-                [0, -1],
                 [0, 0],
                 [0, 1],
-                [1, -1],
+                [0, -1],
                 [1, 0],
                 [1, 1],
                 [1, 2],
+                [1, -1],
                 [2, 0],
                 [2, 1],
             ],
