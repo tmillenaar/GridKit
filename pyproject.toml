@@ -18,8 +18,8 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-doc = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "matplotlib"]
-test = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "matplotlib", "black", "pytest", "pytest-cov", "pytest-pylint", "pytest-black", "pylint", "pre-commit", "maturin"]
+doc = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "dask", "matplotlib"]
+test = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "dask", "matplotlib", "black", "pytest", "pytest-cov", "pytest-pylint", "pytest-black", "pylint", "pre-commit", "maturin"]
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
