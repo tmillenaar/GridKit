@@ -162,14 +162,13 @@ impl TriGrid {
         let nr_cells_y: usize = ((bounds.3 - bounds.1) / self.dy()).round() as usize;
         let mut index = Array2::<i64>::zeros((nr_cells_x * nr_cells_y, 2));
         let mut cell_id: usize = 0;
-        let mut centroid: Array2<f64>;
         for y in (miny..=maxy).rev() {
             for x in minx..=maxx {
-                centroid = self.centroid(&array!([x, y]).view()); // TODO: allow for calls using tuple or 1d array
-                if (centroid[Ix2(0, 0)] > bounds.0) & // x > minx
-                   (centroid[Ix2(0, 0)] < bounds.2) & // x < maxx
-                   (centroid[Ix2(0, 1)] > bounds.1) & // y > miny
-                   (centroid[Ix2(0, 1)] < bounds.3)   // y < maxy
+                let (centroid_x, centroid_y) = self.centroid_single_point(x, y);
+                if (centroid_x > bounds.0) & // x > minx
+                   (centroid_x < bounds.2) & // x < maxx
+                   (centroid_y > bounds.1) & // y > miny
+                   (centroid_y < bounds.3)   // y < maxy
                 {
                     index[Ix2(cell_id, 0)] = x;
                     index[Ix2(cell_id, 1)] = y;
