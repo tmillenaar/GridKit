@@ -1,4 +1,5 @@
 import inspect
+import warnings
 from functools import wraps
 from typing import List, Tuple, Union
 
@@ -276,6 +277,30 @@ class GridIndex(metaclass=_IndexMeta):
         return self.index
 
     @property
+    def _1d_view(self):
+        """Create a structured array where each (x,y) pair is seen as a single entitiy.
+
+        .. Note ::
+
+            This property is deprecated in favor of :meth:`.GridIndex.index_1d`
+        """
+        warnings.warn(
+            "'_1d_view' is deprecated in favor of 'index_1d'",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        raveled_index = self.index.reshape((-1, 2))
+        formats = (
+            numpy.full(len(raveled_index), raveled_index.dtype)
+            if raveled_index.shape[0] > 1
+            else 2 * [raveled_index.dtype]
+        )
+        dtype = {"names": ["f0", "f1"], "formats": formats}
+        if raveled_index.flags["F_CONTIGUOUS"]:  # https://stackoverflow.com/a/63196035
+            raveled_index = numpy.require(raveled_index, requirements=["C"])
+        return raveled_index.view(dtype)
+
+    @property
     def index_1d(index):
         """Turn index based on x,y into a single integer. Assumes x and y are 32-bit integers"""
         index = numpy.array(index).astype("int64")
@@ -453,3 +478,16 @@ class GridIndex(metaclass=_IndexMeta):
     def copy(self):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())
+
+
+def _nd_view(index):
+    """Turn 1d-view into ndarray"""
+    warnings.warn(
+        "'_nd_view' is deprecated in favor of 'GridIndex.from_index_1d'",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    if index.shape[0] == 0:  # return index if empty
+        result = index
+    result = index.view(int).reshape(-1, 2).squeeze()
+    return GridIndex(result)
