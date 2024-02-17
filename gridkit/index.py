@@ -1,9 +1,10 @@
 import inspect
+import warnings
 from functools import wraps
 from typing import List, Tuple, Union
 
 import numpy
-import warnings
+
 
 def validate_index(func):
     """Decorator to convert the index argument of a function to a GridIndex object."""
@@ -283,7 +284,11 @@ class GridIndex(metaclass=_IndexMeta):
 
             This property is deprecated in favor of :meth:`.GridIndex.index_1d`
         """
-        warnings.warn("'_1d_view' is deprecated in favor of 'index_1d'", DeprecationWarning, stacklevel=2)
+        warnings.warn(
+            "'_1d_view' is deprecated in favor of 'index_1d'",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         raveled_index = self.index.reshape((-1, 2))
         formats = (
             numpy.full(len(raveled_index), raveled_index.dtype)
@@ -474,9 +479,14 @@ class GridIndex(metaclass=_IndexMeta):
         """Return an immutable copy of self."""
         return GridIndex(self.index.copy())
 
+
 def _nd_view(index):
     """Turn 1d-view into ndarray"""
-    warnings.warn("'_nd_view' is deprecated in favor of 'GridIndex.from_index_1d'", DeprecationWarning, stacklevel=2)
+    warnings.warn(
+        "'_nd_view' is deprecated in favor of 'GridIndex.from_index_1d'",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     if index.shape[0] == 0:  # return index if empty
         result = index
     result = index.view(int).reshape(-1, 2).squeeze()
