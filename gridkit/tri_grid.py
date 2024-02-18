@@ -55,7 +55,9 @@ class TriGrid(BaseGrid):
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
         self._offset = value
         # TODO: implement a generalize update method that takes the PyTriGrid into account
-        self._grid = PyTriGrid(cellsize=self.size, offset=value, rotation=self._rotation)
+        self._grid = PyTriGrid(
+            cellsize=self.size, offset=value, rotation=self._rotation
+        )
 
     @validate_index
     def centroid(self, index):
