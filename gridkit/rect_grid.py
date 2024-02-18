@@ -7,6 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.gridkit_rs import PyRectGrid
 from gridkit.index import GridIndex, validate_index
 
 
@@ -33,11 +34,12 @@ class RectGrid(BaseGrid):
         Default: None
     """
 
-    def __init__(self, *args, dx, dy, **kwargs):
+    def __init__(self, *args, dx, dy, offset=(0, 0), **kwargs):
         self.__dx = dx
         self.__dy = dy
+        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset)
         self.bounded_cls = BoundedRectGrid
-        super(RectGrid, self).__init__(*args, **kwargs)
+        super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -176,6 +178,7 @@ class RectGrid(BaseGrid):
 
         return GridIndex(neighbours)
 
+    @validate_index
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
 
@@ -240,16 +243,16 @@ class RectGrid(BaseGrid):
 
 
         """
-
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        index = numpy.array(index, dtype="int").T
-        centroids = numpy.empty_like(index, dtype=float)
-        centroids[0] = index[0] * self.dx + (self.dx / 2) + self.offset[0]
-        centroids[1] = index[1] * self.dy + (self.dy / 2) + self.offset[1]
-        return centroids.T
+        original_shape = (*index.shape, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        centroids = self._grid.centroid(index=index)
+        return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):
         """Nearest 4 cells around a point.

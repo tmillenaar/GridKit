@@ -4,6 +4,7 @@ use pyo3::types::*;
 use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
 mod tri_grid;
+mod rect_grid;
 mod vector_shapes;
 mod interpolate;
 
@@ -152,6 +153,32 @@ impl PyTriGrid {
     }
 }
 
+
+#[pyclass]
+struct PyRectGrid {
+    dx: f64,
+    dy: f64,
+    _grid: rect_grid::RectGrid,
+}
+
+#[pymethods]
+impl PyRectGrid {
+    #[new]
+    fn new(dx: f64, dy: f64, offset: (f64, f64)) -> Self {
+        let _grid = rect_grid::RectGrid::new(dx, dy, offset);
+        PyRectGrid { dx, dy, _grid }
+    }
+
+    fn centroid<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+    ) -> &'py PyArray2<f64> {
+        let index = index.as_array();
+        self._grid.centroid(&index).into_pyarray(py)
+    }
+}
+
 #[pyfunction]
 fn linear_interp_weights_triangles<'py>(
     py: Python<'py>,
@@ -189,6 +216,7 @@ fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyTriGrid>()?;
+    module.add_class::<PyRectGrid>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())
