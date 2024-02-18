@@ -3,6 +3,18 @@
 Release notes
 ================
 
+Version 0.7.2 (February 18, 2024)
+---------------------------------
+Features
+ - Replace ``GridIndex._1d_view`` with :meth:`.GridIndex.index_1d`, which is an int64 instead of a custom data type.
+ - Replace ``index._nd_view`` with :meth:`.GridIndex.from_index_1d`
+
+Fixes
+ - Remove redundant array allocation in :meth:`.TriGrid.cells_in_bounds`
+
+Documentation
+ - Remove ``dask_geopandas`` dependency in example :ref:`aggregate_dask.py <example aggregate_dask>`. Use :meth:`.GridIndex.index_1d` instead.
+ - Use numpy array :meth:`.GridIndex.index_1d` in example :ref:`aggregate.py <example aggregate>` instead of a python list of :class:`.GridIndex` objects.
 
 Version 0.7.1 (February 11, 2024)
 ---------------------------------

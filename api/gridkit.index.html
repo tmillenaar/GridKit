@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>index &mdash; GridKit v0.7.1 documentation</title>
+  <title>index &mdash; GridKit v0.7.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=d99421f2"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ee6cab98"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.7.1
+                v0.7.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -147,6 +147,12 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd class="field-even"><p><strong>ValueError</strong> – When the shape of the index does not match the expected shape of (2,) or (N,2) where N is the number of cells, a ValuError is raised.</p>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.from_index_1d">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_index_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combined</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.from_index_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.from_index_1d" title="Permalink to this definition"></a></dt>
+<dd><p>Turn 1d-view into GridIndex</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="gridkit.index.GridIndex.x">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#gridkit.index.GridIndex.x" title="Permalink to this definition"></a></dt>
@@ -228,6 +234,12 @@ This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarra
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.index_1d">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">index_1d</span></span><a class="headerlink" href="#gridkit.index.GridIndex.index_1d" title="Permalink to this definition"></a></dt>
+<dd><p>Turn index based on x,y into a single integer. Assumes x and y are 32-bit integers</p>
 </dd></dl>
 
 <dl class="py method">

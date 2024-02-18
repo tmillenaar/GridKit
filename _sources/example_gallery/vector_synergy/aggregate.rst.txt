@@ -29,24 +29,6 @@ Group points into grid cells
 
     For a tiled implementation of this approach using Dask, see example :ref:`aggregate_dask.py <example aggregate_dask>`
 
-TL;DR
------
-
-.. code-block:: python
-    :linenos:
-    :emphasize-lines: 5-7
-
-    import pandas
-    from gridkit import HexGrid
-
-    grid = HexGrid(size=1, shape="flat")
-    cell_ids = grid.cell_at_point(points)
-    df = pandas.DataFrame({"nr_points": 0, "grid_id": list(cell_ids)})
-    occurrences = df.groupby("grid_id").count()
-
-..
-
-
 Introduction
 ------------
 
@@ -76,7 +58,7 @@ The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
 I'll plot the input here to show what it looks like.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-78
+.. GENERATED FROM PYTHON SOURCE LINES 43-60
 
 .. code-block:: Python
 
@@ -109,14 +91,14 @@ I'll plot the input here to show what it looks like.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-84
+.. GENERATED FROM PYTHON SOURCE LINES 62-66
 
 Relate points to grid cells
 ---------------------------
 
 Now we can create a grid and aggregate our points onto that grid.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-91
+.. GENERATED FROM PYTHON SOURCE LINES 67-73
 
 .. code-block:: Python
 
@@ -133,7 +115,7 @@ Now we can create a grid and aggregate our points onto that grid.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-100
+.. GENERATED FROM PYTHON SOURCE LINES 74-84
 
 Count the points per cell
 -------------------------
@@ -142,16 +124,18 @@ The ``cell_ids`` obtained in the previous step can be used to group the points.
 Each point with the same 'cell_id' will be regarded as being in the same 'bin'.
 We can then do statistics on these bins. In our case we will count the number of points per bin.
 For convenience, I will use a panda's groupby functionality for this.
+Note that :meth:`.GridIndex.index_1d` is used here, and not `GridIndex.index`.
+In the latter the x and y ids are split, which does not work well with DataFrames.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-108
+.. GENERATED FROM PYTHON SOURCE LINES 85-92
 
 .. code-block:: Python
 
     import pandas
 
     df = pandas.DataFrame(
-        {"nr_points": 0, "cell_id": list(cell_ids)}
+        {"nr_points": 0, "cell_id": cell_ids.index_1d}
     )  # The 'nr_points' will contain the result after `.count()` is called
     occurrences = df.groupby("cell_id").count()
 
@@ -162,18 +146,24 @@ For convenience, I will use a panda's groupby functionality for this.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
+.. GENERATED FROM PYTHON SOURCE LINES 93-100
 
 Visualize the results
 ---------------------
 
 Now we have the number of points per cell, let's obtain the corresponding cell shapes from the grid object and plot them.
+Since we used :meth:`.GridIndex.index_1d`,
+we will have to convert that back into a GridIndex using :meth:`.GridIndex.from_index_1d`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+
+.. GENERATED FROM PYTHON SOURCE LINES 101-108
 
 .. code-block:: Python
 
-    geoms = grid.to_shapely(occurrences.index.to_list())
+    from gridkit import GridIndex
+
+    occurrences_ids = GridIndex.from_index_1d(occurrences.index)
+    geoms = grid.to_shapely(occurrences_ids)
     plot_polygons(geoms, colors=occurrences["nr_points"].values, cmap="Oranges")
     plt.title("Number of points per cell")
     plt.show()
@@ -192,7 +182,7 @@ Now we have the number of points per cell, let's obtain the corresponding cell s
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.533 seconds)
+   **Total running time of the script:** (0 minutes 0.398 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate.py:

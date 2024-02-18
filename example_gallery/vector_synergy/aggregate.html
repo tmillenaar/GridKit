@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aggregate from points &mdash; GridKit v0.7.1 documentation</title>
+  <title>Aggregate from points &mdash; GridKit v0.7.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,13 +19,13 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=d99421f2"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ee6cab98"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Geometry intersections" href="intersect_geometries.html" />
+    <link rel="next" title="Tiled aggregation from points with Dask" href="aggregate_dask.html" />
     <link rel="prev" title="Combining land cover and DEM" href="../raster_operations/elevation_distribution_per_land_cover.html" /> 
 </head>
 
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.7.1
+                v0.7.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -60,7 +60,6 @@
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Aggregate from points</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#tl-dr">TL;DR</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#generate-input-data">Generate input data</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#relate-points-to-grid-cells">Relate points to grid cells</a></li>
@@ -68,8 +67,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#visualize-the-results">Visualize the results</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aggregate_dask.html">Tiled aggregation from points with Dask</a></li>
+<li class="toctree-l3"><a class="reference internal" href="intersect_geometries.html">Geometry intersections</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interpolate_from_points.html">Interpolate from points</a></li>
 </ul>
 </li>
@@ -118,18 +117,6 @@ to download the full example code</p>
 <p class="admonition-title">Note</p>
 <p>For a tiled implementation of this approach using Dask, see example <a class="reference internal" href="aggregate_dask.html#example-aggregate-dask"><span class="std std-ref">aggregate_dask.py</span></a></p>
 </div>
-<section id="tl-dr">
-<h2>TL;DR<a class="headerlink" href="#tl-dr" title="Permalink to this heading"></a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">pandas</span>
-<span class="linenos">2</span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
-<span class="linenos">3</span>
-<span class="linenos">4</span><span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;flat&quot;</span><span class="p">)</span>
-<span class="hll"><span class="linenos">5</span><span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-</span><span class="hll"><span class="linenos">6</span><span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;nr_points&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;grid_id&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">)})</span>
-</span><span class="hll"><span class="linenos">7</span><span class="n">occurrences</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;grid_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-</span></pre></div>
-</div>
-</section>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
 <p>Grouping points in cells (here referred to as ‘aggregation’) is a common occurrence in spatial data processing.
@@ -183,11 +170,13 @@ I’ll plot the input here to show what it looks like.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">cell_ids</span></code> obtained in the previous step can be used to group the points.
 Each point with the same ‘cell_id’ will be regarded as being in the same ‘bin’.
 We can then do statistics on these bins. In our case we will count the number of points per bin.
-For convenience, I will use a panda’s groupby functionality for this.</p>
+For convenience, I will use a panda’s groupby functionality for this.
+Note that <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a> is used here, and not <cite>GridIndex.index</cite>.
+In the latter the x and y ids are split, which does not work well with DataFrames.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;nr_points&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;cell_id&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">)}</span>
+    <span class="p">{</span><span class="s2">&quot;nr_points&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;cell_id&quot;</span><span class="p">:</span> <span class="n">cell_ids</span><span class="o">.</span><span class="n">index_1d</span><span class="p">}</span>
 <span class="p">)</span>  <span class="c1"># The &#39;nr_points&#39; will contain the result after `.count()` is called</span>
 <span class="n">occurrences</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;cell_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
@@ -195,14 +184,19 @@ For convenience, I will use a panda’s groupby functionality for this.</p>
 </section>
 <section id="visualize-the-results">
 <h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Permalink to this heading"></a></h2>
-<p>Now we have the number of points per cell, let’s obtain the corresponding cell shapes from the grid object and plot them.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">geoms</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_list</span><span class="p">())</span>
+<p>Now we have the number of points per cell, let’s obtain the corresponding cell shapes from the grid object and plot them.
+Since we used <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a>,
+we will have to convert that back into a GridIndex using <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.from_index_1d" title="gridkit.index.GridIndex.from_index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.from_index_1d()</span></code></a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">GridIndex</span>
+
+<span class="n">occurrences_ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="o">.</span><span class="n">from_index_1d</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">geoms</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">occurrences_ids</span><span class="p">)</span>
 <span class="n">plot_polygons</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">occurrences</span><span class="p">[</span><span class="s2">&quot;nr_points&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Oranges&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Number of points per cell&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.533 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.398 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/59a915f944b0f9e57a3c5fbf3640acb8/aggregate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate.ipynb</span></code></a></p>
@@ -220,7 +214,7 @@ For convenience, I will use a panda’s groupby functionality for this.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="../raster_operations/elevation_distribution_per_land_cover.html" class="btn btn-neutral float-left" title="Combining land cover and DEM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="intersect_geometries.html" class="btn btn-neutral float-right" title="Geometry intersections" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="aggregate_dask.html" class="btn btn-neutral float-right" title="Tiled aggregation from points with Dask" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
