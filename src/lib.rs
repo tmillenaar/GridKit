@@ -10,15 +10,16 @@ mod interpolate;
 #[pyclass]
 struct PyTriGrid {
     cellsize: f64,
+    rotation: f64,
     _grid: tri_grid::TriGrid,
 }
 
 #[pymethods]
 impl PyTriGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
-        let _grid = tri_grid::TriGrid { cellsize, offset };
-        PyTriGrid { cellsize, _grid }
+    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _grid = tri_grid::TriGrid::new( cellsize, offset, rotation);
+        PyTriGrid { cellsize, rotation, _grid }
     }
 
     fn cell_height(&self) -> f64 {
