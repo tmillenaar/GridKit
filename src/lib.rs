@@ -177,6 +177,15 @@ impl PyRectGrid {
         let index = index.as_array();
         self._grid.centroid(&index).into_pyarray(py)
     }
+
+    fn cell_at_point<'py>(
+        &self,
+        py: Python<'py>,
+        points: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray2<i64> {
+        let points = points.as_array();
+        self._grid.cell_at_point(&points).into_pyarray(py)
+    }
 }
 
 #[pyfunction]

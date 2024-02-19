@@ -414,11 +414,11 @@ class RectGrid(BaseGrid):
         ..
 
         """
-        point = numpy.array(point).T
-        ids_x = numpy.floor((point[0] - self.offset[0]) / self.dx)
-        ids_y = numpy.floor((point[1] - self.offset[1]) / self.dy)
-        index = numpy.array([ids_x, ids_y], dtype="int").T
-        return GridIndex(index)
+        point = numpy.array(point, dtype=float)
+        original_shape = point.shape
+        point = point.reshape(-1, 2)
+        cell_ids = self._grid.cell_at_point(point)
+        return GridIndex(cell_ids.reshape(original_shape))
 
     @validate_index
     def cell_corners(self, index: GridIndex = None) -> numpy.ndarray:

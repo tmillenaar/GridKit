@@ -53,4 +53,16 @@ impl RectGrid {
         let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
         (centroid_x, centroid_y)
     }
+
+    pub fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+        let shape = points.shape();
+        let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
+        for cell_id in 0..points.shape()[0] {
+            let id_x = ((points[Ix2(cell_id, 0)] - self.offset.0) / self.dx()).floor() as i64;
+            let id_y = ((points[Ix2(cell_id, 1)] - self.offset.1) / self.dy()).floor() as i64;
+            index[Ix2(cell_id, 0)] = id_x;
+            index[Ix2(cell_id, 1)] = id_y;
+        }
+        index
+    }
 }
