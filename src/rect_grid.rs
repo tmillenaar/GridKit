@@ -18,7 +18,6 @@ impl RectGrid {
         let offset_x = ((offset.0 % dx) + dx ) % dx;
         let offset_y = ((offset.1 % dy) + dy ) % dy;
         let offset = (offset_x, offset_y);
-        println!("Rust offset: {:?}", offset);
         RectGrid { _dx, _dy, offset }
     }
 
