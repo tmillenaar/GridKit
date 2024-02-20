@@ -65,4 +65,22 @@ impl RectGrid {
         }
         index
     }
+
+    pub fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
+        let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
+        for cell_id in 0..index.shape()[0] {
+            let id_x = index[Ix2(cell_id, 0)];
+            let id_y = index[Ix2(cell_id, 1)];
+            let (centroid_x, centroid_y) = self.centroid_single_point(id_x, id_y);
+            corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
+            corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
+            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
+            corners[Ix3(cell_id, 1, 1)] = centroid_y - self.dy() / 2.;
+            corners[Ix3(cell_id, 2, 0)] = centroid_x + self.dx() / 2.;
+            corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
+            corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
+            corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
+        }
+        corners
+    }
 }
