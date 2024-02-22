@@ -7,7 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.gridkit_rs import interp
+from gridkit.gridkit_rs import PyHexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 
@@ -39,7 +39,7 @@ class HexGrid(BaseGrid):
 
     """
 
-    def __init__(self, *args, size, shape="pointy", **kwargs):
+    def __init__(self, *args, size, shape="pointy", offset=(0, 0), **kwargs):
         self._size = size
         self._radius = size / 3**0.5
 
@@ -55,8 +55,9 @@ class HexGrid(BaseGrid):
             )
 
         self._shape = shape
+        self._grid = PyHexGrid(cellsize=size, offset=offset)
         self.bounded_cls = BoundedHexGrid
-        super(HexGrid, self).__init__(*args, **kwargs)
+        super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -238,6 +239,7 @@ class HexGrid(BaseGrid):
         neighbours = neighbours.reshape(*original_shape, *neighbours.shape[-2:])
         return GridIndex(neighbours.squeeze())
 
+    @validate_index
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
 
@@ -300,23 +302,20 @@ class HexGrid(BaseGrid):
 
 
         """
-
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        index = numpy.array(index, dtype="int").T
-        centroids = numpy.empty_like(index, dtype=float)
-        centroids[0] = index[0] * self.dx + (self.dx / 2) + self.offset[0]
-        centroids[1] = index[1] * self.dy + (self.dy / 2) + self.offset[1]
-
-        if self._shape == "pointy":
-            offset_rows = index[1] % 2 == 1
-            centroids[0, offset_rows] += self.dx / 2
-        elif self._shape == "flat":
-            offset_rows = index[0] % 2 == 1
-            centroids[1, offset_rows] += self.dy / 2
-        return centroids.T
+        original_shape = (*index.shape, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        if self.shape == "flat":
+            index = index.T[::-1].T
+        centroids = self._grid.centroid(index=index)
+        if self.shape == "flat":
+            centroids = centroids.T[::-1].T
+        return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):
         """Nearest 3 cells around a point.
