@@ -7,6 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.gridkit_rs import PyRectGrid
 from gridkit.index import GridIndex, validate_index
 
 
@@ -33,11 +34,12 @@ class RectGrid(BaseGrid):
         Default: None
     """
 
-    def __init__(self, *args, dx, dy, **kwargs):
+    def __init__(self, *args, dx, dy, offset=(0, 0), **kwargs):
         self.__dx = dx
         self.__dy = dy
+        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset)
         self.bounded_cls = BoundedRectGrid
-        super(RectGrid, self).__init__(*args, **kwargs)
+        super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -176,6 +178,7 @@ class RectGrid(BaseGrid):
 
         return GridIndex(neighbours)
 
+    @validate_index
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
 
@@ -240,16 +243,16 @@ class RectGrid(BaseGrid):
 
 
         """
-
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        index = numpy.array(index, dtype="int").T
-        centroids = numpy.empty_like(index, dtype=float)
-        centroids[0] = index[0] * self.dx + (self.dx / 2) + self.offset[0]
-        centroids[1] = index[1] * self.dy + (self.dy / 2) + self.offset[1]
-        return centroids.T
+        original_shape = (*index.shape, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        centroids = self._grid.centroid(index=index)
+        return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):
         """Nearest 4 cells around a point.
@@ -411,11 +414,11 @@ class RectGrid(BaseGrid):
         ..
 
         """
-        point = numpy.array(point).T
-        ids_x = numpy.floor((point[0] - self.offset[0]) / self.dx)
-        ids_y = numpy.floor((point[1] - self.offset[1]) / self.dy)
-        index = numpy.array([ids_x, ids_y], dtype="int").T
-        return GridIndex(index)
+        point = numpy.array(point, dtype=float)
+        original_shape = point.shape
+        point = point.reshape(-1, 2)
+        cell_ids = self._grid.cell_at_point(point)
+        return GridIndex(cell_ids.reshape(original_shape))
 
     @validate_index
     def cell_corners(self, index: GridIndex = None) -> numpy.ndarray:
@@ -423,27 +426,12 @@ class RectGrid(BaseGrid):
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
             )
-        centroids = self.centroid(index).T
-
-        if len(centroids.shape) == 1:
-            corners = numpy.empty((4, 2))
-        else:
-            corners = numpy.empty((4, 2, centroids.shape[1]))
-
-        corners[0, 0] = centroids[0] - self.dx / 2
-        corners[0, 1] = centroids[1] - self.dy / 2
-        corners[1, 0] = centroids[0] + self.dx / 2
-        corners[1, 1] = centroids[1] - self.dy / 2
-        corners[2, 0] = centroids[0] + self.dx / 2
-        corners[2, 1] = centroids[1] + self.dy / 2
-        corners[3, 0] = centroids[0] - self.dx / 2
-        corners[3, 1] = centroids[1] + self.dy / 2
-
-        # swap from (corners, xy, cells) to (cells, corners, xy)
-        if len(centroids.shape) > 1:
-            corners = numpy.moveaxis(corners, 2, 0)
-
-        return numpy.squeeze(corners)
+        original_shape = (*index.shape, 4, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        corners = self._grid.cell_corners(index)
+        return corners.reshape(original_shape)
 
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
