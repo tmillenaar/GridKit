@@ -3,8 +3,10 @@ use pyo3::prelude::*;
 use pyo3::types::*;
 use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
+mod utils;
 mod tri_grid;
 mod rect_grid;
+mod hex_grid;
 mod vector_shapes;
 mod interpolate;
 
@@ -197,6 +199,68 @@ impl PyRectGrid {
     }
 }
 
+#[pyclass]
+struct PyHexGrid {
+    cellsize: f64,
+    _grid: hex_grid::HexGrid,
+}
+
+#[pymethods]
+impl PyHexGrid {
+    #[new]
+    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
+        let _grid = hex_grid::HexGrid::new(cellsize, offset);
+        PyHexGrid { cellsize, _grid }
+    }
+
+    // fn cell_height(&self) -> f64 {
+    //     self._grid.cell_height()
+    // }
+
+    // fn cell_width(&self) -> f64 {
+    //     self._grid.cell_width()
+    // }
+
+    fn radius(&self) -> f64 {
+        self._grid.radius()
+    }
+
+    fn dx(&self) -> f64 {
+        self._grid.dx()
+    }
+
+    fn dy(&self) -> f64 {
+        self._grid.dy()
+    }
+
+    fn centroid<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+    ) -> &'py PyArray2<f64> {
+        let index = index.as_array();
+        self._grid.centroid(&index).into_pyarray(py)
+    }
+
+    fn cell_at_location<'py>(
+        &self,
+        py: Python<'py>,
+        points: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray2<i64> {
+        let points = points.as_array();
+        self._grid.cell_at_location(&points).into_pyarray(py)
+    }
+
+    fn cell_corners<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+    ) -> &'py PyArray3<f64> {
+        let index = index.as_array();
+        self._grid.cell_corners(&index).into_pyarray(py)
+    }
+}
+
 #[pyfunction]
 fn linear_interp_weights_triangles<'py>(
     py: Python<'py>,
@@ -235,6 +299,7 @@ fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyTriGrid>()?;
     module.add_class::<PyRectGrid>()?;
+    module.add_class::<PyHexGrid>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())

@@ -7,7 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.gridkit_rs import interp
+from gridkit.gridkit_rs import PyHexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 
@@ -39,7 +39,7 @@ class HexGrid(BaseGrid):
 
     """
 
-    def __init__(self, *args, size, shape="pointy", **kwargs):
+    def __init__(self, *args, size, shape="pointy", offset=(0, 0), **kwargs):
         self._size = size
         self._radius = size / 3**0.5
 
@@ -54,9 +54,15 @@ class HexGrid(BaseGrid):
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
             )
 
+        offset_x, offset_y = offset[0], offset[1]
+        offset_x = offset_x % self.dx
+        offset_y = offset_y % self.dy
+        offset = (offset_x, offset_y)
+
         self._shape = shape
+        self._grid = PyHexGrid(cellsize=size, offset=offset)
         self.bounded_cls = BoundedHexGrid
-        super(HexGrid, self).__init__(*args, **kwargs)
+        super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -238,6 +244,7 @@ class HexGrid(BaseGrid):
         neighbours = neighbours.reshape(*original_shape, *neighbours.shape[-2:])
         return GridIndex(neighbours.squeeze())
 
+    @validate_index
     def centroid(self, index=None):
         """Coordinates at the center of the cell(s) specified by `index`.
 
@@ -300,23 +307,20 @@ class HexGrid(BaseGrid):
 
 
         """
-
         if index is None:
             raise ValueError(
                 "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        index = numpy.array(index, dtype="int").T
-        centroids = numpy.empty_like(index, dtype=float)
-        centroids[0] = index[0] * self.dx + (self.dx / 2) + self.offset[0]
-        centroids[1] = index[1] * self.dy + (self.dy / 2) + self.offset[1]
-
-        if self._shape == "pointy":
-            offset_rows = index[1] % 2 == 1
-            centroids[0, offset_rows] += self.dx / 2
-        elif self._shape == "flat":
-            offset_rows = index[0] % 2 == 1
-            centroids[1, offset_rows] += self.dy / 2
-        return centroids.T
+        original_shape = (*index.shape, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        if self.shape == "flat":
+            index = index.T[::-1].T
+        centroids = self._grid.centroid(index=index)
+        if self.shape == "flat":
+            centroids = centroids.T[::-1].T
+        return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):
         """Nearest 3 cells around a point.
@@ -439,105 +443,33 @@ class HexGrid(BaseGrid):
             If multiple points are supplied, the indices are returned as Nx2 ndarrays.
 
         """
-        point = numpy.array(point)
-        point = numpy.expand_dims(point, axis=0) if len(point.shape) == 1 else point
+        point = numpy.array(point, dtype=float)
         original_shape = point.shape
-        point = point.reshape(-1, 2).T
-
-        # approach adapted after https://stackoverflow.com/a/7714148
-        if self._shape == "pointy":
-            flat_axis = 0
-            pointy_axis = 1
-            flat_stepsize = self.dx
-            pointy_stepsize = self.dy
-        elif self._shape == "flat":
-            flat_axis = 1
-            pointy_axis = 0
-            flat_stepsize = self.dy
-            pointy_stepsize = self.dx
-        else:
-            raise ValueError(
-                f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{self._shape}'"
-            )
-
-        ids_pointy = numpy.floor(
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            / pointy_stepsize
-        )
-        even = ids_pointy % 2 == 0
-        ids_flat = numpy.empty_like(ids_pointy)
-        ids_flat[~even] = numpy.floor(
-            (point[flat_axis][~even] - self.offset[flat_axis] - flat_stepsize / 2)
-            / flat_stepsize
-        )
-        ids_flat[even] = numpy.floor(
-            (point[flat_axis][even] - self.offset[flat_axis]) / flat_stepsize
-        )
-
-        # Finetune ambiguous points
-        # Points at the top of the cell can be in this cell or in the cell to the top right or top left
-        rel_loc_y = (
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            % pointy_stepsize
-        ) + self.r / 4
-        rel_loc_x = (point[flat_axis] - self.offset[flat_axis]) % flat_stepsize
-        top_left_even = rel_loc_x / (flat_stepsize / self.r) < (
-            rel_loc_y - self.r * 5 / 4
-        )
-        top_right_even = (self.r * 1.25 - rel_loc_y) <= (rel_loc_x - flat_stepsize) / (
-            flat_stepsize / self.r
-        )
-        top_right_odd = (rel_loc_x - flat_stepsize / 2) / (flat_stepsize / self.r) <= (
-            rel_loc_y - self.r * 5 / 4
-        )
-        top_right_odd &= rel_loc_x >= flat_stepsize / 2
-        top_left_odd = (self.r * 1.25 - rel_loc_y) < (rel_loc_x - flat_stepsize / 2) / (
-            flat_stepsize / self.r
-        )
-        top_left_odd &= rel_loc_x < flat_stepsize / 2
-
-        ids_pointy[top_left_even & even] += 1
-        ids_pointy[top_right_even & even] += 1
-        ids_pointy[top_left_odd & ~even] += 1
-        ids_pointy[top_right_odd & ~even] += 1
-
-        ids_flat[top_left_even & even] -= 1
-        ids_flat[top_left_odd & ~even] += 1
-
-        if self._shape == "pointy":
-            result = numpy.array([ids_flat, ids_pointy], dtype="int").T
-
-        elif self._shape == "flat":
-            result = numpy.array([ids_pointy, ids_flat], dtype="int").T
-
-        result = result.reshape(original_shape)
-        return GridIndex(result)
+        point = point[None] if point.ndim == 1 else point
+        point = point.reshape(-1, 2)
+        if self.shape == "flat":
+            point = point.T[::-1].T
+        cell_at_point = self._grid.cell_at_location(points=point)
+        if self.shape == "flat":
+            cell_at_point = cell_at_point.T[::-1].T
+        return GridIndex(cell_at_point.squeeze().reshape(original_shape))
 
     @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
             raise ValueError(
-                "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
+                "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        cell_shape = index.shape
-        centroids = self.centroid(index.ravel()).T
-
-        if len(centroids.shape) == 1:
-            corners = numpy.empty((6, 2))
-        else:
-            corners = numpy.empty((6, 2, centroids.shape[1]))
-
-        for i in range(6):
-            angle_deg = 60 * i - 30 if self._shape == "pointy" else 60 * i
-            angle_rad = numpy.pi / 180 * angle_deg
-            corners[i, 0] = centroids[0] + self.r * numpy.cos(angle_rad)
-            corners[i, 1] = centroids[1] + self.r * numpy.sin(angle_rad)
-
-        # swap from (corners, xy, cells) to (cells, corners, xy)
-        if len(centroids.shape) > 1:
-            corners = numpy.moveaxis(corners, 2, 0)
-
-        return corners.reshape((*cell_shape, 6, 2))
+        return_shape = (*index.shape, 6, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        if self.shape == "flat":
+            index = index.T[::-1].T
+        corners = self._grid.cell_corners(index=index)
+        if self.shape == "flat":
+            corners = corners[:, :, ::-1]
+        return corners.reshape(return_shape)
 
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.

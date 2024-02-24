@@ -1,8 +1,6 @@
 use numpy::ndarray::*;
+use crate::utils::*;
 
-fn iseven(val: i64) -> bool {
-    val % 2 == 0
-}
 pub struct RectGrid {
     pub _dx: f64,
     pub _dy: f64,
@@ -11,13 +9,8 @@ pub struct RectGrid {
 
 impl RectGrid {
     pub fn new(dx: f64, dy: f64, offset: (f64, f64)) -> Self {
-        let (_dx, _dy) = (dx,dy);
-        // Note: In Rust, % is the remainder.
-        //       In Python, % is the modulus.
-        //       Here we want the modulus, see https://stackoverflow.com/q/31210357
-        let offset_x = ((offset.0 % dx) + dx ) % dx;
-        let offset_y = ((offset.1 % dy) + dy ) % dy;
-        let offset = (offset_x, offset_y);
+        let offset = normalize_offset(offset, dx, dy);
+        let (_dx, _dy) = (dx, dy); // rename in order to pass to struct
         RectGrid { _dx, _dy, offset }
     }
 

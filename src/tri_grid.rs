@@ -1,5 +1,6 @@
 use numpy::ndarray::*;
 use crate::interpolate;
+use crate::utils::*;
 
 fn iseven(val: i64) -> bool {
     val % 2 == 0
@@ -11,6 +12,8 @@ pub struct TriGrid {
 
 impl TriGrid {
     pub fn new(cellsize: f64, offset: (f64, f64)) -> Self {
+        let self_tmp = TriGrid { cellsize, offset };
+        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
         TriGrid { cellsize, offset }
     }
 
