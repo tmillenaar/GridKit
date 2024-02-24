@@ -438,79 +438,16 @@ class HexGrid(BaseGrid):
             If multiple points are supplied, the indices are returned as Nx2 ndarrays.
 
         """
-        point = numpy.array(point)
-        point = numpy.expand_dims(point, axis=0) if len(point.shape) == 1 else point
+        point = numpy.array(point, dtype=float)
         original_shape = point.shape
-        point = point.reshape(-1, 2).T
-
-        # approach adapted after https://stackoverflow.com/a/7714148
-        if self._shape == "pointy":
-            flat_axis = 0
-            pointy_axis = 1
-            flat_stepsize = self.dx
-            pointy_stepsize = self.dy
-        elif self._shape == "flat":
-            flat_axis = 1
-            pointy_axis = 0
-            flat_stepsize = self.dy
-            pointy_stepsize = self.dx
-        else:
-            raise ValueError(
-                f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{self._shape}'"
-            )
-
-        ids_pointy = numpy.floor(
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            / pointy_stepsize
-        )
-        even = ids_pointy % 2 == 0
-        ids_flat = numpy.empty_like(ids_pointy)
-        ids_flat[~even] = numpy.floor(
-            (point[flat_axis][~even] - self.offset[flat_axis] - flat_stepsize / 2)
-            / flat_stepsize
-        )
-        ids_flat[even] = numpy.floor(
-            (point[flat_axis][even] - self.offset[flat_axis]) / flat_stepsize
-        )
-
-        # Finetune ambiguous points
-        # Points at the top of the cell can be in this cell or in the cell to the top right or top left
-        rel_loc_y = (
-            (point[pointy_axis] - self.offset[pointy_axis] - self.r / 4)
-            % pointy_stepsize
-        ) + self.r / 4
-        rel_loc_x = (point[flat_axis] - self.offset[flat_axis]) % flat_stepsize
-        top_left_even = rel_loc_x / (flat_stepsize / self.r) < (
-            rel_loc_y - self.r * 5 / 4
-        )
-        top_right_even = (self.r * 1.25 - rel_loc_y) <= (rel_loc_x - flat_stepsize) / (
-            flat_stepsize / self.r
-        )
-        top_right_odd = (rel_loc_x - flat_stepsize / 2) / (flat_stepsize / self.r) <= (
-            rel_loc_y - self.r * 5 / 4
-        )
-        top_right_odd &= rel_loc_x >= flat_stepsize / 2
-        top_left_odd = (self.r * 1.25 - rel_loc_y) < (rel_loc_x - flat_stepsize / 2) / (
-            flat_stepsize / self.r
-        )
-        top_left_odd &= rel_loc_x < flat_stepsize / 2
-
-        ids_pointy[top_left_even & even] += 1
-        ids_pointy[top_right_even & even] += 1
-        ids_pointy[top_left_odd & ~even] += 1
-        ids_pointy[top_right_odd & ~even] += 1
-
-        ids_flat[top_left_even & even] -= 1
-        ids_flat[top_left_odd & ~even] += 1
-
-        if self._shape == "pointy":
-            result = numpy.array([ids_flat, ids_pointy], dtype="int").T
-
-        elif self._shape == "flat":
-            result = numpy.array([ids_pointy, ids_flat], dtype="int").T
-
-        result = result.reshape(original_shape)
-        return GridIndex(result)
+        point = point[None] if point.ndim == 1 else point
+        point = point.reshape(-1, 2)
+        if self.shape == "flat":
+            point = point.T[::-1].T
+        cell_at_point = self._grid.cell_at_location(points=point)
+        if self.shape == "flat":
+            cell_at_point = cell_at_point.T[::-1].T
+        return GridIndex(cell_at_point.squeeze().reshape(original_shape))
 
     @validate_index
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
