@@ -121,4 +121,19 @@ impl HexGrid {
         }
     index
     }
+
+    pub fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
+        let mut corners = Array3::<f64>::zeros((index.shape()[0], 6, 2));
+
+        for cell_id in 0..index.shape()[0] {
+            for corner_id in 0..6 {
+                let angle_deg = 60. * corner_id as f64 - 30.;
+                let angle_rad = angle_deg * std::f64::consts::PI / 180.;
+                let centroid = self.centroid_single_point(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                corners[Ix3(cell_id, corner_id, 0)] = centroid.0 + self.radius() * angle_rad.cos();
+                corners[Ix3(cell_id, corner_id, 1)] = centroid.1 + self.radius() * angle_rad.sin();
+            }
+        }
+        corners
+    }
 }

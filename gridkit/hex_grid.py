@@ -54,6 +54,11 @@ class HexGrid(BaseGrid):
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
             )
 
+        offset_x, offset_y = offset[0], offset[1]
+        offset_x = offset_x % self.dx
+        offset_y = offset_y % self.dy
+        offset = (offset_x, offset_y)
+
         self._shape = shape
         self._grid = PyHexGrid(cellsize=size, offset=offset)
         self.bounded_cls = BoundedHexGrid
@@ -453,27 +458,18 @@ class HexGrid(BaseGrid):
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
             raise ValueError(
-                "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
+                "For grids that do not contain data, argument `index` is to be supplied to method `centroid`."
             )
-        cell_shape = index.shape
-        centroids = self.centroid(index.ravel()).T
-
-        if len(centroids.shape) == 1:
-            corners = numpy.empty((6, 2))
-        else:
-            corners = numpy.empty((6, 2, centroids.shape[1]))
-
-        for i in range(6):
-            angle_deg = 60 * i - 30 if self._shape == "pointy" else 60 * i
-            angle_rad = numpy.pi / 180 * angle_deg
-            corners[i, 0] = centroids[0] + self.r * numpy.cos(angle_rad)
-            corners[i, 1] = centroids[1] + self.r * numpy.sin(angle_rad)
-
-        # swap from (corners, xy, cells) to (cells, corners, xy)
-        if len(centroids.shape) > 1:
-            corners = numpy.moveaxis(corners, 2, 0)
-
-        return corners.reshape((*cell_shape, 6, 2))
+        return_shape = (*index.shape, 6, 2)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        if self.shape == "flat":
+            index = index.T[::-1].T
+        corners = self._grid.cell_corners(index=index)
+        if self.shape == "flat":
+            corners = corners[:, :, ::-1]
+        return corners.reshape(return_shape)
 
     def to_crs(self, crs):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
