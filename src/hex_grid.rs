@@ -1,4 +1,5 @@
 use numpy::ndarray::*;
+use crate::utils::*;
 
 fn iseven(val: i64) -> bool {
     val % 2 == 0
@@ -14,25 +15,19 @@ pub struct HexGrid {
 
 impl HexGrid {
     pub fn new(cellsize: f64, offset: (f64, f64)) -> Self {
-        // let (_dx, _dy) = (dx,dy);
-        // // Note: In Rust, % is the remainder.
-        // //       In Python, % is the modulus.
-        // //       Here we want the modulus, see https://stackoverflow.com/q/31210357
-        // let offset_x = ((offset.0 % dx) + dx ) % dx;
-        // let offset_y = ((offset.1 % dy) + dy ) % dy;
-        let offset = offset;
+        // Note: dx and dy are required to normalize the offset
+        //       Create an intermediate grid with incorrect offset first,
+        //       such that dx and dy of the intermediate grid can be used
+        //       to calculate dx and dy. Then create self with the
+        //       normalized offset
+        let self_tmp = HexGrid { cellsize, offset };
+        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
         HexGrid { cellsize, offset }
     }
 
     pub fn radius(&self) -> f64 {
         self.cellsize / 3_f64.powf(0.5)
     }
-
-    // pub fn cell_height(&self) -> f64 {
-    // }
-
-    // pub fn cell_width(&self) -> f64 {
-    // }
 
     pub fn dx(&self) -> f64 {
         self.cellsize
