@@ -40,9 +40,14 @@ impl HexGrid {
             let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             centroids[Ix2(cell_id, 0)] = point.0;
             centroids[Ix2(cell_id, 1)] = point.1;
-            let mut centroid = centroids.slice_mut(s![cell_id, ..]);
-            let cent_rot = self.rotation_matrix.dot(&centroid);
-            centroid.assign(&cent_rot);
+        }
+
+        if self.rotation != 0. {
+            for cell_id in 0..centroids.shape()[0] {
+                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
+                let cent_rot = self.rotation_matrix.dot(&centroid);
+                centroid.assign(&cent_rot);
+            }
         }
         centroids
     }
