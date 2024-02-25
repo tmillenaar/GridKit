@@ -5,13 +5,18 @@ pub struct RectGrid {
     pub _dx: f64,
     pub _dy: f64,
     pub offset: (f64, f64),
+    pub rotation: f64,
+    pub rotation_matrix: Array2<f64>,
+    pub rotation_matrix_inv: Array2<f64>,
 }
 
 impl RectGrid {
-    pub fn new(dx: f64, dy: f64, offset: (f64, f64)) -> Self {
+    pub fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let rotation_matrix = _rotation_matrix(rotation);
+        let rotation_matrix_inv = _rotation_matrix(-rotation);
         let offset = normalize_offset(offset, dx, dy);
         let (_dx, _dy) = (dx, dy); // rename in order to pass to struct
-        RectGrid { _dx, _dy, offset }
+        RectGrid { _dx, _dy, offset, rotation, rotation_matrix, rotation_matrix_inv }
     }
 
     pub fn cell_height(&self) -> f64 {

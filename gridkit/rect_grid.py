@@ -34,10 +34,11 @@ class RectGrid(BaseGrid):
         Default: None
     """
 
-    def __init__(self, *args, dx, dy, offset=(0, 0), **kwargs):
+    def __init__(self, *args, dx, dy, offset=(0, 0), rotation=0, **kwargs):
         self.__dx = dx
         self.__dy = dy
-        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset)
+        self._rotation = rotation
+        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
         super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
 
