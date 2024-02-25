@@ -3,6 +3,23 @@
 Release notes
 ================
 
+Version 0.7.3 (February 25, 2024)
+---------------------------------
+Fixes
+ - Properly handle negative offsets in Rust grid classes
+
+Misc
+ - Move the following methods to Rust:
+
+     - :meth:`.RectGrid.centroid`
+     - :meth:`.RectGrid.cell_at_point`
+     - :meth:`.RectGrid.cell_corners`
+     - :meth:`.HexGrid.centroid`
+     - :meth:`.HexGrid.cell_at_point`
+     - :meth:`.HexGrid.cell_corners`
+
+    This is done in preparation of rotation of un-bounded grids and provides a minor speedup.
+
 Version 0.7.2 (February 18, 2024)
 ---------------------------------
 Features
