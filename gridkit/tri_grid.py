@@ -73,12 +73,16 @@ class TriGrid(BaseGrid):
         return centroids.reshape(original_shape)
 
     @validate_index
-    def cell_corners(self, index):
+    def cell_corners(self, index=None):
+        if index is None:
+            raise ValueError(
+                "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
+            )
         return_shape = (
             *index.shape,
             3,
             2,
-        )  # already include the axis containing the 3 corners
+        )
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )

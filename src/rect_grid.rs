@@ -39,7 +39,7 @@ impl RectGrid {
         let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
 
         for cell_id in 0..centroids.shape()[0] {
-            let point = self.centroid_single_point(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             centroids[Ix2(cell_id, 0)] = point.0;
             centroids[Ix2(cell_id, 1)] = point.1;
         }
@@ -54,7 +54,7 @@ impl RectGrid {
         centroids
     }
 
-    fn centroid_single_point(&self, x: i64, y: i64) -> (f64, f64) {
+    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
         let centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
         let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
         (centroid_x, centroid_y)
@@ -64,8 +64,10 @@ impl RectGrid {
         let shape = points.shape();
         let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
         for cell_id in 0..points.shape()[0] {
-            let id_x = ((points[Ix2(cell_id, 0)] - self.offset.0) / self.dx()).floor() as i64;
-            let id_y = ((points[Ix2(cell_id, 1)] - self.offset.1) / self.dy()).floor() as i64;
+            let point = points.slice(s![cell_id, ..]);
+            let point = self.rotation_matrix_inv.dot(&point);
+            let id_x = ((point[Ix1(0)] - self.offset.0) / self.dx()).floor() as i64;
+            let id_y = ((point[Ix1(1)] - self.offset.1) / self.dy()).floor() as i64;
             index[Ix2(cell_id, 0)] = id_x;
             index[Ix2(cell_id, 1)] = id_y;
         }
@@ -77,7 +79,7 @@ impl RectGrid {
         for cell_id in 0..index.shape()[0] {
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
-            let (centroid_x, centroid_y) = self.centroid_single_point(id_x, id_y);
+            let (centroid_x, centroid_y) = self.centroid_xy_no_rot(id_x, id_y);
             corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
             corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
             corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
@@ -86,6 +88,16 @@ impl RectGrid {
             corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
             corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
             corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
+        }
+        
+        if self.rotation != 0. {
+            for cell_id in 0..corners.shape()[0] {
+                for corner_id in 0..corners.shape()[1] {
+                    let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
+                    let rotated_corner_xy = self.rotation_matrix.dot(&corner_xy);
+                    corner_xy.assign(&rotated_corner_xy);
+                }
+            }
         }
         corners
     }

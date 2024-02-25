@@ -104,7 +104,7 @@ impl TriGrid {
 
         if self.rotation != 0. {
             for cell_id in 0..corners.shape()[0] {
-                for corner_id in 0..3 {
+                for corner_id in 0..corners.shape()[1] {
                     let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
                     let rotated_corner_xy = self.rotation_matrix.dot(&corner_xy);
                     corner_xy.assign(&rotated_corner_xy);

@@ -39,7 +39,9 @@ class HexGrid(BaseGrid):
 
     """
 
-    def __init__(self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs):
+    def __init__(
+        self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs
+    ):
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation

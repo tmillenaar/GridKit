@@ -67,9 +67,6 @@ impl HexGrid {
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
             let point = self.rotation_matrix_inv.dot(&point);
-            
-            // let x = points[Ix2(cell_id, 0)];
-            // let y = points[Ix2(cell_id, 1)];
             let x = point[Ix1(0)];
             let y = point[Ix1(1)];
 
@@ -141,7 +138,7 @@ impl HexGrid {
 
         if self.rotation != 0. {
             for cell_id in 0..corners.shape()[0] {
-                for corner_id in 0..6 {
+                for corner_id in 0..corners.shape()[1] {
                     let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
                     let rotated_corner_xy = self.rotation_matrix.dot(&corner_xy);
                     corner_xy.assign(&rotated_corner_xy);
