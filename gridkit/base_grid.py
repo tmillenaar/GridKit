@@ -242,18 +242,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def cell_corners(self, index: numpy.ndarray) -> numpy.ndarray:
-        """Coordinates of the cell corners as specified by `index`.
+        """Coordinates of the cell corners as specified by ``index``.
 
         Parameters
         ----------
-        :class:`~.index.GridIndex`
+        index: :class:`.GridIndex`
             The indices of the cells of interest. Each id contains an `x` and `y` value.
 
         Returns
         -------
-        index: `numpy.ndarray`
-            A list of coordinates in (x,y) specifying each of the corners.
-            If an ND index is supplied, the returned array will be of the same shpae,
+        `numpy.ndarray`
+            An array of coordinates in (x,y) specifying each of the corners.
+            The returned array will be of the same shape as the input ``index``,
             but with an extra axis containing the corners.
             The last axis is always of size 2 (x,y).
             The second to last axis is the length of the corners.

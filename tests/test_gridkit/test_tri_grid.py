@@ -35,7 +35,7 @@ def test_centroid(indices, offset, expected_centroids):
 
 
 @pytest.mark.parametrize(
-    "indices, expected_centroids",
+    "indices, expected_corners",
     [
         [(-1, -1), [[-2.25, -5.19615242], [-0.75, -2.59807621], [-3.75, -2.59807621]]],
         [
@@ -48,12 +48,14 @@ def test_centroid(indices, offset, expected_centroids):
         ],
     ],
 )
-@pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
-def test_cell_corners(indices, offset, expected_centroids):
+@pytest.mark.parametrize("offset", ((0, 0), (-1.3, 0.3), (1, -2.2)))
+def test_cell_corners(indices, offset, expected_corners):
     grid = TriGrid(size=1.5, offset=offset)
     corners = grid.cell_corners(indices)
-    corners -= offset
-    numpy.testing.assert_allclose(corners, expected_centroids, atol=1e-15)
+    corners -= grid.offset
+    expected_corners = numpy.array(expected_corners)
+
+    numpy.testing.assert_allclose(corners, expected_corners, atol=1e-8)
 
 
 @pytest.mark.parametrize(
@@ -72,8 +74,8 @@ def test_cell_corners(indices, offset, expected_centroids):
 @pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
 def test_cell_at_point(points, offset, expected_ids):
     points = numpy.array(points)
-    points += offset
     grid = TriGrid(size=0.7, offset=offset)
+    points += grid.offset
     ids = grid.cell_at_point(points)
     numpy.testing.assert_allclose(ids, expected_ids)
 
