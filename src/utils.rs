@@ -1,3 +1,5 @@
+use numpy::ndarray::*;
+
 pub fn iseven(val: i64) -> bool {
     val % 2 == 0
 }
@@ -9,4 +11,14 @@ pub fn normalize_offset(offset: (f64, f64), dx: f64, dy: f64) -> (f64, f64) {
     let offset_x = ((offset.0 % dx) + dx ) % dx;
     let offset_y = ((offset.1 % dy) + dy ) % dy;
     (offset_x, offset_y)
+}
+
+pub fn _rotation_matrix(angle_deg: f64) -> Array2<f64> {
+    let angle_rad = angle_deg.to_radians();
+    let cos_angle = angle_rad.cos();
+    let sin_angle = angle_rad.sin();
+    array![
+        [cos_angle, -sin_angle],
+        [sin_angle, cos_angle]
+    ]
 }

@@ -6,16 +6,6 @@ fn iseven(val: i64) -> bool {
     val % 2 == 0
 }
 
-fn _rotation_matrix(angle_deg: f64) -> Array2<f64> {
-    let angle_rad = angle_deg.to_radians();
-    let cos_angle = angle_rad.cos();
-    let sin_angle = angle_rad.sin();
-    array![
-        [cos_angle, -sin_angle],
-        [sin_angle, cos_angle]
-    ]
-}
-
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
