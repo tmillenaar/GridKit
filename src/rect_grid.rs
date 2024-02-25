@@ -76,4 +76,62 @@ impl RectGrid {
         }
         corners
     }
+
+    pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
+        let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
+        let index = self.cell_at_point(points);
+        for cell_id in 0..points.shape()[0] {
+            let rel_loc_x: f64 = ((points[Ix2(cell_id, 0)] - self.offset.0).abs()) % self.dx();
+            let rel_loc_y: f64 = ((points[Ix2(cell_id, 1)] - self.offset.1).abs()) % self.dy();
+            let id_x = index[Ix2(cell_id, 0)];
+            let id_y = index[Ix2(cell_id, 0)];
+            match (rel_loc_x, rel_loc_y) {
+                // Top-left quadrant
+                (x, y) if x <= self.dx() / 2. && y >= self.dy() / 2. => {
+                    nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] =  1 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] =  1 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
+                    nearby_cells[Ix3(cell_id, 2, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] =  0 + id_y;
+                }
+                // Top-right quadrant
+                (x, y) if x >= self.dx() / 2. && y >= self.dy() / 2. => {
+                    nearby_cells[Ix3(cell_id, 0, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] =  1 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] =  1 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] =  1 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 2, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] =  1 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] =  0 + id_y;
+                }
+                // Botoom-left quadrant
+                (x, y) if x <= self.dx() / 2. && y <= self.dy() / 2. => {
+                    nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
+                    nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
+                }
+                // Bottom-right quadrant
+                _ => {
+                    nearby_cells[Ix3(cell_id, 0, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] =  1 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] =  1 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
+                }
+            }
+        }
+        nearby_cells
+    }
 }

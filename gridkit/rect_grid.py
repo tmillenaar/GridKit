@@ -254,6 +254,12 @@ class RectGrid(BaseGrid):
         centroids = self._grid.centroid(index=index)
         return centroids.reshape(original_shape)
 
+    def cells_near_point_rs(self, point):
+        point = numpy.array(point, dtype="float64")
+        point = point[None] if point.ndim == 1 else point
+        ids = self._grid.cells_near_point(point)
+        return GridIndex(ids)
+
     def cells_near_point(self, point):
         """Nearest 4 cells around a point.
         This includes the cell the point is contained within,
