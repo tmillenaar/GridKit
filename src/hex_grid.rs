@@ -1,13 +1,6 @@
 use numpy::ndarray::*;
 use crate::utils::*;
 
-fn iseven(val: i64) -> bool {
-    val % 2 == 0
-}
-
-fn modulus(val: f64, modulus: f64) -> f64 {
-    ((val % modulus) + modulus ) % modulus
-}
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),

@@ -4,12 +4,16 @@ pub fn iseven(val: i64) -> bool {
     val % 2 == 0
 }
 
+pub fn modulus(val: f64, modulus: f64) -> f64 {
+    ((val % modulus) + modulus ) % modulus
+}
+
 pub fn normalize_offset(offset: (f64, f64), dx: f64, dy: f64) -> (f64, f64) {
     // Note: In Rust, % is the remainder.
     //       In Python, % is the modulus.
     //       Here we want the modulus, see https://stackoverflow.com/q/31210357
-    let offset_x = ((offset.0 % dx) + dx ) % dx;
-    let offset_y = ((offset.1 % dy) + dy ) % dy;
+    let offset_x = modulus(offset.0, dx);
+    let offset_y = modulus(offset.1, dy);
     (offset_x, offset_y)
 }
 

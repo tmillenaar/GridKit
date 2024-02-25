@@ -2,10 +2,6 @@ use numpy::ndarray::*;
 use crate::interpolate;
 use crate::utils::*;
 
-fn iseven(val: i64) -> bool {
-    val % 2 == 0
-}
-
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
