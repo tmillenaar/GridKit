@@ -203,15 +203,16 @@ impl PyRectGrid {
 #[pyclass]
 struct PyHexGrid {
     cellsize: f64,
+    rotation: f64,
     _grid: hex_grid::HexGrid,
 }
 
 #[pymethods]
 impl PyHexGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
-        let _grid = hex_grid::HexGrid::new(cellsize, offset);
-        PyHexGrid { cellsize, _grid }
+    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
+        PyHexGrid { cellsize, rotation, _grid}
     }
 
     // fn cell_height(&self) -> f64 {

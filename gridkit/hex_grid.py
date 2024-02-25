@@ -39,9 +39,10 @@ class HexGrid(BaseGrid):
 
     """
 
-    def __init__(self, *args, size, shape="pointy", offset=(0, 0), **kwargs):
+    def __init__(self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs):
         self._size = size
         self._radius = size / 3**0.5
+        self._rotation = rotation
 
         if shape == "pointy":
             self._dx = size
@@ -60,7 +61,7 @@ class HexGrid(BaseGrid):
         offset = (offset_x, offset_y)
 
         self._shape = shape
-        self._grid = PyHexGrid(cellsize=size, offset=offset)
+        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
 
