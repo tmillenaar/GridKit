@@ -84,7 +84,7 @@ impl RectGrid {
             let rel_loc_x: f64 = ((points[Ix2(cell_id, 0)] - self.offset.0).abs()) % self.dx();
             let rel_loc_y: f64 = ((points[Ix2(cell_id, 1)] - self.offset.1).abs()) % self.dy();
             let id_x = index[Ix2(cell_id, 0)];
-            let id_y = index[Ix2(cell_id, 0)];
+            let id_y = index[Ix2(cell_id, 1)];
             match (rel_loc_x, rel_loc_y) {
                 // Top-left quadrant
                 (x, y) if x <= self.dx() / 2. && y >= self.dy() / 2. => {

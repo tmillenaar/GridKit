@@ -254,12 +254,6 @@ class RectGrid(BaseGrid):
         centroids = self._grid.centroid(index=index)
         return centroids.reshape(original_shape)
 
-    def cells_near_point_rs(self, point):
-        point = numpy.array(point, dtype="float64")
-        point = point[None] if point.ndim == 1 else point
-        ids = self._grid.cells_near_point(point)
-        return GridIndex(ids)
-
     def cells_near_point(self, point):
         """Nearest 4 cells around a point.
         This includes the cell the point is contained within,
@@ -326,41 +320,12 @@ class RectGrid(BaseGrid):
         ..
 
         """
-
-        # Split each cell into 4 quadrants in order to identify what 3 neigbors to select
-        new_grid = RectGrid(dx=self.dx / 2, dy=self.dy / 2, offset=self.offset)
-        ids = new_grid.cell_at_point(point)
-        left_top_mask = numpy.logical_and(ids.x % 2 == 0, ids.y % 2 == 1)
-        right_top_mask = numpy.logical_and(ids.x % 2 == 1, ids.y % 2 == 1)
-        right_bottom_mask = numpy.logical_and(ids.x % 2 == 1, ids.y % 2 == 0)
-        left_bottom_mask = numpy.logical_and(ids.x % 2 == 0, ids.y % 2 == 0)
-
-        # obtain the bottom-left cell based on selected quadrant
-        base_ids = numpy.empty_like(ids.index, dtype="int")
-        # bottom-left if point in upper-right quadrant
-        base_ids[right_top_mask] = numpy.floor(ids.index[right_top_mask] / 2)
-        # bottom-left if point in bottom-right quadrant
-        base_ids[right_bottom_mask] = numpy.floor(ids.index[right_bottom_mask] / 2)
-        base_ids[right_bottom_mask, 1] -= 1
-        # bottom-left if point in bottom-left quadrant
-        base_ids[left_bottom_mask] = numpy.floor(ids.index[left_bottom_mask] / 2)
-        base_ids[left_bottom_mask] -= 1
-        # bottom-left if point in upper-left qudrant
-        base_ids[left_top_mask] = numpy.floor(ids.index[left_top_mask] / 2)
-        base_ids[left_top_mask, 0] -= 1
-
-        base_ids = GridIndex(base_ids)
-
-        # use the bottom-left cell to determine the other three
-        bl_ids = base_ids.copy()
-        br_ids = base_ids.copy()
-        br_ids.x += 1
-        tr_ids = base_ids.copy()
-        tr_ids += 1
-        tl_ids = base_ids.copy()
-        tl_ids.y += 1
-
-        return GridIndex([tl_ids, tr_ids, bl_ids, br_ids])
+        point = numpy.array(point, dtype="float64")
+        point = point[None] if point.ndim == 1 else point
+        ids = self._grid.cells_near_point(point)
+        # FIXME: remove swapaxes, breaks backwards compatibility
+        ids = numpy.swapaxes(ids, 0, 1)
+        return GridIndex(ids)
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
