@@ -302,19 +302,18 @@ class RectGrid(BaseGrid):
             >>> nearby_cells = grid.cells_near_point(points)
             >>> nearby_cells.index
             array([[[-1,  0],
-                    [ 0,  1],
-                    [ 0,  0]],
-            <BLANKLINE>
-                   [[ 0,  0],
-                    [ 1,  1],
-                    [ 1,  0]],
-            <BLANKLINE>
-                   [[-1, -1],
                     [ 0,  0],
+                    [-1, -1],
                     [ 0, -1]],
             <BLANKLINE>
-                   [[ 0, -1],
+                   [[ 0,  1],
+                    [ 1,  1],
+                    [ 0,  0],
+                    [ 1,  0]],
+            <BLANKLINE>
+                   [[ 0,  0],
                     [ 1,  0],
+                    [ 0, -1],
                     [ 1, -1]]])
 
         ..
@@ -325,8 +324,6 @@ class RectGrid(BaseGrid):
         point = point[None] if point.ndim == 1 else point
         point = point.reshape(-1, 2)
         ids = self._grid.cells_near_point(point)
-        # FIXME: remove swapaxes, but breaks backwards compatibility
-        # ids = numpy.swapaxes(ids, 0, 1)
         return GridIndex(ids.squeeze().reshape(original_shape))
 
     def cell_at_point(self, point):
@@ -673,7 +670,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         :py:meth:`.RectGrid.cell_at_point`
         """
         nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
-        tl_ids, tr_ids, bl_ids, br_ids = self.cells_near_point(sample_points).index
+        tl_ids, tr_ids, bl_ids, br_ids = numpy.rollaxis(
+            self.cells_near_point(sample_points).index, -2
+        )
 
         tl_val = self.value(tl_ids, oob_value=nodata_value)
         tr_val = self.value(tr_ids, oob_value=nodata_value)
