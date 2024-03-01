@@ -320,12 +320,14 @@ class RectGrid(BaseGrid):
         ..
 
         """
-        point = numpy.array(point, dtype="float64")
+        point = numpy.array(point, dtype=float)
+        original_shape = (*point.shape[:-1], 4, 2)
         point = point[None] if point.ndim == 1 else point
+        point = point.reshape(-1, 2)
         ids = self._grid.cells_near_point(point)
-        # FIXME: remove swapaxes, breaks backwards compatibility
-        ids = numpy.swapaxes(ids, 0, 1)
-        return GridIndex(ids)
+        # FIXME: remove swapaxes, but breaks backwards compatibility
+        # ids = numpy.swapaxes(ids, 0, 1)
+        return GridIndex(ids.squeeze().reshape(original_shape))
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).

@@ -343,15 +343,16 @@ class HexGrid(BaseGrid):
             If multiple points are supplied, the four indices are returned as Nx2 ndarrays.
 
         """
-
-        point = numpy.array(point, dtype="float64")
+        point = numpy.array(point, dtype=float)
+        original_shape = (*point.shape[:-1], 3, 2)
         point = point[None] if point.ndim == 1 else point
+        point = point.reshape(-1, 2)
         if self.shape == "flat":
             point = point.T[::-1].T
         ids = self._grid.cells_near_point(point)
         if self.shape == "flat":
             ids = ids.T[::-1].T
-        return GridIndex(ids)
+        return GridIndex(ids.squeeze().reshape(original_shape))
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).
