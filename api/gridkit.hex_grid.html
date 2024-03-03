@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.7.3 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.8.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=4a142f81"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=cbff0a6f"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.7.3
+                v0.8.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -323,12 +323,12 @@ Axes order if multiple indices are specified: (points, xy), else (xy).</p>
 <dd><p>Nearest 3 cells around a point.
 This includes the cell the point is contained within,
 as well as two direct neighbours of this cell and one diagonal neighbor.
-What neigbors of the containing are slected, depends on where in the cell the point is located.</p>
+What neighbours of the containing are selected, depends on where in the cell the point is located.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>point</strong> (:class”<cite>tuple</cite>) – Coordinate of the point around which the cells are to be selected.
+<dd class="field-odd"><p><strong>point</strong> (<cite>tuple</cite>) – Coordinate of the point around which the cells are to be selected.
 The point consists of two floats specifying x- and y-coordinates, respectively.
-Mutliple poins can be specified at once in the form of a list of points or an Nx2 ndarray.</p>
+Multiple points can be specified at once in the form of a list of points or an Nx2 ndarray.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The indices of the 4 nearest cells in order (top-left, top-right, bottom-left, bottom-right).
@@ -336,11 +336,9 @@ If a single point is supplied, the four indices are returned as 1d arrays of len
 If multiple points are supplied, the four indices are returned as Nx2 ndarrays.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
-<p>Nearby cell indices are returned as a tuple:</p>
 </dd></dl>
 
 <dl class="py method">

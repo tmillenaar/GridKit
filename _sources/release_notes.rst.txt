@@ -3,6 +3,20 @@
 Release notes
 ================
 
+Version 0.8.0 (March 03, 2024)
+---------------------------------
+Fixes
+ - Return :class:`.GridIndex` from :meth:`.HexGrid.cells_near_point`
+ - Align return shape of index :meth:`.RectGrid.cells_near_point` with those of :meth:`.TriGrid.cells_near_point` and :meth:`.HexGrid.cells_near_point` (!API change)
+ - Allow multi-dimensional input and returns form method `cells_near_point` on the three grid types
+
+Misc
+ - Move the following methods to Rust:
+
+     - :meth:`.RectGrid.cells_near_point`
+     - :meth:`.HexGrid.cells_near_point`
+
+
 Version 0.7.3 (February 25, 2024)
 ---------------------------------
 Fixes
