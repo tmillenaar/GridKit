@@ -18,8 +18,32 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-doc = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "dask", "matplotlib"]
-test = ["sphinx", "sphinx_rtd_theme", "sphinx-gallery", "sphinxcontrib-plantuml", "geopandas", "dask", "matplotlib", "black", "pytest", "pytest-cov", "pytest-pylint", "pytest-black", "pylint", "pre-commit", "maturin"]
+doc = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-gallery",
+    "sphinxcontrib-plantuml",
+    "geopandas",
+    "dask",
+    "matplotlib"
+]
+test = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-gallery",
+    "sphinxcontrib-plantuml",
+    "geopandas",
+    "dask",
+    "matplotlib",
+    "black",
+    "pytest<8.0", # pin for error when running pytest: `pluggy._manager.PluginValidationError: Plugin 'black' for hook 'pytest_collect_file'`
+    "pytest-cov",
+    "pytest-pylint",
+    "pytest-black",
+    "pylint",
+    "pre-commit",
+    "maturin"
+]
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
