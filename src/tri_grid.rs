@@ -388,12 +388,23 @@ impl TriGrid {
         relative_neighbours
     }
 
-    pub fn cells_near_point(&self, point: &ArrayView2<f64>) -> Array3<i64> {
-        let mut nearby_cells = Array3::<i64>::zeros((point.shape()[0], 6, 2));
+    pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
+        let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 6, 2));
         // TODO:
         // Condense this into a single loop
-        let cell_ids = self.cell_at_point(point);
+        let cell_ids = self.cell_at_point(points);
         let corners = self.cell_corners(&cell_ids.view());
+
+
+        if self.rotation != 0. {
+            println!("Rotating {} degrees", -self.rotation);
+            let mut points = points.to_owned();
+            for cell_id in 0..points.shape()[0] {
+                let mut point = points.slice_mut(s![cell_id, ..]);
+                let point_rot = self.rotation_matrix_inv.dot(&point);
+                point.assign(&point_rot);
+            }
+        }
 
         // Define arguments to be used when determining the minimum distance
         let mut min_dist: f64 = 0.;
@@ -403,8 +414,8 @@ impl TriGrid {
             for corner_id in 0..corners.shape()[1] {
                 let x = corners[Ix3(cell_id, corner_id, 0)];
                 let y = corners[Ix3(cell_id, corner_id, 1)];
-                let dx = point[Ix2(cell_id, 0)] - x;
-                let dy = point[Ix2(cell_id, 1)] - y;
+                let dx = points[Ix2(cell_id, 0)] - x;
+                let dy = points[Ix2(cell_id, 1)] - y;
                 let distance = (dx.powi(2) + dy.powi(2)).powf(0.5);
                 if corner_id == 0 {
                     nearest_corner_id = corner_id;

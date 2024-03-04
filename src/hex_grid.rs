@@ -160,7 +160,7 @@ impl HexGrid {
         let cell_ids = self.cell_at_location(points);
         for cell_id in 0..points.shape()[0] {
             // Determine the azimuth based on the direction vector from the cell centroid to the point
-            let centroid = self.centroid_single_point(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
+            let centroid = self.centroid_xy_no_rot(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
             let direction_x = points[Ix2(cell_id, 0)] - centroid.0;
             let direction_y = points[Ix2(cell_id, 1)] - centroid.1;
             let mut azimuth = direction_x.atan2(direction_y) * 180. / std::f64::consts::PI;

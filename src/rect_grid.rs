@@ -103,11 +103,24 @@ impl RectGrid {
     }
 
     pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
+
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
         let index = self.cell_at_point(points);
+
+        // FIXME: Find a way to not clone points in the case of no rotation
+        //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
+        let mut points = points.to_owned();
+        if self.rotation != 0. {
+            for cell_id in 0..points.shape()[0] {
+                let mut point = points.slice_mut(s![cell_id, ..]);
+                let point_rot = self.rotation_matrix_inv.dot(&point);
+                point.assign(&point_rot);
+            }
+        }
+
         for cell_id in 0..points.shape()[0] {
-            let rel_loc_x: f64 = ((points[Ix2(cell_id, 0)] - self.offset.0).abs()) % self.dx();
-            let rel_loc_y: f64 = ((points[Ix2(cell_id, 1)] - self.offset.1).abs()) % self.dy();
+            let rel_loc_x: f64 = modulus((points[Ix2(cell_id, 0)] - self.offset.0), self.dx());
+            let rel_loc_y: f64 = modulus((points[Ix2(cell_id, 1)] - self.offset.1), self.dy());
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
             match (rel_loc_x, rel_loc_y) {
@@ -133,7 +146,7 @@ impl RectGrid {
                     nearby_cells[Ix3(cell_id, 3, 0)] =  1 + id_x;
                     nearby_cells[Ix3(cell_id, 3, 1)] =  0 + id_y;
                 }
-                // Botoom-left quadrant
+                // Bottom-left quadrant
                 (x, y) if x <= self.dx() / 2. && y <= self.dy() / 2. => {
                     nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
                     nearby_cells[Ix3(cell_id, 0, 1)] =  0 + id_y;
