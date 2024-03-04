@@ -3,8 +3,17 @@
 Release notes
 ================
 
+Version 0.9.0 (March ??, 2024)
+------------------------------
+Features
+ - Rotation for :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid`
+     - Note: not for the bounded versions
+
+Fixes:
+ - Fixed :meth:`.RectGrid.cells_near_point` returning incorrect cells for negative points
+
 Version 0.8.0 (March 03, 2024)
----------------------------------
+------------------------------
 Fixes
  - Return :class:`.GridIndex` from :meth:`.HexGrid.cells_near_point`
  - Align return shape of index :meth:`.RectGrid.cells_near_point` with those of :meth:`.TriGrid.cells_near_point` and :meth:`.HexGrid.cells_near_point` (!API change)
