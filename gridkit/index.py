@@ -231,7 +231,7 @@ class GridIndex(metaclass=_IndexMeta):
         return GridIndex.from_index_1d(intersection)
 
     def difference(self, other):
-        """The differenceof two GridIndex instances. Keep the IDs contained in ``self`` that are not in ``other``.
+        """The difference of two GridIndex instances. Keep the IDs contained in ``self`` that are not in ``other``.
 
         Parameters
         ----------

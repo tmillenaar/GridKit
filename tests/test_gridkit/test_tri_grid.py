@@ -448,14 +448,21 @@ def test_is_cell_upright():
         ),
     ],
 )
-def test_cells_near_point(points, expected_nearby_ids):
+@pytest.mark.parametrize("expand_axes", [True, False])
+def test_cells_near_point(points, expected_nearby_ids, expand_axes):
     grid = TriGrid(size=0.6, offset=(0.2, 0.3))
-    nearby_ids = grid.cells_near_point(points)
+    nearby_ids = grid.cells_near_point(points[0])
     # Test single point input
-    numpy.testing.assert_allclose(nearby_ids[0], expected_nearby_ids)
+    numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids)
     # Test for all points
     expected_nearby_ids_extended = numpy.empty(shape=(len(points), 6, 2))
     expected_nearby_ids_extended[:] = expected_nearby_ids
+    if expand_axes:
+        points = numpy.repeat(numpy.array(points)[None], 3, axis=0)
+        expected_nearby_ids_extended = numpy.repeat(
+            numpy.array(expected_nearby_ids_extended)[None], 3, axis=0
+        )
+    nearby_ids = grid.cells_near_point(points)
     numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
 
 

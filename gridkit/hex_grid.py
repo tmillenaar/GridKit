@@ -329,104 +329,33 @@ class HexGrid(BaseGrid):
         """Nearest 3 cells around a point.
         This includes the cell the point is contained within,
         as well as two direct neighbours of this cell and one diagonal neighbor.
-        What neigbors of the containing are slected, depends on where in the cell the point is located.
+        What neighbours of the containing are selected, depends on where in the cell the point is located.
 
-        Args
-        ----
-        point: :class"`tuple`
+        Parameters
+        ----------
+        point: `tuple`
             Coordinate of the point around which the cells are to be selected.
             The point consists of two floats specifying x- and y-coordinates, respectively.
-            Mutliple poins can be specified at once in the form of a list of points or an Nx2 ndarray.
+            Multiple points can be specified at once in the form of a list of points or an Nx2 ndarray.
 
         Returns
         -------
-        :class:`tuple`
+        :class:`.GridIndex`
             The indices of the 4 nearest cells in order (top-left, top-right, bottom-left, bottom-right).
             If a single point is supplied, the four indices are returned as 1d arrays of length 2.
             If multiple points are supplied, the four indices are returned as Nx2 ndarrays.
 
-        Examples
-        --------
-        Nearby cell indices are returned as a tuple:
-
-
         """
-        cell = self.cell_at_point(point)
-        original_shape = cell.shape
-        cell = cell.ravel()
-
-        point = numpy.reshape(point, cell.index.shape)
-        centroid = self.centroid(cell)
-        distance_vector = point - centroid
-        azimuth = numpy.arctan2(*distance_vector.T) * 180 / numpy.pi
-        # FIXME: if there is one point, azimuth is a float in which we cannot use a mask. Make the check more elegant
-        point = numpy.array(point)
-        if len(point.shape) == 1:
-            azimuth = numpy.array([azimuth])
-
-        cell = cell.index
-        if len(cell.shape) == 1:
-            cell = numpy.expand_dims(cell, axis=0)
-        az_ranges = [(0, 60), (60, 120), (120, 180), (180, 240), (240, 300), (300, 360)]
-        if self._shape == "flat":
-            inconsistent_axis = (
-                0  # TODO: Make consistent and inconsisten axis a property of self
-            )
-            consistent_axis = 1
-            shift_odd_cells = [1, slice(1, 3), 2, 1, slice(1, 3), 2]
-            nearby_cells_relative_idx = [
-                [[1, 0], [0, 1]],
-                [[1, -1], [1, 0]],
-                [[0, -1], [1, -1]],
-                [[-1, -1], [0, -1]],
-                [[-1, 0], [-1, -1]],
-                [[0, 1], [-1, 0]],
-            ]
-        elif self._shape == "pointy":
-            inconsistent_axis = 1
-            consistent_axis = 0
-            azimuth += (
-                30  # it is easier to work with ranges starting at 0 rather than -30
-            )
-            shift_odd_cells = [slice(1, 3), 1, 2, slice(1, 3), 1, 2]
-            nearby_cells_relative_idx = [
-                [[-1, 1], [0, 1]],
-                [[0, 1], [1, 0]],
-                [[1, 0], [0, -1]],
-                [[0, -1], [-1, -1]],
-                [[-1, -1], [-1, 0]],
-                [[-1, 0], [-1, 1]],
-            ]
-        else:
-            raise AttributeError(f"Unrecognized grid shape {self._shape}")
-
-        nearby_cells = numpy.repeat(
-            numpy.expand_dims(cell, axis=0), 3, axis=0
-        )  # shape: neighbours(3), points(n), xy(2)
-        odd_cells_mask = cell[:, inconsistent_axis] % 2 == 1
-
-        # make sure azimuth is inbetween 0 and 360, and not between -180 and 180
-        azimuth[azimuth <= 0] += 360
-        azimuth[azimuth > 360] -= 360
-
-        for az_range, shift_odd, cells in zip(
-            az_ranges, shift_odd_cells, nearby_cells_relative_idx
-        ):
-            mask = numpy.logical_and(azimuth > az_range[0], azimuth <= az_range[1])
-            nearby_cells[1, mask] += cells[0]
-            nearby_cells[2, mask] += cells[1]
-            mask_odd = numpy.logical_and(mask, odd_cells_mask)
-            nearby_cells[shift_odd, mask_odd, consistent_axis] += 1
-
-        # turn into shape: points(n), neighbours(3), xy(2)
-        # points(n) will be unraveled later if multiple points were provided
-        nearby_cells = numpy.swapaxes(nearby_cells, 0, 1)
-
-        if len(nearby_cells) == 1:
-            return nearby_cells[0]
-        # return shape: points(...), neighbours(3), xy(2)
-        # where points(...) can be any nd (unraveled) shape
-        return nearby_cells.reshape((*original_shape, 3, 2))
+        point = numpy.array(point, dtype=float)
+        original_shape = (*point.shape[:-1], 3, 2)
+        point = point[None] if point.ndim == 1 else point
+        point = point.reshape(-1, 2)
+        if self.shape == "flat":
+            point = point.T[::-1].T
+        ids = self._grid.cells_near_point(point)
+        if self.shape == "flat":
+            ids = ids.T[::-1].T
+        return GridIndex(ids.squeeze().reshape(original_shape))
 
     def cell_at_point(self, point):
         """Index of the cell containing the supplied point(s).

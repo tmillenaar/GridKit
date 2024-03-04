@@ -147,4 +147,70 @@ impl HexGrid {
         }
         corners
     }
+
+    pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
+        // There are 6 options for the nearby cells,
+        // based on where in a cell the point is located.
+        // Hence there are 6 sections within the cell,
+        // each 60 degrees wide (360/6 = 60).
+        // We divide the quadrants based on the angle between
+        // the point and pure up, as measured from the centroid of the cell.
+        let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
+
+        let cell_ids = self.cell_at_location(points);
+        for cell_id in 0..points.shape()[0] {
+            // Determine the azimuth based on the direction vector from the cell centroid to the point
+            let centroid = self.centroid_single_point(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
+            let direction_x = points[Ix2(cell_id, 0)] - centroid.0;
+            let direction_y = points[Ix2(cell_id, 1)] - centroid.1;
+            let mut azimuth = direction_x.atan2(direction_y) * 180. / std::f64::consts::PI;
+            azimuth += 30.; // it is easier to work with ranges starting at 0 rather than -30;
+            // make sure azimuth is inbetween 0 and 360, and not between -180 and 180
+            azimuth += 360. * (azimuth <= 0.) as i64 as f64;
+            azimuth -= 360. * (azimuth > 360.) as i64 as f64;
+            // Determine which of the 6 quadratns is in based on the azimuth
+            let quadrant_id = (azimuth / 60.).floor() as usize;
+            // The first nearby cell is the cell the point is located in.
+            // So this point can be excluded from the slice.
+            // It is already 0,0 which is the correct relative ID
+            let mut nearby_cells_slice = nearby_cells.slice_mut(s![cell_id, 1.., ..]);
+            // Offset the nearby cells by one depending whether the cell points up or down
+            let offset = !iseven(cell_ids[Ix2(cell_id, 1)]) as i64;
+            match quadrant_id {
+                0 => { // azimuth 0-60
+                    nearby_cells_slice.assign(&array![[-1, 1], [0, 1]]);
+                    nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
+                    nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
+                }
+                1 => { // azimuth 60-120
+                    nearby_cells_slice.assign(&array![[0, 1], [1, 0]]);
+                    nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
+                }
+                2 => { // azimuth 120-180
+                    nearby_cells_slice.assign(&array![[1, 0], [0, -1]]);
+                    nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
+                }
+                3 => { // azimuth 180-240
+                    nearby_cells_slice.assign(&array![[0, -1], [-1, -1]]);
+                    nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
+                    nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
+                }
+                4 => { // azimuth 240- 300
+                    nearby_cells_slice.assign(&array![[-1, -1], [-1, 0]]);
+                    nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
+                }
+                _ => { // azimuth 300- 360
+                    nearby_cells_slice.assign(&array![[-1, 0], [-1, 1]]);
+                    nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
+                }
+            }
+
+            // Add cell ID to relative ID
+            for nearby_cell_id in 0..3 {
+                nearby_cells[Ix3(cell_id, nearby_cell_id, 0)] += cell_ids[Ix2(cell_id, 0)];
+                nearby_cells[Ix3(cell_id, nearby_cell_id, 1)] += cell_ids[Ix2(cell_id, 1)];
+            }
+        }
+        nearby_cells
+    }
 }

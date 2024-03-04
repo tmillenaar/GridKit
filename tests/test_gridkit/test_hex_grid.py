@@ -108,8 +108,14 @@ def test_cells_in_bounds(shape, bounds, expected_ids, expected_shape):
         ],
     ],
 )
-def test_cells_near_point(shape, point, expected_nearby_cells):
+@pytest.mark.parametrize("expand_axes", [True, False])
+def test_cells_near_point(shape, point, expected_nearby_cells, expand_axes):
     grid = HexGrid(size=3, shape=shape)
+    if expand_axes:
+        point = numpy.repeat(numpy.array(point)[None], 3, axis=0)
+        expected_nearby_cells = numpy.repeat(
+            numpy.array(expected_nearby_cells)[None], 3, axis=0
+        )
     nearby_cells = grid.cells_near_point(point)
     numpy.testing.assert_allclose(nearby_cells, expected_nearby_cells)
 

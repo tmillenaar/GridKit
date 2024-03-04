@@ -227,6 +227,16 @@ impl PyRectGrid {
         let index = index.as_array();
         self._grid.cell_corners(&index).into_pyarray(py)
     }
+
+    fn cells_near_point<'py>(
+        &self,
+        py: Python<'py>,
+        point: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray3<i64> {
+        self._grid
+            .cells_near_point(&point.as_array())
+            .into_pyarray(py)
+    }
 }
 
 #[pyclass]
@@ -303,6 +313,16 @@ impl PyHexGrid {
     ) -> &'py PyArray3<f64> {
         let index = index.as_array();
         self._grid.cell_corners(&index).into_pyarray(py)
+    }
+
+    fn cells_near_point<'py>(
+        &self,
+        py: Python<'py>,
+        point: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray3<i64> {
+        self._grid
+            .cells_near_point(&point.as_array())
+            .into_pyarray(py)
     }
 }
 
