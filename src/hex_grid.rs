@@ -158,6 +158,18 @@ impl HexGrid {
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
 
         let cell_ids = self.cell_at_location(points);
+
+        // FIXME: Find a way to not clone points in the case of no rotation
+        //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
+        let mut points = points.to_owned();
+        if self.rotation != 0. {
+            for cell_id in 0..points.shape()[0] {
+                let mut point = points.slice_mut(s![cell_id, ..]);
+                let point_rot = self.rotation_matrix_inv.dot(&point);
+                point.assign(&point_rot);
+            }
+        }
+
         for cell_id in 0..points.shape()[0] {
             // Determine the azimuth based on the direction vector from the cell centroid to the point
             let centroid = self.centroid_xy_no_rot(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
