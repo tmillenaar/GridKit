@@ -34,10 +34,11 @@ class RectGrid(BaseGrid):
         Default: None
     """
 
-    def __init__(self, *args, dx, dy, offset=(0, 0), **kwargs):
+    def __init__(self, *args, dx, dy, offset=(0, 0), rotation=0, **kwargs):
         self.__dx = dx
         self.__dy = dy
-        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset)
+        self._rotation = rotation
+        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
         super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
 
@@ -472,6 +473,11 @@ class RectGrid(BaseGrid):
         :class:`.GridIndex`
             The indices of the cells contained in the bounds
         """
+
+        if self.rotation != 0:
+            raise NotImplementedError(
+                f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees"
+            )
 
         if not self.are_bounds_aligned(bounds):
             raise ValueError(

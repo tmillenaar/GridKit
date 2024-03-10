@@ -87,6 +87,23 @@ class BaseGrid(metaclass=abc.ABCMeta):
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
         self._offset = value
 
+    @property
+    def rotation(self) -> float:
+        """The counter-clockwise rotation of the grid around the origin in degrees."""
+        return self._rotation
+
+    @property
+    def rotation_matrix(self):
+        """The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        return self._grid.rotation_matrix()
+
+    @property
+    def rotation_matrix_inv(self):
+        """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        return self._grid.rotation_matrix_inv()
+
     @abc.abstractmethod
     def centroid(self, index) -> float:
         """Coordinates at the center of the cell(s) specified by ``index``.

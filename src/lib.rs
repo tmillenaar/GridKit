@@ -13,15 +13,16 @@ mod interpolate;
 #[pyclass]
 struct PyTriGrid {
     cellsize: f64,
+    rotation: f64,
     _grid: tri_grid::TriGrid,
 }
 
 #[pymethods]
 impl PyTriGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
-        let _grid = tri_grid::TriGrid { cellsize, offset };
-        PyTriGrid { cellsize, _grid }
+    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _grid = tri_grid::TriGrid::new( cellsize, offset, rotation);
+        PyTriGrid { cellsize, rotation, _grid }
     }
 
     fn cell_height(&self) -> f64 {
@@ -42,6 +43,20 @@ impl PyTriGrid {
 
     fn dy(&self) -> f64 {
         self._grid.dy()
+    }
+    
+    fn rotation_matrix<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix.clone().into_pyarray(py)
+    }
+
+    fn rotation_matrix_inv<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -160,15 +175,30 @@ impl PyTriGrid {
 struct PyRectGrid {
     dx: f64,
     dy: f64,
+    rotation: f64,
     _grid: rect_grid::RectGrid,
 }
 
 #[pymethods]
 impl PyRectGrid {
     #[new]
-    fn new(dx: f64, dy: f64, offset: (f64, f64)) -> Self {
-        let _grid = rect_grid::RectGrid::new(dx, dy, offset);
-        PyRectGrid { dx, dy, _grid }
+    fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _grid = rect_grid::RectGrid::new(dx, dy, offset, rotation);
+        PyRectGrid { dx, dy, rotation, _grid }
+    }
+
+    fn rotation_matrix<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix.clone().into_pyarray(py)
+    }
+
+    fn rotation_matrix_inv<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -212,15 +242,16 @@ impl PyRectGrid {
 #[pyclass]
 struct PyHexGrid {
     cellsize: f64,
+    rotation: f64,
     _grid: hex_grid::HexGrid,
 }
 
 #[pymethods]
 impl PyHexGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64)) -> Self {
-        let _grid = hex_grid::HexGrid::new(cellsize, offset);
-        PyHexGrid { cellsize, _grid }
+    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
+        PyHexGrid { cellsize, rotation, _grid}
     }
 
     // fn cell_height(&self) -> f64 {
@@ -241,6 +272,20 @@ impl PyHexGrid {
 
     fn dy(&self) -> f64 {
         self._grid.dy()
+    }
+    
+    fn rotation_matrix<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix.clone().into_pyarray(py)
+    }
+
+    fn rotation_matrix_inv<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> &'py PyArray2<f64> {
+        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
     }
 
     fn centroid<'py>(

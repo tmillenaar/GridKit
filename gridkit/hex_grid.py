@@ -39,9 +39,12 @@ class HexGrid(BaseGrid):
 
     """
 
-    def __init__(self, *args, size, shape="pointy", offset=(0, 0), **kwargs):
+    def __init__(
+        self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs
+    ):
         self._size = size
         self._radius = size / 3**0.5
+        self._rotation = rotation
 
         if shape == "pointy":
             self._dx = size
@@ -60,7 +63,7 @@ class HexGrid(BaseGrid):
         offset = (offset_x, offset_y)
 
         self._shape = shape
-        self._grid = PyHexGrid(cellsize=size, offset=offset)
+        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
 
@@ -474,6 +477,11 @@ class HexGrid(BaseGrid):
             The indices of the cells contained in the bounds
         """
         # TODO: Simplify function. Conceptually hard to follow and not very DRY
+        if self.rotation != 0:
+            raise NotImplementedError(
+                f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees"
+            )
+
         if not self.are_bounds_aligned(bounds):
             raise ValueError(
                 f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."

@@ -10,11 +10,11 @@ from gridkit.index import GridIndex, validate_index
 
 
 class TriGrid(BaseGrid):
-    def __init__(self, *args, size, offset=(0, 0), **kwargs):
+    def __init__(self, *args, size, offset=(0, 0), rotation=0, **kwargs):
         self._size = size
         self._radius = size / 3**0.5
-
-        self._grid = PyTriGrid(cellsize=size, offset=offset)
+        self._rotation = rotation
+        self._grid = PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, offset=offset, **kwargs)
@@ -55,7 +55,9 @@ class TriGrid(BaseGrid):
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
         self._offset = value
         # TODO: implement a generalize update method that takes the PyTriGrid into account
-        self._grid = PyTriGrid(cellsize=self.size, offset=value)
+        self._grid = PyTriGrid(
+            cellsize=self.size, offset=value, rotation=self._rotation
+        )
 
     @validate_index
     def centroid(self, index):
@@ -71,12 +73,16 @@ class TriGrid(BaseGrid):
         return centroids.reshape(original_shape)
 
     @validate_index
-    def cell_corners(self, index):
+    def cell_corners(self, index=None):
+        if index is None:
+            raise ValueError(
+                "For grids that do not contain data, argument `index` is to be supplied to method `corners`."
+            )
         return_shape = (
             *index.shape,
             3,
             2,
-        )  # already include the axis containing the 3 corners
+        )
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
@@ -91,6 +97,12 @@ class TriGrid(BaseGrid):
         return GridIndex(result.reshape(return_shape))
 
     def cells_in_bounds(self, bounds, return_cell_count=False):
+
+        if self.rotation != 0:
+            raise NotImplementedError(
+                f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees"
+            )
+
         if not self.are_bounds_aligned(bounds):
             raise ValueError(
                 f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."
