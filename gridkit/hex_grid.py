@@ -478,7 +478,9 @@ class HexGrid(BaseGrid):
         """
         # TODO: Simplify function. Conceptually hard to follow and not very DRY
         if self.rotation != 0:
-            raise NotImplementedError(f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees")
+            raise NotImplementedError(
+                f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees"
+            )
 
         if not self.are_bounds_aligned(bounds):
             raise ValueError(
