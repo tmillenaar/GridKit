@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.tri_grid &mdash; GridKit v0.8.0 documentation</title>
+  <title>gridkit.tri_grid &mdash; GridKit v0.9.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=cbff0a6f"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ba2a4036"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.8.0
+                v0.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -95,11 +95,11 @@
 
 
 <div class="viewcode-block" id="TriGrid"><a class="viewcode-back" href="../../api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid">[docs]</a><span class="k">class</span> <span class="nc">TriGrid</span><span class="p">(</span><span class="n">BaseGrid</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyTriGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span> <span class="o">=</span> <span class="n">rotation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyTriGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span> <span class="o">=</span> <span class="n">BoundedTriGrid</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TriGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -140,7 +140,9 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">value</span>
         <span class="c1"># TODO: implement a generalize update method that takes the PyTriGrid into account</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyTriGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyTriGrid</span><span class="p">(</span>
+            <span class="n">cellsize</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="TriGrid.centroid"><a class="viewcode-back" href="../../api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.centroid">[docs]</a>    <span class="nd">@validate_index</span>
     <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
@@ -156,12 +158,16 @@
         <span class="k">return</span> <span class="n">centroids</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">original_shape</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TriGrid.cell_corners"><a class="viewcode-back" href="../../api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_corners">[docs]</a>    <span class="nd">@validate_index</span>
-    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `corners`.&quot;</span>
+            <span class="p">)</span>
         <span class="n">return_shape</span> <span class="o">=</span> <span class="p">(</span>
             <span class="o">*</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
             <span class="mi">3</span><span class="p">,</span>
             <span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>  <span class="c1"># already include the axis containing the 3 corners</span>
+        <span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
         <span class="p">)</span>
@@ -176,6 +182,12 @@
         <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">return_shape</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TriGrid.cells_in_bounds"><a class="viewcode-back" href="../../api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cells_in_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`cells_in_bounds` is not suppored for rotated grids. Roatation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="si">}</span><span class="s2"> degrees&quot;</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;supplied bounds &#39;</span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&#39; are not aligned with the grid lines. Consider calling &#39;align_bounds&#39; first.&quot;</span>
