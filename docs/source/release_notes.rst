@@ -3,7 +3,7 @@
 Release notes
 ================
 
-Version 0.9.0 (March ??, 2024)
+Version 0.9.0 (March 10, 2024)
 ------------------------------
 Features
  - Rotation for :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid`
@@ -11,6 +11,9 @@ Features
 
 Fixes:
  - Fixed :meth:`.RectGrid.cells_near_point` returning incorrect cells for negative points
+
+Documentation
+ - Add example :ref:`rotated_grids.py <example rotated grids>`.
 
 Version 0.8.0 (March 03, 2024)
 ------------------------------
