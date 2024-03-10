@@ -474,6 +474,9 @@ class RectGrid(BaseGrid):
             The indices of the cells contained in the bounds
         """
 
+        if self.rotation != 0:
+            raise NotImplementedError(f"`cells_in_bounds` is not suppored for rotated grids. Roatation: {self.rotation} degrees")
+
         if not self.are_bounds_aligned(bounds):
             raise ValueError(
                 f"supplied bounds '{bounds}' are not aligned with the grid lines. Consider calling 'align_bounds' first."

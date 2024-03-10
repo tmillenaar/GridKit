@@ -397,7 +397,6 @@ impl TriGrid {
 
 
         if self.rotation != 0. {
-            println!("Rotating {} degrees", -self.rotation);
             let mut points = points.to_owned();
             for cell_id in 0..points.shape()[0] {
                 let mut point = points.slice_mut(s![cell_id, ..]);
