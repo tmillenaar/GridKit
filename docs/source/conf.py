@@ -64,6 +64,7 @@ sphinx_gallery_conf = {
     "filename_pattern": "^((?!sgskip).)*$",
     "remove_config_comments": True,  # remove comments like: # sphinx_gallery_thumbnail_number = -1
     "nested_sections": False,
+    "matplotlib_animations": True,
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -117,10 +118,11 @@ autodoc_default_options = {
 import gridkit.bounded_grid
 import gridkit.hex_grid
 import gridkit.rect_grid
+import gridkit.tri_grid
+
 # need to assign the names here, otherwise autodoc won't document these classes,
 # and will instead just say 'alias of ...'
 # after https://github.com/slundberg/shap/blob/6af9e1008702fb0fab939bf2154bbf93dfe84a16/docs/conf.py#L380-L394
-import gridkit.tri_grid
 
 gridkit.tri_grid.BoundedTriGrid.__name__ = "BoundedTriGrid"
 gridkit.rect_grid.BoundedRectGrid.__name__ = "BoundedRectGrid"
