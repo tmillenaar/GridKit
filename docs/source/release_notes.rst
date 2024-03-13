@@ -3,6 +3,14 @@
 Release notes
 ================
 
+Version 0.9.1 (March ??, 2024)
+------------------------------
+Fixes
+ - Fixed changing ``offset`` by creating a setter. I.e. ``grid.offset = (0,-0,5)``.
+
+Documentation
+ - Add example :ref:`rotation_animation.py <example rotated animation>`.
+
 Version 0.9.0 (March 10, 2024)
 ------------------------------
 Features
