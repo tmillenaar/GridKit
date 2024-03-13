@@ -617,3 +617,10 @@ def test_resample(
 
     numpy.testing.assert_allclose(resampled.data, expected_result)
     numpy.testing.assert_allclose(resampled.bounds, expected_bounds)
+
+
+@pytest.mark.parametrize("rot", (0, 15.5, 30, -26.2))
+def test_centering_with_offset(rot):
+    grid = TriGrid(size=3, rotation=rot)
+    grid.offset = (grid.dx / 2, grid.dy - grid.r)
+    numpy.testing.assert_allclose(grid.centroid([0, 0]), [0, 0])
