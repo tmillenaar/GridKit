@@ -66,7 +66,7 @@ plt.show()
 # Let's shift the whole grid vertically to center it around coordinate (0,0)
 # Also, let's zoom in a bit to the center
 
-main_grid._offset = (0, main_grid.dy / 2)
+main_grid.offset = (0, main_grid.dy / 2)
 main_shapes = get_shapes_in_bounds(main_grid, bounds)
 
 # plot the cell outlines
