@@ -373,3 +373,14 @@ def test_is_aligned_with():
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
     assert "Grid type is not the same" in reason
+
+
+@pytest.mark.parametrize("rot", (0, 15.5, 30, -26.2))
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_centering_with_offset(shape, rot):
+    grid = HexGrid(size=3, shape=shape, rotation=rot)
+    if shape == "pointy":
+        grid.offset = (0, grid.dy / 2)
+    else:
+        grid.offset = (grid.dx / 2, 0)
+    numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])

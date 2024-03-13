@@ -5,7 +5,7 @@ import pytest
 import shapely
 from geopandas import GeoSeries
 
-from gridkit import rect_grid
+from gridkit import HexGrid, RectGrid, TriGrid
 
 
 @pytest.mark.parametrize(
@@ -31,7 +31,7 @@ from gridkit import rect_grid
     ],
 )
 def test_cell_at_point(dx, dy, offset, point, expected_id):
-    testgrid = rect_grid.RectGrid(dx=dx, dy=dy, offset=offset)
+    testgrid = RectGrid(dx=dx, dy=dy, offset=offset)
     result_id = testgrid.cell_at_point(point)
     numpy.testing.assert_allclose(result_id, expected_id)
 
@@ -51,7 +51,7 @@ def test_cell_at_point(dx, dy, offset, point, expected_id):
     ],
 )
 def test_centroid(dx, dy, offset, id, expected_center):
-    testgrid = rect_grid.RectGrid(dx=dx, dy=dy, offset=offset)
+    testgrid = RectGrid(dx=dx, dy=dy, offset=offset)
     center = testgrid.centroid(id)
 
     numpy.testing.assert_allclose(center, expected_center)
@@ -105,7 +105,7 @@ def test_centroid(dx, dy, offset, id, expected_center):
     ],
 )
 def test_cell_corners(dx, dy, offset, id, expected_corners):
-    testgrid = rect_grid.RectGrid(dx=dx, dy=dy, offset=offset)
+    testgrid = RectGrid(dx=dx, dy=dy, offset=offset)
     corners = testgrid.cell_corners(id)
 
     numpy.testing.assert_allclose(corners, expected_corners)

@@ -389,3 +389,10 @@ def test_is_aligned_with():
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
     assert "Grid type is not the same" in reason
+
+
+@pytest.mark.parametrize("rot", (0, 15.5, 30, -26.2))
+def test_centering_with_offset(rot):
+    grid = RectGrid(dx=3, dy=3, rotation=rot)
+    grid.offset = (-grid.dx / 2, -grid.dy / 2)
+    numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])

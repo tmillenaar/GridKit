@@ -96,6 +96,26 @@ class HexGrid(BaseGrid):
         """
         return self._size
 
+    @property
+    def offset(self) -> float:
+        """The offset off the grid in dx and dy.
+        The offset is never larger than the (dx, dy) of a single grid cell.
+        The offset represents the shift from the origin (0,0)."""
+        return self._offset
+
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) or not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        if self.shape == "flat":
+            value = value[::-1]  # swap xy to yx
+        self._offset = value
+        # TODO: implement a generalize update method that takes the PyTriGrid into account
+        self._grid = PyHexGrid(
+            cellsize=self.size, offset=value, rotation=self._rotation
+        )
+
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
         data = numpy.full(shape=shape, fill_value=fill_value)
