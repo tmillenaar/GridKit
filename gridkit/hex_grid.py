@@ -89,6 +89,19 @@ class HexGrid(BaseGrid):
         """
         return self._shape
 
+    @shape.setter
+    def shape(self, value):
+        """The counter-clockwise rotation of the grid around the origin in degrees."""
+        if not value in ("pointy", "flat"):
+            raise ValueError(
+                f"Shape cannot be set to '{value}', must be either 'pointy' or 'flat'"
+            )
+        rot = self.rotation
+        self._shape = value
+        self.rotation = (
+            rot  # Re-run rotation settter to update rotaiton according to new shape
+        )
+
     @property
     def size(self) -> float:
         """The size of the cell as supplied when initiating the class.

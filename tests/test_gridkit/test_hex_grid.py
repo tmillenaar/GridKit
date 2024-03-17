@@ -405,6 +405,27 @@ def test_rotation_setter(rot, expected_rot_mat, shape):
     numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
 
 
+def test_shape_setter():
+    grid = HexGrid(size=1.23, shape="pointy", rotation=10)
+    expected_rot_mat = numpy.array(
+        [[0.98480775, -0.17364818], [0.17364818, 0.98480775]]
+    )
+    assert grid.shape == "pointy"
+    numpy.testing.assert_allclose(grid.rotation, 10)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
+    grid.shape = "flat"
+    assert grid.shape == "flat"
+    numpy.testing.assert_allclose(grid.rotation, 10)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat.T)
+    grid.shape = "pointy"
+    assert grid.shape == "pointy"
+    numpy.testing.assert_allclose(grid.rotation, 10)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
+
+    with pytest.raises(ValueError):
+        grid.shape = "foo"
+
+
 def test_update():
     grid = HexGrid(size=1, shape="pointy")
 
