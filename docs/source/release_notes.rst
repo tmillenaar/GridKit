@@ -3,10 +3,18 @@
 Release notes
 ================
 
-Version 0.9.1 (March ??, 2024)
+Version 0.9.1 (March 17, 2024)
 ------------------------------
+Features
+ - Change ``rotation`` using a setter. I.e. ``grid.rotation = 20``
+ - Add :meth:`.BaseGrid.cell_height` and :meth:`.BaseGrid.cell_width`
+ - Add :meth:`.BaseGrid.update` method for easily making small changes to grid specs
+
 Fixes
- - Fixed changing ``offset`` by creating a setter. I.e. ``grid.offset = (0,-0,5)``.
+ - Created a setter for ``offset`` to resolve changes to ``offset`` or ``_offset`` not taking effect. I.e. ``grid.offset = (0,-0,5)``
+ - ``offset`` is now properly taken into account for :meth:`.HexGrid.cell_at_point`
+ - Less restrictive offsets by limiting offset for all grids with :meth:`.BaseGrid.cell_height` and :meth:`.BaseGrid.cell_width` instead of dx and dy.
+ - Rotation of "flat" :class:`.HexGrids` is no longer in the opposite direction (was clockwise)
 
 Documentation
  - Add example :ref:`rotation_animation.py <example rotated animation>`.
