@@ -106,9 +106,7 @@ plt.show()
 
 tri_centroids = tri_grid.centroid(tri_ids)
 hex_ids = hex_grid.cell_at_point(tri_centroids).ravel()
-value_map = {tuple(cell): i for (i, cell) in enumerate(hex_ids.unique().index)}
-color_values = [value_map[tuple(cell)] for cell in hex_ids.index]
-plot_polygons(tri_geoms, filled=True, cmap="viridis", colors=color_values, linewidth=2)
+plot_polygons(tri_geoms, filled=True, cmap="viridis", colors=hex_ids.index_1d, linewidth=2)
 plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=0.3, linestyle=":")
 plt.show()
 
