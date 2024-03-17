@@ -396,3 +396,19 @@ def test_centering_with_offset(rot):
     grid = RectGrid(dx=3, dy=3, rotation=rot)
     grid.offset = (-grid.dx / 2, -grid.dy / 2)
     numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])
+
+
+@pytest.mark.parametrize(
+    "rot,expected_rot_mat",
+    (
+        (0, [[1, 0], [0, 1]]),
+        (15.5, [[0.96363045, -0.26723838], [0.26723838, 0.96363045]]),
+        (30, [[0.8660254, -0.5], [0.5, 0.8660254]]),
+        (-26.2, [[0.89725837, 0.44150585], [-0.44150585, 0.89725837]]),
+    ),
+)
+def test_rotation_setter(rot, expected_rot_mat):
+    grid = RectGrid(dx=1.23, dy=0.987)
+    grid.rotation = rot
+    numpy.testing.assert_allclose(rot, grid.rotation)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
