@@ -47,14 +47,19 @@ hex_grid = HexGrid(size=3 / 3**0.5, shape="flat")
 
 bounds = (-7.5, -5, 6, 5)
 
-tri_bounds = tri_grid.align_bounds(bounds)
+ax = plt.subplot()
+tri_bounds = tri_grid.align_bounds(bounds, mode="nearest")
 tri_ids = tri_grid.cells_in_bounds(tri_bounds)
 tri_geoms = tri_grid.to_shapely(tri_ids)
-plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
-hex_bounds = hex_grid.align_bounds(bounds)
+plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2, ax=ax)
+hex_bounds = hex_grid.align_bounds(bounds, mode="nearest")
 hex_ids = hex_grid.cells_in_bounds(hex_bounds)
 hex_geoms = hex_grid.to_shapely(hex_ids)
-plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
+plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":", ax=ax)
+# Create lattice with spacing of dx and dy to highlight cell bounds
+ax.set_xticks([i * hex_grid.dx for i in range(-5, 5)])
+ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
+ax.grid()
 plt.scatter(0, 0, s=10, zorder=10)
 plt.show()
 
@@ -77,10 +82,15 @@ plt.show()
 tri_grid.offset = (1.5 * tri_grid.dx, 0)
 hex_grid.offset = (hex_grid.dx / 2, 0)
 
+ax = plt.subplot()
 tri_geoms = tri_grid.to_shapely(tri_ids)
 plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
 hex_geoms = hex_grid.to_shapely(hex_ids)
 plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
+# Create lattice with spacing of dx and dy to highlight cell bounds
+ax.set_xticks([i * hex_grid.dx + hex_grid.dx / 2 for i in range(-5, 5)])
+ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
+ax.grid()
 plt.scatter(0, 0, s=10, zorder=10)
 plt.show()
 
@@ -96,7 +106,7 @@ plt.show()
 # the first triangle will be in the top left of the hexagon.
 # If you obtained the cell id's in a different manner,
 # you can sort them to make sure this is the case.
-# You can use numpy for this, like `numpy.sort(tri_ids.ravel())` for example.
+# You can use numpy for this, like ``numpy.sort(tri_ids.ravel())`` for example.
 #
 # First let's find all the hex_ids.
 # We can then assign each hex id a different value.
@@ -148,6 +158,7 @@ plt.show()
 # Maybe I will implement that as a default method some day.
 # It's fun but also arguably a good way to go about resampling
 # in many cases.
+#
 # This is called remapping in the following publication:
 #
 # Accadia, C., S. Mariani, M. Casaioli, A. Lavagnini, and A. Speranza, 2003:
