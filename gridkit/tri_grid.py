@@ -41,6 +41,16 @@ class TriGrid(BaseGrid):
         """
         return self._size
 
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._grid = self._update_inner_grid(size=value)
+
     @validate_index
     def centroid(self, index):
         if index is None:

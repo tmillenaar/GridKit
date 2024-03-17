@@ -660,3 +660,15 @@ def test_update():
     new_grid = grid.update(rotation=2.5)
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
+
+
+def test_size_setter():
+    grid = TriGrid(size=1.23, rotation=10)
+    numpy.testing.assert_allclose(grid.size, 1.23)
+    grid.size = 3.21
+    numpy.testing.assert_allclose(grid.size, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.size = 0
+    with pytest.raises(ValueError):
+        grid.size = -1

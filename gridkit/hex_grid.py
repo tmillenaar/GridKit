@@ -91,7 +91,7 @@ class HexGrid(BaseGrid):
 
     @shape.setter
     def shape(self, value):
-        """The counter-clockwise rotation of the grid around the origin in degrees."""
+        """Set the shape of the grid to a new value. Possible values: 'pointy' or 'flat'"""
         if not value in ("pointy", "flat"):
             raise ValueError(
                 f"Shape cannot be set to '{value}', must be either 'pointy' or 'flat'"
@@ -108,6 +108,16 @@ class HexGrid(BaseGrid):
         This is the same as dx for a flat grid and the same as dy for a pointy grid.
         """
         return self._size
+
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._grid = self._update_inner_grid(size=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)

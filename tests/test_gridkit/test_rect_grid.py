@@ -438,3 +438,24 @@ def test_update():
     new_grid = grid.update(rotation=2.5)
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
+
+
+def test_dx_dy_setter():
+    grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
+    numpy.testing.assert_allclose(grid.dx, 1.23)
+    numpy.testing.assert_allclose(grid.dy, 4.56)
+    grid.dx = 3.21
+    grid.dy = 6.54
+    numpy.testing.assert_allclose(grid.dx, 3.21)
+    numpy.testing.assert_allclose(grid.dy, 6.54)
+    numpy.testing.assert_allclose(grid._grid.cell_width(), 3.21)
+    numpy.testing.assert_allclose(grid._grid.cell_height(), 6.54)
+
+    with pytest.raises(ValueError):
+        grid.dx = 0
+    with pytest.raises(ValueError):
+        grid.dx = -1
+    with pytest.raises(ValueError):
+        grid.dy = 0
+    with pytest.raises(ValueError):
+        grid.dy = -1
