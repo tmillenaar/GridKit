@@ -640,3 +640,23 @@ def test_rotation_setter(rot, expected_rot_mat):
     grid.rotation = rot
     numpy.testing.assert_allclose(rot, grid.rotation)
     numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
+
+
+def test_update():
+    grid = TriGrid(size=1)
+
+    new_grid = grid.update(crs=4326)
+    assert grid.crs is None
+    assert new_grid.crs.to_epsg() == 4326
+
+    new_grid = grid.update(size=0.3)
+    numpy.testing.assert_allclose(grid.size, 1)
+    numpy.testing.assert_allclose(new_grid.size, 0.3)
+
+    new_grid = grid.update(offset=(0.2, 0.3))
+    numpy.testing.assert_allclose(grid.offset, (0, 0))
+    numpy.testing.assert_allclose(new_grid.offset, (0.2, 0.3))
+
+    new_grid = grid.update(rotation=2.5)
+    numpy.testing.assert_allclose(grid.rotation, 0)
+    numpy.testing.assert_allclose(new_grid.rotation, 2.5)
