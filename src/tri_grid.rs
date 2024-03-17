@@ -16,7 +16,7 @@ impl TriGrid {
         let rotation_matrix_inv = _rotation_matrix(-rotation);
         // TODO: Find a way to normalize_offset without having to instantiate tmp object
         let self_tmp = TriGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv };
-        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
+        let offset = normalize_offset(offset, self_tmp.cell_width(), self_tmp.cell_height());
         let rotation_matrix = _rotation_matrix(rotation);
         let rotation_matrix_inv = _rotation_matrix(-rotation);
         TriGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv }
@@ -26,12 +26,12 @@ impl TriGrid {
         self.cellsize * (3_f64).sqrt()
     }
 
-    pub fn radius(&self) -> f64 {
-        2. / 3. * self.cell_height()
-    }
-
     pub fn cell_width(&self) -> f64 {
         self.cellsize * 2.
+    }
+
+    pub fn radius(&self) -> f64 {
+        2. / 3. * self.cell_height()
     }
 
     pub fn dx(&self) -> f64 {

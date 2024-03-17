@@ -25,6 +25,10 @@ impl PyTriGrid {
         PyTriGrid { cellsize, rotation, _grid }
     }
 
+    fn offset(&self) -> (f64, f64) {
+        self._grid.offset
+    }
+
     fn cell_height(&self) -> f64 {
         self._grid.cell_height()
     }
@@ -187,6 +191,18 @@ impl PyRectGrid {
         PyRectGrid { dx, dy, rotation, _grid }
     }
 
+    fn cell_height(&self) -> f64 {
+        self._grid.cell_height()
+    }
+
+    fn cell_width(&self) -> f64 {
+        self._grid.cell_width()
+    }
+
+    fn offset(&self) -> (f64, f64) {
+        self._grid.offset
+    }
+
     fn rotation_matrix<'py>(
         &self,
         py: Python<'py>,
@@ -254,13 +270,17 @@ impl PyHexGrid {
         PyHexGrid { cellsize, rotation, _grid}
     }
 
-    // fn cell_height(&self) -> f64 {
-    //     self._grid.cell_height()
-    // }
+    fn cell_height(&self) -> f64 {
+        self._grid.cell_height()
+    }
 
-    // fn cell_width(&self) -> f64 {
-    //     self._grid.cell_width()
-    // }
+    fn cell_width(&self) -> f64 {
+        self._grid.cell_width()
+    }
+
+    fn offset(&self) -> (f64, f64) {
+        self._grid.offset
+    }
 
     fn radius(&self) -> f64 {
         self._grid.radius()

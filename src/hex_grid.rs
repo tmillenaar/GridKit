@@ -33,6 +33,14 @@ impl HexGrid {
         3. / 2. * self.radius()
     }
 
+    pub fn cell_height(&self) -> f64 {
+        self.radius() * 2.
+    }
+
+    pub fn cell_width(&self) -> f64 {
+        self.dx()
+    }
+
     pub fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
         let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
 
@@ -71,13 +79,13 @@ impl HexGrid {
             let y = point[Ix1(1)];
 
             // determine initial id_y
-            let mut id_y = ((y - self.radius() / 4.) / self.dy()).floor();
+            let mut id_y = ((y - self.offset.1 - self.radius() / 4.) / self.dy()).floor();
             let is_offset = modulus(id_y, 2.) != 0.;
             let mut id_x: f64;
 
             // determine initial id_x
             if is_offset == true {
-                id_x = (x - self.dx() / 2.) / self.dx();
+                id_x = (x - self.offset.0 - self.dx() / 2.) / self.dx();
             } else {
                 id_x = x / self.dx();
             }
@@ -85,8 +93,8 @@ impl HexGrid {
 
             // refine id_x and id_y
             // Example: points at the top of the cell can be in this cell or in the cell to the top right or top left
-            let rel_loc_y = modulus(y - self.radius() / 4., self.dy()) + self.radius() / 4.;
-            let rel_loc_x = modulus(x, self.dx());
+            let rel_loc_y = modulus(y - self.offset.1 - self.radius() / 4., self.dy()) + self.radius() / 4.;
+            let rel_loc_x = modulus(x - self.offset.0, self.dx());
 
             let mut in_top_left: bool;
             let mut in_top_right: bool;
