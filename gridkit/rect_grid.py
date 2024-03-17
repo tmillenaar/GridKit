@@ -35,8 +35,8 @@ class RectGrid(BaseGrid):
     """
 
     def __init__(self, *args, dx, dy, offset=(0, 0), rotation=0, **kwargs):
-        self.__dx = dx
-        self.__dy = dy
+        self._dx = dx
+        self._dy = dy
         self._rotation = rotation
         self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
@@ -45,12 +45,32 @@ class RectGrid(BaseGrid):
     @property
     def dx(self) -> float:
         """The cellsize in x-direction"""
-        return self.__dx
+        return self._dx
+
+    @dx.setter
+    def dx(self, value):
+        """Set the cellsize in x-direction"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._dx = value
+        self._grid = self._update_inner_grid(dx=value)
 
     @property
     def dy(self) -> float:
         """The cellsize in y-direction"""
-        return self.__dy
+        return self._dy
+
+    @dy.setter
+    def dy(self, value):
+        """Set the cellsize in y-direction"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._dy = value
+        self._grid = self._update_inner_grid(dy=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
