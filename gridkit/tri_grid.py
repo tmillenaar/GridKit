@@ -17,7 +17,7 @@ class TriGrid(BaseGrid):
         self._grid = PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
 
         self.bounded_cls = BoundedTriGrid
-        super(TriGrid, self).__init__(*args, offset=offset, **kwargs)
+        super(TriGrid, self).__init__(*args, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -40,24 +40,6 @@ class TriGrid(BaseGrid):
         The size is equivalent to dx, which is half a cell edge length.
         """
         return self._size
-
-    @property
-    def offset(self) -> float:
-        """The offset off the grid in dx and dy.
-        The offset is never larger than the (dx, dy) of a single grid cell.
-        The offset represents the shift from the origin (0,0)."""
-        return self._offset
-
-    @offset.setter
-    def offset(self, value):
-        """Sets the x and y value of the offset"""
-        if not isinstance(value, tuple) or not len(value) == 2:
-            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        self._offset = value
-        # TODO: implement a generalize update method that takes the PyTriGrid into account
-        self._grid = PyTriGrid(
-            cellsize=self.size, offset=value, rotation=self._rotation
-        )
 
     @validate_index
     def centroid(self, index):
@@ -270,6 +252,26 @@ class TriGrid(BaseGrid):
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+
+    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+        if size is None:
+            size = self.size
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        return PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
+
+    def update(self, size=None, offset=None, rotation=None, crs=None, **kwargs):
+        if size is None:
+            size = self.size
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        if crs is None:
+            crs = self.crs
+        return TriGrid(size=size, offset=offset, rotation=rotation, crs=crs, **kwargs)
 
 
 class BoundedTriGrid(BoundedGrid, TriGrid):

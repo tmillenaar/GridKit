@@ -373,3 +373,57 @@ def test_is_aligned_with():
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
     assert "Grid type is not the same" in reason
+
+
+@pytest.mark.parametrize("rot", (0, 15.5, 30, -26.2))
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_centering_with_offset(shape, rot):
+    grid = HexGrid(size=3, shape=shape, rotation=rot)
+    if shape == "pointy":
+        grid.offset = (0, grid.dy / 2)
+    else:
+        grid.offset = (grid.dx / 2, 0)
+    numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])
+
+
+@pytest.mark.parametrize(
+    "rot,expected_rot_mat",
+    (
+        (0, [[1, 0], [0, 1]]),
+        (15.5, [[0.96363045, -0.26723838], [0.26723838, 0.96363045]]),
+        (30, [[0.8660254, -0.5], [0.5, 0.8660254]]),
+        (-26.2, [[0.89725837, 0.44150585], [-0.44150585, 0.89725837]]),
+    ),
+)
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_rotation_setter(rot, expected_rot_mat, shape):
+    grid = HexGrid(size=1.23, shape=shape)
+    grid.rotation = rot
+    numpy.testing.assert_allclose(rot, grid.rotation)
+    if shape == "flat" and rot != 0:
+        expected_rot_mat = numpy.array(expected_rot_mat).T
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
+
+
+def test_update():
+    grid = HexGrid(size=1, shape="pointy")
+
+    new_grid = grid.update(shape="flat")
+    assert grid.shape == "pointy"
+    assert new_grid.shape == "flat"
+
+    new_grid = grid.update(crs=4326)
+    assert grid.crs is None
+    assert new_grid.crs.to_epsg() == 4326
+
+    new_grid = grid.update(size=0.3)
+    numpy.testing.assert_allclose(grid.size, 1)
+    numpy.testing.assert_allclose(new_grid.size, 0.3)
+
+    new_grid = grid.update(offset=(0.2, 0.3))
+    numpy.testing.assert_allclose(grid.offset, (0, 0))
+    numpy.testing.assert_allclose(new_grid.offset, (0.2, 0.3))
+
+    new_grid = grid.update(rotation=2.5)
+    numpy.testing.assert_allclose(grid.rotation, 0)
+    numpy.testing.assert_allclose(new_grid.rotation, 2.5)

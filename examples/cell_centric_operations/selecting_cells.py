@@ -36,7 +36,7 @@ from gridkit.doc_utils import plot_polygons
 
 # create a grids
 fine_grid = HexGrid(size=1, shape="pointy")
-fine_grid._offset = (0, fine_grid.dy / 2)
+fine_grid.offset = (0, fine_grid.dy / 2)
 coarse_grid = HexGrid(
     size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
 )

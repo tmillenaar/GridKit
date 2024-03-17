@@ -32,13 +32,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         Default: None
     """
 
-    def __init__(self, offset=(0, 0), crs=None):
-        # limit offset to be positive and max 1 cell-size
-        offset_x, offset_y = offset[0], offset[1]
-        offset_x = offset_x % self.dx
-        offset_y = offset_y % self.dy
-        self._offset = (offset_x, offset_y)
-
+    def __init__(self, crs=None):
         # set the CRS using crs.setter
         self._crs = None
         self.crs = crs
@@ -74,23 +68,48 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @property
+    def cell_height(self) -> float:
+        """The height of a cell"""
+        return self._grid.cell_height()
+
+    @property
+    def cell_width(self) -> float:
+        """The width of a cell"""
+        return self._grid.cell_width()
+
+    @property
     def offset(self) -> float:
         """The offset off the grid in dx and dy.
         The offset is never larger than the size of a single grid cell.
         The offset represents the shift from the origin (0,0)."""
-        return self._offset
+        return self._grid.offset()
 
     @offset.setter
     def offset(self, value):
         """Sets the x and y value of the offset"""
         if not isinstance(value, tuple) or not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        self._offset = value
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            value = value[::-1]  # swap xy to yx
+        new_offset = (value[0] % self.cell_width, value[1] % self.cell_height)
+        self._offset = new_offset
+        self._grid = self._update_inner_grid(offset=new_offset)
 
     @property
     def rotation(self) -> float:
         """The counter-clockwise rotation of the grid around the origin in degrees."""
-        return self._rotation
+        rotation = self._rotation
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            rotation = -rotation
+        return rotation
+
+    @rotation.setter
+    def rotation(self, value):
+        """The counter-clockwise rotation of the grid around the origin in degrees."""
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            value = -value
+        self._rotation = value
+        self._grid = self._update_inner_grid(rotation=value)
 
     @property
     def rotation_matrix(self):
@@ -594,3 +613,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if hasattr(self, "_shape"):
             grid_kwargs["shape"] = self._shape
         return self.bounded_cls(**grid_kwargs)
+
+    @abc.abstractmethod
+    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+        pass
+
+    @abc.abstractmethod
+    def update(self, size=None, shape=None, offset=None, rotation=None, **kwargs):
+        pass

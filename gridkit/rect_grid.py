@@ -40,7 +40,7 @@ class RectGrid(BaseGrid):
         self._rotation = rotation
         self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
-        super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
+        super(RectGrid, self).__init__(*args, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -514,6 +514,32 @@ class RectGrid(BaseGrid):
     @property
     def parent_grid_class(self):
         return RectGrid
+
+    def _update_inner_grid(self, dx=None, dy=None, offset=None, rotation=None):
+        if dx is None:
+            dx = self.dx
+        if dy is None:
+            dy = self.dy
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        return PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
+
+    def update(self, dx=None, dy=None, offset=None, rotation=None, crs=None, **kwargs):
+        if dx is None:
+            dx = self.dx
+        if dy is None:
+            dy = self.dy
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        if crs is None:
+            crs = self.crs
+        return RectGrid(
+            dx=dx, dy=dy, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedRectGrid(BoundedGrid, RectGrid):

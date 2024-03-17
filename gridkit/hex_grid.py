@@ -44,7 +44,7 @@ class HexGrid(BaseGrid):
     ):
         self._size = size
         self._radius = size / 3**0.5
-        self._rotation = rotation
+        self._rotation = rotation if shape == "pointy" else -rotation
 
         if shape == "pointy":
             self._dx = size
@@ -63,9 +63,9 @@ class HexGrid(BaseGrid):
         offset = (offset_x, offset_y)
 
         self._shape = shape
-        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
+        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
-        super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
+        super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -538,6 +538,32 @@ class HexGrid(BaseGrid):
     @property
     def parent_grid_class(self):
         return HexGrid
+
+    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+        if size is None:
+            size = self.size
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
+
+    def update(
+        self, size=None, shape=None, offset=None, rotation=None, crs=None, **kwargs
+    ):
+        if size is None:
+            size = self.size
+        if shape is None:
+            shape = self.shape
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        if crs is None:
+            crs = self.crs
+        return HexGrid(
+            size=size, shape=shape, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedHexGrid(BoundedGrid, HexGrid):
