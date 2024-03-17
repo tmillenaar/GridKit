@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triangles in hexagons &mdash; GridKit v0.9.0 documentation</title>
+  <title>Triangles in hexagons &mdash; GridKit v0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,14 +19,14 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ba2a4036"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=1e52c42f"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Hexagon grids" href="hex_grids.html" />
-    <link rel="prev" title="Rotating grids" href="rotated_grids.html" /> 
+    <link rel="next" title="NDVI" href="../raster_operations/ndvi.html" />
+    <link rel="prev" title="Hexagon grids" href="hex_grids.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.0
+                v0.9.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -57,12 +57,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="rotation_animation.html">Rotation animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rotated_grids.html">Rotating grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hex_grids.html">Hexagon grids</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Triangles in hexagons</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="hex_grids.html">Hexagon grids</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
@@ -144,14 +145,19 @@ From there we can figure out how to shift the grids in order to align them.</p>
 
 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">7.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
 
-<span class="n">tri_bounds</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">()</span>
+<span class="n">tri_bounds</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
 <span class="n">tri_ids</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">tri_bounds</span><span class="p">)</span>
 <span class="n">tri_geoms</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-<span class="n">hex_bounds</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">hex_bounds</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
 <span class="n">hex_ids</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">hex_bounds</span><span class="p">)</span>
 <span class="n">hex_geoms</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">hex_ids</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">hex_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">hex_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Create lattice with spacing of dx and dy to highlight cell bounds</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dy</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -172,10 +178,15 @@ Let’s do the latter</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tri_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="n">hex_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">()</span>
 <span class="n">tri_geoms</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
 <span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">hex_geoms</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">hex_ids</span><span class="p">)</span>
 <span class="n">plot_polygons</span><span class="p">(</span><span class="n">hex_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="c1"># Create lattice with spacing of dx and dy to highlight cell bounds</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dy</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -190,7 +201,7 @@ Because of the way we ordered the cell-ids, we know that
 the first triangle will be in the top left of the hexagon.
 If you obtained the cell id’s in a different manner,
 you can sort them to make sure this is the case.
-You can use numpy for this, like <cite>numpy.sort(tri_ids.ravel())</cite> for example.</p>
+You can use numpy for this, like <code class="docutils literal notranslate"><span class="pre">numpy.sort(tri_ids.ravel())</span></code> for example.</p>
 <p>First let’s find all the hex_ids.
 We can then assign each hex id a different value.
 Then we plot the triangles using these values and expect the hexagon
@@ -233,13 +244,13 @@ cells, after which the mean or majority can be used to determine
 the value of the larger cell.
 Maybe I will implement that as a default method some day.
 It’s fun but also arguably a good way to go about resampling
-in many cases.
-This is called remapping in the following publication:</p>
+in many cases.</p>
+<p>This is called remapping in the following publication:</p>
 <p>Accadia, C., S. Mariani, M. Casaioli, A. Lavagnini, and A. Speranza, 2003:
 Sensitivity of Precipitation Forecast Skill Scores to Bilinear Interpolation and
 a Simple Nearest-Neighbor Average Method on High-Resolution Verification Grids.
 Wea. Forecasting, 18, 918–932, <a class="reference external" href="https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2">https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2</a> .</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.395 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.337 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-triangles-in-hexes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3ef8508f3fe8d2ff60db217ac866cd81/triangles_in_hexes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">triangles_in_hexes.ipynb</span></code></a></p>
@@ -256,8 +267,8 @@ Wea. Forecasting, 18, 918–932, <a class="reference external" href="https://doi
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="rotated_grids.html" class="btn btn-neutral float-left" title="Rotating grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="hex_grids.html" class="btn btn-neutral float-right" title="Hexagon grids" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="hex_grids.html" class="btn btn-neutral float-left" title="Hexagon grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../raster_operations/ndvi.html" class="btn btn-neutral float-right" title="NDVI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

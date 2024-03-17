@@ -52,7 +52,7 @@ Feel free to raise a github issue if your are interested in this.
 Let's first plot some cells of these two grids and compare them. 
 From there we can figure out how to shift the grids in order to align them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-60
+.. GENERATED FROM PYTHON SOURCE LINES 37-65
 
 .. code-block:: Python
 
@@ -68,14 +68,19 @@ From there we can figure out how to shift the grids in order to align them.
 
     bounds = (-7.5, -5, 6, 5)
 
-    tri_bounds = tri_grid.align_bounds(bounds)
+    ax = plt.subplot()
+    tri_bounds = tri_grid.align_bounds(bounds, mode="nearest")
     tri_ids = tri_grid.cells_in_bounds(tri_bounds)
     tri_geoms = tri_grid.to_shapely(tri_ids)
-    plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
-    hex_bounds = hex_grid.align_bounds(bounds)
+    plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2, ax=ax)
+    hex_bounds = hex_grid.align_bounds(bounds, mode="nearest")
     hex_ids = hex_grid.cells_in_bounds(hex_bounds)
     hex_geoms = hex_grid.to_shapely(hex_ids)
-    plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
+    plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":", ax=ax)
+    # Create lattice with spacing of dx and dy to highlight cell bounds
+    ax.set_xticks([i * hex_grid.dx for i in range(-5, 5)])
+    ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
+    ax.grid()
     plt.scatter(0, 0, s=10, zorder=10)
     plt.show()
 
@@ -91,7 +96,7 @@ From there we can figure out how to shift the grids in order to align them.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-75
+.. GENERATED FROM PYTHON SOURCE LINES 67-80
 
 Hooray! The grids are already aligned.
 It looks like the default origin already works well for this case,
@@ -107,7 +112,7 @@ so we'd need to either shift them half a side length to the left or
 This works out to half a dx to the left or one and a half dx to the right.
 Let's do the latter
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-87
+.. GENERATED FROM PYTHON SOURCE LINES 81-97
 
 .. code-block:: Python
 
@@ -115,10 +120,15 @@ Let's do the latter
     tri_grid.offset = (1.5 * tri_grid.dx, 0)
     hex_grid.offset = (hex_grid.dx / 2, 0)
 
+    ax = plt.subplot()
     tri_geoms = tri_grid.to_shapely(tri_ids)
     plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
     hex_geoms = hex_grid.to_shapely(hex_ids)
     plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
+    # Create lattice with spacing of dx and dy to highlight cell bounds
+    ax.set_xticks([i * hex_grid.dx + hex_grid.dx / 2 for i in range(-5, 5)])
+    ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
+    ax.grid()
     plt.scatter(0, 0, s=10, zorder=10)
     plt.show()
 
@@ -134,7 +144,7 @@ Let's do the latter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-105
+.. GENERATED FROM PYTHON SOURCE LINES 98-115
 
 Et voila. Our grids are centered around the origin.
 Now we can play with the interaction between these grids.
@@ -146,7 +156,7 @@ Because of the way we ordered the cell-ids, we know that
 the first triangle will be in the top left of the hexagon.
 If you obtained the cell id's in a different manner,
 you can sort them to make sure this is the case.
-You can use numpy for this, like `numpy.sort(tri_ids.ravel())` for example.
+You can use numpy for this, like ``numpy.sort(tri_ids.ravel())`` for example.
 
 First let's find all the hex_ids.
 We can then assign each hex id a different value.
@@ -154,7 +164,7 @@ Then we plot the triangles using these values and expect the hexagon
 grid to be reflected in the colors
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-115
+.. GENERATED FROM PYTHON SOURCE LINES 116-125
 
 .. code-block:: Python
 
@@ -179,7 +189,7 @@ grid to be reflected in the colors
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-125
+.. GENERATED FROM PYTHON SOURCE LINES 126-135
 
 As mentioned above, we can use the order of the data to color the
 cells based on whether they are the first, second, third etc. occurrence
@@ -191,7 +201,7 @@ Then we create a colors list that will have a number for each triangle
 based on whether it was the first, second, etc. triangle in that hexagon.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-138
+.. GENERATED FROM PYTHON SOURCE LINES 136-148
 
 .. code-block:: Python
 
@@ -219,7 +229,7 @@ based on whether it was the first, second, etc. triangle in that hexagon.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-157
+.. GENERATED FROM PYTHON SOURCE LINES 149-168
 
 Ain't that pretty?
 
@@ -232,6 +242,7 @@ the value of the larger cell.
 Maybe I will implement that as a default method some day.
 It's fun but also arguably a good way to go about resampling
 in many cases.
+
 This is called remapping in the following publication:
 
 Accadia, C., S. Mariani, M. Casaioli, A. Lavagnini, and A. Speranza, 2003:
@@ -243,7 +254,7 @@ Wea. Forecasting, 18, 918–932, `https://doi.org/10.1175/1520-0434(2003)018\<09
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.395 seconds)
+   **Total running time of the script:** (0 minutes 1.337 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_triangles_in_hexes.py:

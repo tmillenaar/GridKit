@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API reference &mdash; GridKit v0.9.0 documentation</title>
+  <title>API reference &mdash; GridKit v0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=ba2a4036"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=1e52c42f"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.0
+                v0.9.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -105,6 +105,8 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.crs"><code class="docutils literal notranslate"><span class="pre">BaseGrid.crs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dx"><code class="docutils literal notranslate"><span class="pre">BaseGrid.dx()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dy"><code class="docutils literal notranslate"><span class="pre">BaseGrid.dy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_height"><code class="docutils literal notranslate"><span class="pre">BaseGrid.cell_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_width"><code class="docutils literal notranslate"><span class="pre">BaseGrid.cell_width</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.offset"><code class="docutils literal notranslate"><span class="pre">BaseGrid.offset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotation"><code class="docutils literal notranslate"><span class="pre">BaseGrid.rotation</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotation_matrix"><code class="docutils literal notranslate"><span class="pre">BaseGrid.rotation_matrix</span></code></a></li>
@@ -126,6 +128,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.intersect_geometries"><code class="docutils literal notranslate"><span class="pre">BaseGrid.intersect_geometries()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely"><code class="docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points"><code class="docutils literal notranslate"><span class="pre">BaseGrid.interp_from_points()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.update"><code class="docutils literal notranslate"><span class="pre">BaseGrid.update()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -197,6 +200,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">HexGrid.to_crs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds"><code class="docutils literal notranslate"><span class="pre">HexGrid.cells_in_bounds()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.parent_grid_class"><code class="docutils literal notranslate"><span class="pre">HexGrid.parent_grid_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.update"><code class="docutils literal notranslate"><span class="pre">HexGrid.update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a><ul>
@@ -211,17 +215,17 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.to_shapely()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.to_crs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.numpy_id_to_grid_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.grid_id_to_numpy_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.interp_nodata"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.interp_nodata()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.argmax"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.argmax()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.argmin"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.argmin()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.centroid"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.centroid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.grid_id_to_numpy_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.max"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.max()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.mean"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.mean()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.median"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.median()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.min"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.min()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.std"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.std()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.sum"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.sum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.interp_nodata"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.interp_nodata()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.centroid"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.centroid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.update"><code class="docutils literal notranslate"><span class="pre">BoundedHexGrid.update()</span></code></a></li>
 </ul>
 </li>
@@ -269,6 +273,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">RectGrid.to_crs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_in_bounds"><code class="docutils literal notranslate"><span class="pre">RectGrid.cells_in_bounds()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.parent_grid_class"><code class="docutils literal notranslate"><span class="pre">RectGrid.parent_grid_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.update"><code class="docutils literal notranslate"><span class="pre">RectGrid.update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a><ul>
@@ -282,16 +287,16 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_shapely"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.to_shapely()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.to_crs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.numpy_id_to_grid_id"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.numpy_id_to_grid_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.grid_id_to_numpy_id"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.grid_id_to_numpy_id()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.interp_nodata"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.interp_nodata()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmax"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.argmax()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.argmin"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.argmin()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.grid_id_to_numpy_id"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.grid_id_to_numpy_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.max"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.max()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.mean"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.mean()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.median"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.median()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.min"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.min()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.std"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.std()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.sum"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.sum()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.interp_nodata"><code class="docutils literal notranslate"><span class="pre">BoundedRectGrid.interp_nodata()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -302,7 +307,6 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.dy"><code class="docutils literal notranslate"><span class="pre">TriGrid.dy</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.r"><code class="docutils literal notranslate"><span class="pre">TriGrid.r</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.size"><code class="docutils literal notranslate"><span class="pre">TriGrid.size</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.offset"><code class="docutils literal notranslate"><span class="pre">TriGrid.offset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.centroid"><code class="docutils literal notranslate"><span class="pre">TriGrid.centroid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_corners"><code class="docutils literal notranslate"><span class="pre">TriGrid.cell_corners()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_at_point"><code class="docutils literal notranslate"><span class="pre">TriGrid.cell_at_point()</span></code></a></li>
@@ -314,6 +318,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.neighbours"><code class="docutils literal notranslate"><span class="pre">TriGrid.neighbours()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_bounded"><code class="docutils literal notranslate"><span class="pre">TriGrid.to_bounded()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_crs"><code class="docutils literal notranslate"><span class="pre">TriGrid.to_crs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.update"><code class="docutils literal notranslate"><span class="pre">TriGrid.update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid"><code class="docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a><ul>

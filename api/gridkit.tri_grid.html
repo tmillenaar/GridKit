@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>tri_grid &mdash; GridKit v0.9.0 documentation</title>
+  <title>tri_grid &mdash; GridKit v0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ba2a4036"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=1e52c42f"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.0
+                v0.9.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -136,14 +136,6 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.tri_grid.TriGrid.size" title="Permalink to this definition"></a></dt>
 <dd><p>The size of the cell as supplied when initiating the class.
 The size is equivalent to dx, which is half a cell edge length.</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.offset">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.tri_grid.TriGrid.offset" title="Permalink to this definition"></a></dt>
-<dd><p>The offset off the grid in dx and dy.
-The offset is never larger than the (dx, dy) of a single grid cell.
-The offset represents the shift from the origin (0,0).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -388,6 +380,11 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs" title="gridkit.hex_grid.BoundedHexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_crs()</span></code></a></p>
 </div>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 

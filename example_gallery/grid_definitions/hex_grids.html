@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hexagon grids &mdash; GridKit v0.9.0 documentation</title>
+  <title>Hexagon grids &mdash; GridKit v0.9.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,14 +19,14 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ba2a4036"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=1e52c42f"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="NDVI" href="../raster_operations/ndvi.html" />
-    <link rel="prev" title="Triangles in hexagons" href="triangles_in_hexes.html" /> 
+    <link rel="next" title="Triangles in hexagons" href="triangles_in_hexes.html" />
+    <link rel="prev" title="Rotating grids" href="rotated_grids.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.0
+                v0.9.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -57,14 +57,15 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="rotation_animation.html">Rotation animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rotated_grids.html">Rotating grids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="triangles_in_hexes.html">Triangles in hexagons</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Hexagon grids</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#shifting-grids">Shifting grids</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#grid-sizes">Grid sizes</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="triangles_in_hexes.html">Triangles in hexagons</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
@@ -159,7 +160,7 @@ We can modify this using the ‘offset’.</p>
 <h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Permalink to this heading"></a></h2>
 <p>Let’s shift the whole grid vertically to center it around coordinate (0,0)
 Also, let’s zoom in a bit to the center</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 <span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_shapes_in_bounds</span><span class="p">(</span><span class="n">main_grid</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
 
 <span class="c1"># plot the cell outlines</span>
@@ -217,7 +218,7 @@ we also obtain interesting patterns.</p>
 </div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.513 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.520 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a7ba0282faa773492ac8af4740356e0/hex_grids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hex_grids.ipynb</span></code></a></p>
@@ -234,8 +235,8 @@ See <a class="reference internal" href="../cell_centric_operations/selecting_cel
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="triangles_in_hexes.html" class="btn btn-neutral float-left" title="Triangles in hexagons" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../raster_operations/ndvi.html" class="btn btn-neutral float-right" title="NDVI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rotated_grids.html" class="btn btn-neutral float-left" title="Rotating grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="triangles_in_hexes.html" class="btn btn-neutral float-right" title="Triangles in hexagons" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
