@@ -395,10 +395,13 @@ def test_centering_with_offset(shape, rot):
         (-26.2, [[0.89725837, 0.44150585], [-0.44150585, 0.89725837]]),
     ),
 )
-def test_rotation_setter(rot, expected_rot_mat):
-    grid = HexGrid(size=1.23)
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+def test_rotation_setter(rot, expected_rot_mat, shape):
+    grid = HexGrid(size=1.23, shape=shape)
     grid.rotation = rot
     numpy.testing.assert_allclose(rot, grid.rotation)
+    if shape == "flat" and rot != 0:
+        expected_rot_mat = numpy.array(expected_rot_mat).T
     numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
 
 

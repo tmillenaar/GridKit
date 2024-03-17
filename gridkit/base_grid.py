@@ -98,7 +98,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
     @property
     def rotation(self) -> float:
         """The counter-clockwise rotation of the grid around the origin in degrees."""
-        return self._rotation
+        rotation = self._rotation
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            rotation = -rotation
+        return rotation
 
     @rotation.setter
     def rotation(self, value):
