@@ -44,7 +44,7 @@ class HexGrid(BaseGrid):
     ):
         self._size = size
         self._radius = size / 3**0.5
-        self._rotation = rotation
+        self._rotation = rotation if shape == "pointy" else -rotation
 
         if shape == "pointy":
             self._dx = size
@@ -63,9 +63,9 @@ class HexGrid(BaseGrid):
         offset = (offset_x, offset_y)
 
         self._shape = shape
-        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
+        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
-        super(HexGrid, self).__init__(*args, offset=offset, **kwargs)
+        super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -95,26 +95,6 @@ class HexGrid(BaseGrid):
         This is the same as dx for a flat grid and the same as dy for a pointy grid.
         """
         return self._size
-
-    @property
-    def offset(self) -> float:
-        """The offset off the grid in dx and dy.
-        The offset is never larger than the (dx, dy) of a single grid cell.
-        The offset represents the shift from the origin (0,0)."""
-        return self._offset
-
-    @offset.setter
-    def offset(self, value):
-        """Sets the x and y value of the offset"""
-        if not isinstance(value, tuple) or not len(value) == 2:
-            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        if self.shape == "flat":
-            value = value[::-1]  # swap xy to yx
-        self._offset = value
-        # TODO: implement a generalize update method that takes the PyTriGrid into account
-        self._grid = PyHexGrid(
-            cellsize=self.size, offset=value, rotation=self._rotation
-        )
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -558,6 +538,32 @@ class HexGrid(BaseGrid):
     @property
     def parent_grid_class(self):
         return HexGrid
+
+    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+        if size is None:
+            size = self.size
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
+
+    def update(
+        self, size=None, shape=None, offset=None, rotation=None, crs=None, **kwargs
+    ):
+        if size is None:
+            size = self.size
+        if shape is None:
+            shape = self.shape
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        if crs is None:
+            crs = self.crs
+        return HexGrid(
+            size=size, shape=shape, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedHexGrid(BoundedGrid, HexGrid):

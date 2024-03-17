@@ -40,7 +40,7 @@ class RectGrid(BaseGrid):
         self._rotation = rotation
         self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
-        super(RectGrid, self).__init__(*args, offset=offset, **kwargs)
+        super(RectGrid, self).__init__(*args, **kwargs)
 
     @property
     def dx(self) -> float:
@@ -51,24 +51,6 @@ class RectGrid(BaseGrid):
     def dy(self) -> float:
         """The cellsize in y-direction"""
         return self.__dy
-
-    @property
-    def offset(self) -> float:
-        """The offset off the grid in dx and dy.
-        The offset is never larger than the (dx, dy) of a single grid cell.
-        The offset represents the shift from the origin (0,0)."""
-        return self._offset
-
-    @offset.setter
-    def offset(self, value):
-        """Sets the x and y value of the offset"""
-        if not isinstance(value, tuple) or not len(value) == 2:
-            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        self._offset = value
-        # TODO: implement a generalize update method that takes the PyTriGrid into account
-        self._grid = PyRectGrid(
-            dx=self.dx, dy=self.dy, offset=value, rotation=self._rotation
-        )
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -532,6 +514,32 @@ class RectGrid(BaseGrid):
     @property
     def parent_grid_class(self):
         return RectGrid
+
+    def _update_inner_grid(self, dx=None, dy=None, offset=None, rotation=None):
+        if dx is None:
+            dx = self.dx
+        if dy is None:
+            dy = self.dy
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        return PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
+
+    def update(self, dx=None, dy=None, offset=None, rotation=None, crs=None, **kwargs):
+        if dx is None:
+            dx = self.dx
+        if dy is None:
+            dy = self.dy
+        if offset is None:
+            offset = self.offset
+        if rotation is None:
+            rotation = self.rotation
+        if crs is None:
+            crs = self.crs
+        return RectGrid(
+            dx=dx, dy=dy, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedRectGrid(BoundedGrid, RectGrid):
