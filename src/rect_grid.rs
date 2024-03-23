@@ -1,5 +1,9 @@
 use numpy::ndarray::*;
 use crate::utils::*;
+use crate::interpolate::*;
+
+use geo_types::{LineString, Point, Coord, Geometry};
+use geo::Intersects;
 
 pub struct RectGrid {
     pub _dx: f64,
@@ -172,4 +176,109 @@ impl RectGrid {
         }
         nearby_cells
     }
+
+    pub fn cells_intersecting_line(&self, p1: &ArrayView1<f64>, p2: &ArrayView1<f64>) -> Array2<i64> {
+        let mut ids = Array2::<i64>::zeros((0, 2));
+        let mut cell_id = self.cell_at_point(&p1.into_shape((1, p1.len())).unwrap());
+        let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)]].view());
+        // let sides = array![
+        //     [[corners[Ix3(0,0,0)], corners[Ix3(0,0,1)]],[corners[Ix3(0,1,0)],corners[Ix3(0,1,1)]]],
+        //     [[corners[Ix3(0,1,0)], corners[Ix3(0,1,1)]],[corners[Ix3(0,2,0)],corners[Ix3(0,2,1)]]],
+        //     [[corners[Ix3(0,2,0)], corners[Ix3(0,2,1)]],[corners[Ix3(0,3,0)],corners[Ix3(0,3,1)]]],
+        //     [[corners[Ix3(0,3,0)], corners[Ix3(0,3,1)]],[corners[Ix3(0,0,0)],corners[Ix3(0,0,1)]]],
+        // ];
+        // for i in 0..corners.shape()[0] {
+
+        let point1 = Coord::<f64> {x:p1[Ix1(0)], y:p1[Ix1(1)]};
+        let point2 = Coord::<f64> {x:p2[Ix1(0)], y:p2[Ix1(1)]};
+        let line = LineString::new(vec![point1, point2]);
+
+        let mut intersection_id: i64 = -1;
+        let mut counter = 0;
+        loop {
+            let corners = self.cell_corners(&cell_id.view());
+            let sides = vec![
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]},Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]},Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]},Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]},Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]}]),
+            ];
+            
+            let mut entered_through_side_id: i64;
+            match intersection_id { // convert intersection_id of previous cell to id of same side for new cell_id
+                0 => {entered_through_side_id = 2;}
+                1 => {entered_through_side_id = 3;}
+                2 => {entered_through_side_id = 0;}
+                3 => {entered_through_side_id = 1;}
+                _ => {entered_through_side_id = -1;}
+            }
+
+            intersection_id = -1;
+
+            for i in 0..sides.len() {
+                // TODO: Handle case where line intersects cell corner
+                println!("{},{}", entered_through_side_id, intersection_id);
+                if i as i64 == entered_through_side_id { // Discount the intersection towards previous cell
+                    continue;
+                }
+                let intersects = sides[i].intersects(&line);
+                if intersects {
+                    intersection_id = i as i64;
+                    break;
+                }
+                
+            }
+            println!("{:?}, {}", cell_id, intersection_id);
+            match intersection_id {
+                0 => { // Bottom side
+                    cell_id[Ix2(0,1)] -= 1;
+                    // cell_id = array![[cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] - 1]];
+                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] - 1].view());
+                }
+                1 => { // Right side
+                    cell_id[Ix2(0,0)] += 1;
+                    // cell_id = array![[cell_id[Ix2(0,0)] + 1, cell_id[Ix2(0,1)]]];
+                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)] + 1, cell_id[Ix2(0,1)]].view());
+                }
+                2 => { // Top side
+                    cell_id[Ix2(0,1)] += 1;
+                    // cell_id = array![[cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] + 1]];
+                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] + 1].view());
+                }
+                3 => { // Left side
+                    cell_id[Ix2(0,0)] -= 1;
+                    // cell_id = array![[cell_id[Ix2(0,0)] - 1, cell_id[Ix2(0,1)]]];
+                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)] - 1, cell_id[Ix2(0,1)]].view());
+                }
+                _ => { // No intersection
+                    // Reached the end of the line, break infinite loop and return from function
+                    break;
+                }
+            }
+            let _ = ids.push(Axis(0), cell_id.slice(s![0, ..]).view());
+            counter += 1;
+            if counter == 50 {
+                break
+            }
+        }
+
+            // TODO: Remove previous intersection from sides before checking new intersection
+            // TODO: Loop until no intersection
+
+            
+
+            // let projected_vec_1 = projected_1 - &sides.slice(s![i, 0, ..]);
+            // let projected_vec_2 = projected_2 - &sides.slice(s![i, 1, ..]);
+            // // Check if the direction of the projected arrow is the same
+            // let same_x = (projected_vec_1[Ix1(0)] > 0.) == (projected_vec_2[Ix1(0)] > 0.);
+            // let same_y = (projected_vec_1[Ix1(1)] > 0.) == (projected_vec_2[Ix1(1)] > 0.);
+            // if (!same_x || !same_y) {
+            //     // line crossing cell_side
+            //     println!("{:?}, {:?}", projected_vec_1, projected_vec_2);
+            // }
+        // for points in sides.axis_iter(Axis(0)){}
+        // ids.into()
+        ids
+        // let mut ids_arr = Array2::<f64>::zeros((ids.shape()[0], 2));
+    }    
 }
