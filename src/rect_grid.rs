@@ -255,49 +255,49 @@ impl RectGrid {
                     skip_sides = array![true, true, false, false];
                 }
             }
-        }
-
+        } else { // Starting point not on corner
         // Also check if the line starts on a cell side. If so, 
         // find out which of the connecting cells is the true starting cell and
         // add the starting side to 'skip_sides' when determining the next cell.
-        let mut p1_on_side: i8 = -1;
-        let sides = vec![
-                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]},Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]}]),
-                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]},Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]}]),
-                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]},Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]}]),
-                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]},Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]}]),
-            ];
-        for i in 0..4 { // loop over sides
-            let intersects = sides[i].intersects(&point1);
-            if intersects {
-                p1_on_side = i as i8;
-                break
-            }
-        }
-        match p1_on_side {
-            // Because of the way cell_at_point handles the boundary conditions,
-            // we only need to check for the point being on the left or bottom sides.
-            // Points on the right or top sides are considered to be in the next cell over.
-            0 => { // Bottom-left corner
-                if p2[Ix1(1)] > p1[Ix1(1)] { // Line continues towards the top
-                    // cell_id already correct
-                    skip_sides = array![true, false, false, false];
-                } else { // Line continues towards the bottom
-                    cell_id[Ix2(0,1)] -= 1;
-                    skip_sides = array![false, false, true, false];
+            let mut p1_on_side: i8 = -1;
+            let sides = vec![
+                    LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]},Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]}]),
+                    LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]},Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]}]),
+                    LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]},Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]}]),
+                    LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]},Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]}]),
+                ];
+            for i in 0..4 { // loop over sides
+                let intersects = sides[i].intersects(&point1);
+                if intersects {
+                    p1_on_side = i as i8;
+                    break
                 }
             }
-            3 => { // Top-left corner
-                if p2[Ix1(0)] > p1[Ix1(0)] { // Line continues towards the right
-                    // cell_id already correct
-                    skip_sides = array![false, false, false, true];
-                } else { // Line continues towards the left
-                    cell_id[Ix2(0,0)] -= 1;
-                    skip_sides = array![false, true, false, false];
+            match p1_on_side {
+                // Because of the way cell_at_point handles the boundary conditions,
+                // we only need to check for the point being on the left or bottom sides.
+                // Points on the right or top sides are considered to be in the next cell over.
+                0 => { // Bottom-left corner
+                    if p2[Ix1(1)] > p1[Ix1(1)] { // Line continues towards the top
+                        // cell_id already correct
+                        skip_sides = array![true, false, false, false];
+                    } else { // Line continues towards the bottom
+                        cell_id[Ix2(0,1)] -= 1;
+                        skip_sides = array![false, false, true, false];
+                    }
                 }
+                3 => { // Top-left corner
+                    if p2[Ix1(0)] > p1[Ix1(0)] { // Line continues towards the right
+                        // cell_id already correct
+                        skip_sides = array![false, false, false, true];
+                    } else { // Line continues towards the left
+                        cell_id[Ix2(0,0)] -= 1;
+                        skip_sides = array![false, true, false, false];
+                    }
+                }
+                _ => {} // No intersection, check sides next
             }
-            _ => {} // No intersection, check sides next
-        }
+        } // End checking for starting point on corner or side
 
         // Add starting cell to return ids
         let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)]].view());
