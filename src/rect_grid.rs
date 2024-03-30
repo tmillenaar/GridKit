@@ -1,3 +1,4 @@
+use geo::intersects;
 use numpy::ndarray::*;
 use crate::utils::*;
 use crate::interpolate::*;
@@ -184,7 +185,8 @@ impl RectGrid {
         // on which side or corner is intersected, we find the next cell and repeat the process.
         // Since the line also has an intersection where it 'entered' the new cell,
         // we ignore this intersection and look for anohter.
-        // The loop is terminated when the line does not intersect any new corners or lines.
+        // The loop is terminated when the line does not intersect any new corners or lines,
+        // or when corner or cell that intersects the line also intersects point2, the end of the line.
         // Since the corners are also part of the lines as far as the line.intersects function is concerned,
         // we check the corners first and skip the lines check if a corner is intersected. 
         // We then also have to ignore the lines that contain the corner when checking intersections for the next cell.
@@ -202,34 +204,127 @@ impl RectGrid {
         //
         let mut ids = Array2::<i64>::zeros((0, 2));
         let mut cell_id = self.cell_at_point(&p1.into_shape((1, p1.len())).unwrap());
-        let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)]].view());
 
         // Create a LineString from the supplied endpoints
         let point1 = Coord::<f64> {x:p1[Ix1(0)], y:p1[Ix1(1)]};
         let point2 = Coord::<f64> {x:p2[Ix1(0)], y:p2[Ix1(1)]};
         let line = LineString::new(vec![point1, point2]);
 
-        // TODO: Check if the line starts on a cell corner. If so, find out which of the connecting cells is the true starting cell.
-
         let mut side_intersection_id: i64 = -1;
         let mut corner_intersection_id: i64 = -1;
         let mut skip_corners = array![false, false, false, false];
         let mut skip_sides = array![false, false, false, false];
+
+        // Check if the line starts on a cell corner. If so, 
+        // find out which of the connecting cells is the true starting cell and
+        // add the starting corner to 'skip_corners' when determining the next cell.
+        let mut p1_on_corner: bool = false;
+        let corners = self.cell_corners(&cell_id.view());
+        for i in 0..4 { // loop over corners
+            p1_on_corner = point1.intersects(&Coord::<f64> {x:corners[Ix3(0,i,0)], y:corners[Ix3(0,i,1)]});
+            if p1_on_corner {
+                break
+            }
+        }
+        if p1_on_corner {
+            let direction_x = p2[Ix1(0)] - p1[Ix1(0)];
+            let direction_y = p2[Ix1(1)] - p1[Ix1(1)];
+            let mut azimuth = direction_x.atan2(direction_y) * 180. / std::f64::consts::PI;
+            azimuth += 360. * (azimuth <= 0.) as i64 as f64;
+            azimuth -= 360. * (azimuth > 360.) as i64 as f64;
+            match azimuth { // Line continues in top-right direction
+                az if (az >= 0.0 && az <= 90.0) => {
+                    // Already in correct starting cell
+                    skip_corners = array![true, false, false, false];
+                    skip_sides = array![true, false, false, true];
+                } // Line continues in bottom-right direction
+                az if (az > 90.0 && az <= 180.0) => {
+                    cell_id[Ix2(0,1)] -= 1;
+                    skip_corners = array![false, false, false, true];
+                    skip_sides = array![false, false, true, true];
+                } // Line continues in bottom-left direction
+                az if (az > 180.0 && az <= 270.0) => {
+                    cell_id[Ix2(0,0)] -= 1;
+                    cell_id[Ix2(0,1)] -= 1;
+                    skip_corners = array![false, false, true, false];
+                    skip_sides = array![false, true, true, false];
+                }
+                _ => { // Line continues in top-left direction
+                    cell_id[Ix2(0,0)] -= 1;
+                    skip_corners = array![false, true, false, false];
+                    skip_sides = array![true, true, false, false];
+                }
+            }
+        }
+
+        // Also check if the line starts on a cell side. If so, 
+        // find out which of the connecting cells is the true starting cell and
+        // add the starting side to 'skip_sides' when determining the next cell.
+        let mut p1_on_side: i8 = -1;
+        let sides = vec![
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]},Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]},Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]},Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]}]),
+                LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]},Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]}]),
+            ];
+        for i in 0..4 { // loop over sides
+            let intersects = sides[i].intersects(&point1);
+            if intersects {
+                p1_on_side = i as i8;
+                break
+            }
+        }
+        match p1_on_side {
+            // Because of the way cell_at_point handles the boundary conditions,
+            // we only need to check for the point being on the left or bottom sides.
+            // Points on the right or top sides are considered to be in the next cell over.
+            0 => { // Bottom-left corner
+                if p2[Ix1(1)] > p1[Ix1(1)] { // Line continues towards the top
+                    // cell_id already correct
+                    skip_sides = array![true, false, false, false];
+                } else { // Line continues towards the bottom
+                    cell_id[Ix2(0,1)] -= 1;
+                    skip_sides = array![false, false, true, false];
+                }
+            }
+            3 => { // Top-left corner
+                if p2[Ix1(0)] > p1[Ix1(0)] { // Line continues towards the right
+                    // cell_id already correct
+                    skip_sides = array![false, false, false, true];
+                } else { // Line continues towards the left
+                    cell_id[Ix2(0,0)] -= 1;
+                    skip_sides = array![false, true, false, false];
+                }
+            }
+            _ => {} // No intersection, check sides next
+        }
+
+        // Add starting cell to return ids
+        let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)]].view());
+
+        // Loop and continuousely find the next cell until the end of the line is reached.
         loop {
             let corners = self.cell_corners(&cell_id.view());
-
+            let mut reached_point2 = false;
             corner_intersection_id = -1;
             for i in 0..4 { // Loop over corners
                 if skip_corners[i] { // Discount the intersection towards previous cell
-                    println!("Skipping corner {}", i);
                     continue;
                 }
-                let intersects = line.intersects(&Coord::<f64> {x:corners[Ix3(0,i,0)], y:corners[Ix3(0,i,1)]});
+                let corner_coord = Coord::<f64> {x:corners[Ix3(0,i,0)], y:corners[Ix3(0,i,1)]};
+                let intersects = line.intersects(&corner_coord);
                 if intersects {
+                    if corner_coord.intersects(&point2) {
+                        reached_point2 = true;
+                    }
                     corner_intersection_id = i as i64;
-                    side_intersection_id = -1; // Reset 
                     break;
                 }
+            }
+
+            if reached_point2 {
+                // Line ends in this cell, break infinite loop and return
+                break
             }
 
             match corner_intersection_id {
@@ -267,7 +362,6 @@ impl RectGrid {
 
             // Add previous cell to vec and don't bother checking side intersections if we have a corner intersection
             if corner_intersection_id != -1 {
-                println!("Crossed corner {}", corner_intersection_id);
                 let _ = ids.push(Axis(0), cell_id.slice(s![0, ..]).view());
                 continue
             }
@@ -286,15 +380,21 @@ impl RectGrid {
             side_intersection_id = -1;
             for i in 0..sides.len() {
                 if skip_sides[i] { // Discount the intersection towards previous cell
-                    println!("Skipping side {}", i);
                     continue;
                 }
                 let intersects = sides[i].intersects(&line);
                 if intersects {
+                    if sides[i].intersects(&point2) {
+                        reached_point2 = true;
+                    }
                     side_intersection_id = i as i64;
-                    corner_intersection_id = -1; // Also reset the corner
                     break;
                 }
+            }
+
+            if reached_point2 {
+                // Line ends in this cell, break infinite loop and return
+                break
             }
 
             match side_intersection_id {
@@ -323,7 +423,6 @@ impl RectGrid {
                     break;
                 }
             }
-            println!("Crossed side {}", side_intersection_id);
             let _ = ids.push(Axis(0), cell_id.slice(s![0, ..]).view());
         }
         return ids
