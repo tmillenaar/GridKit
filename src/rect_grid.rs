@@ -178,107 +178,155 @@ impl RectGrid {
     }
 
     pub fn cells_intersecting_line(&self, p1: &ArrayView1<f64>, p2: &ArrayView1<f64>) -> Array2<i64> {
+        // This function returns the ids of the cells that intersect the line defined by the outer points p1 and p2.
+        // This is done through an infinite loop where we start at the cell that contains p1, 
+        // check if any of the line intersects any of the corners or sides of the cell and depending
+        // on which side or corner is intersected, we find the next cell and repeat the process.
+        // Since the line also has an intersection where it 'entered' the new cell,
+        // we ignore this intersection and look for anohter.
+        // The loop is terminated when the line does not intersect any new corners or lines.
+        // Since the corners are also part of the lines as far as the line.intersects function is concerned,
+        // we check the corners first and skip the lines check if a corner is intersected. 
+        // We then also have to ignore the lines that contain the corner when checking intersections for the next cell.
+        //
+        // The layout of the corners and lines with their indices are counter-clockwise starting at the bottom-left:
+        //
+        // C3 -- L2 -- C2
+        //  |          |
+        // L3          L1
+        //  |          |
+        // C0 -- L0 -- C1
+        //
+        // Where C0 represents the first corner (corner index 0), C1 represents corner index 1 and so forth.
+        // The sampe applies to the lines, where L0 is the first line.
+        //
         let mut ids = Array2::<i64>::zeros((0, 2));
         let mut cell_id = self.cell_at_point(&p1.into_shape((1, p1.len())).unwrap());
         let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)]].view());
-        // let sides = array![
-        //     [[corners[Ix3(0,0,0)], corners[Ix3(0,0,1)]],[corners[Ix3(0,1,0)],corners[Ix3(0,1,1)]]],
-        //     [[corners[Ix3(0,1,0)], corners[Ix3(0,1,1)]],[corners[Ix3(0,2,0)],corners[Ix3(0,2,1)]]],
-        //     [[corners[Ix3(0,2,0)], corners[Ix3(0,2,1)]],[corners[Ix3(0,3,0)],corners[Ix3(0,3,1)]]],
-        //     [[corners[Ix3(0,3,0)], corners[Ix3(0,3,1)]],[corners[Ix3(0,0,0)],corners[Ix3(0,0,1)]]],
-        // ];
-        // for i in 0..corners.shape()[0] {
 
+        // Create a LineString from the supplied endpoints
         let point1 = Coord::<f64> {x:p1[Ix1(0)], y:p1[Ix1(1)]};
         let point2 = Coord::<f64> {x:p2[Ix1(0)], y:p2[Ix1(1)]};
         let line = LineString::new(vec![point1, point2]);
 
-        let mut intersection_id: i64 = -1;
-        let mut counter = 0;
+        // TODO: Check if the line starts on a cell corner. If so, find out which of the connecting cells is the true starting cell.
+
+        let mut side_intersection_id: i64 = -1;
+        let mut corner_intersection_id: i64 = -1;
+        let mut skip_corners = array![false, false, false, false];
+        let mut skip_sides = array![false, false, false, false];
         loop {
             let corners = self.cell_corners(&cell_id.view());
+
+            corner_intersection_id = -1;
+            for i in 0..4 { // Loop over corners
+                if skip_corners[i] { // Discount the intersection towards previous cell
+                    println!("Skipping corner {}", i);
+                    continue;
+                }
+                let intersects = line.intersects(&Coord::<f64> {x:corners[Ix3(0,i,0)], y:corners[Ix3(0,i,1)]});
+                if intersects {
+                    corner_intersection_id = i as i64;
+                    side_intersection_id = -1; // Reset 
+                    break;
+                }
+            }
+
+            match corner_intersection_id {
+                // Adjust the cell-id to reflect the next cell and mark the oppisite corner and connecting sides to be skipped.
+                // To demonstrate what I mean with skipping the opposite corner and connecting sides:
+                //   If the line now intersects the top-right corner, from the perspective of the next cell
+                //   the line intersects the bottom-left corner, which is the one we want to ignore in the next iteration.
+                //   This corner also belongs to the bottom and left sides, which we also want to ignore in the next iteration.
+                0 => { // Bottom-left corner
+                    cell_id[Ix2(0,0)] -= 1;
+                    cell_id[Ix2(0,1)] -= 1;
+                    skip_corners = array![false, false, true, false];
+                    skip_sides = array![false, true, true, false];
+                }
+                1 => { // Bottom-right corner
+                    cell_id[Ix2(0,0)] += 1;
+                    cell_id[Ix2(0,1)] -= 1;
+                    skip_corners = array![false, false, false, true];
+                    skip_sides = array![false, false, true, true];
+                }
+                2 => { // Top-right corner
+                    cell_id[Ix2(0,0)] += 1;
+                    cell_id[Ix2(0,1)] += 1;
+                    skip_corners = array![true, false, false, false];
+                    skip_sides = array![true, false, false, true];
+                }
+                3 => { // Top-left corner
+                    cell_id[Ix2(0,0)] -= 1;
+                    cell_id[Ix2(0,1)] += 1;
+                    skip_corners = array![false, true, false, false];
+                    skip_sides = array![true, true, false, false];
+                }
+                _ => {} // No intersection, check sides next
+            }
+
+            // Add previous cell to vec and don't bother checking side intersections if we have a corner intersection
+            if corner_intersection_id != -1 {
+                println!("Crossed corner {}", corner_intersection_id);
+                let _ = ids.push(Axis(0), cell_id.slice(s![0, ..]).view());
+                continue
+            }
+
+            // Since there is no corner intersection, reset skip_corners
+            skip_corners = array![false, false, false, false];
+
+            // Check insersection on sides
             let sides = vec![
                 LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]},Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]}]),
                 LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,1,0)], y:corners[Ix3(0,1,1)]},Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]}]),
                 LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,2,0)], y:corners[Ix3(0,2,1)]},Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]}]),
                 LineString::new(vec![Coord::<f64> {x:corners[Ix3(0,3,0)], y:corners[Ix3(0,3,1)]},Coord::<f64> {x:corners[Ix3(0,0,0)], y:corners[Ix3(0,0,1)]}]),
             ];
-            
-            let mut entered_through_side_id: i64;
-            match intersection_id { // convert intersection_id of previous cell to id of same side for new cell_id
-                0 => {entered_through_side_id = 2;}
-                1 => {entered_through_side_id = 3;}
-                2 => {entered_through_side_id = 0;}
-                3 => {entered_through_side_id = 1;}
-                _ => {entered_through_side_id = -1;}
-            }
 
-            intersection_id = -1;
-
+            side_intersection_id = -1;
             for i in 0..sides.len() {
-                // TODO: Handle case where line intersects cell corner
-                println!("{},{}", entered_through_side_id, intersection_id);
-                if i as i64 == entered_through_side_id { // Discount the intersection towards previous cell
+                if skip_sides[i] { // Discount the intersection towards previous cell
+                    println!("Skipping side {}", i);
                     continue;
                 }
                 let intersects = sides[i].intersects(&line);
                 if intersects {
-                    intersection_id = i as i64;
+                    side_intersection_id = i as i64;
+                    corner_intersection_id = -1; // Also reset the corner
                     break;
                 }
-                
             }
-            println!("{:?}, {}", cell_id, intersection_id);
-            match intersection_id {
+
+            match side_intersection_id {
+                // Adjust the cell-id to reflect the next cell and mark the oppisite side to be skipped.
+                // To demonstrate what I mean with skipping the opposite side:
+                //   If the line now intersects the top side, from the perspective of the next cell
+                //   the line intersects the bottom side, which is the one we want to ignore in the next iteration.
                 0 => { // Bottom side
                     cell_id[Ix2(0,1)] -= 1;
-                    // cell_id = array![[cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] - 1]];
-                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] - 1].view());
+                    skip_sides = array![false, false, true, false];
                 }
                 1 => { // Right side
                     cell_id[Ix2(0,0)] += 1;
-                    // cell_id = array![[cell_id[Ix2(0,0)] + 1, cell_id[Ix2(0,1)]]];
-                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)] + 1, cell_id[Ix2(0,1)]].view());
+                    skip_sides = array![false, false, false, true];
                 }
                 2 => { // Top side
                     cell_id[Ix2(0,1)] += 1;
-                    // cell_id = array![[cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] + 1]];
-                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)], cell_id[Ix2(0,1)] + 1].view());
+                    skip_sides = array![true, false, false, false];
                 }
                 3 => { // Left side
                     cell_id[Ix2(0,0)] -= 1;
-                    // cell_id = array![[cell_id[Ix2(0,0)] - 1, cell_id[Ix2(0,1)]]];
-                    // let _ = ids.push(Axis(0), array![cell_id[Ix2(0,0)] - 1, cell_id[Ix2(0,1)]].view());
+                    skip_sides = array![false, true, false, false];
                 }
                 _ => { // No intersection
-                    // Reached the end of the line, break infinite loop and return from function
+                    // Reached the end point of the line, break infinite loop and return from function
                     break;
                 }
             }
+            println!("Crossed side {}", side_intersection_id);
             let _ = ids.push(Axis(0), cell_id.slice(s![0, ..]).view());
-            counter += 1;
-            if counter == 50 {
-                break
-            }
         }
-
-            // TODO: Remove previous intersection from sides before checking new intersection
-            // TODO: Loop until no intersection
-
-            
-
-            // let projected_vec_1 = projected_1 - &sides.slice(s![i, 0, ..]);
-            // let projected_vec_2 = projected_2 - &sides.slice(s![i, 1, ..]);
-            // // Check if the direction of the projected arrow is the same
-            // let same_x = (projected_vec_1[Ix1(0)] > 0.) == (projected_vec_2[Ix1(0)] > 0.);
-            // let same_y = (projected_vec_1[Ix1(1)] > 0.) == (projected_vec_2[Ix1(1)] > 0.);
-            // if (!same_x || !same_y) {
-            //     // line crossing cell_side
-            //     println!("{:?}, {:?}", projected_vec_1, projected_vec_2);
-            // }
-        // for points in sides.axis_iter(Axis(0)){}
-        // ids.into()
-        ids
-        // let mut ids_arr = Array2::<f64>::zeros((ids.shape()[0], 2));
-    }    
+        return ids
+    }
+        
 }
