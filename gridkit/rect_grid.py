@@ -531,6 +531,13 @@ class RectGrid(BaseGrid):
         ids = GridIndex(ids.T.reshape((*shape, 2)))
         return (ids, shape) if return_cell_count else ids
 
+    def cells_intersecting_line(self, line):
+        line = numpy.array(line, dtype=float)
+        if not line.shape == (2,2):
+            raise ValueError(f"Expected a line to be supplied in the form [[x1,y1], [x2,y2]]. Got shape {line.shape}")
+        cell_ids = self._grid.cells_intersecting_line(*line)
+        return GridIndex(cell_ids)
+
     @property
     def parent_grid_class(self):
         return RectGrid
