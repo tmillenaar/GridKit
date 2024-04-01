@@ -333,11 +333,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             aligned = False
             reasons.append("CRS")
 
-        try:
+        if self.size is not None and other.size is not None:
             if not numpy.isclose(self.size, other.size):
                 aligned = False
                 reasons.append("cellsize")
-        except AttributeError:
+        else:
             if not numpy.isclose(self.dx, other.dx) or not numpy.isclose(
                 self.dy, other.dy
             ):

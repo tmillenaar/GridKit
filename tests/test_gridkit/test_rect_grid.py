@@ -6,6 +6,46 @@ from gridkit import HexGrid
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
+def test_dx_dy_init():
+    with pytest.raises(ValueError):
+        RectGrid(dx=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, dx=1, size=1)
+
+    grid = RectGrid(dx=2, dy=3)
+    assert grid.size is None
+
+    grid = RectGrid(dx=2, dy=2)
+    numpy.testing.assert_allclose(grid.size, 2)
+
+
+def test_size_setter():
+    grid = RectGrid(size=1)
+    numpy.testing.assert_allclose(grid.size, 1)
+    numpy.testing.assert_allclose(grid.dx, 1)
+    numpy.testing.assert_allclose(grid.dy, 1)
+
+    grid = RectGrid(dx=2, dy=2)
+    numpy.testing.assert_allclose(grid.size, 2)
+    numpy.testing.assert_allclose(grid.dx, 2)
+    numpy.testing.assert_allclose(grid.dy, 2)
+
+    grid.size = 3
+    numpy.testing.assert_allclose(grid.size, 3)
+    numpy.testing.assert_allclose(grid.dx, 3)
+    numpy.testing.assert_allclose(grid.dy, 3)
+
+
 @pytest.mark.parametrize(
     "points, expected_ids",
     [

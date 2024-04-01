@@ -34,7 +34,23 @@ class RectGrid(BaseGrid):
         Default: None
     """
 
-    def __init__(self, *args, dx, dy, offset=(0, 0), rotation=0, **kwargs):
+    def __init__(
+        self, *args, dx=None, dy=None, size=None, offset=(0, 0), rotation=0, **kwargs
+    ):
+        if size is not None:
+            if dx is not None or dy is not None:
+                raise ValueError(
+                    "Argument conflict. Please supply either 'size' or 'dx'&'dy' when instantiating a new RectGrid. Found both."
+                )
+            dx = dy = size
+            self._size = size
+        else:
+            if dx is None or dy is None:
+                raise ValueError(
+                    f"Found only '{'dx' if dx is not None else 'dy'}' when instantiating a new RectGrid. Please also supply '{'dx' if dx is None else 'dy'}'."
+                )
+            self._size = dx if numpy.isclose(dx, dy) else None
+
         self._dx = dx
         self._dy = dy
         self._rotation = rotation
@@ -71,6 +87,25 @@ class RectGrid(BaseGrid):
             )
         self._dy = value
         self._grid = self._update_inner_grid(dy=value)
+
+    @property
+    def size(self) -> float:
+        """The length of the cell sides, if all sides are of the same length.
+        The returned size is 'None' if :meth:`.RectGrid.dx` and :meth:`.RectGrid.dy` are not the same length.
+        """
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._dx = value
+        self._dy = value
+        self._grid = self._update_inner_grid(dx=value, dy=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
