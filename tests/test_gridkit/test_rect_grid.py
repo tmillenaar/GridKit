@@ -499,3 +499,17 @@ def test_dx_dy_setter():
         grid.dy = 0
     with pytest.raises(ValueError):
         grid.dy = -1
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"size": 0.1},
+        {"size": 1234},
+        {"dx": 1234, "dy": 0.3},
+    ],
+)
+def test_cell_area(kwargs):
+    grid = RectGrid(**kwargs)
+    geom = grid.to_shapely((0, 0))
+    numpy.testing.assert_allclose(grid.cell_area, geom.area)

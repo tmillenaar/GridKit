@@ -106,6 +106,13 @@ class HexGrid(BaseGrid):
     def size(self) -> float:
         """The size of the cell as supplied when initiating the class.
         This is the same as dx for a flat grid and the same as dy for a pointy grid.
+
+        See also
+        --------
+        :meth:`.BaseGrid.size`
+        :meth:`.TriGrid.size`
+        :meth:`.RectGrid.size`
+
         """
         return self._size
 
@@ -574,6 +581,30 @@ class HexGrid(BaseGrid):
     def update(
         self, size=None, shape=None, offset=None, rotation=None, crs=None, **kwargs
     ):
+        """Modify attributes of the existing grid and return a copy.
+        The original grid remains un-mutated.
+
+        Parameters
+        ----------
+        size: `float`
+            The new size of the length of the cells (dx and dy)
+        shape: Literal["pointy", "flat"]
+            The new shape of the grid cells
+        offset: `Tuple[float, float]`
+            The new offset of the origin of the grid
+        rotation: `float`
+            The new counter-clockwise rotation of the grid in degrees.
+            Can be negative for clockwise rotation.
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        :class:`.RectGrid`
+            A modified copy of the current grid
+        """
         if size is None:
             size = self.size
         if shape is None:

@@ -465,3 +465,11 @@ def test_update():
     new_grid = grid.update(rotation=2.5)
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
+
+
+@pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_cell_area(size, shape):
+    grid = HexGrid(size=size, shape=shape)
+    geom = grid.to_shapely((0, 0))
+    numpy.testing.assert_allclose(grid.cell_area, geom.area)

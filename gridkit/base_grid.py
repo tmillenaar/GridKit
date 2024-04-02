@@ -57,6 +57,19 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Sets the value of the crs"""
         self._crs = None if not value else CRS.from_user_input(value)
 
+    @property
+    def size(self) -> float:
+        """The size of the cell as supplied when initiating the class.
+
+        See also
+        --------
+        :meth:`.TriGrid.size`
+        :meth:`.RectGrid.size`
+        :meth:`.HexGrid.size`
+
+        """
+        return self._size
+
     @abc.abstractmethod
     def dx(self) -> float:
         """The distance in x-direction between two adjacent cell centers."""
@@ -122,6 +135,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
         Note: makes a copy every time this is called."""
         return self._grid.rotation_matrix_inv()
+
+    @property
+    def cell_area(self):
+        """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
+        return self.dx * self.dy
 
     @abc.abstractmethod
     def centroid(self, index) -> float:

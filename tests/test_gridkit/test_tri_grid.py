@@ -672,3 +672,10 @@ def test_size_setter():
         grid.size = 0
     with pytest.raises(ValueError):
         grid.size = -1
+
+
+@pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])
+def test_cell_area(size):
+    grid = TriGrid(size=size)
+    geom = grid.to_shapely((0, 0))
+    numpy.testing.assert_allclose(grid.cell_area, geom.area)

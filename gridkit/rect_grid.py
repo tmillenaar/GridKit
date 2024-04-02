@@ -45,6 +45,10 @@ class RectGrid(BaseGrid):
             dx = dy = size
             self._size = size
         else:
+            if dx is None and dy is None:
+                raise ValueError(
+                    "No cell size found. Please supply either 'size' or both 'dx' and 'dy'."
+                )
             if dx is None or dy is None:
                 raise ValueError(
                     f"Found only '{'dx' if dx is not None else 'dy'}' when instantiating a new RectGrid. Please also supply '{'dx' if dx is None else 'dy'}'."
@@ -92,6 +96,13 @@ class RectGrid(BaseGrid):
     def size(self) -> float:
         """The length of the cell sides, if all sides are of the same length.
         The returned size is 'None' if :meth:`.RectGrid.dx` and :meth:`.RectGrid.dy` are not the same length.
+
+        See also
+        --------
+        :meth:`.BaseGrid.size`
+        :meth:`.TriGrid.size`
+        :meth:`.HexGrid.size`
+
         """
         return self._size
 
@@ -581,10 +592,45 @@ class RectGrid(BaseGrid):
             rotation = self.rotation
         return PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
 
-    def update(self, dx=None, dy=None, offset=None, rotation=None, crs=None, **kwargs):
-        if dx is None:
+    def update(
+        self,
+        dx=None,
+        dy=None,
+        size=None,
+        offset=None,
+        rotation=None,
+        crs=None,
+        **kwargs,
+    ):
+        """Modify attributes of the existing grid and return a copy.
+        The original grid remains un-mutated.
+
+        Parameters
+        ----------
+        dx: `float`
+            The new horizontal spacing between two cell centroids, i.e. the new width of the cells
+        dy: `float`
+            The new vertical spacing between two cell centroids, i.e. the new height of the cells
+        size: `float`
+            The new size of the length of the cells (dx and dy)
+        offset: `Tuple[float, float]`
+            The new offset of the origin of the grid
+        rotation: `float`
+            The new counter-clockwise rotation of the grid in degrees.
+            Can be negative for clockwise rotation.
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        :class:`.RectGrid`
+            A modified copy of the current grid
+        """
+        if dx is None and size is None:
             dx = self.dx
-        if dy is None:
+        if dy is None and size is None:
             dy = self.dy
         if offset is None:
             offset = self.offset
@@ -593,7 +639,7 @@ class RectGrid(BaseGrid):
         if crs is None:
             crs = self.crs
         return RectGrid(
-            dx=dx, dy=dy, offset=offset, rotation=rotation, crs=crs, **kwargs
+            dx=dx, dy=dy, size=size, offset=offset, rotation=rotation, crs=crs, **kwargs
         )
 
 
