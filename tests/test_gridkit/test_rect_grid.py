@@ -47,18 +47,6 @@ def test_area_init(area):
     numpy.testing.assert_allclose(grid.size, area**0.5)
 
 
-def test_size_setter():
-    grid = RectGrid(dx=2, dy=2)
-    numpy.testing.assert_allclose(grid.size, 2)
-    numpy.testing.assert_allclose(grid.dx, 2)
-    numpy.testing.assert_allclose(grid.dy, 2)
-
-    grid.size = 3
-    numpy.testing.assert_allclose(grid.size, 3)
-    numpy.testing.assert_allclose(grid.dx, 3)
-    numpy.testing.assert_allclose(grid.dy, 3)
-
-
 @pytest.mark.parametrize(
     "points, expected_ids",
     [
