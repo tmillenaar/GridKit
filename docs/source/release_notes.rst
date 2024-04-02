@@ -3,6 +3,20 @@
 Release notes
 ================
 
+Version 0.9.2 (April 02, 2024)
+------------------------------
+Features
+ - Add new initialization argument ``area`` to :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid` for specifying the cell area of the grid
+ - Add new property :meth:`.BaseGrid.area`
+ - Add ``shape`` to :class:`.RectGrid` to further unify the class API between the three grid types
+
+Fixes
+ - Prevent passing rotation argument to Bounded grids, which were not designed with rotation in mind because that breaks the tiling.
+
+Documentation
+ - Update example :ref:`resampling.py <example resampling>`
+ - Improve docstrings about initialization of :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid`
+
 Version 0.9.1 (March 17, 2024)
 ------------------------------
 Features
@@ -13,7 +27,7 @@ Features
 Fixes
  - ``offset`` is now properly taken into account for :meth:`.HexGrid.cell_at_point`
  - Less restrictive offsets by limiting offset for all grids with :meth:`.BaseGrid.cell_height` and :meth:`.BaseGrid.cell_width` instead of dx and dy.
- - Rotation of "flat" :class:`.HexGrids` is no longer in the opposite direction (was clockwise)
+ - Rotation of "flat" :class:`.HexGrid` is no longer in the opposite direction (was clockwise)
 
 Documentation
  - Add example :ref:`rotation_animation.py <example rotated animation>`.
