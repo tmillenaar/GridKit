@@ -35,31 +35,53 @@ class RectGrid(BaseGrid):
     """
 
     def __init__(
-        self, *args, dx=None, dy=None, size=None, offset=(0, 0), rotation=0, **kwargs
+        self,
+        *args,
+        dx=None,
+        dy=None,
+        size=None,
+        area=None,
+        offset=(0, 0),
+        rotation=0,
+        **kwargs,
     ):
+        # Make sure only one method of defining cell size is used
+        nr_input_methods = sum(
+            [
+                dx is not None or dy is not None,
+                size is not None,
+                area is not None,
+            ]
+        )
+        if nr_input_methods == 0:
+            raise ValueError(
+                "No cell size can be determined. Please supply either 'size', 'area' or both 'dx' and 'dy'."
+            )
+        if nr_input_methods > 1:
+            supplied_args = [arg for arg in [dx, dy, size, area] if arg is not None]
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size', 'area' or 'dx'&'dy' when instantiating a new RectGrid. Found: {supplied_args}."
+            )
+
+        # Determine cell size
         if size is not None:
-            if dx is not None or dy is not None:
-                raise ValueError(
-                    "Argument conflict. Please supply either 'size' or 'dx'&'dy' when instantiating a new RectGrid. Found both."
-                )
-            dx = dy = size
-            self._size = size
+            self._size = dx = dy = size
+        elif area is not None:
+            self._size = dx = dy = area**0.5
         else:
-            if dx is None and dy is None:
-                raise ValueError(
-                    "No cell size found. Please supply either 'size' or both 'dx' and 'dy'."
-                )
             if dx is None or dy is None:
                 raise ValueError(
                     f"Found only '{'dx' if dx is not None else 'dy'}' when instantiating a new RectGrid. Please also supply '{'dx' if dx is None else 'dy'}'."
                 )
             self._size = dx if numpy.isclose(dx, dy) else None
 
+        # Instantiate attributes
         self._dx = dx
         self._dy = dy
         self._rotation = rotation
         self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
+
         super(RectGrid, self).__init__(*args, **kwargs)
 
     @property

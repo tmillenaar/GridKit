@@ -6,6 +6,21 @@ from gridkit import RectGrid
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 
 
+def test_cell_size_init_raises():
+
+    with pytest.raises(ValueError):
+        HexGrid()
+
+    with pytest.raises(ValueError):
+        HexGrid(size=1, area=1)
+
+
+@pytest.mark.parametrize("area", [0.1, 123, 987.6])
+def test_init_area(area):
+    grid = HexGrid(area=area)
+    numpy.testing.assert_allclose(grid.area, area)
+
+
 @pytest.mark.parametrize(
     "shape, indices, expected_centroids",
     [
@@ -469,7 +484,7 @@ def test_update():
 
 @pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])
 @pytest.mark.parametrize("shape", ["flat", "pointy"])
-def test_cell_area(size, shape):
+def test_area(size, shape):
     grid = HexGrid(size=size, shape=shape)
     geom = grid.to_shapely((0, 0))
-    numpy.testing.assert_allclose(grid.cell_area, geom.area)
+    numpy.testing.assert_allclose(grid.area, geom.area)

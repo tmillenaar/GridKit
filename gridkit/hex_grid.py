@@ -40,8 +40,26 @@ class HexGrid(BaseGrid):
     """
 
     def __init__(
-        self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs
+        self,
+        *args,
+        size=None,
+        area=None,
+        shape="pointy",
+        offset=(0, 0),
+        rotation=0,
+        **kwargs,
     ):
+        if area is None and size is None:
+            raise ValueError(
+                "No cell size can be determined. Please supply either 'size' or 'area'"
+            )
+        if area is not None and size is not None:
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size' or 'area'. Got both"
+            )
+        if area is not None:
+            size = (2 / 3 * area * 3**0.5) ** 0.5
+
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation if shape == "pointy" else -rotation

@@ -6,7 +6,7 @@ from gridkit import HexGrid
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
-def test_dx_dy_init():
+def test_cell_size_init():
     with pytest.raises(ValueError):
         RectGrid(dx=1)
 
@@ -22,11 +22,29 @@ def test_dx_dy_init():
     with pytest.raises(ValueError):
         RectGrid(dy=1, dx=1, size=1)
 
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, dx=1, area=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(area=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, area=1)
+
     grid = RectGrid(dx=2, dy=3)
     assert grid.size is None
 
     grid = RectGrid(dx=2, dy=2)
     numpy.testing.assert_allclose(grid.size, 2)
+
+
+@pytest.mark.parametrize("area", [0.1, 123, 987.6])
+def test_area_init(area):
+    grid = RectGrid(area=area)
+    numpy.testing.assert_allclose(grid.area, area)
+    numpy.testing.assert_allclose(grid.dx, area**0.5)
+    numpy.testing.assert_allclose(grid.dy, area**0.5)
+    numpy.testing.assert_allclose(grid.size, area**0.5)
 
 
 def test_size_setter():
@@ -509,7 +527,7 @@ def test_dx_dy_setter():
         {"dx": 1234, "dy": 0.3},
     ],
 )
-def test_cell_area(kwargs):
+def test_area(kwargs):
     grid = RectGrid(**kwargs)
     geom = grid.to_shapely((0, 0))
-    numpy.testing.assert_allclose(grid.cell_area, geom.area)
+    numpy.testing.assert_allclose(grid.area, geom.area)

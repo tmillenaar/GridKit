@@ -137,7 +137,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return self._grid.rotation_matrix_inv()
 
     @property
-    def cell_area(self):
+    def area(self):
         """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
         return self.dx * self.dy
 

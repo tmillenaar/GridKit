@@ -14,6 +14,21 @@ def test_radius(size, expected_radius):
     numpy.testing.assert_allclose(grid.r, expected_radius)
 
 
+def test_cell_size_init_raises():
+
+    with pytest.raises(ValueError):
+        TriGrid()
+
+    with pytest.raises(ValueError):
+        TriGrid(size=1, area=1)
+
+
+@pytest.mark.parametrize("area", [0.1, 123, 987.6])
+def test_init_area(area):
+    grid = TriGrid(area=area)
+    numpy.testing.assert_allclose(grid.area, area)
+
+
 @pytest.mark.parametrize(
     "indices, expected_centroids",
     [
@@ -675,7 +690,7 @@ def test_size_setter():
 
 
 @pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])
-def test_cell_area(size):
+def test_area(size):
     grid = TriGrid(size=size)
     geom = grid.to_shapely((0, 0))
-    numpy.testing.assert_allclose(grid.cell_area, geom.area)
+    numpy.testing.assert_allclose(grid.area, geom.area)
