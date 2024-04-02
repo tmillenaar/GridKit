@@ -1,4 +1,5 @@
 import warnings
+from typing import Tuple, Union
 
 import numpy
 import scipy
@@ -85,7 +86,7 @@ class RectGrid(BaseGrid):
         if size is not None:
             self._size = dx = dy = size
         elif area is not None:
-            self._size = dx = dy = area**0.5
+            self._size = dx = dy = self._area_to_size(area)
         else:
             if dx is None or dy is None:
                 raise ValueError(
@@ -101,6 +102,10 @@ class RectGrid(BaseGrid):
         self.bounded_cls = BoundedRectGrid
 
         super(RectGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return area**0.5
 
     @property
     def dx(self) -> float:
@@ -140,8 +145,6 @@ class RectGrid(BaseGrid):
         See also
         --------
         :meth:`.BaseGrid.size`
-        :meth:`.TriGrid.size`
-        :meth:`.HexGrid.size`
 
         """
         return self._size
@@ -621,7 +624,15 @@ class RectGrid(BaseGrid):
     def parent_grid_class(self):
         return RectGrid
 
-    def _update_inner_grid(self, dx=None, dy=None, offset=None, rotation=None):
+    def _update_inner_grid(
+        self, dx=None, dy=None, size=None, offset=None, rotation=None
+    ):
+        if size is not None and (dx is not None or dy is not None):
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size' or 'dx'&'dy'. Found both."
+            )
+        if size is not None:
+            dx = dy = size
         if dx is None:
             dx = self.dx
         if dy is None:
@@ -637,6 +648,7 @@ class RectGrid(BaseGrid):
         dx=None,
         dy=None,
         size=None,
+        area=None,
         offset=None,
         rotation=None,
         crs=None,
@@ -647,15 +659,17 @@ class RectGrid(BaseGrid):
 
         Parameters
         ----------
-        dx: `float`
+        dx: float
             The new horizontal spacing between two cell centroids, i.e. the new width of the cells
-        dy: `float`
+        dy: float
             The new vertical spacing between two cell centroids, i.e. the new height of the cells
-        size: `float`
+        size: float
             The new size of the length of the cells (dx and dy)
-        offset: `Tuple[float, float]`
+        area: float
+            The area of a cell. Cannot be supplied together with `size` or `dx`&`dy`.
+        offset: Tuple[float, float]
             The new offset of the origin of the grid
-        rotation: `float`
+        rotation: float
             The new counter-clockwise rotation of the grid in degrees.
             Can be negative for clockwise rotation.
         crs: Union[int, str, pyproj.CRS]
@@ -668,9 +682,9 @@ class RectGrid(BaseGrid):
         :class:`.RectGrid`
             A modified copy of the current grid
         """
-        if dx is None and size is None:
+        if not any([dx, size, area]):
             dx = self.dx
-        if dy is None and size is None:
+        if not any([dy, size, area]):
             dy = self.dy
         if offset is None:
             offset = self.offset
@@ -679,7 +693,14 @@ class RectGrid(BaseGrid):
         if crs is None:
             crs = self.crs
         return RectGrid(
-            dx=dx, dy=dy, size=size, offset=offset, rotation=rotation, crs=crs, **kwargs
+            dx=dx,
+            dy=dy,
+            size=size,
+            area=area,
+            offset=offset,
+            rotation=rotation,
+            crs=crs,
+            **kwargs,
         )
 
 

@@ -458,6 +458,19 @@ def test_size_setter():
         grid.size = -1
 
 
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_area_setter(shape):
+    grid = HexGrid(size=1, shape=shape, rotation=10)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 2)
+    grid.area = 3.21
+    numpy.testing.assert_allclose(grid.area, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.area = 0
+    with pytest.raises(ValueError):
+        grid.area = -1
+
+
 def test_update():
     grid = HexGrid(size=1, shape="pointy")
 
@@ -480,6 +493,10 @@ def test_update():
     new_grid = grid.update(rotation=2.5)
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
+
+    new_grid = grid.update(area=4)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 2)
+    numpy.testing.assert_allclose(new_grid.area, 4)
 
 
 @pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])

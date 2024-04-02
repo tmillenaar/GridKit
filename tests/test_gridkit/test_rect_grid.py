@@ -497,6 +497,10 @@ def test_update():
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
 
+    new_grid = grid.update(area=4)
+    numpy.testing.assert_allclose(grid.area, 2)
+    numpy.testing.assert_allclose(new_grid.area, 4)
+
 
 def test_dx_dy_setter():
     grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
@@ -517,6 +521,34 @@ def test_dx_dy_setter():
         grid.dy = 0
     with pytest.raises(ValueError):
         grid.dy = -1
+
+
+def test_size_setter():
+    grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
+    assert grid.size is None
+    numpy.testing.assert_allclose(grid.dx, 1.23)
+    numpy.testing.assert_allclose(grid.dy, 4.56)
+    grid.size = 3.21
+    numpy.testing.assert_allclose(grid.size, 3.21)
+    numpy.testing.assert_allclose(grid.dx, 3.21)
+    numpy.testing.assert_allclose(grid.dy, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.size = 0
+    with pytest.raises(ValueError):
+        grid.size = -1
+
+
+def test_area_setter():
+    grid = RectGrid(size=1, rotation=10)
+    numpy.testing.assert_allclose(grid.area, 1)
+    grid.area = 3.21
+    numpy.testing.assert_allclose(grid.area, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.area = 0
+    with pytest.raises(ValueError):
+        grid.area = -1
 
 
 @pytest.mark.parametrize(

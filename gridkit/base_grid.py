@@ -59,16 +59,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @property
     def size(self) -> float:
-        """The size of the cell as supplied when initiating the class.
-
-        See also
-        --------
-        :meth:`.TriGrid.size`
-        :meth:`.RectGrid.size`
-        :meth:`.HexGrid.size`
-
-        """
+        """The size of the cell as supplied when initiating the class"""
         return self._size
+
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._grid = self._update_inner_grid(size=value)
 
     @abc.abstractmethod
     def dx(self) -> float:
@@ -140,6 +142,18 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def area(self):
         """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
         return self.dx * self.dy
+
+    @area.setter
+    def area(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = self._area_to_size(value)
+        self._grid = self._update_inner_grid(size=self._size)
+        self._dx = self._grid.dx()
+        self._dy = self._grid.dy()
 
     @abc.abstractmethod
     def centroid(self, index) -> float:

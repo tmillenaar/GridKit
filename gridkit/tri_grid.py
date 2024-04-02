@@ -55,7 +55,7 @@ class TriGrid(BaseGrid):
                 f"Argument conflict. Please supply either 'size' or 'area'. Got both"
             )
         if area is not None:
-            size = (area / 3**0.5) ** 0.5
+            size = self._area_to_size(area)
 
         self._size = size
         self._radius = size / 3**0.5
@@ -64,6 +64,10 @@ class TriGrid(BaseGrid):
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return (area / 3**0.5) ** 0.5
 
     @property
     def dx(self) -> float:
@@ -79,30 +83,6 @@ class TriGrid(BaseGrid):
     def r(self) -> float:
         """The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner."""
         return self._grid.radius()
-
-    @property
-    def size(self) -> float:
-        """The size of the cell as supplied when initiating the class.
-        The size is equivalent to dx, which is half a cell edge length.
-
-        See also
-        --------
-        :meth:`.BaseGrid.size`
-        :meth:`.RectGrid.size`
-        :meth:`.HexGrid.size`
-
-        """
-        return self._size
-
-    @size.setter
-    def size(self, value):
-        """Set the size of the grid to a new value"""
-        if value <= 0:
-            raise ValueError(
-                f"Size of cell cannot be set to '{value}', must be larger than zero"
-            )
-        self._size = value
-        self._grid = self._update_inner_grid(size=value)
 
     @validate_index
     def centroid(self, index):
@@ -325,16 +305,18 @@ class TriGrid(BaseGrid):
             rotation = self.rotation
         return PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
 
-    def update(self, size=None, offset=None, rotation=None, crs=None, **kwargs):
+    def update(
+        self, size=None, area=None, offset=None, rotation=None, crs=None, **kwargs
+    ):
         """Modify attributes of the existing grid and return a copy.
         The original grid remains un-mutated.
 
         Parameters
         ----------
         size: `float`
-            The new size of the length of the cells (dx and dy)
-        shape: Literal["pointy", "flat"]
-            The new shape of the grid cells
+            The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.
+        area: float
+            The area of a cell. Cannot be supplied together with ``size``.
         offset: `Tuple[float, float]`
             The new offset of the origin of the grid
         rotation: `float`
@@ -350,7 +332,7 @@ class TriGrid(BaseGrid):
         :class:`.RectGrid`
             A modified copy of the current grid
         """
-        if size is None:
+        if size is None and area is None:
             size = self.size
         if offset is None:
             offset = self.offset
@@ -358,7 +340,9 @@ class TriGrid(BaseGrid):
             rotation = self.rotation
         if crs is None:
             crs = self.crs
-        return TriGrid(size=size, offset=offset, rotation=rotation, crs=crs, **kwargs)
+        return TriGrid(
+            size=size, area=area, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedTriGrid(BoundedGrid, TriGrid):
@@ -543,7 +527,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
         Returns
         -------
-        :class:`~.rect_grid.BoundedTriGrid`
+        :class:`.BoundedTriGrid`
             A copy of the grid with modified cell spacing and bounds to match the specified CRS
 
         See also

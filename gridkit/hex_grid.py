@@ -70,7 +70,7 @@ class HexGrid(BaseGrid):
                 f"Argument conflict. Please supply either 'size' or 'area'. Got both"
             )
         if area is not None:
-            size = (2 / 3 * area * 3**0.5) ** 0.5
+            size = self._area_to_size(area)
 
         self._size = size
         self._radius = size / 3**0.5
@@ -96,6 +96,27 @@ class HexGrid(BaseGrid):
         self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return (2 / 3 * area * 3**0.5) ** 0.5
+
+    @property
+    def area(self):
+        """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
+        return self.dx * self.dy
+
+    @area.setter
+    def area(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = self._area_to_size(value)
+        self._grid = self._update_inner_grid(size=self._size)
+        self._dx = self._grid.dx() if self.shape == "pointy" else self._grid.dy()
+        self._dy = self._grid.dy() if self.shape == "pointy" else self._grid.dx()
 
     @property
     def dx(self) -> float:
@@ -131,30 +152,6 @@ class HexGrid(BaseGrid):
         self.rotation = (
             rot  # Re-run rotation settter to update rotaiton according to new shape
         )
-
-    @property
-    def size(self) -> float:
-        """The size of the cell as supplied when initiating the class.
-        This is the same as dx for a flat grid and the same as dy for a pointy grid.
-
-        See also
-        --------
-        :meth:`.BaseGrid.size`
-        :meth:`.TriGrid.size`
-        :meth:`.RectGrid.size`
-
-        """
-        return self._size
-
-    @size.setter
-    def size(self, value):
-        """Set the size of the grid to a new value"""
-        if value <= 0:
-            raise ValueError(
-                f"Size of cell cannot be set to '{value}', must be larger than zero"
-            )
-        self._size = value
-        self._grid = self._update_inner_grid(size=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -609,20 +606,29 @@ class HexGrid(BaseGrid):
         return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
-        self, size=None, shape=None, offset=None, rotation=None, crs=None, **kwargs
+        self,
+        size=None,
+        shape=None,
+        area=None,
+        offset=None,
+        rotation=None,
+        crs=None,
+        **kwargs,
     ):
         """Modify attributes of the existing grid and return a copy.
         The original grid remains un-mutated.
 
         Parameters
         ----------
-        size: `float`
-            The new size of the length of the cells (dx and dy)
+        size: float
+            The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.
+        area: float
+            The area of a cell. Cannot be supplied together with ``size``.
         shape: Literal["pointy", "flat"]
             The new shape of the grid cells
-        offset: `Tuple[float, float]`
+        offset: Tuple[float, float]
             The new offset of the origin of the grid
-        rotation: `float`
+        rotation: float
             The new counter-clockwise rotation of the grid in degrees.
             Can be negative for clockwise rotation.
         crs: Union[int, str, pyproj.CRS]
@@ -635,7 +641,7 @@ class HexGrid(BaseGrid):
         :class:`.RectGrid`
             A modified copy of the current grid
         """
-        if size is None:
+        if size is None and area is None:
             size = self.size
         if shape is None:
             shape = self.shape
@@ -646,7 +652,13 @@ class HexGrid(BaseGrid):
         if crs is None:
             crs = self.crs
         return HexGrid(
-            size=size, shape=shape, offset=offset, rotation=rotation, crs=crs, **kwargs
+            size=size,
+            shape=shape,
+            area=area,
+            offset=offset,
+            rotation=rotation,
+            crs=crs,
+            **kwargs,
         )
 
 
