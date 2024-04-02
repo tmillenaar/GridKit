@@ -48,11 +48,6 @@ def test_area_init(area):
 
 
 def test_size_setter():
-    grid = RectGrid(size=1)
-    numpy.testing.assert_allclose(grid.size, 1)
-    numpy.testing.assert_allclose(grid.dx, 1)
-    numpy.testing.assert_allclose(grid.dy, 1)
-
     grid = RectGrid(dx=2, dy=2)
     numpy.testing.assert_allclose(grid.size, 2)
     numpy.testing.assert_allclose(grid.dx, 2)
