@@ -66,15 +66,14 @@ plt.show()
 # Now let's do the same, but on hexagonal grids.
 # There are two flavours, "pointy" and "flat" hexagonal grids.
 # Let's show both so we can compare them both to each other and to the downsampled rectangular grid.
-# Hexagonal cells are smaller than square cells when given the same width,
-# so to make a more fair visual comparisson let's use a slightly larger cell width.
-# This way we will have a roughly equal number of cells covering the area.
-
+# We can define the hexagon cell size to have the same area as the downsampled rectangular dem cell size
+# for a fair visual comparison.
+#
 hexdem_flat = dem.resample(
-    HexGrid(size=11, shape="flat", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.area, shape="flat", crs=dem.crs), method="bilinear"
 )
 hexdem_pointy = dem.resample(
-    HexGrid(size=11, shape="pointy", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.area, shape="pointy", crs=dem.crs), method="bilinear"
 )
 
 
