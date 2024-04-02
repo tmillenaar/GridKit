@@ -15,11 +15,15 @@ from gridkit.rect_grid import RectGrid
 class HexGrid(BaseGrid):
     """Abstraction that represents an infinite grid with hexagonal cell shape.
 
+    The size of each cell can be specified through the `size` or `area` arguments.
+
     Initialization parameters
     -------------------------
-    size: :class:`float`
-        The spacing between two cells in horizontal direction if ``shape`` is "pointy",
-        or in vertical direction if ``shape`` is "flat".
+    size: float
+        The spacing between two cell centroids in horizontal direction if ``shape`` is "pointy",
+        or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area`.
+    area: float
+        The area of a cell. Cannot be supplied together with `size`.
     shape: `Literal["pointy", "flat"]`
         The shape of the layout of the grid.
         If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
@@ -31,11 +35,19 @@ class HexGrid(BaseGrid):
         If the supplied shift is larger,
         a shift will be performed such that the new center is a multiple of dx or dy away.
         Default: (0,0)
+    rotation: float
+        The counter-clockwise rotation of the grid around the origin in degrees.
     crs: `pyproj.CRS` (optional)
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.TriGrid`
+    :class:`.RectGrid`
+    :class:`.BoundedHexGrid`
 
     """
 
@@ -639,7 +651,8 @@ class HexGrid(BaseGrid):
 
 
 class BoundedHexGrid(BoundedGrid, HexGrid):
-    """
+    """A HexGrid with data encapsulated within a bounding box.
+
     Initialization parameters
     -------------------------
     data: `numpy.ndarray`
@@ -655,6 +668,13 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.HexGrid`
+    :class:`.BoundedTriGrid`
+    :class:`.BoundedRectGrid`
+
     """
 
     def __init__(self, data, *args, bounds, shape="flat", **kwargs):

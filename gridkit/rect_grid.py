@@ -17,9 +17,18 @@ class RectGrid(BaseGrid):
     Initialization parameters
     -------------------------
     dx: :class:`float`
-        The spacing between two cell centroids in horizontal direction
+        The spacing between two cell centroids in horizontal direction.
+        Has to be supplied together with `dx`.
+        Cannot be supplied together with `area` or `size`.
     dy: :class:`float`
         The spacing between two cell centroids in vertical direction
+        Has to be supplied together with `dy`.
+        Cannot be supplied together with `area` or `size`.
+    size: float
+        The spacing between two cell centroids in horizontal and vertical direction.
+        Cannot be supplied together with `area` or `dx`&`dy`.
+    area: float
+        The area of a cell. Cannot be supplied together with `size` or `dx`&`dy`.
     offset: `Tuple(float, float)` (optional)
         The offset in dx and dy.
         Shifts the whole grid by the specified amount.
@@ -27,11 +36,20 @@ class RectGrid(BaseGrid):
         If the supplied shift is larger,
         a shift will be performed such that the new center is a multiple of dx or dy away.
         Default: (0,0)
+    rotation: float
+        The counter-clockwise rotation of the grid around the origin in degrees.
     crs: `pyproj.CRS` (optional)
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.TriGrid`
+    :class:`.HexGrid`
+    :class:`.BoundedRectGrid`
+
     """
 
     def __init__(
@@ -678,6 +696,13 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.RectGrid`
+    :class:`.BoundedTriGrid`
+    :class:`.BoundedHexGrid`
+
     """
 
     def __init__(self, data, *args, bounds, **kwargs):
