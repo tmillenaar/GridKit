@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.doc_utils &mdash; GridKit v0.9.1 documentation</title>
+  <title>gridkit.doc_utils &mdash; GridKit v0.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=1e52c42f"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=29aa4e45"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.1
+                v0.9.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -129,7 +129,17 @@
     <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot polygons on a map and color them based on the supplied ``values``</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot polygons on a map and color them based on the supplied ``values``.</span>
+
+<span class="sd">    .. warning ::</span>
+
+<span class="sd">        This function is a workaround to have matplotlib plot arbitrary shapes.</span>
+<span class="sd">        It is not performant and thus not suitable for large amounts of data.</span>
+<span class="sd">        Moreover, sometimes the shapes don&#39;t seem to align well in the corners.</span>
+<span class="sd">        This is a matplotlib visualization issue, likely related to the resolution of the figure.</span>
+<span class="sd">        The jagged corners tend to disappear when zooming in closely.</span>
+
+<span class="sd">    ..</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>base_grid &mdash; GridKit v0.9.1 documentation</title>
+  <title>base_grid &mdash; GridKit v0.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=1e52c42f"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=29aa4e45"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.1
+                v0.9.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -148,6 +148,12 @@ such as an authority string (eg “EPSG:4326”) or a WKT string.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.size" title="Permalink to this definition"></a></dt>
+<dd><p>The size of the cell as supplied when initiating the class</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.dx">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.dx" title="Permalink to this definition"></a></dt>
@@ -198,6 +204,12 @@ Note: makes a copy every time this is called.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotation_matrix_inv</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotation_matrix_inv" title="Permalink to this definition"></a></dt>
 <dd><p>The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
 Note: makes a copy every time this is called.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.area">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">area</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.area" title="Permalink to this definition"></a></dt>
+<dd><p>The area of a cell. The unit is the unit used for the cell’s <a class="reference internal" href="#gridkit.base_grid.BaseGrid.size" title="gridkit.base_grid.BaseGrid.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.size()</span></code></a>, squared.</p>
 </dd></dl>
 
 <dl class="py method">

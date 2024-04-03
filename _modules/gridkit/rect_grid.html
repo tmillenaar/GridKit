@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.rect_grid &mdash; GridKit v0.9.1 documentation</title>
+  <title>gridkit.rect_grid &mdash; GridKit v0.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=1e52c42f"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=29aa4e45"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.1
+                v0.9.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -84,6 +84,7 @@
              
   <h1>Source code for gridkit.rect_grid</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">scipy</span>
@@ -102,9 +103,18 @@
 <span class="sd">    Initialization parameters</span>
 <span class="sd">    -------------------------</span>
 <span class="sd">    dx: :class:`float`</span>
-<span class="sd">        The spacing between two cell centroids in horizontal direction</span>
+<span class="sd">        The spacing between two cell centroids in horizontal direction.</span>
+<span class="sd">        Has to be supplied together with `dx`.</span>
+<span class="sd">        Cannot be supplied together with `area` or `size`.</span>
 <span class="sd">    dy: :class:`float`</span>
 <span class="sd">        The spacing between two cell centroids in vertical direction</span>
+<span class="sd">        Has to be supplied together with `dy`.</span>
+<span class="sd">        Cannot be supplied together with `area` or `size`.</span>
+<span class="sd">    size: float</span>
+<span class="sd">        The spacing between two cell centroids in horizontal and vertical direction.</span>
+<span class="sd">        Cannot be supplied together with `area` or `dx`&amp;`dy`.</span>
+<span class="sd">    area: float</span>
+<span class="sd">        The area of a cell. Cannot be supplied together with `size` or `dx`&amp;`dy`.</span>
 <span class="sd">    offset: `Tuple(float, float)` (optional)</span>
 <span class="sd">        The offset in dx and dy.</span>
 <span class="sd">        Shifts the whole grid by the specified amount.</span>
@@ -112,20 +122,75 @@
 <span class="sd">        If the supplied shift is larger,</span>
 <span class="sd">        a shift will be performed such that the new center is a multiple of dx or dy away.</span>
 <span class="sd">        Default: (0,0)</span>
+<span class="sd">    rotation: float</span>
+<span class="sd">        The counter-clockwise rotation of the grid around the origin in degrees.</span>
 <span class="sd">    crs: `pyproj.CRS` (optional)</span>
 <span class="sd">        The coordinate reference system of the grid.</span>
 <span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
 <span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
 <span class="sd">        Default: None</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`.TriGrid`</span>
+<span class="sd">    :class:`.HexGrid`</span>
+<span class="sd">    :class:`.BoundedRectGrid`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Make sure only one method of defining cell size is used</span>
+        <span class="n">nr_input_methods</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">nr_input_methods</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;No cell size can be determined. Please supply either &#39;size&#39;, &#39;area&#39; or both &#39;dx&#39; and &#39;dy&#39;.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">nr_input_methods</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">supplied_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">area</span><span class="p">]</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Argument conflict. Please supply either &#39;size&#39;, &#39;area&#39; or &#39;dx&#39;&amp;&#39;dy&#39; when instantiating a new RectGrid. Found: </span><span class="si">{</span><span class="n">supplied_args</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Determine cell size</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="k">elif</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_to_size</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Found only &#39;</span><span class="si">{</span><span class="s1">&#39;dx&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">dx</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;dy&#39;</span><span class="si">}</span><span class="s2">&#39; when instantiating a new RectGrid. Please also supply &#39;</span><span class="si">{</span><span class="s1">&#39;dx&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">dx</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="kc">None</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;dy&#39;</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">dx</span> <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Instantiate attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="n">dx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="n">dy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span> <span class="o">=</span> <span class="n">rotation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyRectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">RectGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_area_to_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">area</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the ``size`` that corresponds to a specific area.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">area</span><span class="o">**</span><span class="mf">0.5</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -156,6 +221,30 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">dy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The length of the cell sides, if all sides are of the same length.</span>
+<span class="sd">        The returned size is &#39;None&#39; if :meth:`.RectGrid.dx` and :meth:`.RectGrid.dy` are not the same length.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`.BaseGrid.size`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
+
+    <span class="nd">@size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the size of the grid to a new value&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Size of cell cannot be set to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;, must be larger than zero&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RectGrid.to_bounded"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_bounded">[docs]</a>    <span class="k">def</span> <span class="nf">to_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -620,7 +709,15 @@
     <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">RectGrid</span>
 
-    <span class="k">def</span> <span class="nf">_update_inner_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_update_inner_grid</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dy</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Argument conflict. Please supply either &#39;size&#39; or &#39;dx&#39;&amp;&#39;dy&#39;. Found both.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">size</span>
         <span class="k">if</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
         <span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -631,10 +728,48 @@
             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span>
         <span class="k">return</span> <span class="n">PyRectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">)</span>
 
-<div class="viewcode-block" id="RectGrid.update"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">dx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="RectGrid.update"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify attributes of the existing grid and return a copy.</span>
+<span class="sd">        The original grid remains un-mutated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dx: float</span>
+<span class="sd">            The new horizontal spacing between two cell centroids, i.e. the new width of the cells</span>
+<span class="sd">        dy: float</span>
+<span class="sd">            The new vertical spacing between two cell centroids, i.e. the new height of the cells</span>
+<span class="sd">        size: float</span>
+<span class="sd">            The new size of the length of the cells (dx and dy)</span>
+<span class="sd">        area: float</span>
+<span class="sd">            The area of a cell. Cannot be supplied together with `size` or `dx`&amp;`dy`.</span>
+<span class="sd">        offset: Tuple[float, float]</span>
+<span class="sd">            The new offset of the origin of the grid</span>
+<span class="sd">        rotation: float</span>
+<span class="sd">            The new counter-clockwise rotation of the grid in degrees.</span>
+<span class="sd">            Can be negative for clockwise rotation.</span>
+<span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
+<span class="sd">            The value can be anything accepted</span>
+<span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.RectGrid`</span>
+<span class="sd">            A modified copy of the current grid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">dx</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">area</span><span class="p">]):</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
-        <span class="k">if</span> <span class="n">dy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">dy</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">area</span><span class="p">]):</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
         <span class="k">if</span> <span class="n">offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span>
@@ -643,7 +778,14 @@
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">crs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span>
         <span class="k">return</span> <span class="n">RectGrid</span><span class="p">(</span>
-            <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">dy</span><span class="o">=</span><span class="n">dy</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+            <span class="n">area</span><span class="o">=</span><span class="n">area</span><span class="p">,</span>
+            <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span>
+            <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
@@ -660,6 +802,13 @@
 <span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
 <span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
 <span class="sd">        Default: None</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    :class:`.RectGrid`</span>
+<span class="sd">    :class:`.BoundedTriGrid`</span>
+<span class="sd">    :class:`.BoundedHexGrid`</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; GridKit v0.9.1 documentation</title>
+  <title>Release notes &mdash; GridKit v0.9.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=1e52c42f"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=29aa4e45"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -40,7 +40,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.9.1
+                v0.9.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -58,6 +58,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-2-april-03-2024">Version 0.9.2 (April 03, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-9-1-march-17-2024">Version 0.9.1 (March 17, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-9-0-march-10-2024">Version 0.9.0 (March 10, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-8-0-march-03-2024">Version 0.8.0 (March 03, 2024)</a></li>
@@ -112,6 +113,26 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<section id="version-0-9-2-april-03-2024">
+<h2>Version 0.9.2 (April 03, 2024)<a class="headerlink" href="#version-0-9-2-april-03-2024" title="Permalink to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add new initialization argument <code class="docutils literal notranslate"><span class="pre">area</span></code> to <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> for specifying the cell area of the grid</p></li>
+<li><p>Add new property <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.area" title="gridkit.base_grid.BaseGrid.area"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.area()</span></code></a></p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">shape</span></code> to <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> to further unify the class API between the three grid types</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Prevent passing rotation argument to Bounded grids, which were not designed with rotation in mind because that breaks the tiling.</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Update example <a class="reference internal" href="example_gallery/raster_operations/resampling.html#example-resampling"><span class="std std-ref">resampling.py</span></a></p></li>
+<li><p>Improve docstrings about initialization of <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-9-1-march-17-2024">
 <h2>Version 0.9.1 (March 17, 2024)<a class="headerlink" href="#version-0-9-1-march-17-2024" title="Permalink to this heading"></a></h2>
 <dl class="simple">
@@ -124,7 +145,7 @@
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code> is now properly taken into account for <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.hex_grid.HexGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cell_at_point()</span></code></a></p></li>
 <li><p>Less restrictive offsets by limiting offset for all grids with <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_height" title="gridkit.base_grid.BaseGrid.cell_height"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_height()</span></code></a> and <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_width" title="gridkit.base_grid.BaseGrid.cell_width"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_width()</span></code></a> instead of dx and dy.</p></li>
-<li><p>Rotation of “flat” <code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrids</span></code> is no longer in the opposite direction (was clockwise)</p></li>
+<li><p>Rotation of “flat” <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> is no longer in the opposite direction (was clockwise)</p></li>
 </ul>
 </dd>
 <dt>Documentation</dt><dd><ul class="simple">
