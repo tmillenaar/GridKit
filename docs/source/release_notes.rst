@@ -3,7 +3,7 @@
 Release notes
 ================
 
-Version 0.9.2 (April 02, 2024)
+Version 0.9.2 (April 03, 2024)
 ------------------------------
 Features
  - Add new initialization argument ``area`` to :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid` for specifying the cell area of the grid
