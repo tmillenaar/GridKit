@@ -10,7 +10,53 @@ from gridkit.index import GridIndex, validate_index
 
 
 class TriGrid(BaseGrid):
-    def __init__(self, *args, size, offset=(0, 0), rotation=0, **kwargs):
+    """Abstraction that represents an infinite grid with cells in the shape of equilateral triangles.
+
+    The size of each cell can be specified through the `size` or `area` arguments.
+
+    Initialization parameters
+    -------------------------
+    size: float
+        The spacing between two cell centroids in horizontal direction. Cannot be supplied together with `area`.
+    area: float
+        The area of a cell. Cannot be supplied together with `size`.
+    offset: `Tuple(float, float)` (optional)
+        The offset in dx and dy.
+        Shifts the whole grid by the specified amount.
+        The shift is always reduced to be maximum one cell size.
+        If the supplied shift is larger,
+        a shift will be performed such that the new center is a multiple of dx or dy away.
+        Default: (0,0)
+    rotation: float
+        The counter-clockwise rotation of the grid around the origin in degrees.
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+
+    See also
+    --------
+    :class:`.RectGrid`
+    :class:`.HexGrid`
+    :class:`.BoundedTriGrid`
+
+    """
+
+    def __init__(
+        self, *args, size=None, area=None, offset=(0, 0), rotation=0, **kwargs
+    ):
+        if area is None and size is None:
+            raise ValueError(
+                "No cell size can be determined. Please supply either 'size' or 'area'"
+            )
+        if area is not None and size is not None:
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size' or 'area'. Got both"
+            )
+        if area is not None:
+            size = self._area_to_size(area)
+
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation
@@ -18,6 +64,10 @@ class TriGrid(BaseGrid):
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return (area / 3**0.5) ** 0.5
 
     @property
     def dx(self) -> float:
@@ -33,23 +83,6 @@ class TriGrid(BaseGrid):
     def r(self) -> float:
         """The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner."""
         return self._grid.radius()
-
-    @property
-    def size(self) -> float:
-        """The size of the cell as supplied when initiating the class.
-        The size is equivalent to dx, which is half a cell edge length.
-        """
-        return self._size
-
-    @size.setter
-    def size(self, value):
-        """Set the size of the grid to a new value"""
-        if value <= 0:
-            raise ValueError(
-                f"Size of cell cannot be set to '{value}', must be larger than zero"
-            )
-        self._size = value
-        self._grid = self._update_inner_grid(size=value)
 
     @validate_index
     def centroid(self, index):
@@ -272,8 +305,34 @@ class TriGrid(BaseGrid):
             rotation = self.rotation
         return PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
 
-    def update(self, size=None, offset=None, rotation=None, crs=None, **kwargs):
-        if size is None:
+    def update(
+        self, size=None, area=None, offset=None, rotation=None, crs=None, **kwargs
+    ):
+        """Modify attributes of the existing grid and return a copy.
+        The original grid remains un-mutated.
+
+        Parameters
+        ----------
+        size: `float`
+            The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.
+        area: float
+            The area of a cell. Cannot be supplied together with ``size``.
+        offset: `Tuple[float, float]`
+            The new offset of the origin of the grid
+        rotation: `float`
+            The new counter-clockwise rotation of the grid in degrees.
+            Can be negative for clockwise rotation.
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        :class:`.RectGrid`
+            A modified copy of the current grid
+        """
+        if size is None and area is None:
             size = self.size
         if offset is None:
             offset = self.offset
@@ -281,10 +340,34 @@ class TriGrid(BaseGrid):
             rotation = self.rotation
         if crs is None:
             crs = self.crs
-        return TriGrid(size=size, offset=offset, rotation=rotation, crs=crs, **kwargs)
+        return TriGrid(
+            size=size, area=area, offset=offset, rotation=rotation, crs=crs, **kwargs
+        )
 
 
 class BoundedTriGrid(BoundedGrid, TriGrid):
+    """A HexGrid with data encapsulated within a bounding box.
+
+    Initialization parameters
+    -------------------------
+    data: `numpy.ndarray`
+        A 2D ndarray containing the data
+    bounds: `Tuple(float, float, float, float)`
+        The extend of the data in minx, miny, maxx, maxy.
+    crs: `pyproj.CRS` (optional)
+        The coordinate reference system of the grid.
+        The value can be anything accepted by pyproj.CRS.from_user_input(),
+        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+        Default: None
+
+    See also
+    --------
+    :class:`.TriGrid`
+    :class:`.BoundedRectGrid`
+    :class:`.BoundedHexGrid`
+
+    """
+
     def __init__(self, data, *args, bounds, **kwargs):
         if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
             raise ValueError(
@@ -444,7 +527,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
         Returns
         -------
-        :class:`~.rect_grid.BoundedTriGrid`
+        :class:`.BoundedTriGrid`
             A copy of the grid with modified cell spacing and bounds to match the specified CRS
 
         See also

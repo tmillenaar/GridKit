@@ -18,7 +18,7 @@ def read_raster(
 
     Parameters
     ----------
-    path: :class:`str`
+    path: str
         The path to the file. This needs to be a file that is supported by rasterio.
     bounds: Tuple(float, float, float, float)
         The bounds of the are of interest. Only the data within the supplied bounds is read from the input file.
@@ -26,12 +26,12 @@ def read_raster(
         The Coordinte Reference System (CRS) of the supploed bounds.
         If the CRS of the bounds does not match that of the input files,
         the bounds are converted to that of the input file before reading.
-    border_buffer: :class:`int`
+    border_buffer: int
         A buffer to apply to the supplied `bounds` to read in a larger slice of the area.
 
     Returns
     -------
-    :class:`~gridkit.rect_grid.BoundedRectGrid`
+    :class:`.BoundedRectGrid`
         The contents of the GeoTIFF in the form of a BoundedRectGrid
 
     See also
