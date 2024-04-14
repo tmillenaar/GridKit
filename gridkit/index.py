@@ -131,7 +131,11 @@ class GridIndex(metaclass=_IndexMeta):
     """
 
     def __init__(self, index):
-        self.index = numpy.array(index, dtype=int).squeeze()
+        if not isinstance(index, numpy.ndarray) or not numpy.issubdtype(
+            index.dtype, numpy.integer
+        ):
+            index = numpy.array(index, dtype=int)
+        self.index = index.squeeze()
         if self.index.shape[-1] != 2 and self.index.size != 0:
             raise ValueError(
                 f"The last axis should contain two elements (an x and a y coordinate). Got {self.index.shape[-1]} elements instead."
