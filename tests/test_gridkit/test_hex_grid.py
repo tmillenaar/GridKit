@@ -186,6 +186,23 @@ def test_neighbours(shape, depth, index, multi_index, include_selected):
     assert all(distances <= grid.size * depth)
 
 
+def test_relative_neighbours():
+    grid = HexGrid(size=1)
+    ids = [
+        [4, 4],
+        [3, 5],
+    ]
+    expected_neighbours = [
+        [[3, 5], [4, 5], [3, 4], [5, 4], [4, 3], [3, 3]],
+        [[3, 6], [4, 6], [2, 5], [4, 5], [4, 4], [3, 4]],
+    ]
+
+    # test both singe id and multi-id input
+    numpy.testing.assert_allclose(grid.neighbours(ids), expected_neighbours)
+    numpy.testing.assert_allclose(grid.neighbours(ids[0]), expected_neighbours[0])
+    numpy.testing.assert_allclose(grid.neighbours(ids[1]), expected_neighbours[1])
+
+
 @pytest.mark.parametrize(
     "shape, method, expected_result, expected_bounds",
     (
