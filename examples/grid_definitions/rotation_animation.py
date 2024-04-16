@@ -47,6 +47,7 @@ def update_frame(rotation):
     ax.set_title(f"Rotation: {rotation} degrees")
     ax.set_xlim(-5, 5)
     ax.set_ylim(-5, 5)
+    ax.set_axis_off()
 
 
 # Create animation
@@ -55,3 +56,4 @@ ax.set_aspect("equal")
 anim = FuncAnimation(
     fig, update_frame, frames=range(0, 60, 2), repeat=True, interval=50
 )
+plt.show()

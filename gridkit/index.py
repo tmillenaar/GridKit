@@ -221,6 +221,9 @@ class GridIndex(metaclass=_IndexMeta):
         unique = numpy.unique(self.index_1d, **kwargs)
         return GridIndex.from_index_1d(unique)
 
+    def sort(self):
+        return GridIndex.from_index_1d(numpy.sort(self.index_1d))
+
     def intersection(self, other):
         """The intersection of two GridIndex instances. Keep the IDs contained in both.
 
