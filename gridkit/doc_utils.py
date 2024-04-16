@@ -1,13 +1,13 @@
 import warnings
 from typing import List, Union
 
+import matplotlib.patches as mpatches
 import matplotlib.pylab as pl
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.collections import PatchCollection
 import numpy
 import shapely
 import shapely.geometry
+from matplotlib.collections import PatchCollection
 
 
 def generate_2d_scatter_doughnut(num_points: float, radius: float) -> numpy.ndarray:
@@ -46,6 +46,7 @@ def plot_polygons(
     fill: bool = True,
     filled: bool = None,
     ax=None,
+    add_colorbar=False,
     **kwargs,
 ):
     """Plot polygons on a map and color them based on the supplied ``values``
@@ -82,7 +83,9 @@ def plot_polygons(
 
     """
     if filled is not None:
-        warnings.warn("""The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version.""")
+        warnings.warn(
+            """The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version."""
+        )
         fill = filled
 
     if ax is None:
@@ -101,23 +104,28 @@ def plot_polygons(
     if colors is None:
         colors = "black"
     if isinstance(colors, str):
-        colors = numpy.full(shape=len(geoms.geoms), fill_value = colors)
+        colors = numpy.full(shape=len(geoms.geoms), fill_value=colors)
     elif all(isinstance(c, str) for c in colors):
         pass  # already got passed a list of color names
-    elif isinstance(colors, numpy.ndarray) and colors.ndim > 1 and (colors.shape[-1] == 3 or colors.shape == 4):
-        pass # Assume rgb(a) values were supplied. Do nothing.
+    elif (
+        isinstance(colors, numpy.ndarray)
+        and colors.ndim > 1
+        and (colors.shape[-1] == 3 or colors.shape == 4)
+    ):
+        pass  # Assume rgb(a) values were supplied. Do nothing.
     else:
         # create colormap that matches our values
         cmap = getattr(pl.cm, cmap)
         values = colors
-        vmin = numpy.nanmin(values)
+        vmin = kwargs.pop("vmin", numpy.nanmin(values))
+        vmax = kwargs.pop("vmax", numpy.nanmax(values))
         values_normalized = values - vmin
-        vmax = numpy.nanmax(values_normalized)
-        values_normalized = values_normalized / vmax
+        values_normalized = values_normalized / numpy.nanmax(values_normalized)
         colors = cmap(
             values_normalized
         ).squeeze()  # squeeze to remove empty axes (when values is pandas series)
         colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
+        kwargs.setdefault("clim", (vmin, vmax))
 
     polygons = []
     for geom in geoms.geoms:
@@ -134,9 +142,13 @@ def plot_polygons(
     im = ax.add_artist(
         PatchCollection(
             patches=polygons,
+            cmap=cmap,
             **kwargs,
         )
     )
+
+    if add_colorbar:
+        plt.colorbar(im)
 
     ax.set_xlim(bounds[0], bounds[2])
     ax.set_ylim(bounds[1], bounds[3])
