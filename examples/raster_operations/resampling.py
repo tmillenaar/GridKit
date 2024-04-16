@@ -20,8 +20,6 @@ Several grids with different cell shapes are then defined on which the DEM data 
 
 # sphinx_gallery_thumbnail_number = -1
 
-import numpy
-
 from gridkit import HexGrid, RectGrid, read_raster
 
 dem = read_raster(
@@ -51,7 +49,7 @@ print("Original resolution in (dx, dy):", dem.cellsize)
 # I am calling it rectdem for later on I will define hexagonal ones as well.
 # To make sure it worked we can print out the cellsize after resampling
 rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.crs), method="bilinear")
-print("Downsampled resolution in (dx, dy):", dem.cellsize)
+print("Downsampled resolution in (dx, dy):", rectdem.cellsize)
 
 # %%
 #
@@ -67,57 +65,48 @@ plt.show()
 #
 # Now let's do the same, but on hexagonal grids.
 # There are two flavours, "pointy" and "flat" hexagonal grids.
-# Let's show both so we can compare them both to each other and the downsampled rectangular grid.
-# Hexagonal cells are smaller than square cells when given the same width,
-# so to make a more fair visual comparisson let's use a slightly larger cell width.
-# This way we will have a roughly equal number of cells covering the area.
-
+# Let's show both so we can compare them both to each other and to the downsampled rectangular grid.
+# We can define the hexagon cell size to have the same area as the downsampled rectangular dem cell size
+# for a fair visual comparison.
+#
 hexdem_flat = dem.resample(
-    HexGrid(size=11, shape="flat", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.area, shape="flat", crs=dem.crs), method="bilinear"
 )
 hexdem_pointy = dem.resample(
-    HexGrid(size=11, shape="pointy", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.area, shape="pointy", crs=dem.crs), method="bilinear"
 )
-
-# %%
-#
-# Since matplotlib's imshow cannot be used to plot this hexagonal data, we have to get a little more involved.
-# We can each cell as a polygon. This is more involved and less performant way of plotting than imshow,
-# but it will get the job done.
-# First, let's create a function that determines the colors for our polygons.
-
-import matplotlib.pylab as pl
-
-
-def get_colors(data):
-    """Obtain a color for each data value based on the data range of the original dem"""
-    cmap = getattr(pl.cm, "terrain")
-    vmin = numpy.nanmin(dem)
-    dem_values_normalized = dem.data.ravel() - vmin
-    vmax = numpy.nanmax(dem_values_normalized)
-    values_normalized = data.ravel() - vmin
-    values_normalized = values_normalized / vmax
-    colors = cmap(values_normalized)
-    colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
-    return colors
 
 
 # %%
 #
 # Now let's create two new figures and populate these with the colored shapes of the two downsampled hexagon grids.
+# Since there is no 'imshow' equivalent for hexagons in matplotlib, we use our own :func:`gridkit.doc_utils.plot_polygons`
+# function, which is less performant but works on generalized shapes.
+#
+from gridkit.doc_utils import plot_polygons
 
 # define two new figures
 fig_flat, ax_flat = plt.subplots()
 fig_pointy, ax_pointy = plt.subplots()
 
-# populate the figures with colored polygons
-for geom, color in zip(hexdem_flat.to_shapely().ravel(), get_colors(hexdem_flat.data)):
-    ax_flat.fill(*geom.exterior.xy, alpha=1.0, color=color)
-for geom, color in zip(
-    hexdem_pointy.to_shapely().ravel(), get_colors(hexdem_pointy.data)
-):
-    ax_pointy.fill(*geom.exterior.xy, alpha=1.0, color=color)
+plot_polygons(
+    hexdem_flat.to_shapely(),
+    colors=hexdem_flat.data.ravel(),
+    cmap="terrain",
+    ax=ax_flat,
+)
+plot_polygons(
+    hexdem_pointy.to_shapely(),
+    colors=hexdem_pointy.data.ravel(),
+    cmap="terrain",
+    ax=ax_pointy,
+)
 
+# Format the plot
+for hexdem, ax in zip((hexdem_flat, hexdem_pointy), (ax_flat, ax_pointy)):
+    ax.set_xlim(hexdem.bounds[0], hexdem.bounds[2])
+    ax.set_ylim(hexdem.bounds[1], hexdem.bounds[3])
+    ax.set_aspect("equal")
 plt.show()
 
 # %%

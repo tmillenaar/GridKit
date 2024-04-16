@@ -1,4 +1,5 @@
 import warnings
+from typing import Tuple, Union
 
 import numpy
 import scipy
@@ -17,9 +18,18 @@ class RectGrid(BaseGrid):
     Initialization parameters
     -------------------------
     dx: :class:`float`
-        The spacing between two cell centroids in horizontal direction
+        The spacing between two cell centroids in horizontal direction.
+        Has to be supplied together with `dx`.
+        Cannot be supplied together with `area` or `size`.
     dy: :class:`float`
         The spacing between two cell centroids in vertical direction
+        Has to be supplied together with `dy`.
+        Cannot be supplied together with `area` or `size`.
+    size: float
+        The spacing between two cell centroids in horizontal and vertical direction.
+        Cannot be supplied together with `area` or `dx`&`dy`.
+    area: float
+        The area of a cell. Cannot be supplied together with `size` or `dx`&`dy`.
     offset: `Tuple(float, float)` (optional)
         The offset in dx and dy.
         Shifts the whole grid by the specified amount.
@@ -27,20 +37,75 @@ class RectGrid(BaseGrid):
         If the supplied shift is larger,
         a shift will be performed such that the new center is a multiple of dx or dy away.
         Default: (0,0)
+    rotation: float
+        The counter-clockwise rotation of the grid around the origin in degrees.
     crs: `pyproj.CRS` (optional)
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.TriGrid`
+    :class:`.HexGrid`
+    :class:`.BoundedRectGrid`
+
     """
 
-    def __init__(self, *args, dx, dy, offset=(0, 0), rotation=0, **kwargs):
+    def __init__(
+        self,
+        *args,
+        dx=None,
+        dy=None,
+        size=None,
+        area=None,
+        offset=(0, 0),
+        rotation=0,
+        **kwargs,
+    ):
+        # Make sure only one method of defining cell size is used
+        nr_input_methods = sum(
+            [
+                dx is not None or dy is not None,
+                size is not None,
+                area is not None,
+            ]
+        )
+        if nr_input_methods == 0:
+            raise ValueError(
+                "No cell size can be determined. Please supply either 'size', 'area' or both 'dx' and 'dy'."
+            )
+        if nr_input_methods > 1:
+            supplied_args = [arg for arg in [dx, dy, size, area] if arg is not None]
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size', 'area' or 'dx'&'dy' when instantiating a new RectGrid. Found: {supplied_args}."
+            )
+
+        # Determine cell size
+        if size is not None:
+            self._size = dx = dy = size
+        elif area is not None:
+            self._size = dx = dy = self._area_to_size(area)
+        else:
+            if dx is None or dy is None:
+                raise ValueError(
+                    f"Found only '{'dx' if dx is not None else 'dy'}' when instantiating a new RectGrid. Please also supply '{'dx' if dx is None else 'dy'}'."
+                )
+            self._size = dx if numpy.isclose(dx, dy) else None
+
+        # Instantiate attributes
         self._dx = dx
         self._dy = dy
         self._rotation = rotation
         self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
         self.bounded_cls = BoundedRectGrid
+
         super(RectGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return area**0.5
 
     @property
     def dx(self) -> float:
@@ -71,6 +136,30 @@ class RectGrid(BaseGrid):
             )
         self._dy = value
         self._grid = self._update_inner_grid(dy=value)
+
+    @property
+    def size(self) -> float:
+        """The length of the cell sides, if all sides are of the same length.
+        The returned size is 'None' if :meth:`.RectGrid.dx` and :meth:`.RectGrid.dy` are not the same length.
+
+        See also
+        --------
+        :meth:`.BaseGrid.size`
+
+        """
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._dx = value
+        self._dy = value
+        self._grid = self._update_inner_grid(dx=value, dy=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -535,7 +624,15 @@ class RectGrid(BaseGrid):
     def parent_grid_class(self):
         return RectGrid
 
-    def _update_inner_grid(self, dx=None, dy=None, offset=None, rotation=None):
+    def _update_inner_grid(
+        self, dx=None, dy=None, size=None, offset=None, rotation=None
+    ):
+        if size is not None and (dx is not None or dy is not None):
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size' or 'dx'&'dy'. Found both."
+            )
+        if size is not None:
+            dx = dy = size
         if dx is None:
             dx = self.dx
         if dy is None:
@@ -546,10 +643,48 @@ class RectGrid(BaseGrid):
             rotation = self.rotation
         return PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
 
-    def update(self, dx=None, dy=None, offset=None, rotation=None, crs=None, **kwargs):
-        if dx is None:
+    def update(
+        self,
+        dx=None,
+        dy=None,
+        size=None,
+        area=None,
+        offset=None,
+        rotation=None,
+        crs=None,
+        **kwargs,
+    ):
+        """Modify attributes of the existing grid and return a copy.
+        The original grid remains un-mutated.
+
+        Parameters
+        ----------
+        dx: float
+            The new horizontal spacing between two cell centroids, i.e. the new width of the cells
+        dy: float
+            The new vertical spacing between two cell centroids, i.e. the new height of the cells
+        size: float
+            The new size of the length of the cells (dx and dy)
+        area: float
+            The area of a cell. Cannot be supplied together with `size` or `dx`&`dy`.
+        offset: Tuple[float, float]
+            The new offset of the origin of the grid
+        rotation: float
+            The new counter-clockwise rotation of the grid in degrees.
+            Can be negative for clockwise rotation.
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        :class:`.RectGrid`
+            A modified copy of the current grid
+        """
+        if not any([dx, size, area]):
             dx = self.dx
-        if dy is None:
+        if not any([dy, size, area]):
             dy = self.dy
         if offset is None:
             offset = self.offset
@@ -558,7 +693,14 @@ class RectGrid(BaseGrid):
         if crs is None:
             crs = self.crs
         return RectGrid(
-            dx=dx, dy=dy, offset=offset, rotation=rotation, crs=crs, **kwargs
+            dx=dx,
+            dy=dy,
+            size=size,
+            area=area,
+            offset=offset,
+            rotation=rotation,
+            crs=crs,
+            **kwargs,
         )
 
 
@@ -575,6 +717,13 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.RectGrid`
+    :class:`.BoundedTriGrid`
+    :class:`.BoundedHexGrid`
+
     """
 
     def __init__(self, data, *args, bounds, **kwargs):

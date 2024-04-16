@@ -57,6 +57,21 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Sets the value of the crs"""
         self._crs = None if not value else CRS.from_user_input(value)
 
+    @property
+    def size(self) -> float:
+        """The size of the cell as supplied when initiating the class"""
+        return self._size
+
+    @size.setter
+    def size(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = value
+        self._grid = self._update_inner_grid(size=value)
+
     @abc.abstractmethod
     def dx(self) -> float:
         """The distance in x-direction between two adjacent cell centers."""
@@ -122,6 +137,23 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
         Note: makes a copy every time this is called."""
         return self._grid.rotation_matrix_inv()
+
+    @property
+    def area(self):
+        """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
+        return self.dx * self.dy
+
+    @area.setter
+    def area(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = self._area_to_size(value)
+        self._grid = self._update_inner_grid(size=self._size)
+        self._dx = self._grid.dx()
+        self._dy = self._grid.dy()
 
     @abc.abstractmethod
     def centroid(self, index) -> float:
@@ -333,11 +365,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
             aligned = False
             reasons.append("CRS")
 
-        try:
+        if self.size is not None and other.size is not None:
             if not numpy.isclose(self.size, other.size):
                 aligned = False
                 reasons.append("cellsize")
-        except AttributeError:
+        else:
             if not numpy.isclose(self.dx, other.dx) or not numpy.isclose(
                 self.dy, other.dy
             ):

@@ -199,6 +199,14 @@ impl PyRectGrid {
         self._grid.cell_width()
     }
 
+    fn dx(&self) -> f64 {
+        self._grid.dx()
+    }
+
+    fn dy(&self) -> f64 {
+        self._grid.dy()
+    }
+
     fn offset(&self) -> (f64, f64) {
         self._grid.offset
     }

@@ -49,7 +49,17 @@ def plot_polygons(
     add_colorbar=False,
     **kwargs,
 ):
-    """Plot polygons on a map and color them based on the supplied ``values``
+    """Plot polygons on a map and color them based on the supplied ``values``.
+
+    .. warning ::
+
+        This function is a workaround to have matplotlib plot arbitrary shapes.
+        It is not performant and thus not suitable for large amounts of data.
+        Moreover, sometimes the shapes don't seem to align well in the corners.
+        This is a matplotlib visualization issue, likely related to the resolution of the figure.
+        The jagged corners tend to disappear when zooming in closely.
+
+    ..
 
     Parameters
     ----------
