@@ -70,6 +70,23 @@ These examples highlight operations where specific cells are targeted.
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="2D Diffusion on a HexGrid">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_2d_diff_hex_anim_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_2d_diff_hex_anim.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">2D Diffusion</div>
+    </div>
+
+
+.. raw:: html
+
     </div>
 
 
@@ -78,6 +95,7 @@ These examples highlight operations where specific cells are targeted.
 
    /example_gallery/cell_centric_operations/downslope_path
    /example_gallery/cell_centric_operations/selecting_cells
+   /example_gallery/cell_centric_operations/2d_diff_hex_anim
 
 
 Grid definitions
