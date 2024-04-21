@@ -209,15 +209,15 @@ class HexGrid(BaseGrid):
                    [ 0,  1],
                    [-1,  0],
                    [ 1,  0],
-                   [-1, -1],
-                   [ 0, -1]])
+                   [ 0, -1],
+                   [-1, -1]])
             >>> grid.relative_neighbours(index=[0,1]).index
             array([[ 0,  1],
                    [ 1,  1],
                    [-1,  0],
                    [ 1,  0],
-                   [ 0, -1],
-                   [ 1, -1]])
+                   [ 1, -1],
+                   [ 0, -1]])
 
         ..
 
@@ -242,8 +242,8 @@ class HexGrid(BaseGrid):
                    [-1,  0],
                    [ 0,  0],
                    [ 1,  0],
-                   [-1, -1],
-                   [ 0, -1]])
+                   [ 0, -1],
+                   [-1, -1]])
 
         ..
 
@@ -294,7 +294,9 @@ class HexGrid(BaseGrid):
             start_slice += row_length
 
         # mirror top half to bottom half (leaving the center row be)
-        neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][::-1]
+        neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][
+            :, ::-1
+        ]
         neighbours[:, start_slice:, pointy_axis] *= -1
 
         if include_selected is False:
