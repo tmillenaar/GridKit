@@ -1,8 +1,8 @@
-from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
 import numpy
 import pytest
 import shapely
+from matplotlib.collections import PatchCollection
 
 from gridkit import doc_utils
 

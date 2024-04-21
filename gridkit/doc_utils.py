@@ -1,13 +1,13 @@
 import warnings
 from typing import List, Union
 
+import matplotlib.patches as mpatches
 import matplotlib.pylab as pl
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
-from matplotlib.collections import PatchCollection
 import numpy
 import shapely
 import shapely.geometry
+from matplotlib.collections import PatchCollection
 
 
 def generate_2d_scatter_doughnut(num_points: float, radius: float) -> numpy.ndarray:
