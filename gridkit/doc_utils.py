@@ -46,6 +46,7 @@ def plot_polygons(
     fill: bool = True,
     filled: bool = None,
     ax=None,
+    add_colorbar=False,
     **kwargs,
 ):
     """Plot polygons on a map and color them based on the supplied ``values``.
@@ -126,14 +127,15 @@ def plot_polygons(
         # create colormap that matches our values
         cmap = getattr(pl.cm, cmap)
         values = colors
-        vmin = numpy.nanmin(values)
+        vmin = kwargs.pop("vmin", numpy.nanmin(values))
+        vmax = kwargs.pop("vmax", numpy.nanmax(values))
         values_normalized = values - vmin
-        vmax = numpy.nanmax(values_normalized)
-        values_normalized = values_normalized / vmax
+        values_normalized = values_normalized / numpy.nanmax(values_normalized)
         colors = cmap(
             values_normalized
         ).squeeze()  # squeeze to remove empty axes (when values is pandas series)
         colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
+        kwargs.setdefault("clim", (vmin, vmax))
 
     polygons = []
     for geom in geoms.geoms:
@@ -150,9 +152,13 @@ def plot_polygons(
     im = ax.add_artist(
         PatchCollection(
             patches=polygons,
+            cmap=cmap,
             **kwargs,
         )
     )
+
+    if add_colorbar:
+        plt.colorbar(im)
 
     ax.set_xlim(bounds[0], bounds[2])
     ax.set_ylim(bounds[1], bounds[3])
