@@ -1,10 +1,13 @@
 import warnings
 from typing import List, Union
 
+import matplotlib.patches as mpatches
 import matplotlib.pylab as pl
 import matplotlib.pyplot as plt
 import numpy
 import shapely
+import shapely.geometry
+from matplotlib.collections import PatchCollection
 
 
 def generate_2d_scatter_doughnut(num_points: float, radius: float) -> numpy.ndarray:
@@ -40,8 +43,9 @@ def plot_polygons(
     geoms: List[shapely.Polygon],
     colors: Union[numpy.ndarray, str] = None,
     cmap: str = "viridis",
-    filled: bool = True,
-    ax=plt,
+    fill: bool = True,
+    filled: bool = None,
+    ax=None,
     **kwargs,
 ):
     """Plot polygons on a map and color them based on the supplied ``values``.
@@ -68,26 +72,56 @@ def plot_polygons(
     cmap: :class:`str`
         The matplitlib complient colormap name to use
         Will be ignored if the 'values' argument not is supplied.
-    filled: :class:`bool`
-        Whether only the outline of the polygon should be drawn (False) or the polygon should be filled (True)
+    fill: :class:`bool`
+        Whether only the outline of the polygon should be drawn (False) or the polygon should be filled (True).
+        If True, the 'edgecolor' (outline of each cell) will also be colored.
+        If both a fill color and a small cell outline are desired, supply the keyword argument `edgecolors=None`
+        alongside `colors`. If both a fill color and a different cell outline color are desired,
+        supply a custom array for `edgecolor` alongside `colors`.
     ax: `matplotlib.axes.Axes` (optional)
         The matplotlib axis object to plot on.
         If an axis object is supplied, the plot will be edited in-place.
         Default: `matplotlib.pyplot`
+    **kwargs:
+        Keyword arguments passed to matplotlib's PatchCollection, see:
+        https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.Collection
 
     Returns
     -------
     None
 
     """
-    # ravel geoms if necessary
+    if filled is not None:
+        warnings.warn(
+            """The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version."""
+        )
+        fill = filled
+
+    if ax is None:
+        ax = plt.gca()
+
+    # Sanetize input
     if isinstance(geoms, numpy.ndarray):
         geoms = geoms.ravel()
+        geoms = shapely.MultiPolygon(iter(geoms))
+    elif isinstance(geoms, list):
+        geoms = shapely.MultiPolygon(geoms)
+    elif isinstance(geoms, shapely.geometry.base.GeometrySequence):
+        geoms = geoms._parent
+    bounds = geoms.bounds
 
-    if isinstance(colors, str) or colors is None:
-        colors = [colors if colors else "black"] * len(geoms)
-    if all(isinstance(c, str) for c in colors):
+    if colors is None:
+        colors = "black"
+    if isinstance(colors, str):
+        colors = numpy.full(shape=len(geoms.geoms), fill_value=colors)
+    elif all(isinstance(c, str) for c in colors):
         pass  # already got passed a list of color names
+    elif (
+        isinstance(colors, numpy.ndarray)
+        and colors.ndim > 1
+        and (colors.shape[-1] == 3 or colors.shape == 4)
+    ):
+        pass  # Assume rgb(a) values were supplied. Do nothing.
     else:
         # create colormap that matches our values
         cmap = getattr(pl.cm, cmap)
@@ -101,9 +135,26 @@ def plot_polygons(
         ).squeeze()  # squeeze to remove empty axes (when values is pandas series)
         colors[numpy.all(colors == 0, axis=1)] += 1  # turn black (nodata) to white
 
-    # plot each cell as a polygon with color
-    for geom, color in zip(geoms, colors):
-        if filled:
-            ax.fill(*geom.exterior.xy, color=color, **kwargs)
-        else:
-            ax.plot(*geom.exterior.xy, color=color, **kwargs)
+    polygons = []
+    for geom in geoms.geoms:
+        polygon = mpatches.Polygon(numpy.array(geom.exterior.coords))
+        polygons.append(polygon)
+
+    if fill:
+        kwargs["facecolors"] = colors
+        kwargs.setdefault("edgecolors", colors)
+    else:
+        kwargs["facecolors"] = "None"
+        kwargs["edgecolors"] = colors
+
+    im = ax.add_artist(
+        PatchCollection(
+            patches=polygons,
+            **kwargs,
+        )
+    )
+
+    ax.set_xlim(bounds[0], bounds[2])
+    ax.set_ylim(bounds[1], bounds[3])
+
+    return im
