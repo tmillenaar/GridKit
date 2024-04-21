@@ -82,7 +82,9 @@ def plot_polygons(
 
     """
     if filled is not None:
-        warnings.warn("""The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version.""")
+        warnings.warn(
+            """The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version."""
+        )
         fill = filled
 
     if ax is None:
@@ -101,11 +103,15 @@ def plot_polygons(
     if colors is None:
         colors = "black"
     if isinstance(colors, str):
-        colors = numpy.full(shape=len(geoms.geoms), fill_value = colors)
+        colors = numpy.full(shape=len(geoms.geoms), fill_value=colors)
     elif all(isinstance(c, str) for c in colors):
         pass  # already got passed a list of color names
-    elif isinstance(colors, numpy.ndarray) and colors.ndim > 1 and (colors.shape[-1] == 3 or colors.shape == 4):
-        pass # Assume rgb(a) values were supplied. Do nothing.
+    elif (
+        isinstance(colors, numpy.ndarray)
+        and colors.ndim > 1
+        and (colors.shape[-1] == 3 or colors.shape == 4)
+    ):
+        pass  # Assume rgb(a) values were supplied. Do nothing.
     else:
         # create colormap that matches our values
         cmap = getattr(pl.cm, cmap)
