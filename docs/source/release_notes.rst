@@ -3,6 +3,21 @@
 Release notes
 ================
 
+
+Version 0.10.0 (April 21, 2024)
+------------------------------
+Features
+ - Add :meth:`.GridIndex.sort`
+ - Allow plotting of RGB(A) values in :func:`.doc_utils.plot_polygons`
+ - Improve performance of :func:`.doc_utils.plot_polygons`
+ - Improve performance of initializing a new :class:`.GridIndex` if the supplied indices are already in an appropriate numpy integer ndarray.
+
+Fixes
+ - Fix incorrect :meth:`.HexGrid.relative_neighbours` and by extension :meth:`.BaseGrid.neighbours` for :class:`.HexGrid` when supplying multiple grid indices at a time
+
+Documentation
+ - Add example :ref:`2d_diff_hex_anim.py <example diffusion>`
+
 Version 0.9.2 (April 03, 2024)
 ------------------------------
 Features
