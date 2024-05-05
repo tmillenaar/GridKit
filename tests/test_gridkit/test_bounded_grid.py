@@ -1,12 +1,12 @@
 import numpy
 import pytest
 
-from gridkit import bounded_grid, rect_grid
+from gridkit import BoundedHexGrid, BoundedRectGrid, BoundedTriGrid, RectGrid
 
 
 def test_data_ravel_order():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
 
     value = grid.value(grid.cell_at_point(grid.centroid()))
     numpy.testing.assert_equal(value, data)
@@ -14,10 +14,8 @@ def test_data_ravel_order():
 
 def test_data_mutability():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
-    grid_mutable = rect_grid.BoundedRectGrid(
-        data, bounds=(0, 0, 3, 3), prevent_copy=True
-    )
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid_mutable = BoundedRectGrid(data, bounds=(0, 0, 3, 3), prevent_copy=True)
 
     assert id(data) != id(grid.data)
     assert id(data) == id(grid_mutable.data)
@@ -25,7 +23,7 @@ def test_data_mutability():
 
 def test_data_setter():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
 
     grid.data = data + 1
     numpy.testing.assert_equal(data + 1, grid.data)
@@ -57,8 +55,8 @@ def test_data_setter():
 )
 def test_intersects(bounds, expected):
     data = numpy.arange(9).reshape((3, 3))
-    grid1 = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
-    grid2 = rect_grid.BoundedRectGrid(data, bounds=bounds)
+    grid1 = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid2 = BoundedRectGrid(data, bounds=bounds)
     result = grid1.intersects(grid2)
     assert result == expected
 
@@ -93,17 +91,15 @@ def test_intersects(bounds, expected):
 )
 def test_add_partial_overlap(bounds, expected_data):
     data = numpy.arange(9).reshape((3, 3))
-    grid1 = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid1 = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
 
     # test with nodata_value of NaN
-    grid2 = rect_grid.BoundedRectGrid(
-        data.astype(float), bounds=bounds, nodata_value=numpy.nan
-    )
+    grid2 = BoundedRectGrid(data.astype(float), bounds=bounds, nodata_value=numpy.nan)
     result = grid1 + grid2
     numpy.testing.assert_allclose(result.data, expected_data)
 
     # test with nodata_value of 1
-    grid3 = rect_grid.BoundedRectGrid(data, bounds=bounds, nodata_value=-1)
+    grid3 = BoundedRectGrid(data, bounds=bounds, nodata_value=-1)
     expected_data[numpy.isnan(expected_data)] = -1
     result = grid1 + grid3
     numpy.testing.assert_allclose(result.data, expected_data)
@@ -112,7 +108,7 @@ def test_add_partial_overlap(bounds, expected_data):
 def test_basic_operations_with_scalars():
     # initialize grid
     data = numpy.arange(4).reshape((2, 2))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 2, 2))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 2, 2))
     grid_nodata = grid.copy()
     grid_nodata.nodata_value = 2
 
@@ -192,7 +188,7 @@ def test_basic_operations_with_scalars():
 def test_comparissons_with_scalars(nodata):
     # initialize grid
     data = numpy.arange(4).reshape((2, 2))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 2, 2))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 2, 2))
 
     grid.nodata = nodata  # should not have an effect, set here to make sure
 
@@ -230,7 +226,7 @@ def test_comparissons_with_scalars(nodata):
 def test_reduction_operators():
     # initialize grid
     data = numpy.arange(4).reshape((2, 2))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 2, 2))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 2, 2))
     grid_nodata = grid.copy()
     grid_nodata.nodata_value = 3
 
@@ -274,7 +270,7 @@ def test_reduction_operators():
 def test_reduction_operators_arg():
     # initialize grid
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(-10, -0.7, 1, 25))
+    grid = BoundedRectGrid(data, bounds=(-10, -0.7, 1, 25))
 
     # test argmax
     idx = grid.argmax()
@@ -305,7 +301,7 @@ def test_reduction_operators_arg():
 
 def test_dtype_after_division():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
     result = grid / (grid + 1)
     assert numpy.issubdtype(
         result.dtype, float
@@ -314,7 +310,7 @@ def test_dtype_after_division():
 
 def test_crop():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
     bounds = (0.7, -1, 5, 2)
 
     expected_data = numpy.array(
@@ -331,7 +327,7 @@ def test_crop():
 
 def test_centroid():
     data = numpy.array([[0, 1], [2, 3]])
-    grid = rect_grid.BoundedRectGrid(data, bounds=(-2, 0, 0, 2))
+    grid = BoundedRectGrid(data, bounds=(-2, 0, 0, 2))
 
     expected_centroids = [[[-1.5, 1.5], [-0.5, 1.5]], [[-1.5, 0.5], [-0.5, 0.5]]]
     numpy.testing.assert_equal(grid.centroid(), expected_centroids)
@@ -343,14 +339,14 @@ def test_centroid():
 
 def test_centroid_index_comparisson():
     data = numpy.array([[0, 1], [2, 3]])
-    grid = rect_grid.BoundedRectGrid(data, bounds=(-2, 0, 0.2, 2.1))
+    grid = BoundedRectGrid(data, bounds=(-2, 0, 0.2, 2.1))
     ids = grid.indices
     numpy.testing.assert_almost_equal(grid.centroid(ids), grid.centroid())
 
 
 def test_assign():
     data = numpy.array([[0, 1], [2, 3]])
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 2, 2))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 2, 2))
 
     # Test assigning single value
     expected_data = numpy.array([[0, 10], [2, 10]])
@@ -373,7 +369,7 @@ def test_assign():
 )
 def test_offset(bounds, expected_offset):
     data = numpy.array([[0, 1, 3], [2, 3, 4]])
-    grid = rect_grid.BoundedRectGrid(data, bounds=bounds)
+    grid = BoundedRectGrid(data, bounds=bounds)
     numpy.testing.assert_allclose(grid.offset, expected_offset)
 
 
@@ -386,8 +382,8 @@ def test_offset(bounds, expected_offset):
 )
 def test_resample(method, expected_result):
     data = numpy.array([[0, 1, 2], [3, 4, 5]], dtype=float)
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 2))
-    new_grid = rect_grid.RectGrid(dx=0.5, dy=1.5)
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 2))
+    new_grid = RectGrid(dx=0.5, dy=1.5)
 
     resampled = grid.resample(new_grid, method=method)
 
@@ -398,7 +394,7 @@ def test_resample(method, expected_result):
 def test_crs():
     data = numpy.arange(9).reshape((3, 3))
     crs = 3857
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3), crs=crs)
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3), crs=crs)
     new_grid = grid.to_crs(crs=4326, resample_method="nearest")
 
     expected_dx = expected_dy = 8.983152841195214e-06
@@ -416,7 +412,7 @@ def test_crs():
 
 def test__mask_to_index():
     data = numpy.arange(9).reshape((3, 3))
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
 
     expected_ids = [
         [1, 1],
@@ -444,7 +440,7 @@ def test__mask_to_index():
 )
 def test_value_positive_bounds(ids, expected_value):
     data = numpy.arange(9).reshape((3, 3)).astype("float")
-    grid = rect_grid.BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
+    grid = BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
 
     result = grid.value(ids)
 
@@ -461,9 +457,7 @@ def test_value_positive_bounds(ids, expected_value):
 )
 def test_value_negative_bounds(ids, expected_value):
     data = numpy.arange(9).reshape((3, 3)).astype("float")
-    grid = rect_grid.BoundedRectGrid(
-        data, bounds=(-4, -5, -1, -2), nodata_value=numpy.nan
-    )
+    grid = BoundedRectGrid(data, bounds=(-4, -5, -1, -2), nodata_value=numpy.nan)
 
     result = grid.value(ids)
 
@@ -472,7 +466,7 @@ def test_value_negative_bounds(ids, expected_value):
 
 def test_value_nd_index():
     data = numpy.arange(9).reshape((3, 3)).astype("float")
-    grid = rect_grid.BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
+    grid = BoundedRectGrid(data, bounds=(1, 2, 4, 5), nodata_value=numpy.nan)
 
     result = grid.value([[[1, 2]], [[3, 4]]])
 
@@ -482,7 +476,7 @@ def test_value_nd_index():
 @pytest.mark.parametrize("percentile", (2, 31, 50, 69, 98))
 def test_percentile(percentile):
     data = numpy.arange(9).reshape((3, 3)).astype("float")
-    grid = rect_grid.BoundedRectGrid(data, bounds=(0, 0, 3, 3))
+    grid = BoundedRectGrid(data, bounds=(0, 0, 3, 3))
     numpy.testing.assert_allclose(
         numpy.percentile(data, percentile), grid.percentile(percentile)
     )
@@ -503,7 +497,7 @@ def test_interp_from_points(method, expected_min, expected_max):
     y = 100 * numpy.random.rand(100)
     value = numpy.sin(x / (10 * numpy.pi)) * numpy.sin(y / (10 * numpy.pi))
 
-    empty_grid = rect_grid.RectGrid(dx=5, dy=5)
+    empty_grid = RectGrid(dx=5, dy=5)
     data_grid = empty_grid.interp_from_points(
         numpy.array([x, y]).T,
         value,
@@ -565,3 +559,31 @@ def test_grid_id_to_numpy_id_back_and_forth(
     np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
     numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
+
+
+@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
+@pytest.mark.parametrize(
+    "GridType, init_kwargs",
+    [
+        (BoundedTriGrid, {}),
+        (BoundedRectGrid, {}),
+        (BoundedHexGrid, {"shape": "flat"}),
+        (BoundedHexGrid, {"shape": "pointy"}),
+    ],
+)
+def test_auto_bound_init(shape, GridType, init_kwargs):
+    data = numpy.ones(shape)
+    grid = GridType(data, **init_kwargs)
+
+    numpy.testing.assert_allclose(grid.bounds[0], 0)
+    numpy.testing.assert_allclose(grid.bounds[1], 0)
+    if init_kwargs.get("shape", None) == "flat":
+        numpy.testing.assert_allclose(grid.height, shape[1])
+        numpy.testing.assert_allclose(grid.width, shape[0])
+        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[0])
+        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[1])
+    else:
+        numpy.testing.assert_allclose(grid.height, shape[0])
+        numpy.testing.assert_allclose(grid.width, shape[1])
+        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[1])
+        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[0])

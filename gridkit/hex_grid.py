@@ -691,15 +691,24 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
     """
 
-    def __init__(self, data, *args, bounds, shape="flat", **kwargs):
-        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
-            raise ValueError(
-                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
-            )
+    def __init__(self, data, *args, bounds=None, shape="flat", **kwargs):
+
+        data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
 
         if data.ndim != 2:
             raise ValueError(
                 f"Expected a 2D numpy array, got data with shape {data.shape}"
+            )
+
+        if bounds is None:
+            if shape == "pointy":
+                bounds = (0, 0, data.shape[1] * 2 / 3**0.5, data.shape[0])
+            else:
+                bounds = (0, 0, data.shape[0] * 3**0.5 / 2, data.shape[1])
+
+        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+            raise ValueError(
+                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
             )
 
         if shape == "pointy":
