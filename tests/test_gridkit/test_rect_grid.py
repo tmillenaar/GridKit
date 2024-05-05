@@ -546,3 +546,11 @@ def test_area(kwargs):
     grid = RectGrid(**kwargs)
     geom = grid.to_shapely((0, 0))
     numpy.testing.assert_allclose(grid.area, geom.area)
+
+
+@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
+def test_auto_bound_init(shape):
+    data = numpy.ones(shape)
+    grid = BoundedRectGrid(data)
+    numpy.testing.assert_allclose(grid.height, shape[0])
+    numpy.testing.assert_allclose(grid.width, shape[1])

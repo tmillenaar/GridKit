@@ -368,15 +368,21 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
     """
 
-    def __init__(self, data, *args, bounds, **kwargs):
-        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
-            raise ValueError(
-                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
-            )
+    def __init__(self, data, *args, bounds=None, **kwargs):
+
         data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
+
         if data.ndim != 2:
             raise ValueError(
                 f"Expected a 2D numpy array, got data with shape {data.shape}"
+            )
+
+        if bounds is None:
+            bounds = (0, 0, data.shape[1], data.shape[0] * 3**0.5)
+
+        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+            raise ValueError(
+                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
             )
 
         dx = (bounds[2] - bounds[0]) / data.shape[1]
