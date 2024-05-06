@@ -36,6 +36,12 @@ Upgrade the basics: pip, setuptools, wheel
 
 ``python3 -m pip install pip setuptools wheel``
 
+.. Note ::
+    When running ``pip install .``, it is assumed that ``rustup`` and ``Cargo`` are installed.
+    If these are not installed, see the `rust installation guide <https://doc.rust-lang.org/cargo/getting-started/installation.html>`_.
+    The build process also assumes build tools are installed such as ``gcc``  and ``make``.
+    On Ubuntu, as used for this example, these can be installed using ``sudo apt install build-essential``.
+
 Install the package with the additional 'doc' and 'test' dependencies.
 Here the ``-e`` flag will prevent GridKit itself from being installed in the venv and should
 create an 'easy-install.pth' file that points to this local repository.
@@ -90,4 +96,7 @@ And build the documentation locally using Sphinx
 
 The docs are then stored locally in ``./build/sphinx/html/``
 
+.. Note ::
+    In the case you get the message `sphinx-build: command not found` or similar, you can either run ``python3 -m sphinx.cmd.build docs/source build/sphinx/html``
+    or install the ``python3-sphinx`` package on your system.
 
