@@ -6,6 +6,21 @@ from gridkit import RectGrid
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 
 
+def test_cell_size_init_raises():
+
+    with pytest.raises(ValueError):
+        HexGrid()
+
+    with pytest.raises(ValueError):
+        HexGrid(size=1, area=1)
+
+
+@pytest.mark.parametrize("area", [0.1, 123, 987.6])
+def test_init_area(area):
+    grid = HexGrid(area=area)
+    numpy.testing.assert_allclose(grid.area, area)
+
+
 @pytest.mark.parametrize(
     "shape, indices, expected_centroids",
     [
@@ -169,6 +184,23 @@ def test_neighbours(shape, depth, index, multi_index, include_selected):
 
     # No cell can be further away than 'depth' number of cells * cell size
     assert all(distances <= grid.size * depth)
+
+
+def test_relative_neighbours():
+    grid = HexGrid(size=1)
+    ids = [
+        [4, 4],
+        [3, 5],
+    ]
+    expected_neighbours = [
+        [[3, 5], [4, 5], [3, 4], [5, 4], [4, 3], [3, 3]],
+        [[3, 6], [4, 6], [2, 5], [4, 5], [4, 4], [3, 4]],
+    ]
+
+    # test both singe id and multi-id input
+    numpy.testing.assert_allclose(grid.neighbours(ids), expected_neighbours)
+    numpy.testing.assert_allclose(grid.neighbours(ids[0]), expected_neighbours[0])
+    numpy.testing.assert_allclose(grid.neighbours(ids[1]), expected_neighbours[1])
 
 
 @pytest.mark.parametrize(
@@ -443,6 +475,19 @@ def test_size_setter():
         grid.size = -1
 
 
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_area_setter(shape):
+    grid = HexGrid(size=1, shape=shape, rotation=10)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 2)
+    grid.area = 3.21
+    numpy.testing.assert_allclose(grid.area, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.area = 0
+    with pytest.raises(ValueError):
+        grid.area = -1
+
+
 def test_update():
     grid = HexGrid(size=1, shape="pointy")
 
@@ -465,3 +510,15 @@ def test_update():
     new_grid = grid.update(rotation=2.5)
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
+
+    new_grid = grid.update(area=4)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 2)
+    numpy.testing.assert_allclose(new_grid.area, 4)
+
+
+@pytest.mark.parametrize("size", [0.1, 2.3, 4, 1234])
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_area(size, shape):
+    grid = HexGrid(size=size, shape=shape)
+    geom = grid.to_shapely((0, 0))
+    numpy.testing.assert_allclose(grid.area, geom.area)

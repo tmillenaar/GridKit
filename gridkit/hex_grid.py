@@ -15,11 +15,15 @@ from gridkit.rect_grid import RectGrid
 class HexGrid(BaseGrid):
     """Abstraction that represents an infinite grid with hexagonal cell shape.
 
+    The size of each cell can be specified through the `size` or `area` arguments.
+
     Initialization parameters
     -------------------------
-    size: :class:`float`
-        The spacing between two cells in horizontal direction if ``shape`` is "pointy",
-        or in vertical direction if ``shape`` is "flat".
+    size: float
+        The spacing between two cell centroids in horizontal direction if ``shape`` is "pointy",
+        or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area`.
+    area: float
+        The area of a cell. Cannot be supplied together with `size`.
     shape: `Literal["pointy", "flat"]`
         The shape of the layout of the grid.
         If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
@@ -31,17 +35,43 @@ class HexGrid(BaseGrid):
         If the supplied shift is larger,
         a shift will be performed such that the new center is a multiple of dx or dy away.
         Default: (0,0)
+    rotation: float
+        The counter-clockwise rotation of the grid around the origin in degrees.
     crs: `pyproj.CRS` (optional)
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
 
+    See also
+    --------
+    :class:`.TriGrid`
+    :class:`.RectGrid`
+    :class:`.BoundedHexGrid`
+
     """
 
     def __init__(
-        self, *args, size, shape="pointy", offset=(0, 0), rotation=0, **kwargs
+        self,
+        *args,
+        size=None,
+        area=None,
+        shape="pointy",
+        offset=(0, 0),
+        rotation=0,
+        **kwargs,
     ):
+        if area is None and size is None:
+            raise ValueError(
+                "No cell size can be determined. Please supply either 'size' or 'area'"
+            )
+        if area is not None and size is not None:
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size' or 'area'. Got both"
+            )
+        if area is not None:
+            size = self._area_to_size(area)
+
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation if shape == "pointy" else -rotation
@@ -66,6 +96,27 @@ class HexGrid(BaseGrid):
         self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
+
+    def _area_to_size(self, area):
+        """Find the ``size`` that corresponds to a specific area."""
+        return (2 / 3 * area * 3**0.5) ** 0.5
+
+    @property
+    def area(self):
+        """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
+        return self.dx * self.dy
+
+    @area.setter
+    def area(self, value):
+        """Set the size of the grid to a new value"""
+        if value <= 0:
+            raise ValueError(
+                f"Size of cell cannot be set to '{value}', must be larger than zero"
+            )
+        self._size = self._area_to_size(value)
+        self._grid = self._update_inner_grid(size=self._size)
+        self._dx = self._grid.dx() if self.shape == "pointy" else self._grid.dy()
+        self._dy = self._grid.dy() if self.shape == "pointy" else self._grid.dx()
 
     @property
     def dx(self) -> float:
@@ -101,23 +152,6 @@ class HexGrid(BaseGrid):
         self.rotation = (
             rot  # Re-run rotation settter to update rotaiton according to new shape
         )
-
-    @property
-    def size(self) -> float:
-        """The size of the cell as supplied when initiating the class.
-        This is the same as dx for a flat grid and the same as dy for a pointy grid.
-        """
-        return self._size
-
-    @size.setter
-    def size(self, value):
-        """Set the size of the grid to a new value"""
-        if value <= 0:
-            raise ValueError(
-                f"Size of cell cannot be set to '{value}', must be larger than zero"
-            )
-        self._size = value
-        self._grid = self._update_inner_grid(size=value)
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -175,15 +209,15 @@ class HexGrid(BaseGrid):
                    [ 0,  1],
                    [-1,  0],
                    [ 1,  0],
-                   [-1, -1],
-                   [ 0, -1]])
+                   [ 0, -1],
+                   [-1, -1]])
             >>> grid.relative_neighbours(index=[0,1]).index
             array([[ 0,  1],
                    [ 1,  1],
                    [-1,  0],
                    [ 1,  0],
-                   [ 0, -1],
-                   [ 1, -1]])
+                   [ 1, -1],
+                   [ 0, -1]])
 
         ..
 
@@ -208,8 +242,8 @@ class HexGrid(BaseGrid):
                    [-1,  0],
                    [ 0,  0],
                    [ 1,  0],
-                   [-1, -1],
-                   [ 0, -1]])
+                   [ 0, -1],
+                   [-1, -1]])
 
         ..
 
@@ -260,7 +294,9 @@ class HexGrid(BaseGrid):
             start_slice += row_length
 
         # mirror top half to bottom half (leaving the center row be)
-        neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][::-1]
+        neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][
+            :, ::-1
+        ]
         neighbours[:, start_slice:, pointy_axis] *= -1
 
         if include_selected is False:
@@ -572,9 +608,42 @@ class HexGrid(BaseGrid):
         return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
-        self, size=None, shape=None, offset=None, rotation=None, crs=None, **kwargs
+        self,
+        size=None,
+        shape=None,
+        area=None,
+        offset=None,
+        rotation=None,
+        crs=None,
+        **kwargs,
     ):
-        if size is None:
+        """Modify attributes of the existing grid and return a copy.
+        The original grid remains un-mutated.
+
+        Parameters
+        ----------
+        size: float
+            The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.
+        area: float
+            The area of a cell. Cannot be supplied together with ``size``.
+        shape: Literal["pointy", "flat"]
+            The new shape of the grid cells
+        offset: Tuple[float, float]
+            The new offset of the origin of the grid
+        rotation: float
+            The new counter-clockwise rotation of the grid in degrees.
+            Can be negative for clockwise rotation.
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        Returns
+        -------
+        :class:`.RectGrid`
+            A modified copy of the current grid
+        """
+        if size is None and area is None:
             size = self.size
         if shape is None:
             shape = self.shape
@@ -585,12 +654,19 @@ class HexGrid(BaseGrid):
         if crs is None:
             crs = self.crs
         return HexGrid(
-            size=size, shape=shape, offset=offset, rotation=rotation, crs=crs, **kwargs
+            size=size,
+            shape=shape,
+            area=area,
+            offset=offset,
+            rotation=rotation,
+            crs=crs,
+            **kwargs,
         )
 
 
 class BoundedHexGrid(BoundedGrid, HexGrid):
-    """
+    """A HexGrid with data encapsulated within a bounding box.
+
     Initialization parameters
     -------------------------
     data: `numpy.ndarray`
@@ -606,17 +682,33 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
         Default: None
+
+    See also
+    --------
+    :class:`.HexGrid`
+    :class:`.BoundedTriGrid`
+    :class:`.BoundedRectGrid`
+
     """
 
-    def __init__(self, data, *args, bounds, shape="flat", **kwargs):
-        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
-            raise ValueError(
-                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
-            )
+    def __init__(self, data, *args, bounds=None, shape="flat", **kwargs):
+
+        data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
 
         if data.ndim != 2:
             raise ValueError(
                 f"Expected a 2D numpy array, got data with shape {data.shape}"
+            )
+
+        if bounds is None:
+            if shape == "pointy":
+                bounds = (0, 0, data.shape[1] * 2 / 3**0.5, data.shape[0])
+            else:
+                bounds = (0, 0, data.shape[0] * 3**0.5 / 2, data.shape[1])
+
+        if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+            raise ValueError(
+                f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
             )
 
         if shape == "pointy":

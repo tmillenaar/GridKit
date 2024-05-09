@@ -6,6 +6,47 @@ from gridkit import HexGrid
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
+def test_cell_size_init():
+    with pytest.raises(ValueError):
+        RectGrid(dx=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, dx=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, dx=1, area=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(area=1, size=1)
+
+    with pytest.raises(ValueError):
+        RectGrid(dy=1, area=1)
+
+    grid = RectGrid(dx=2, dy=3)
+    assert grid.size is None
+
+    grid = RectGrid(dx=2, dy=2)
+    numpy.testing.assert_allclose(grid.size, 2)
+
+
+@pytest.mark.parametrize("area", [0.1, 123, 987.6])
+def test_area_init(area):
+    grid = RectGrid(area=area)
+    numpy.testing.assert_allclose(grid.area, area)
+    numpy.testing.assert_allclose(grid.dx, area**0.5)
+    numpy.testing.assert_allclose(grid.dy, area**0.5)
+    numpy.testing.assert_allclose(grid.size, area**0.5)
+
+
 @pytest.mark.parametrize(
     "points, expected_ids",
     [
@@ -439,6 +480,10 @@ def test_update():
     numpy.testing.assert_allclose(grid.rotation, 0)
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
 
+    new_grid = grid.update(area=4)
+    numpy.testing.assert_allclose(grid.area, 2)
+    numpy.testing.assert_allclose(new_grid.area, 4)
+
 
 def test_dx_dy_setter():
     grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
@@ -576,3 +621,45 @@ def test_cells_intersecting_line(line, expected_ids):
     # Make sure the returned indices don't depend on the order of the two points
     ids_rev = grid.cells_intersecting_line(line[::-1])
     numpy.testing.assert_allclose(ids, ids_rev[::-1])
+
+
+def test_size_setter():
+    grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
+    assert grid.size is None
+    numpy.testing.assert_allclose(grid.dx, 1.23)
+    numpy.testing.assert_allclose(grid.dy, 4.56)
+    grid.size = 3.21
+    numpy.testing.assert_allclose(grid.size, 3.21)
+    numpy.testing.assert_allclose(grid.dx, 3.21)
+    numpy.testing.assert_allclose(grid.dy, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.size = 0
+    with pytest.raises(ValueError):
+        grid.size = -1
+
+
+def test_area_setter():
+    grid = RectGrid(size=1, rotation=10)
+    numpy.testing.assert_allclose(grid.area, 1)
+    grid.area = 3.21
+    numpy.testing.assert_allclose(grid.area, 3.21)
+
+    with pytest.raises(ValueError):
+        grid.area = 0
+    with pytest.raises(ValueError):
+        grid.area = -1
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"size": 0.1},
+        {"size": 1234},
+        {"dx": 1234, "dy": 0.3},
+    ],
+)
+def test_area(kwargs):
+    grid = RectGrid(**kwargs)
+    geom = grid.to_shapely((0, 0))
+    numpy.testing.assert_allclose(grid.area, geom.area)

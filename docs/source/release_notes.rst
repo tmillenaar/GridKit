@@ -3,6 +3,35 @@
 Release notes
 ================
 
+
+Version 0.10.0 (April 21, 2024)
+------------------------------
+Features
+ - Add :meth:`.GridIndex.sort`
+ - Allow plotting of RGB(A) values in :func:`.doc_utils.plot_polygons`
+ - Improve performance of :func:`.doc_utils.plot_polygons`
+ - Improve performance of initializing a new :class:`.GridIndex` if the supplied indices are already in an appropriate numpy integer ndarray.
+
+Fixes
+ - Fix incorrect :meth:`.HexGrid.relative_neighbours` and by extension :meth:`.BaseGrid.neighbours` for :class:`.HexGrid` when supplying multiple grid indices at a time
+
+Documentation
+ - Add example :ref:`2d_diff_hex_anim.py <example diffusion>`
+
+Version 0.9.2 (April 03, 2024)
+------------------------------
+Features
+ - Add new initialization argument ``area`` to :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid` for specifying the cell area of the grid
+ - Add new property :meth:`.BaseGrid.area`
+ - Add ``shape`` to :class:`.RectGrid` to further unify the class API between the three grid types
+
+Fixes
+ - Prevent passing rotation argument to Bounded grids, which were not designed with rotation in mind because that breaks the tiling.
+
+Documentation
+ - Update example :ref:`resampling.py <example resampling>`
+ - Improve docstrings about initialization of :class:`.TriGrid`, :class:`.RectGrid` and :class:`.HexGrid`
+
 Version 0.9.1 (March 17, 2024)
 ------------------------------
 Features
@@ -13,7 +42,7 @@ Features
 Fixes
  - ``offset`` is now properly taken into account for :meth:`.HexGrid.cell_at_point`
  - Less restrictive offsets by limiting offset for all grids with :meth:`.BaseGrid.cell_height` and :meth:`.BaseGrid.cell_width` instead of dx and dy.
- - Rotation of "flat" :class:`.HexGrids` is no longer in the opposite direction (was clockwise)
+ - Rotation of "flat" :class:`.HexGrid` is no longer in the opposite direction (was clockwise)
 
 Documentation
  - Add example :ref:`rotation_animation.py <example rotated animation>`.

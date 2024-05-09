@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy
 import pytest
 import shapely
+from matplotlib.collections import PatchCollection
 
 from gridkit import doc_utils
 
@@ -34,12 +35,7 @@ def test_plot_polygons(filled, colors):
         nr_shapes * [poly], colors=colors, cmap="viridis", ax=ax, filled=filled
     )
 
-    # check if shapes have been added
-    if filled:
-        artists = ax.get_children()
-        polygons = [a for a in artists if isinstance(a, plt.Polygon)]
-        assert len(polygons) == nr_shapes
-    else:
-        assert len(ax.lines) == nr_shapes
-    # clear the plot in preparation for the next test
+    artists = ax.get_children()
+    path_collection = [a for a in artists if isinstance(a, PatchCollection)][0]
+    assert len(path_collection.get_edgecolors()) == nr_shapes
     plt.clf()

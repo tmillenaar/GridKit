@@ -281,6 +281,9 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         prevent_copy: bool = False,
         **kwargs,
     ) -> None:
+        if "rotation" in kwargs:
+            raise NotImplementedError("'rotation' is not supported for Bounded grids")
+
         self._data = data if prevent_copy else data.copy()
         self._bounds = bounds
         self.nodata_value = nodata_value

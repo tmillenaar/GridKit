@@ -131,7 +131,11 @@ class GridIndex(metaclass=_IndexMeta):
     """
 
     def __init__(self, index):
-        self.index = numpy.array(index, dtype=int).squeeze()
+        if not isinstance(index, numpy.ndarray) or not numpy.issubdtype(
+            index.dtype, numpy.integer
+        ):
+            index = numpy.array(index, dtype=int)
+        self.index = index.squeeze()
         if self.index.shape[-1] != 2 and self.index.size != 0:
             raise ValueError(
                 f"The last axis should contain two elements (an x and a y coordinate). Got {self.index.shape[-1]} elements instead."
@@ -216,6 +220,32 @@ class GridIndex(metaclass=_IndexMeta):
             return GridIndex.from_index_1d(unique), *other
         unique = numpy.unique(self.index_1d, **kwargs)
         return GridIndex.from_index_1d(unique)
+
+    def sort(self):
+        """Sort the grid indices. Multidimentional indices are not supported.
+        Ravels the indices if indices are multidimentional.
+
+        The indices are sorted first by x, then by y.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The sorted ids
+
+        Examples
+        --------
+
+        >>> from gridkit.index import GridIndex
+        >>> unsorted_ids = GridIndex([[1,1],[0,1],[1,0],[0,0]])
+        >>> sorted_ids = unsorted_ids.sort()
+        >>> sorted_ids.index
+        array([[0, 0],
+               [0, 1],
+               [1, 0],
+               [1, 1]], dtype=int32)
+
+        """
+        return GridIndex.from_index_1d(numpy.sort(self.index_1d))
 
     def intersection(self, other):
         """The intersection of two GridIndex instances. Keep the IDs contained in both.
