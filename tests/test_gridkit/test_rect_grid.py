@@ -506,6 +506,123 @@ def test_dx_dy_setter():
         grid.dy = -1
 
 
+@pytest.mark.parametrize(
+    "line, expected_ids",
+    (
+        (
+            numpy.array(
+                [
+                    [-2.5, -1],
+                    [2.5, 3],
+                ]
+            ),
+            numpy.array(
+                [[-3, -1], [-2, -1], [-2, 0], [-1, 0], [0, 1], [1, 1], [1, 2], [2, 2]]
+            ),
+        ),
+        (
+            numpy.array(
+                [
+                    [-2.5, 1],
+                    [2.5, -3],
+                ]
+            ),
+            numpy.array(
+                [
+                    [-3, 0],
+                    [-2, 0],
+                    [-2, -1],
+                    [-1, -1],
+                    [0, -2],
+                    [1, -2],
+                    [1, -3],
+                    [2, -3],
+                ]
+            ),
+        ),
+        (
+            numpy.array(
+                [
+                    [3, 2.5],
+                    [-1, -2.5],
+                ]
+            ),
+            numpy.array(
+                [[2, 2], [2, 1], [1, 1], [1, 0], [0, -1], [0, -2], [-1, -2], [-1, -3]]
+            ),
+        ),
+        (
+            numpy.array(
+                [
+                    [-2, -2.5],
+                    [2, 2.5],
+                ]
+            ),
+            numpy.array(
+                [[-2, -3], [-2, -2], [-1, -2], [-1, -1], [0, 0], [0, 1], [1, 1], [1, 2]]
+            ),
+        ),
+        (
+            numpy.array(
+                [
+                    [-2, -2],
+                    [2, 2],
+                ]
+            ),
+            numpy.array([[-2, -2], [-1, -1], [0, 0], [1, 1]]),
+        ),
+        (
+            numpy.array(
+                [
+                    [-3, 3],
+                    [3, -3],
+                ]
+            ),
+            numpy.array([[-3, 2], [-2, 1], [-1, 0], [0, -1], [1, -2], [2, -3]]),
+        ),
+        (
+            numpy.array(
+                [
+                    [-3, -2],
+                    [3, 2],
+                ]
+            ),
+            numpy.array(
+                [[-3, -2], [-2, -2], [-2, -1], [-1, -1], [0, 0], [1, 0], [1, 1], [2, 1]]
+            ),
+        ),
+        (
+            numpy.array(
+                [
+                    [-3, -1],
+                    [3, 1],
+                ]
+            ),
+            numpy.array([[-3, -1], [-2, -1], [-1, -1], [0, 0], [1, 0], [2, 0]]),
+        ),
+        (
+            numpy.array(
+                [
+                    [2, 1],
+                    [-2, -1],
+                ]
+            ),
+            numpy.array([[1, 0], [0, 0], [-1, -1], [-2, -1]]),
+        ),
+    ),
+)
+def test_cells_intersecting_line(line, expected_ids):
+    grid = RectGrid(dx=1, dy=1)
+
+    line = numpy.array(line)
+    ids = grid.cells_intersecting_line(line)
+    numpy.testing.assert_allclose(ids, expected_ids)
+
+    # Make sure the returned indices don't depend on the order of the two points
+    ids_rev = grid.cells_intersecting_line(line[::-1])
+    numpy.testing.assert_allclose(ids, ids_rev[::-1])
+
+
 def test_size_setter():
     grid = RectGrid(dx=1.23, dy=4.56, rotation=10)
     assert grid.size is None

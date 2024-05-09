@@ -535,6 +535,32 @@ class BaseGrid(metaclass=abc.ABCMeta):
             intersecting_cells.extend(cells_in_bounds[mask])
         return GridIndex(intersecting_cells).unique()
 
+    @abc.abstractmethod
+    def cells_intersecting_line(self, line):
+        """Obtain the cell ids of the cells that are intersected the a supplied line.
+
+        Similar functionality is found in :meth:`.BaseGrid.intersect_geometries`.
+        That method is more general and also handles point and polygon geometries.
+        However, :meth:`cells_intersecting_line` is more performant than :meth:`.BaseGrid.intersect_geometries`
+        when dealing with only line geometries.
+
+        Parameters
+        ----------
+        line: `numpy.ndarray`
+            A line as described by two points in the form [[x1,y1], [x2,y2]]
+
+        Returns
+        -------
+        :class:`GridIndex`
+            The ids of the cells intersected by the supplied line
+
+        See also
+        --------
+        :meth:`.BaseGrid.intersect_geometries`
+            The intersect_geometries method is more general, but less performant.
+        """
+        pass
+
     @validate_index
     def to_shapely(self, index, as_multipolygon: bool = False):
         """Represent the cells as Shapely Polygons

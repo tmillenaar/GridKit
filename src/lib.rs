@@ -261,6 +261,17 @@ impl PyRectGrid {
             .cells_near_point(&point.as_array())
             .into_pyarray(py)
     }
+
+    fn cells_intersecting_line<'py>(
+        &self,
+        py: Python<'py>,
+        p1: PyReadonlyArray1<'py, f64>,
+        p2: PyReadonlyArray1<'py, f64>,
+    ) -> &'py PyArray2<i64> {
+        self._grid
+            .cells_intersecting_line(&p1.as_array(), &p2.as_array())
+            .into_pyarray(py)
+    }
 }
 
 #[pyclass]

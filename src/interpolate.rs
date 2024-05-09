@@ -10,7 +10,7 @@ pub fn vec_norm_1d(
     return squared_sum.powf(0.5)
 }
 
-fn _project(
+pub fn project_point_on_line(
     point: &Array1<f64>,
     line_point_1: &Array1<f64>,
     line_point_2: &Array1<f64>
@@ -44,7 +44,7 @@ pub fn linear_interp_weights_single_triangle(
             median = &midpoint_opposite_side - &p1;
         }
 
-        let projected: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> = _project(
+        let projected: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> = project_point_on_line(
             &(sample_point - &p1),
             &(&p2 - &p1),
             &(&p3 - &p1),
