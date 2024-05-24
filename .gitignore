@@ -4,3 +4,12 @@ gridkit/__pycache__/*
 *__pycache__*
 *gridkit/__pycache__*
 *gridkit_rs/Cargo.lock
+venv/*
+target/*
+docs/source/api/*
+docs/source/example_gallery
+Cargo.lock
+.vscode/*
+*.swp
+build/*
+gridkit/gridkit_rs.cpython*
