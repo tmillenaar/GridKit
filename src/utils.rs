@@ -5,7 +5,10 @@ pub fn iseven(val: i64) -> bool {
 }
 
 pub fn modulus(val: f64, modulus: f64) -> f64 {
-    ((val % modulus) + modulus ) % modulus
+    if val == modulus {
+        return val
+    }
+    return ((val % modulus) + modulus ) % modulus
 }
 
 pub fn normalize_offset(offset: (f64, f64), dx: f64, dy: f64) -> (f64, f64) {

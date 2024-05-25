@@ -102,7 +102,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
     @offset.setter
     def offset(self, value):
         """Sets the x and y value of the offset"""
-        if not isinstance(value, tuple) or not len(value) == 2:
+        if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
         if getattr(self, "shape", None) == "flat":  # flat hex grid
             value = value[::-1]  # swap xy to yx

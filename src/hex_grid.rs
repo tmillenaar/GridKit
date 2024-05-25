@@ -15,7 +15,7 @@ impl HexGrid {
         let rotation_matrix_inv = _rotation_matrix(-rotation);
         // TODO: Find a way to normalize_offset without having to instantiate tmp object
         let self_tmp = HexGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv };
-        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
+        // let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
         let rotation_matrix = _rotation_matrix(rotation);
         let rotation_matrix_inv = _rotation_matrix(-rotation);
         HexGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv }

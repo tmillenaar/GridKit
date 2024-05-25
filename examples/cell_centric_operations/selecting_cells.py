@@ -35,11 +35,27 @@ from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
 
 # create a grids
-fine_grid = HexGrid(size=1, shape="pointy")
-fine_grid.offset = (0, fine_grid.dy / 2)
-coarse_grid = HexGrid(
-    size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
-)
+# fine_grid = HexGrid(size=1, shape="pointy")
+# fine_grid.offset = (0, fine_grid.dy / 2)
+# coarse_grid = HexGrid(
+#     size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
+# )
+
+# fine_grid = HexGrid(size=1, shape="pointy").anchor([0,0])
+# coarse_grid = HexGrid(
+#     size=3 * fine_grid.size, shape="pointy"
+# ).anchor([0,0])
+
+fine_grid = HexGrid(size=1, shape="flat").anchor([0, 0])
+coarse_grid = HexGrid(size=3 * fine_grid.size, shape="flat").anchor([0, 0])
+
+# fine_grid = HexGrid(size=1, shape="flat")
+# fine_grid.anchor([0,0], in_place=True)
+# coarse_grid = HexGrid(
+#     size=3 * fine_grid.size, shape="flat"
+# )
+# coarse_grid.anchor([0,0], in_place=True)
+
 
 # %%
 #

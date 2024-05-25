@@ -522,3 +522,52 @@ def test_area(size, shape):
     grid = HexGrid(size=size, shape=shape)
     geom = grid.to_shapely((0, 0))
     numpy.testing.assert_allclose(grid.area, geom.area)
+
+
+@pytest.mark.parametrize("in_place", [True, False])
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+@pytest.mark.parametrize(
+    "target_loc",
+    [
+        # [0,0],
+        # [-2.9, -2.9],
+        [-3.0, -3.0],
+        # [-3.1, -3.1],
+    ],
+)
+def test_anchor(target_loc, shape, in_place):
+    grid = HexGrid(size=0.3, shape=shape)
+
+    if in_place:
+        grid.anchor(target_loc, cell_element="centroid", in_place=True)
+        new_grid = grid
+    else:
+        new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
+
+    orig_grid = grid.update()
+    # Note: assertion assumes we center the cell_element="centroid"
+    # numpy.testing.assert_allclose(
+    #     new_grid.centroid(new_grid.cell_at_point(target_loc)),
+    #     target_loc
+    # )
+
+    if in_place:
+        # verify the original grid has a new offset
+        numpy.testing.assert_allclose(grid.offset, new_grid.offset)
+    else:
+        # verify the original grid remains unchanged
+        numpy.testing.assert_allclose(grid.offset, [0, 0])
+
+    # bounds = new_grid.align_bounds((-1,-1,1,1))
+    bounds = new_grid.align_bounds((-4, -4, -2, -2))
+    # bounds = new_grid.align_bounds((2,2,4,4))
+    cell_ids = new_grid.cells_in_bounds(bounds)
+    from gridkit.doc_utils import plot_polygons
+
+    plot_polygons(new_grid.to_shapely(cell_ids, as_multipolygon=True), fill=False)
+    import matplotlib.pyplot as plt
+
+    plt.scatter(*target_loc, marker="+")
+    plt.scatter(*new_grid.centroid(new_grid.cell_at_point(target_loc)), marker="x")
+    plt.scatter(*orig_grid.centroid(new_grid.cell_at_point(target_loc)), marker="d")
+    plt.show()

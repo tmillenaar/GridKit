@@ -92,6 +92,9 @@ class HexGrid(BaseGrid):
         offset_y = offset_y % self.dy
         offset = (offset_x, offset_y)
 
+        if shape == "flat":
+            offset = offset[::-1]
+
         self._shape = shape
         self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
@@ -593,6 +596,43 @@ class HexGrid(BaseGrid):
         ids = GridIndex(ids.reshape((*shape, 2)))
 
         return (ids, shape) if return_cell_count else ids
+
+    def anchor(
+        self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
+    ):
+        if cell_element == "centroid":
+            initial_loc = self.centroid(self.cell_at_point(target_loc))
+            diff = target_loc - initial_loc
+            # diff = target_loc[0] + self.dx, target_loc[1] + self.dy
+            # diff = target_loc + diff
+            # diff = numpy.abs(diff)
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        if self.shape == "pointy":
+            new_offset = (
+                self.offset[0] + diff[0],  # - self.dx / 2,
+                self.offset[1] + diff[1],
+            )
+        else:
+            new_offset = (
+                self.offset[0] + diff[0],
+                self.offset[1] + diff[1],  # + self.dx / 2,
+            )
+        # breakpoint()
+        # if not numpy.all(numpy.isclose(target_loc, [0,0])):
+        #     print(new_offset)
+        # breakpoint() # figure out how flat and pointy work, I expect pointy to shift only y and flat only x if target_loc=0
+
+        # bla = self.update()
+        # bla._offset = new_offset
+        # bla._grid = bla._update_inner_grid(offset=new_offset)
+        # return bla
+        if not in_place:
+            return self.update(offset=new_offset)
+        self.offset = new_offset
 
     @property
     def parent_grid_class(self):
