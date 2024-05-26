@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy
 import shapely
 from pyproj import CRS, Transformer
@@ -60,7 +62,7 @@ class TriGrid(BaseGrid):
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation
-        self._grid = PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
+        self._grid = PyTriGrid(cellsize=size, offset=tuple(offset), rotation=rotation)
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
@@ -295,6 +297,52 @@ class TriGrid(BaseGrid):
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+
+    def anchor(
+        self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
+    ):
+        current_cell = self.cell_at_point(target_loc)
+        if cell_element == "centroid":
+            initial_loc = self.centroid(current_cell)
+            diff = target_loc - initial_loc
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        # if self.is_cell_upright(current_cell):
+        #     # breakpoint()
+        #     new_offset = (
+        #         self.offset[0] + diff[0],
+        #         self.offset[1] + diff[1]# - self.r / 2,
+        #     )
+        # else:
+        #     new_offset = (
+        #         self.offset[0] + diff[0],
+        #         self.offset[1] + diff[1]# + self.r / 2,
+        #     )
+        # print("")
+        # print("diff", diff)
+        # print("self.offset", self.offset)
+        # print("new_offet", new_offset)
+        # print("Upright", self.is_cell_upright(current_cell))
+
+        new_offset = self.offset + diff
+        # ref_grid = self.update(offset=(0,0))
+        # print(ref_grid.cell_at_point(new_offset).index)
+
+        if not in_place:
+            self = self.update(offset=new_offset)
+        self.offset = new_offset
+
+        # Make sure if the target_loc was in an upright cell, the aligned centroid is also from an upright cell. Same for downward cells
+        if not self.is_cell_upright(current_cell) == self.is_cell_upright(
+            self.cell_at_point(target_loc)
+        ):
+            new_offset = (new_offset[0] + self.dx, new_offset[1])
+            if not in_place:
+                return self.update(offset=new_offset)
+            self.offset = new_offset
 
     def _update_inner_grid(self, size=None, offset=None, rotation=None):
         if size is None:
