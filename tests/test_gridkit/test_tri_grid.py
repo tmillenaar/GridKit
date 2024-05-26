@@ -710,3 +710,36 @@ def test_area(size):
     grid = TriGrid(size=size)
     geom = grid.to_shapely((0, 0))
     numpy.testing.assert_allclose(grid.area, geom.area)
+
+
+@pytest.mark.parametrize("in_place", [True, False])
+@pytest.mark.parametrize(
+    "target_loc",
+    [
+        [0, 0],
+        [-2.9, -2.9],
+        [-3.0, -3.0],
+        [-3.1, -3.1],
+    ],
+)
+@pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
+def test_anchor(target_loc, in_place, starting_offset):
+    grid = TriGrid(size=0.3, offset=starting_offset)
+
+    if in_place:
+        grid.anchor(target_loc, cell_element="centroid", in_place=True)
+        new_grid = grid
+    else:
+        new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
+
+    # Note: assertion assumes we center the cell_element="centroid"
+    numpy.testing.assert_allclose(
+        new_grid.centroid(new_grid.cell_at_point(target_loc)), target_loc, atol=1e-15
+    )
+
+    if in_place:
+        # verify the original grid has a new offset
+        numpy.testing.assert_allclose(grid.offset, new_grid.offset)
+    else:
+        # verify the original grid remains unchanged
+        numpy.testing.assert_allclose(grid.offset, starting_offset)
