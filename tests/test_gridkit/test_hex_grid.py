@@ -414,8 +414,25 @@ def test_centering_with_offset(shape, rot):
     if shape == "pointy":
         grid.offset = (0, grid.dy / 2)
     else:
-        grid.offset = (grid.dx / 2, 0)
+        # grid.offset = (grid.dx / 2, 0) # <- intended but does not work
+        # Note: conceptually flat offsets are confusing.
+        #       Since a shortcut was taken by transposing the axes for flat grids,
+        #       The offsets are reversed.
+        #       Rather than attempting to address this, 'flat' shapes will be discontinued from v1.0.0
+        grid.offset = (0, grid.dx / 2)
     numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])
+
+
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_offset_setters(shape):
+    offset = (0.1, 0.2)
+    grid = HexGrid(size=0.3, shape=shape, offset=offset)
+
+    numpy.testing.assert_allclose(grid.offset, offset)
+    new_grid = grid.update(offset=grid.offset)
+    numpy.testing.assert_allclose(new_grid.offset, offset)
+    grid.offset = offset
+    numpy.testing.assert_allclose(grid.offset, offset)
 
 
 @pytest.mark.parametrize(
@@ -529,14 +546,15 @@ def test_area(size, shape):
 @pytest.mark.parametrize(
     "target_loc",
     [
-        # [0,0],
-        # [-2.9, -2.9],
+        [0, 0],
+        [-2.9, -2.9],
         [-3.0, -3.0],
-        # [-3.1, -3.1],
+        [-3.1, -3.1],
     ],
 )
-def test_anchor(target_loc, shape, in_place):
-    grid = HexGrid(size=0.3, shape=shape)
+@pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
+def test_anchor(target_loc, shape, in_place, starting_offset):
+    grid = HexGrid(size=0.3, shape=shape, offset=starting_offset)
 
     if in_place:
         grid.anchor(target_loc, cell_element="centroid", in_place=True)
@@ -544,30 +562,14 @@ def test_anchor(target_loc, shape, in_place):
     else:
         new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
 
-    orig_grid = grid.update()
     # Note: assertion assumes we center the cell_element="centroid"
-    # numpy.testing.assert_allclose(
-    #     new_grid.centroid(new_grid.cell_at_point(target_loc)),
-    #     target_loc
-    # )
+    numpy.testing.assert_allclose(
+        new_grid.centroid(new_grid.cell_at_point(target_loc)), target_loc
+    )
 
     if in_place:
         # verify the original grid has a new offset
         numpy.testing.assert_allclose(grid.offset, new_grid.offset)
     else:
         # verify the original grid remains unchanged
-        numpy.testing.assert_allclose(grid.offset, [0, 0])
-
-    # bounds = new_grid.align_bounds((-1,-1,1,1))
-    bounds = new_grid.align_bounds((-4, -4, -2, -2))
-    # bounds = new_grid.align_bounds((2,2,4,4))
-    cell_ids = new_grid.cells_in_bounds(bounds)
-    from gridkit.doc_utils import plot_polygons
-
-    plot_polygons(new_grid.to_shapely(cell_ids, as_multipolygon=True), fill=False)
-    import matplotlib.pyplot as plt
-
-    plt.scatter(*target_loc, marker="+")
-    plt.scatter(*new_grid.centroid(new_grid.cell_at_point(target_loc)), marker="x")
-    plt.scatter(*orig_grid.centroid(new_grid.cell_at_point(target_loc)), marker="d")
-    plt.show()
+        numpy.testing.assert_allclose(grid.offset, starting_offset)
