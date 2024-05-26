@@ -87,7 +87,17 @@ class HexGrid(BaseGrid):
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
             )
 
+        if shape == "flat":
+            offset = offset[::-1]
+
         offset_x, offset_y = offset[0], offset[1]
+
+        if shape == "pointy":
+            if ((offset_y // self.dy) % 2) != 0:  # Row is odd
+                offset_x -= self.dx / 2
+        elif shape == "flat":
+            if ((offset_x // self.dx) % 2) != 0:  # Row is odd
+                offset_y -= self.dy / 2
         offset_x = offset_x % self.dx
         offset_y = offset_y % self.dy
         offset = (offset_x, offset_y)
@@ -120,6 +130,36 @@ class HexGrid(BaseGrid):
         self._grid = self._update_inner_grid(size=self._size)
         self._dx = self._grid.dx() if self.shape == "pointy" else self._grid.dy()
         self._dy = self._grid.dy() if self.shape == "pointy" else self._grid.dx()
+
+    @property
+    def offset(self) -> float:
+        """The offset off the grid in dx and dy.
+        The offset is never larger than the size of a single grid cell.
+        The offset represents the shift from the origin (0,0)."""
+        return self._grid.offset()
+
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) and not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            value = value[::-1]  # swap xy to yx
+        offset_x, offset_y = value[0], value[1]
+        if self.shape == "pointy":
+            if ((offset_y // self.dy) % 2) != 0:  # Row is odd
+                offset_x -= self.dx / 2
+        elif self.shape == "flat":
+            if ((offset_x // self.dx) % 2) != 0:  # Row is odd
+                offset_y -= self.dy / 2
+        offset_x = offset_x % self.dx
+        offset_y = offset_y % self.dy
+        new_offset = (offset_x, offset_y)
+
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            new_offset = new_offset[::-1]  # swap xy to yx
+        self._grid = self._update_inner_grid(offset=new_offset)
+        self._offset = new_offset
 
     @property
     def dx(self) -> float:
@@ -603,33 +643,16 @@ class HexGrid(BaseGrid):
         if cell_element == "centroid":
             initial_loc = self.centroid(self.cell_at_point(target_loc))
             diff = target_loc - initial_loc
-            # diff = target_loc[0] + self.dx, target_loc[1] + self.dy
-            # diff = target_loc + diff
-            # diff = numpy.abs(diff)
         else:
             raise ValueError(
                 f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
             )
 
         if self.shape == "pointy":
-            new_offset = (
-                self.offset[0] + diff[0],  # - self.dx / 2,
-                self.offset[1] + diff[1],
-            )
+            new_offset = self.offset + diff
         else:
-            new_offset = (
-                self.offset[0] + diff[0],
-                self.offset[1] + diff[1],  # + self.dx / 2,
-            )
-        # breakpoint()
-        # if not numpy.all(numpy.isclose(target_loc, [0,0])):
-        #     print(new_offset)
-        # breakpoint() # figure out how flat and pointy work, I expect pointy to shift only y and flat only x if target_loc=0
+            new_offset = self.offset + diff[::-1]
 
-        # bla = self.update()
-        # bla._offset = new_offset
-        # bla._grid = bla._update_inner_grid(offset=new_offset)
-        # return bla
         if not in_place:
             return self.update(offset=new_offset)
         self.offset = new_offset
@@ -771,7 +794,6 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
         offset_x = dx - offset_x if offset_x < 0 else offset_x
-        offset_y = dy - offset_y if offset_y < 0 else offset_y
         offset = (
             0 if numpy.isclose(offset_x, dx) else offset_x,
             0 if numpy.isclose(offset_y, dy) else offset_y,
