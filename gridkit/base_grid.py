@@ -2,7 +2,7 @@ import abc
 import functools
 import warnings
 from collections.abc import Iterable
-from typing import Literal
+from typing import Literal, Tuple
 
 import numpy
 import scipy
@@ -428,6 +428,43 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return self.parent_grid_class(
             dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs
         )
+
+    @abc.abstractmethod
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid"] = "centroid",
+        in_place: bool = False,
+    ):
+        """Position a cell_element (such as a centroid) at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``
+        This is useful for example to align two grids by anchoring them to the same location.
+
+        Parameters
+        ----------
+        target_loc: Tuple[float, float]
+            The coordinates of the point at which to anchor the grid in (x,y)
+        cell_element: Literal["centroid"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``
+            Currently only "centroid" is supported. Other cell elements could be supported in the future, such as "corner"
+        in_place: bool - Default: False
+            The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.
+            If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.
+
+            .. Note ::
+
+                Even though ``in_place=True`` saves the creation of a Python object,
+                a new Python object that wraps the Rust implementation needs to be updated
+                and hence a new Python object is still created.
+                Nevertheless, creating one new object is often better than creating two new objects.
+
+        Returns
+        -------
+        :class:`.BaseGrid` | None
+            :class:`.BaseGrid` if ``in_place=False`` or `None` if ``in_place=True``
+
+        """
+        pass
 
     @abc.abstractproperty
     def parent_grid_class(self):

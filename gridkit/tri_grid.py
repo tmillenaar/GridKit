@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Tuple
 
 import numpy
 import shapely
@@ -299,7 +299,10 @@ class TriGrid(BaseGrid):
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
 
     def anchor(
-        self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid"] = "centroid",
+        in_place: bool = False,
     ):
         current_cell = self.cell_at_point(target_loc)
 
