@@ -659,7 +659,6 @@ class HexGrid(BaseGrid):
         if cell_element == "centroid":
             orig_rot = self.rotation
             if orig_rot:
-                orig_target_loc = target_loc
                 target_loc = self.rotation_matrix_inv.dot(target_loc)
                 self.rotation = 0
 
