@@ -449,8 +449,6 @@ def test_rotation_setter(rot, expected_rot_mat, shape):
     grid = HexGrid(size=1.23, shape=shape)
     grid.rotation = rot
     numpy.testing.assert_allclose(rot, grid.rotation)
-    if shape == "flat" and rot != 0:
-        expected_rot_mat = numpy.array(expected_rot_mat).T
     numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
 
 
@@ -465,7 +463,7 @@ def test_shape_setter():
     grid.shape = "flat"
     assert grid.shape == "flat"
     numpy.testing.assert_allclose(grid.rotation, 10)
-    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat.T)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
     grid.shape = "pointy"
     assert grid.shape == "pointy"
     numpy.testing.assert_allclose(grid.rotation, 10)
@@ -553,8 +551,9 @@ def test_area(size, shape):
     ],
 )
 @pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
-def test_anchor(target_loc, shape, in_place, starting_offset):
-    grid = HexGrid(size=0.3, shape=shape, offset=starting_offset)
+@pytest.mark.parametrize("rot", [0, 15, -69, 420])
+def test_anchor(target_loc, shape, in_place, starting_offset, rot):
+    grid = HexGrid(size=0.3, shape=shape, offset=starting_offset, rotation=rot)
 
     if in_place:
         grid.anchor(target_loc, cell_element="centroid", in_place=True)
