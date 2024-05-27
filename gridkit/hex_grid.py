@@ -110,6 +110,20 @@ class HexGrid(BaseGrid):
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
+    @property
+    def rotation_matrix(self):
+        """The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        rot_mat = self._grid.rotation_matrix()
+        return rot_mat if self.shape == "pointy" else rot_mat.T
+
+    @property
+    def rotation_matrix_inv(self):
+        """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        rot_mat = self._grid.rotation_matrix_inv()
+        return rot_mat if self.shape == "pointy" else rot_mat.T
+
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
         return (2 / 3 * area * 3**0.5) ** 0.5
@@ -640,9 +654,20 @@ class HexGrid(BaseGrid):
     def anchor(
         self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
     ):
+        current_cell = self.cell_at_point(target_loc)
+
         if cell_element == "centroid":
-            initial_loc = self.centroid(self.cell_at_point(target_loc))
+            orig_rot = self.rotation
+            if orig_rot:
+                orig_target_loc = target_loc
+                target_loc = self.rotation_matrix_inv.dot(target_loc)
+                self.rotation = 0
+
+            initial_loc = self.centroid(current_cell)
             diff = target_loc - initial_loc
+
+            if orig_rot:
+                self.rotation = orig_rot
         else:
             raise ValueError(
                 f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
@@ -668,6 +693,8 @@ class HexGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
+            if self.shape == "flat":
+                rotation = -rotation
         return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
