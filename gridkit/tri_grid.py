@@ -302,34 +302,26 @@ class TriGrid(BaseGrid):
         self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
     ):
         current_cell = self.cell_at_point(target_loc)
+
         if cell_element == "centroid":
+            orig_rot = self.rotation
+            if orig_rot:
+                orig_target_loc = target_loc
+                target_loc = self.rotation_matrix_inv.dot(target_loc)
+                self.rotation = 0
+
             initial_loc = self.centroid(current_cell)
             diff = target_loc - initial_loc
+
+            if orig_rot:
+                self.rotation = orig_rot
+                target_loc = orig_target_loc
         else:
             raise ValueError(
                 f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
             )
 
-        # if self.is_cell_upright(current_cell):
-        #     # breakpoint()
-        #     new_offset = (
-        #         self.offset[0] + diff[0],
-        #         self.offset[1] + diff[1]# - self.r / 2,
-        #     )
-        # else:
-        #     new_offset = (
-        #         self.offset[0] + diff[0],
-        #         self.offset[1] + diff[1]# + self.r / 2,
-        #     )
-        # print("")
-        # print("diff", diff)
-        # print("self.offset", self.offset)
-        # print("new_offet", new_offset)
-        # print("Upright", self.is_cell_upright(current_cell))
-
         new_offset = self.offset + diff
-        # ref_grid = self.update(offset=(0,0))
-        # print(ref_grid.cell_at_point(new_offset).index)
 
         if not in_place:
             self = self.update(offset=new_offset)
@@ -341,8 +333,12 @@ class TriGrid(BaseGrid):
         ):
             new_offset = (new_offset[0] + self.dx, new_offset[1])
             if not in_place:
-                return self.update(offset=new_offset)
-            self.offset = new_offset
+                self = self.update(offset=new_offset)
+            else:
+                self.offset = new_offset
+
+        if not in_place:
+            return self
 
     def _update_inner_grid(self, size=None, offset=None, rotation=None):
         if size is None:
