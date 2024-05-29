@@ -4,6 +4,30 @@ Release notes
 ================
 
 
+Version 0.11.0 (May 29, 2024)
+------------------------------
+Features
+ - Easier shifting of grids using :meth:`.BaseGrid.anchor`
+
+Fixes
+ - Fix issue in HexGrid where offsets were incorrectly applied when the supplied offsets were not between 0:cell size
+ - Fix 'flat' HexGrids rotating in the other direction
+ - Fix error regarding the datatype when supplying the offset for a TriGrid as a non-tuple iterable such as a list or numpy array
+ - Fix :meth:`.HexGrid.cell_at_point` not properly taking x-offset into account
+ - Fix issue where the offset would flip for 'flat' HexGrids when using the offset setter but not when calling `grid.update(offset=new_offset)`
+
+Documentation
+ - Simplify centering of grids in examples :ref:`selecting_cells.py <example selecting cells>`, :ref:`rotation_animation.py <example rotated animation>` and :ref:`rotation_animation.py <example hexagon grids>`
+
+Deprecations
+ - 'flat' ``shape`` for HexGrid will be deprecated in favor of ``rotation`` in v1.0.0. A warning will be raised on class initiation.
+
+Known Issues
+ - The implementation of 'flat' HexGrids is done by swapping the x and y axes compared to a 'pointy' grid.
+   With this release, several issues related to the offset were fixed, but this implementation aspect now leaks into the offset.
+   This means the user might specify an offset of (0,1) and expect a shift of 1 in the y-axis but the shift occurs in the x-axis.
+   Since 'flat' HexGrids will be deprecated in release v1.0.0, fixing this is not worth the effort, meaning this leaky abstraction will be deliberately ignored.
+
 Version 0.10.0 (April 21, 2024)
 ------------------------------
 Features

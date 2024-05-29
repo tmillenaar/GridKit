@@ -32,8 +32,8 @@ from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
 
 # Initialize
-grid = HexGrid(size=1, rotation=0)
-center_id = [-1, -1]
+grid = HexGrid(size=1, rotation=0).anchor([0, 0])
+center_id = grid.cell_at_point([0, 0])
 ids = grid.neighbours(center_id, depth=4)
 distance = numpy.linalg.norm(grid.centroid(ids) - grid.centroid(center_id), axis=1)
 
@@ -41,8 +41,8 @@ distance = numpy.linalg.norm(grid.centroid(ids) - grid.centroid(center_id), axis
 def update_frame(rotation):
     ax.clear()
     ax.scatter(0, 0)
-    rotated_grid = HexGrid(size=1, rotation=rotation, offset=(0, grid.dy / 2))
-    geoms = rotated_grid.to_shapely(ids, as_multipolygon=True)
+    grid.rotation = rotation
+    geoms = grid.to_shapely(ids, as_multipolygon=True)
     im = plot_polygons(geoms.geoms, colors=distance, fill=True, ax=ax)
     ax.set_title(f"Rotation: {rotation} degrees")
     ax.set_xlim(-5, 5)

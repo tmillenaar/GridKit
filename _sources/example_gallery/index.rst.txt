@@ -15,6 +15,9 @@ and to serve as inspiration regarding the types of problems that can be solved u
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -33,6 +36,7 @@ These examples highlight operations where specific cells are targeted.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -85,6 +89,8 @@ These examples highlight operations where specific cells are targeted.
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -109,6 +115,7 @@ These examples highlight the different ways grids can be constructed and manipul
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -178,6 +185,8 @@ These examples highlight the different ways grids can be constructed and manipul
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -204,6 +213,7 @@ These examples show how traditional raster data can be analysed and modified usi
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -290,6 +300,8 @@ These examples show how traditional raster data can be analysed and modified usi
     </div>
 
 
+.. thumbnail-parent-div-close
+
 .. raw:: html
 
     </div>
@@ -317,6 +329,7 @@ The following examples highlight the interactions between vector data and regula
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -385,6 +398,8 @@ The following examples highlight the interactions between vector data and regula
       <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

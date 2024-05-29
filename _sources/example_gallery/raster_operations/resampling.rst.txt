@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_example_gallery_raster_operations_resampling.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -155,6 +155,13 @@ for a fair visual comparison.
 
 
 
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:85: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+      warnings.warn(
 
 
 

@@ -81,11 +81,11 @@ plt.show()
 # We can create a second grid and play with the size and offset
 # If we shift the grid a deliberate amount so that it has a vertex on the center,
 # it creates interesting patterns with respect to the grid we just created.
-# For this we need to shift it half a 'dx' horizontally and one radius (distance from center to corner) vertically,
+# For this we need to shift it half a 'dx' horizontally and half a radius (distance from center to corner) vertically,
 # with respect to the main grid.
 
-shifted_grid = HexGrid(
-    size=10, shape="pointy", offset=(main_grid.dx / 2, (main_grid.dy / 2) + main_grid.r)
+shifted_grid = main_grid.update(
+    offset=(main_grid.dx / 2, (main_grid.dy + main_grid.r) / 2)
 )
 shifted_shapes = get_shapes_in_bounds(shifted_grid, bounds)
 
@@ -109,12 +109,9 @@ plt.show()
 # Finally, let's play with the size of the grid. If we keep the grids centered around zero but vary the size,
 # we also obtain interesting patterns.
 
-half_size_grid = HexGrid(
-    size=main_grid.dx / 2, offset=(0, main_grid.dy / (2 * 2)), shape="pointy"
-)
-third_size_grid = HexGrid(
-    size=main_grid.dx / 3, offset=(0, main_grid.dy / (2 * 3)), shape="pointy"
-)
+half_size_grid = main_grid.update(size=main_grid.size / 2).anchor([0, 0])
+third_size_grid = main_grid.update(size=main_grid.size / 3).anchor([0, 0])
+
 half_size_shapes = get_shapes_in_bounds(half_size_grid, bounds)
 third_size_shapes = get_shapes_in_bounds(third_size_grid, bounds)
 

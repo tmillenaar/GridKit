@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tiled aggregation from points with Dask &mdash; GridKit v0.10.0 documentation</title>
+  <title>Tiled aggregation from points with Dask &mdash; GridKit v0.11.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=7e5c3c63"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=0f89763a"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.10.0
+                v0.11.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -107,7 +107,7 @@
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-example-gallery-vector-synergy-aggregate-dask-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code</p>
+to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="tiled-aggregation-from-points-with-dask">
 <span id="example-aggregate-dask"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-dask-py"></span><h1>Tiled aggregation from points with Dask<a class="headerlink" href="#tiled-aggregation-from-points-with-dask" title="Permalink to this heading"></a></h1>
@@ -189,7 +189,9 @@ DataFrame will need to be ignored for this operation.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dask DataFrame Structure:
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:85: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+  warnings.warn(
+Dask DataFrame Structure:
                  pnt_x    pnt_y cell_id nr_points
 npartitions=4
 0              float64  float64   int64     int64
@@ -234,7 +236,7 @@ The input data was the same so this should indeed be the case.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.447 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.371 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-dask-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/38f8786a96f33fa721d3497600e2357d/aggregate_dask.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate_dask.ipynb</span></code></a></p>
