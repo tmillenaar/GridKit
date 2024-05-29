@@ -82,6 +82,9 @@ class HexGrid(BaseGrid):
         elif shape == "flat":
             self._dy = size
             self._dx = 3 / 2 * self._radius
+            warnings.warn(
+                "A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead."
+            )
         else:
             raise ValueError(
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"

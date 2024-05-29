@@ -29,33 +29,13 @@ where one grid's cells are exactly three times larger than the other grid's cell
 # sphinx_gallery_thumbnail_number = -1
 
 import matplotlib.pyplot as plt
-import numpy
 
 from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
 
 # create a grids
-# fine_grid = HexGrid(size=1, shape="pointy")
-# fine_grid.offset = (0, fine_grid.dy / 2)
-# coarse_grid = HexGrid(
-#     size=3 * fine_grid.dx, offset=(0, 3 * fine_grid.dy / 2), shape="pointy"
-# )
-
-# fine_grid = HexGrid(size=1, shape="pointy").anchor([0,0])
-# coarse_grid = HexGrid(
-#     size=3 * fine_grid.size, shape="pointy"
-# ).anchor([0,0])
-
-fine_grid = HexGrid(size=1, shape="flat").anchor([0, 0])
-coarse_grid = HexGrid(size=3 * fine_grid.size, shape="flat").anchor([0, 0])
-
-# fine_grid = HexGrid(size=1, shape="flat")
-# fine_grid.anchor([0,0], in_place=True)
-# coarse_grid = HexGrid(
-#     size=3 * fine_grid.size, shape="flat"
-# )
-# coarse_grid.anchor([0,0], in_place=True)
-
+fine_grid = HexGrid(size=1).anchor([0, 0])
+coarse_grid = HexGrid(size=3 * fine_grid.size).anchor([0, 0])
 
 # %%
 #
@@ -98,7 +78,6 @@ plt.show()
 # vertices of the orange cells.
 # Let's start by coloring in the center cells.
 
-# coarse_centroids = numpy.array([geom.centroid.xy for geom in coarse_shapes.geoms])
 coarse_centroids = coarse_grid.centroid(coarse_cell_ids)
 center_cells = fine_grid.cell_at_point(coarse_centroids)
 center_shapes = fine_grid.to_shapely(center_cells)

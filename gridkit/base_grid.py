@@ -684,24 +684,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
             grid_kwargs["shape"] = self._shape
         return self.bounded_cls(**grid_kwargs)
 
-    # def anchor(
-    #     self, target_loc, cell_element: Literal["centroid"] = "centroid", in_place=False
-    # ):
-    #     current_cell = self.cell_at_point(target_loc)
-    #     if cell_element == "centroid":
-    #         initial_loc = self.centroid(current_cell)
-    #         diff = target_loc - initial_loc
-    #     else:
-    #         raise ValueError(
-    #             f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
-    #         )
-
-    #     new_offset = tuple(self.offset + diff)
-
-    #     if not in_place:
-    #         return self.update(offset=new_offset)
-    #     self.offset = new_offset
-
     @abc.abstractmethod
     def _update_inner_grid(self, size=None, offset=None, rotation=None):
         pass
