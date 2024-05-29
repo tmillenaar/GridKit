@@ -87,7 +87,7 @@ impl HexGrid {
             if is_offset == true {
                 id_x = (x - self.offset.0 - self.dx() / 2.) / self.dx();
             } else {
-                id_x = x / self.dx();
+                id_x = (x - self.offset.0) / self.dx();
             }
             id_x = id_x.floor();
 
@@ -125,8 +125,8 @@ impl HexGrid {
                     id_y = id_y + 1.;
                 }
             }
-        index[Ix2(cell_id, 0)] = id_x as i64;
-        index[Ix2(cell_id, 1)] = id_y as i64;
+            index[Ix2(cell_id, 0)] = id_x as i64;
+            index[Ix2(cell_id, 1)] = id_y as i64;
         }
     index
     }

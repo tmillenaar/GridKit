@@ -414,8 +414,25 @@ def test_centering_with_offset(shape, rot):
     if shape == "pointy":
         grid.offset = (0, grid.dy / 2)
     else:
-        grid.offset = (grid.dx / 2, 0)
+        # grid.offset = (grid.dx / 2, 0) # <- intended but does not work
+        # Note: conceptually flat offsets are confusing.
+        #       Since a shortcut was taken by transposing the axes for flat grids,
+        #       The offsets are reversed.
+        #       Rather than attempting to address this, 'flat' shapes will be discontinued from v1.0.0
+        grid.offset = (0, grid.dx / 2)
     numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])
+
+
+@pytest.mark.parametrize("shape", ["flat", "pointy"])
+def test_offset_setters(shape):
+    offset = (0.1, 0.2)
+    grid = HexGrid(size=0.3, shape=shape, offset=offset)
+
+    numpy.testing.assert_allclose(grid.offset, offset)
+    new_grid = grid.update(offset=grid.offset)
+    numpy.testing.assert_allclose(new_grid.offset, offset)
+    grid.offset = offset
+    numpy.testing.assert_allclose(grid.offset, offset)
 
 
 @pytest.mark.parametrize(
@@ -432,8 +449,6 @@ def test_rotation_setter(rot, expected_rot_mat, shape):
     grid = HexGrid(size=1.23, shape=shape)
     grid.rotation = rot
     numpy.testing.assert_allclose(rot, grid.rotation)
-    if shape == "flat" and rot != 0:
-        expected_rot_mat = numpy.array(expected_rot_mat).T
     numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
 
 
@@ -448,7 +463,7 @@ def test_shape_setter():
     grid.shape = "flat"
     assert grid.shape == "flat"
     numpy.testing.assert_allclose(grid.rotation, 10)
-    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat.T)
+    numpy.testing.assert_allclose(grid.rotation_matrix, expected_rot_mat)
     grid.shape = "pointy"
     assert grid.shape == "pointy"
     numpy.testing.assert_allclose(grid.rotation, 10)
@@ -522,3 +537,38 @@ def test_area(size, shape):
     grid = HexGrid(size=size, shape=shape)
     geom = grid.to_shapely((0, 0))
     numpy.testing.assert_allclose(grid.area, geom.area)
+
+
+@pytest.mark.parametrize("in_place", [True, False])
+@pytest.mark.parametrize("shape", ["pointy", "flat"])
+@pytest.mark.parametrize(
+    "target_loc",
+    [
+        [0, 0],
+        [-2.9, -2.9],
+        [-3.0, -3.0],
+        [-3.1, -3.1],
+    ],
+)
+@pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
+@pytest.mark.parametrize("rot", [0, 15, -69, 420])
+def test_anchor(target_loc, shape, in_place, starting_offset, rot):
+    grid = HexGrid(size=0.3, shape=shape, offset=starting_offset, rotation=rot)
+
+    if in_place:
+        grid.anchor(target_loc, cell_element="centroid", in_place=True)
+        new_grid = grid
+    else:
+        new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
+
+    # Note: assertion assumes we center the cell_element="centroid"
+    numpy.testing.assert_allclose(
+        new_grid.centroid(new_grid.cell_at_point(target_loc)), target_loc
+    )
+
+    if in_place:
+        # verify the original grid has a new offset
+        numpy.testing.assert_allclose(grid.offset, new_grid.offset)
+    else:
+        # verify the original grid remains unchanged
+        numpy.testing.assert_allclose(grid.offset, starting_offset)

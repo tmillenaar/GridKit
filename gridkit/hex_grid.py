@@ -1,5 +1,5 @@
 import warnings
-from typing import Literal
+from typing import Literal, Tuple
 
 import numpy
 from pyproj import CRS, Transformer
@@ -82,20 +82,50 @@ class HexGrid(BaseGrid):
         elif shape == "flat":
             self._dy = size
             self._dx = 3 / 2 * self._radius
+            warnings.warn(
+                "A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead."
+            )
         else:
             raise ValueError(
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
             )
 
+        if shape == "flat":
+            offset = offset[::-1]
+
         offset_x, offset_y = offset[0], offset[1]
+
+        if shape == "pointy":
+            if ((offset_y // self.dy) % 2) != 0:  # Row is odd
+                offset_x -= self.dx / 2
+        elif shape == "flat":
+            if ((offset_x // self.dx) % 2) != 0:  # Row is odd
+                offset_y -= self.dy / 2
         offset_x = offset_x % self.dx
         offset_y = offset_y % self.dy
         offset = (offset_x, offset_y)
+
+        if shape == "flat":
+            offset = offset[::-1]
 
         self._shape = shape
         self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
+
+    @property
+    def rotation_matrix(self):
+        """The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        rot_mat = self._grid.rotation_matrix()
+        return rot_mat if self.shape == "pointy" else rot_mat.T
+
+    @property
+    def rotation_matrix_inv(self):
+        """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
+        Note: makes a copy every time this is called."""
+        rot_mat = self._grid.rotation_matrix_inv()
+        return rot_mat if self.shape == "pointy" else rot_mat.T
 
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
@@ -117,6 +147,36 @@ class HexGrid(BaseGrid):
         self._grid = self._update_inner_grid(size=self._size)
         self._dx = self._grid.dx() if self.shape == "pointy" else self._grid.dy()
         self._dy = self._grid.dy() if self.shape == "pointy" else self._grid.dx()
+
+    @property
+    def offset(self) -> float:
+        """The offset off the grid in dx and dy.
+        The offset is never larger than the size of a single grid cell.
+        The offset represents the shift from the origin (0,0)."""
+        return self._grid.offset()
+
+    @offset.setter
+    def offset(self, value):
+        """Sets the x and y value of the offset"""
+        if not isinstance(value, tuple) and not len(value) == 2:
+            raise TypeError(f"Expected a tuple of length 2. Got: {value}")
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            value = value[::-1]  # swap xy to yx
+        offset_x, offset_y = value[0], value[1]
+        if self.shape == "pointy":
+            if ((offset_y // self.dy) % 2) != 0:  # Row is odd
+                offset_x -= self.dx / 2
+        elif self.shape == "flat":
+            if ((offset_x // self.dx) % 2) != 0:  # Row is odd
+                offset_y -= self.dy / 2
+        offset_x = offset_x % self.dx
+        offset_y = offset_y % self.dy
+        new_offset = (offset_x, offset_y)
+
+        if getattr(self, "shape", None) == "flat":  # flat hex grid
+            new_offset = new_offset[::-1]  # swap xy to yx
+        self._grid = self._update_inner_grid(offset=new_offset)
+        self._offset = new_offset
 
     @property
     def dx(self) -> float:
@@ -594,6 +654,39 @@ class HexGrid(BaseGrid):
 
         return (ids, shape) if return_cell_count else ids
 
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid"] = "centroid",
+        in_place: bool = False,
+    ):
+        current_cell = self.cell_at_point(target_loc)
+
+        if cell_element == "centroid":
+            orig_rot = self.rotation
+            if orig_rot:
+                target_loc = self.rotation_matrix_inv.dot(target_loc)
+                self.rotation = 0
+
+            initial_loc = self.centroid(current_cell)
+            diff = target_loc - initial_loc
+
+            if orig_rot:
+                self.rotation = orig_rot
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        if self.shape == "pointy":
+            new_offset = self.offset + diff
+        else:
+            new_offset = self.offset + diff[::-1]
+
+        if not in_place:
+            return self.update(offset=new_offset)
+        self.offset = new_offset
+
     @property
     def parent_grid_class(self):
         return HexGrid
@@ -605,6 +698,8 @@ class HexGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
+            if self.shape == "flat":
+                rotation = -rotation
         return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
@@ -731,7 +826,6 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         offset_x = bounds[0] % dx
         offset_y = bounds[1] % dy
         offset_x = dx - offset_x if offset_x < 0 else offset_x
-        offset_y = dy - offset_y if offset_y < 0 else offset_y
         offset = (
             0 if numpy.isclose(offset_x, dx) else offset_x,
             0 if numpy.isclose(offset_y, dy) else offset_y,

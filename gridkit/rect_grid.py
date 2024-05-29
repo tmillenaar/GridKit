@@ -1,5 +1,5 @@
 import warnings
-from typing import Tuple, Union
+from typing import Literal, Tuple, Union
 
 import numpy
 import scipy
@@ -98,7 +98,7 @@ class RectGrid(BaseGrid):
         self._dx = dx
         self._dy = dy
         self._rotation = rotation
-        self._grid = PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
+        self._grid = PyRectGrid(dx=dx, dy=dy, offset=tuple(offset), rotation=rotation)
         self.bounded_cls = BoundedRectGrid
 
         super(RectGrid, self).__init__(*args, **kwargs)
@@ -619,6 +619,36 @@ class RectGrid(BaseGrid):
 
         ids = GridIndex(ids.T.reshape((*shape, 2)))
         return (ids, shape) if return_cell_count else ids
+
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid"] = "centroid",
+        in_place: bool = False,
+    ):
+        current_cell = self.cell_at_point(target_loc)
+
+        if cell_element == "centroid":
+            orig_rot = self.rotation
+            if orig_rot:
+                target_loc = self.rotation_matrix_inv.dot(target_loc)
+                self.rotation = 0
+
+            initial_loc = self.centroid(current_cell)
+            diff = target_loc - initial_loc
+
+            if orig_rot:
+                self.rotation = orig_rot
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        new_offset = self.offset + diff
+
+        if not in_place:
+            return self.update(offset=new_offset)
+        self.offset = new_offset
 
     @property
     def parent_grid_class(self):
