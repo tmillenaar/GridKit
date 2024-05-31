@@ -107,6 +107,8 @@ def plot_polygons(
         geoms = shapely.MultiPolygon(iter(geoms))
     elif isinstance(geoms, list):
         geoms = shapely.MultiPolygon(geoms)
+    elif isinstance(geoms, shapely.geometry.Polygon):
+        geoms = shapely.geometry.MultiPolygon([geoms])
     elif isinstance(geoms, shapely.geometry.base.GeometrySequence):
         geoms = geoms._parent
     bounds = geoms.bounds
