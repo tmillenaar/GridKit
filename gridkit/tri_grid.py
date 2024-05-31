@@ -301,44 +301,65 @@ class TriGrid(BaseGrid):
     def anchor(
         self,
         target_loc: Tuple[float, float],
-        cell_element: Literal["centroid"] = "centroid",
+        cell_element: Literal["centroid", "corner"] = "centroid",
         in_place: bool = False,
     ):
         current_cell = self.cell_at_point(target_loc)
 
+        # Force rotation to zero before determining new offset
+        orig_rot = self.rotation
+        if orig_rot:
+            orig_target_loc = target_loc
+            target_loc = self.rotation_matrix_inv.dot(target_loc)
+            self.rotation = 0
+
+        # Determine the offset
         if cell_element == "centroid":
-            orig_rot = self.rotation
-            if orig_rot:
-                orig_target_loc = target_loc
-                target_loc = self.rotation_matrix_inv.dot(target_loc)
-                self.rotation = 0
-
-            initial_loc = self.centroid(current_cell)
-            diff = target_loc - initial_loc
-
-            if orig_rot:
-                self.rotation = orig_rot
-                target_loc = orig_target_loc
+            diff = target_loc - self.centroid(current_cell)
+        elif cell_element == "corner":
+            corners = self.cell_corners(current_cell)
+            diffs = target_loc - corners
+            distances = numpy.linalg.norm(diffs, axis=1)
+            diff = diffs[numpy.argmin(distances)]
         else:
             raise ValueError(
                 f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
             )
 
+        # Apply offset
         new_offset = self.offset + diff
-
         if not in_place:
             self = self.update(offset=new_offset)
         self.offset = new_offset
 
-        # Make sure if the target_loc was in an upright cell, the aligned centroid is also from an upright cell. Same for downward cells
-        if not self.is_cell_upright(current_cell) == self.is_cell_upright(
-            self.cell_at_point(target_loc)
-        ):
-            new_offset = (new_offset[0] + self.dx, new_offset[1])
-            if not in_place:
-                self = self.update(offset=new_offset)
-            else:
-                self.offset = new_offset
+        # Apply corrections if nesecary, only relevant for Tri- and HexGrids where orientations/positions change per row
+        if cell_element == "centroid":
+            # Make sure if the target_loc was in an upright cell, the aligned centroid is also from an upright cell.
+            # Same for downward cells
+            if not self.is_cell_upright(current_cell) == self.is_cell_upright(
+                self.cell_at_point(target_loc)
+            ):
+                new_offset = (new_offset[0] + self.dx, new_offset[1])
+                if not in_place:
+                    self = self.update(offset=new_offset)
+                else:
+                    self.offset = new_offset
+        elif cell_element == "corner":
+            # Check the target_loc is actually intersects one of the new corners.
+            # If the offset got wrapped, we might need to shift by another dx
+            corners = self.cell_corners(self.cell_at_point(target_loc))
+            distances = numpy.linalg.norm(corners - target_loc, axis=1)
+            if not numpy.any(numpy.isclose(distances, 0)):
+                new_offset = (new_offset[0] + self.dx, new_offset[1])
+                if not in_place:
+                    self = self.update(offset=new_offset)
+                else:
+                    self.offset = new_offset
+
+        # Rotate original grid back
+        if orig_rot:
+            self.rotation = orig_rot
+            target_loc = orig_target_loc
 
         if not in_place:
             return self

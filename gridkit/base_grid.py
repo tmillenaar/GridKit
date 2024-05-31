@@ -433,20 +433,22 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def anchor(
         self,
         target_loc: Tuple[float, float],
-        cell_element: Literal["centroid"] = "centroid",
+        cell_element: Literal["centroid", "corner"] = "centroid",
         in_place: bool = False,
     ):
-        """Position a cell_element (such as a centroid) at a specified location.
-        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``
+        """Position a specified part of a grid cell at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.
         This is useful for example to align two grids by anchoring them to the same location.
 
         Parameters
         ----------
         target_loc: Tuple[float, float]
             The coordinates of the point at which to anchor the grid in (x,y)
-        cell_element: Literal["centroid"] - Default: "centroid"
-            The part of the cell that is to be positioned at the specified ``target_loc``
-            Currently only "centroid" is supported. Other cell elements could be supported in the future, such as "corner"
+        cell_element: Literal["centroid", "corner"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``.
+            Currently only "centroid" and "corner" are supported.
+            When "centroid" is specified, the cell is centered around the ``target_loc``.
+            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
         in_place: bool - Default: False
             The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.
             If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.

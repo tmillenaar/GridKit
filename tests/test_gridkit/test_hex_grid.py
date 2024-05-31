@@ -552,19 +552,38 @@ def test_area(size, shape):
 )
 @pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
 @pytest.mark.parametrize("rot", [0, 15, -69, 420])
-def test_anchor(target_loc, shape, in_place, starting_offset, rot):
+@pytest.mark.parametrize("cell_element", ["centroid", "corner"])
+def test_anchor(target_loc, shape, in_place, starting_offset, rot, cell_element):
     grid = HexGrid(size=0.3, shape=shape, offset=starting_offset, rotation=rot)
-
     if in_place:
-        grid.anchor(target_loc, cell_element="centroid", in_place=True)
+        grid.anchor(target_loc, cell_element=cell_element, in_place=True)
         new_grid = grid
     else:
-        new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
+        new_grid = grid.anchor(target_loc, cell_element=cell_element, in_place=False)
 
-    # Note: assertion assumes we center the cell_element="centroid"
-    numpy.testing.assert_allclose(
-        new_grid.centroid(new_grid.cell_at_point(target_loc)), target_loc
-    )
+    if cell_element == "centroid":
+        numpy.testing.assert_allclose(
+            new_grid.centroid(new_grid.cell_at_point(target_loc)),
+            target_loc,
+            atol=1e-15,
+        )
+    elif cell_element == "corner":
+        # corners = new_grid.cell_corners(new_grid.cell_at_point(target_loc))
+        corners = new_grid.cell_corners(new_grid.cells_near_point(target_loc)).reshape(
+            -1, 2
+        )
+        distances = numpy.linalg.norm(corners - target_loc, axis=1)
+
+        # from gridkit.doc_utils import plot_polygons
+        # import matplotlib.pyplot as plt
+        # # target_cell = new_grid.cell_at_point(numpy.array(target_loc)+0.00001)
+        # target_cell = new_grid.cell_at_point(target_loc)
+        # plot_polygons(new_grid.to_shapely(target_cell), colors="red", alpha=0.3)
+        # plot_polygons(new_grid.to_shapely(new_grid.neighbours(target_cell, depth=3)), fill=False)
+        # plt.scatter(*target_loc, s=150)
+        # plt.show()
+        # breakpoint()
+        assert numpy.any(numpy.isclose(distances, 0))
 
     if in_place:
         # verify the original grid has a new offset
