@@ -429,7 +429,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
             dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs
         )
 
-    @abc.abstractmethod
     def anchor(
         self,
         target_loc: Tuple[float, float],
@@ -466,7 +465,40 @@ class BaseGrid(metaclass=abc.ABCMeta):
             :class:`.BaseGrid` if ``in_place=False`` or `None` if ``in_place=True``
 
         """
-        pass
+        current_cell = self.cell_at_point(target_loc)
+
+        # Force rotation to zer before determining new offset
+        orig_rot = self.rotation
+        if orig_rot:
+            orig_target_loc = target_loc
+            target_loc = self.rotation_matrix_inv.dot(target_loc)
+            self.rotation = 0
+
+        # Determine the offset
+        if cell_element == "centroid":
+            diff = target_loc - self.centroid(current_cell)
+        elif cell_element == "corner":
+            corners = self.cell_corners(current_cell)
+            diffs = target_loc - corners
+            distances = numpy.linalg.norm(diffs, axis=1)
+            diff = diffs[numpy.argmin(distances)]
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        # Rotate original grid back
+        if orig_rot:
+            self.rotation = orig_rot
+            target_loc = orig_target_loc
+
+        # Apply the offset
+        if getattr(self, "shape", None) == "flat":
+            diff = diff[::-1]
+        new_offset = self.offset + diff
+        if not in_place:
+            return self.update(offset=new_offset)
+        self.offset = new_offset
 
     @abc.abstractproperty
     def parent_grid_class(self):
