@@ -114,6 +114,16 @@ class HexGrid(BaseGrid):
         super(HexGrid, self).__init__(*args, **kwargs)
 
     @property
+    def definition(self):
+        return dict(
+            size=self.size,
+            shape=self.shape,
+            offset=self.offset,
+            rotation=self.rotation,
+            crs=self.crs,
+        )
+
+    @property
     def rotation_matrix(self):
         """The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
         Note: makes a copy every time this is called."""
@@ -1058,6 +1068,42 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
                 )
             index = self.indices
         return super(BoundedHexGrid, self).centroid(index)
+
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid", "corner"] = "centroid",
+        resample_method="nearest",
+    ):
+        """Position a specified part of a grid cell at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.
+        This is useful for example to align two grids by anchoring them to the same location.
+        The data values for the new grid will need to be resampled since it has been shifted.
+
+        Parameters
+        ----------
+        target_loc: Tuple[float, float]
+            The coordinates of the point at which to anchor the grid in (x,y)
+        cell_element: Literal["centroid", "corner"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``.
+            Currently only "centroid" and "corner" are supported.
+            When "centroid" is specified, the cell is centered around the ``target_loc``.
+            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
+
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The shifted and resampled grid
+
+        See also
+        --------
+
+        :meth:`.BaseGrid.anchor`
+        """
+        new_inf_grid = self.parent_grid.anchor(target_loc, cell_element, in_place=False)
+        return self.resample(new_inf_grid, method=resample_method)
 
     def update(self, new_data, bounds=None, crs=None, nodata_value=None, shape=None):
         # TODO figure out how to update size, offset

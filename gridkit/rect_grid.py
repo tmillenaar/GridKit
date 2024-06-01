@@ -103,6 +103,16 @@ class RectGrid(BaseGrid):
 
         super(RectGrid, self).__init__(*args, **kwargs)
 
+    @property
+    def definition(self):
+        return dict(
+            dx=self.dx,
+            dy=self.dy,
+            offset=self.offset,
+            rotation=self.rotation,
+            crs=self.crs,
+        )
+
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
         return area**0.5
@@ -951,6 +961,42 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         return (index_topleft.y - index.y, index.x - index_topleft.x)
+
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid", "corner"] = "centroid",
+        resample_method="nearest",
+    ):
+        """Position a specified part of a grid cell at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.
+        This is useful for example to align two grids by anchoring them to the same location.
+        The data values for the new grid will need to be resampled since it has been shifted.
+
+        Parameters
+        ----------
+        target_loc: Tuple[float, float]
+            The coordinates of the point at which to anchor the grid in (x,y)
+        cell_element: Literal["centroid", "corner"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``.
+            Currently only "centroid" and "corner" are supported.
+            When "centroid" is specified, the cell is centered around the ``target_loc``.
+            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
+
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The shifted and resampled grid
+
+        See also
+        --------
+
+        :meth:`.BaseGrid.anchor`
+        """
+        new_inf_grid = self.parent_grid.anchor(target_loc, cell_element, in_place=False)
+        return self.resample(new_inf_grid, method=resample_method)
 
     def interp_nodata(self, *args, **kwargs):
         """Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""

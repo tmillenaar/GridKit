@@ -573,16 +573,6 @@ def test_anchor(target_loc, shape, in_place, starting_offset, rot, cell_element)
             -1, 2
         )
         distances = numpy.linalg.norm(corners - target_loc, axis=1)
-
-        # from gridkit.doc_utils import plot_polygons
-        # import matplotlib.pyplot as plt
-        # # target_cell = new_grid.cell_at_point(numpy.array(target_loc)+0.00001)
-        # target_cell = new_grid.cell_at_point(target_loc)
-        # plot_polygons(new_grid.to_shapely(target_cell), colors="red", alpha=0.3)
-        # plot_polygons(new_grid.to_shapely(new_grid.neighbours(target_cell, depth=3)), fill=False)
-        # plt.scatter(*target_loc, s=150)
-        # plt.show()
-        # breakpoint()
         assert numpy.any(numpy.isclose(distances, 0))
 
     if in_place:
@@ -591,3 +581,28 @@ def test_anchor(target_loc, shape, in_place, starting_offset, rot, cell_element)
     else:
         # verify the original grid remains unchanged
         numpy.testing.assert_allclose(grid.offset, starting_offset)
+
+
+@pytest.mark.parametrize(
+    "cell_element, expected_bounds, expected_data",
+    [
+        (
+            "centroid",
+            (-1.4, -1.448557158514987, 0.1, 2.448557158514987),
+            numpy.array([[1], [2], [5]]),
+        ),
+        (
+            "corner",
+            (-1.4, -2.3145825622994254, 0.1, 1.5825317547305484),
+            numpy.array([[2], [4], [6]]),
+        ),
+    ],
+)
+def test_anchor_bounded(
+    basic_bounded_pointy_grid, cell_element, expected_bounds, expected_data
+):
+    new_grid = basic_bounded_pointy_grid.anchor(
+        [0.1, 0.5], cell_element=cell_element, resample_method="nearest"
+    )
+    numpy.testing.assert_allclose(new_grid.data, expected_data)
+    numpy.testing.assert_allclose(new_grid.bounds, expected_bounds)

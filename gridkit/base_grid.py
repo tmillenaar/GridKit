@@ -425,9 +425,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @property
     def parent_grid(self):
-        return self.parent_grid_class(
-            dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs
-        )
+        return self.parent_grid_class(**self.definition)
 
     def anchor(
         self,

@@ -751,3 +751,28 @@ def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
     else:
         # verify the original grid remains unchanged
         numpy.testing.assert_allclose(grid.offset, starting_offset)
+
+
+@pytest.mark.parametrize(
+    "cell_element, expected_bounds, expected_data",
+    [
+        (
+            "centroid",
+            (-0.4, -1.809401076758503, 1.6, 5.118802153517006),
+            numpy.array([[0, 1], [3, 4], [6, 7], [9, 10]]),
+        ),
+        (
+            "corner",
+            (-0.4, -2.9641016151377544, 1.6, 3.9641016151377544),
+            numpy.array([[3, 5], [7, 7], [9, 11], [13, 13]]),
+        ),
+    ],
+)
+def test_anchor_bounded(
+    basic_bounded_tri_grid, cell_element, expected_bounds, expected_data
+):
+    new_grid = basic_bounded_tri_grid.anchor(
+        [0.1, 0.5], cell_element=cell_element, resample_method="nearest"
+    )
+    numpy.testing.assert_allclose(new_grid.data, expected_data)
+    numpy.testing.assert_allclose(new_grid.bounds, expected_bounds)
