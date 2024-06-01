@@ -552,19 +552,28 @@ def test_area(size, shape):
 )
 @pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
 @pytest.mark.parametrize("rot", [0, 15, -69, 420])
-def test_anchor(target_loc, shape, in_place, starting_offset, rot):
+@pytest.mark.parametrize("cell_element", ["centroid", "corner"])
+def test_anchor(target_loc, shape, in_place, starting_offset, rot, cell_element):
     grid = HexGrid(size=0.3, shape=shape, offset=starting_offset, rotation=rot)
-
     if in_place:
-        grid.anchor(target_loc, cell_element="centroid", in_place=True)
+        grid.anchor(target_loc, cell_element=cell_element, in_place=True)
         new_grid = grid
     else:
-        new_grid = grid.anchor(target_loc, cell_element="centroid", in_place=False)
+        new_grid = grid.anchor(target_loc, cell_element=cell_element, in_place=False)
 
-    # Note: assertion assumes we center the cell_element="centroid"
-    numpy.testing.assert_allclose(
-        new_grid.centroid(new_grid.cell_at_point(target_loc)), target_loc
-    )
+    if cell_element == "centroid":
+        numpy.testing.assert_allclose(
+            new_grid.centroid(new_grid.cell_at_point(target_loc)),
+            target_loc,
+            atol=1e-15,
+        )
+    elif cell_element == "corner":
+        # corners = new_grid.cell_corners(new_grid.cell_at_point(target_loc))
+        corners = new_grid.cell_corners(new_grid.cells_near_point(target_loc)).reshape(
+            -1, 2
+        )
+        distances = numpy.linalg.norm(corners - target_loc, axis=1)
+        assert numpy.any(numpy.isclose(distances, 0))
 
     if in_place:
         # verify the original grid has a new offset
@@ -572,3 +581,28 @@ def test_anchor(target_loc, shape, in_place, starting_offset, rot):
     else:
         # verify the original grid remains unchanged
         numpy.testing.assert_allclose(grid.offset, starting_offset)
+
+
+@pytest.mark.parametrize(
+    "cell_element, expected_bounds, expected_data",
+    [
+        (
+            "centroid",
+            (-1.4, -1.448557158514987, 0.1, 2.448557158514987),
+            numpy.array([[1], [2], [5]]),
+        ),
+        (
+            "corner",
+            (-1.4, -2.3145825622994254, 0.1, 1.5825317547305484),
+            numpy.array([[2], [4], [6]]),
+        ),
+    ],
+)
+def test_anchor_bounded(
+    basic_bounded_pointy_grid, cell_element, expected_bounds, expected_data
+):
+    new_grid = basic_bounded_pointy_grid.anchor(
+        [0.1, 0.5], cell_element=cell_element, resample_method="nearest"
+    )
+    numpy.testing.assert_allclose(new_grid.data, expected_data)
+    numpy.testing.assert_allclose(new_grid.bounds, expected_bounds)

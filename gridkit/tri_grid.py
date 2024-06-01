@@ -67,6 +67,12 @@ class TriGrid(BaseGrid):
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
 
+    @property
+    def definition(self):
+        return dict(
+            size=self.size, offset=self.offset, rotation=self.rotation, crs=self.crs
+        )
+
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
         return (area / 3**0.5) ** 0.5
@@ -301,44 +307,65 @@ class TriGrid(BaseGrid):
     def anchor(
         self,
         target_loc: Tuple[float, float],
-        cell_element: Literal["centroid"] = "centroid",
+        cell_element: Literal["centroid", "corner"] = "centroid",
         in_place: bool = False,
     ):
         current_cell = self.cell_at_point(target_loc)
 
+        # Force rotation to zero before determining new offset
+        orig_rot = self.rotation
+        if orig_rot:
+            orig_target_loc = target_loc
+            target_loc = self.rotation_matrix_inv.dot(target_loc)
+            self.rotation = 0
+
+        # Determine the offset
         if cell_element == "centroid":
-            orig_rot = self.rotation
-            if orig_rot:
-                orig_target_loc = target_loc
-                target_loc = self.rotation_matrix_inv.dot(target_loc)
-                self.rotation = 0
-
-            initial_loc = self.centroid(current_cell)
-            diff = target_loc - initial_loc
-
-            if orig_rot:
-                self.rotation = orig_rot
-                target_loc = orig_target_loc
+            diff = target_loc - self.centroid(current_cell)
+        elif cell_element == "corner":
+            corners = self.cell_corners(current_cell)
+            diffs = target_loc - corners
+            distances = numpy.linalg.norm(diffs, axis=1)
+            diff = diffs[numpy.argmin(distances)]
         else:
             raise ValueError(
                 f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
             )
 
+        # Apply offset
         new_offset = self.offset + diff
-
         if not in_place:
             self = self.update(offset=new_offset)
         self.offset = new_offset
 
-        # Make sure if the target_loc was in an upright cell, the aligned centroid is also from an upright cell. Same for downward cells
-        if not self.is_cell_upright(current_cell) == self.is_cell_upright(
-            self.cell_at_point(target_loc)
-        ):
-            new_offset = (new_offset[0] + self.dx, new_offset[1])
-            if not in_place:
-                self = self.update(offset=new_offset)
-            else:
-                self.offset = new_offset
+        # Apply corrections if nesecary, only relevant for Tri- and HexGrids where orientations/positions change per row
+        if cell_element == "centroid":
+            # Make sure if the target_loc was in an upright cell, the aligned centroid is also from an upright cell.
+            # Same for downward cells
+            if not self.is_cell_upright(current_cell) == self.is_cell_upright(
+                self.cell_at_point(target_loc)
+            ):
+                new_offset = (new_offset[0] + self.dx, new_offset[1])
+                if not in_place:
+                    self = self.update(offset=new_offset)
+                else:
+                    self.offset = new_offset
+        elif cell_element == "corner":
+            # Check the target_loc is actually intersects one of the new corners.
+            # If the offset got wrapped, we might need to shift by another dx
+            corners = self.cell_corners(self.cell_at_point(target_loc))
+            distances = numpy.linalg.norm(corners - target_loc, axis=1)
+            if not numpy.any(numpy.isclose(distances, 0)):
+                new_offset = (new_offset[0] + self.dx, new_offset[1])
+                if not in_place:
+                    self = self.update(offset=new_offset)
+                else:
+                    self.offset = new_offset
+
+        # Rotate original grid back
+        if orig_rot:
+            self.rotation = orig_rot
+            target_loc = orig_target_loc
 
         if not in_place:
             return self
@@ -597,6 +624,42 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
         """
         new_inf_grid = super(BoundedTriGrid, self).to_crs(crs)
+        return self.resample(new_inf_grid, method=resample_method)
+
+    def anchor(
+        self,
+        target_loc: Tuple[float, float],
+        cell_element: Literal["centroid", "corner"] = "centroid",
+        resample_method="nearest",
+    ):
+        """Position a specified part of a grid cell at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.
+        This is useful for example to align two grids by anchoring them to the same location.
+        The data values for the new grid will need to be resampled since it has been shifted.
+
+        Parameters
+        ----------
+        target_loc: Tuple[float, float]
+            The coordinates of the point at which to anchor the grid in (x,y)
+        cell_element: Literal["centroid", "corner"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``.
+            Currently only "centroid" and "corner" are supported.
+            When "centroid" is specified, the cell is centered around the ``target_loc``.
+            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.BoundedGrid.resample`.
+
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The shifted and resampled grid
+
+        See also
+        --------
+
+        :meth:`.BaseGrid.anchor`
+        """
+        new_inf_grid = self.parent_grid.anchor(target_loc, cell_element, in_place=False)
         return self.resample(new_inf_grid, method=resample_method)
 
     def numpy_id_to_grid_id(self, np_index):

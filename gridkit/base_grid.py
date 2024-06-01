@@ -38,6 +38,21 @@ class BaseGrid(metaclass=abc.ABCMeta):
         self._crs = None
         self.crs = crs
 
+    @abc.abstractproperty
+    def definition(self):
+        """The parameters that define the infinite grid.
+        Passing these parameters into a new object instance will create a perfectly aligned grid.
+        Note that Bounded Grids are defined by the bounds and data.
+        Therefore, the properties returned by this property do describe the grid but cannot be used
+        to create a new Bounded Grid object instance.
+
+        Returns
+        -------
+        `dict`
+            A dictionary outlying the parameters that define the grid
+        """
+        pass
+
     @property
     def crs(self):
         """The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.
@@ -425,28 +440,27 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @property
     def parent_grid(self):
-        return self.parent_grid_class(
-            dx=self.dx, dy=self.dy, offset=self.offset, crs=self.crs
-        )
+        return self.parent_grid_class(**self.definition)
 
-    @abc.abstractmethod
     def anchor(
         self,
         target_loc: Tuple[float, float],
-        cell_element: Literal["centroid"] = "centroid",
+        cell_element: Literal["centroid", "corner"] = "centroid",
         in_place: bool = False,
     ):
-        """Position a cell_element (such as a centroid) at a specified location.
-        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``
+        """Position a specified part of a grid cell at a specified location.
+        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.
         This is useful for example to align two grids by anchoring them to the same location.
 
         Parameters
         ----------
         target_loc: Tuple[float, float]
             The coordinates of the point at which to anchor the grid in (x,y)
-        cell_element: Literal["centroid"] - Default: "centroid"
-            The part of the cell that is to be positioned at the specified ``target_loc``
-            Currently only "centroid" is supported. Other cell elements could be supported in the future, such as "corner"
+        cell_element: Literal["centroid", "corner"] - Default: "centroid"
+            The part of the cell that is to be positioned at the specified ``target_loc``.
+            Currently only "centroid" and "corner" are supported.
+            When "centroid" is specified, the cell is centered around the ``target_loc``.
+            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
         in_place: bool - Default: False
             The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.
             If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.
@@ -463,8 +477,48 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :class:`.BaseGrid` | None
             :class:`.BaseGrid` if ``in_place=False`` or `None` if ``in_place=True``
 
+
+        See also
+        --------
+        :meth:`.BoundedTriGrid.anchor`
+        :meth:`.BoundedRectGrid.anchor`
+        :meth:`.BoundedHexGrid.anchor`
+
         """
-        pass
+        current_cell = self.cell_at_point(target_loc)
+
+        # Force rotation to zer before determining new offset
+        orig_rot = self.rotation
+        if orig_rot:
+            orig_target_loc = target_loc
+            target_loc = self.rotation_matrix_inv.dot(target_loc)
+            self.rotation = 0
+
+        # Determine the offset
+        if cell_element == "centroid":
+            diff = target_loc - self.centroid(current_cell)
+        elif cell_element == "corner":
+            corners = self.cell_corners(current_cell)
+            diffs = target_loc - corners
+            distances = numpy.linalg.norm(diffs, axis=1)
+            diff = diffs[numpy.argmin(distances)]
+        else:
+            raise ValueError(
+                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
+            )
+
+        # Rotate original grid back
+        if orig_rot:
+            self.rotation = orig_rot
+            target_loc = orig_target_loc
+
+        # Apply the offset
+        if getattr(self, "shape", None) == "flat":
+            diff = diff[::-1]
+        new_offset = self.offset + diff
+        if not in_place:
+            return self.update(offset=new_offset)
+        self.offset = new_offset
 
     @abc.abstractproperty
     def parent_grid_class(self):
