@@ -182,3 +182,21 @@ def test_intersect_geometries(
     gpd_geoms = GeoSeries(shapely_geoms)
     cell_ids = basic_bounded_rect_grid.intersect_geometries(gpd_geoms)
     numpy.testing.assert_allclose(cell_ids, expected_cell_ids)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1.2),
+        RectGrid(dx=1, dy=1.5),
+        HexGrid(size=0.4, shape="pointy"),
+        HexGrid(size=0.4, shape="flat"),
+    ],
+)
+@pytest.mark.parametrize("rotation", [0, -69, 420])
+@pytest.mark.parametrize("crs", [None, 4326])
+@pytest.mark.parametrize("offset", [[0, 0], [-1, 2], [0.3, -0.2]])
+def test_definition(grid, rotation, crs, offset):
+    grid = grid.update(rotation=rotation, crs=crs, offset=offset)
+    new_grid = grid.parent_grid_class(**grid.definition)
+    assert grid.is_aligned_with(new_grid)

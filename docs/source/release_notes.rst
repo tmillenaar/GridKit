@@ -4,6 +4,14 @@ Release notes
 ================
 
 
+Version 0.11.1 (June 01, 2024)
+------------------------------
+
+Features
+ - Add method ``anchor`` to Bounded Grids (grids with data) that resamples the data after shifting, see :meth:`.BoundedTriGrid.anchor`, :meth:`.BoundedRectGrid.anchor` and :meth:`.BoundedHexGrid.anchor`
+ - Shift nearby corner to specified location using ``cell_element="corner"`` in :meth:`.BaseGrid.anchor` and their bounded equavalents mentioned above
+ - Add an easy method to access all important paramers defining the grid: :meth:`.BaseGrid.definition`
+
 Version 0.11.0 (May 29, 2024)
 ------------------------------
 Features

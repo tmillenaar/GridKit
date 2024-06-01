@@ -38,6 +38,21 @@ class BaseGrid(metaclass=abc.ABCMeta):
         self._crs = None
         self.crs = crs
 
+    @abc.abstractproperty
+    def definition(self):
+        """The parameters that define the infinite grid.
+        Passing these parameters into a new object instance will create a perfectly aligned grid.
+        Note that Bounded Grids are defined by the bounds and data.
+        Therefore, the properties returned by this property do describe the grid but cannot be used
+        to create a new Bounded Grid object instance.
+
+        Returns
+        -------
+        `dict`
+            A dictionary outlying the parameters that define the grid
+        """
+        pass
+
     @property
     def crs(self):
         """The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.
@@ -461,6 +476,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
         -------
         :class:`.BaseGrid` | None
             :class:`.BaseGrid` if ``in_place=False`` or `None` if ``in_place=True``
+
+
+        See also
+        --------
+        :meth:`.BoundedTriGrid.anchor`
+        :meth:`.BoundedRectGrid.anchor`
+        :meth:`.BoundedHexGrid.anchor`
 
         """
         current_cell = self.cell_at_point(target_loc)
