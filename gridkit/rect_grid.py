@@ -630,6 +630,14 @@ class RectGrid(BaseGrid):
         ids = GridIndex(ids.T.reshape((*shape, 2)))
         return (ids, shape) if return_cell_count else ids
 
+    def subdivide(self, factor):
+        sub_grid = self.update(
+            dx=self.dx / factor, dy=self.dy / factor, rotation=self.rotation
+        )
+        anchor_loc = self.cell_corners([0, 0])[0]
+        sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)
+        return sub_grid
+
     @property
     def parent_grid_class(self):
         return RectGrid

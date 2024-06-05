@@ -152,6 +152,12 @@ class TriGrid(BaseGrid):
         ids = self._grid.cells_near_point(point)
         return GridIndex(ids.squeeze().reshape(original_shape))
 
+    def subdivide(self, factor):
+        sub_grid = self.update(size=self.dx / factor, rotation=self.rotation)
+        anchor_loc = self.cell_corners([0, 0])[0]
+        sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)
+        return sub_grid
+
     @validate_index
     def is_cell_upright(self, index):
         """Whether the selected cell points up or down.

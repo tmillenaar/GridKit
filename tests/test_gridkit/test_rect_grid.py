@@ -2,7 +2,7 @@ import numpy
 import pytest
 import shapely
 
-from gridkit import HexGrid
+from gridkit import GridIndex, HexGrid
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
@@ -612,3 +612,45 @@ def test_anchor_bounded(
     )
     numpy.testing.assert_allclose(new_grid.data, expected_data)
     numpy.testing.assert_allclose(new_grid.bounds, expected_bounds)
+
+
+@pytest.mark.parametrize("factor", [2, 9])
+@pytest.mark.parametrize("rotation", [-23.0, 0, 456])
+@pytest.mark.parametrize("offset", [(-2, 3), (0, 0), (0.1, -0.2)])
+@pytest.mark.parametrize("crs", [None, 4326])
+def test_subdivide(factor, rotation, offset, crs):
+    grid = RectGrid(dx=1, dy=0.7, rotation=rotation, offset=offset, crs=crs)
+    subgrid = grid.subdivide(factor)
+
+    # Test for new gridsize
+    numpy.testing.assert_allclose(grid.dx / factor, subgrid.dx)
+    numpy.testing.assert_allclose(grid.dy / factor, subgrid.dy)
+
+    # Test for overlapping corners
+    corner = grid.cell_corners([-4, 23])[-1]
+    sub_corners = subgrid.cell_corners(subgrid.cell_at_point(corner))
+    assert numpy.any(numpy.isclose(sub_corners, corner))
+
+    # Test for nr of cells in parent cell
+    target_cell = GridIndex([3, -2])
+    target = grid.centroid(target_cell)
+
+    # subcells_near_cell = subgrid.intersect_geometries(cell_geom)
+    subcells_near_cell = subgrid.neighbours(
+        subgrid.cell_at_point(target),
+        connect_corners=True,
+        depth=factor,
+        include_selected=True,
+    )
+    centroids = subgrid.centroid(subcells_near_cell)
+    subcells_in_cell = grid.cell_at_point(centroids)
+    mask = subcells_in_cell.index_1d == target_cell.index_1d
+    nr_subcells_in_cell = sum(mask)
+    expected_nr_subcells_in_cell = factor**2
+
+    assert nr_subcells_in_cell == expected_nr_subcells_in_cell
+
+    if grid.crs is None:
+        assert subgrid.crs is None
+    else:
+        assert grid.crs.is_exact_same(subgrid.crs)

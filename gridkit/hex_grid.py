@@ -10,6 +10,7 @@ from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.gridkit_rs import PyHexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
+from gridkit.tri_grid import TriGrid
 
 
 class HexGrid(BaseGrid):
@@ -663,6 +664,19 @@ class HexGrid(BaseGrid):
         ids = GridIndex(ids.reshape((*shape, 2)))
 
         return (ids, shape) if return_cell_count else ids
+
+    def subdivide(self, factor):
+        # Turn Hex Grid into TriGrid, adjust definition appropriately
+        definition = self.definition
+        definition.pop("shape")  # shape does not exist for TriGrids
+        extra_rot = 30 if self.shape == "pointy" else 0
+        definition["rotation"] += extra_rot
+        definition["size"] = self.r / factor / 2
+        sub_grid = TriGrid(**definition)
+
+        anchor_loc = self.cell_corners([0, 0])[0]
+        sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)
+        return sub_grid
 
     @property
     def parent_grid_class(self):
