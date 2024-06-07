@@ -124,8 +124,8 @@ impl TriGrid {
             index[Ix2(cell_id, 1)] =
                 (1. + (point[Ix1(1)] - self.offset.1) / self.dy()).floor() as i64;
 
-            let rel_loc_x: f64 = ((point[Ix1(0)] - self.offset.0).abs()) % self.dx();
-            let rel_loc_y: f64 = ((point[Ix1(1)] - self.offset.1).abs()) % self.dy();
+            let rel_loc_x: f64 = modulus(((point[Ix1(0)] - self.offset.0).abs()), self.dx());
+            let rel_loc_y: f64 = modulus(((point[Ix1(1)] - self.offset.1).abs()), self.dy());
 
             let mut downward_cell =
                 iseven(index[Ix2(cell_id, 0)]) != iseven(index[Ix2(cell_id, 1)]);

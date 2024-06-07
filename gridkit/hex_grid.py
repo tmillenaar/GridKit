@@ -10,6 +10,7 @@ from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.gridkit_rs import PyHexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
+from gridkit.tri_grid import TriGrid
 
 
 class HexGrid(BaseGrid):
@@ -663,6 +664,74 @@ class HexGrid(BaseGrid):
         ids = GridIndex(ids.reshape((*shape, 2)))
 
         return (ids, shape) if return_cell_count else ids
+
+    def subdivide(self, factor: int):
+        """Create a new grid that is ``factor`` times smaller than the existing grid and aligns perfectly
+        with it.
+
+        Since a hexagonal grid that is divided into another hexagonal grid will always cut through
+        some of the cells. They will never perfectly align. Therefore, this ``subdivide`` will
+        return a triangular grid instead. This trianglar grid will perfectly subdivide the hexagonal one.
+        If ``factor`` is one, the side lengths of the triangular cells will be of the same size as
+        the side lengths of the hexagonal cells, which means there will be 6 trianglular cells
+        that perfectly divide up the original hexagonal cell.
+
+        .. Note ::
+
+            In order to properly align the new TriGrid, it will be rotated by 30 degrees
+            if the ``shape`` of the hexagonal grid is 'pointy'.
+
+        The number of cells scale with the supplied ``factor`` in the following way: ``6 * factor**2``.
+        So if ``factor`` is 1, there will be 6 times as many cells in the new grid.
+        If ``factor`` is 2, there will be 24 times as many cells in the new grid, etc..
+
+        If you do, in fact, want to create a smaller HexGrid nd not a TriGrid,
+        try something akin to the following code snippet:
+
+        .. code-block:: python
+
+            >>> from gridkit.hex_grid import HexGrid
+            >>> grid = HexGrid(size=3)
+            >>> new_grid = grid.update(size=grid.size/2)
+            >>> anchor_point = grid.cell_corners([0,0])[0] # take an arbitrary corner of the original grid
+            >>> new_grid.anchor(anchor_point, cell_element="corner", in_place=True) # put corner of new grid on that of the old one
+            >>> print(new_grid.size)
+            1.5
+            >>> print(grid.r / new_grid.r)
+            2.0
+
+        ..
+
+        Parameters
+        ----------
+        factor: `int`
+            An integer (whole number) indicating how many times smaller the new gridsize will be.
+            It refers to the side of a grid cell. If ``factor`` is 1, the new grid will have cell sides
+            of the same length as the cell sides of the original.
+            If ``factor`` is 2, the side of the grid cell will be half the cell side length of the original.
+
+        Returns
+        -------
+        :class:`.TriGrid`
+            A new grid that is ``factor`` times smaller then the original grid.
+
+        """
+        if not factor % 1 == 0:
+            raise ValueError(
+                f"Got a 'factor' that is not a whole number. Please supply an integer. Got: {factor}"
+            )
+
+        # Turn Hex Grid into TriGrid, adjust definition appropriately
+        definition = self.definition
+        definition.pop("shape")  # shape does not exist for TriGrids
+        extra_rot = 30 if self.shape == "pointy" else 0
+        definition["rotation"] += extra_rot
+        definition["size"] = self.r / factor / 2
+        sub_grid = TriGrid(**definition)
+
+        anchor_loc = self.cell_corners([0, 0])[0]
+        sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)
+        return sub_grid
 
     @property
     def parent_grid_class(self):
