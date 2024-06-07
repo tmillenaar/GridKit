@@ -809,7 +809,7 @@ def test_subdivide(factor, rotation, offset, crs):
     subcells_in_cell = grid.cell_at_point(centroids)
     mask = subcells_in_cell.index_1d == target_cell.index_1d
     nr_subcells_in_cell = sum(mask)
-    expected_nr_subcells_in_cell = sum(range(1, factor * 2, 2))
+    expected_nr_subcells_in_cell = factor**2
     assert nr_subcells_in_cell == expected_nr_subcells_in_cell
 
     if grid.crs is None:

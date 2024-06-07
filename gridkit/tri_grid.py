@@ -152,7 +152,36 @@ class TriGrid(BaseGrid):
         ids = self._grid.cells_near_point(point)
         return GridIndex(ids.squeeze().reshape(original_shape))
 
-    def subdivide(self, factor):
+    def subdivide(self, factor: int):
+        """Create a new grid that is ``factor`` times smaller than the existing grid and aligns perfectly
+        with it.
+
+        If ``factor`` is one, the side lengths of the new cells will be of the same size as
+        the side lengths of the original cells, which means that the two grids will be exactly the same.
+        If ``factor`` is two, the new cell sides will be half the size of the original cell sides.
+        The number of cells grows quadratically with ``factor``.
+        A ``factor`` of 2 results in 4 cells that fit in the original, a `factor` of 3 results in 9
+        cells that fit in the original, etc..
+
+        Parameters
+        ----------
+        factor: `int`
+            An integer (whole number) indicating how many times smaller the new gridsize will be.
+            It refers to the side of a grid cell. If ``factor`` is 1, the new grid will have cell sides
+            of the same length as the cell sides of the original.
+            If ``factor`` is 2, the side of the grid cell will be half the cell side length of the original.
+
+        Returns
+        -------
+        :class:`.TriGrid`
+            A new grid that is ``factor`` times smaller then the original grid.
+
+        """
+        if not factor % 1 == 0:
+            raise ValueError(
+                f"Got a 'factor' that is not a whole number. Please supply an integer. Got: {factor}"
+            )
+
         sub_grid = self.update(size=self.dx / factor, rotation=self.rotation)
         anchor_loc = self.cell_corners([0, 0])[0]
         sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)

@@ -3,7 +3,7 @@ import functools
 import operator
 import warnings
 from multiprocessing.sharedctypes import Value
-from typing import Tuple
+from typing import Literal, Tuple
 
 import numpy
 import scipy
@@ -659,7 +659,12 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         self.data.ravel()[nodata_mask] = filled_values
         return self
 
-    def interpolate(self, sample_points, method="nearest", **interp_kwargs):
+    def interpolate(
+        self,
+        sample_points,
+        method: Literal["nearest", "bilinear", "inverse_distance"] = "nearest",
+        **interp_kwargs,
+    ):
         """Interpolate the value at the location of ``sample_points``.
 
         Points that are outside of the bounds of the data are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.
