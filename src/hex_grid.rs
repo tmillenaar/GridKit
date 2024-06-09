@@ -1,6 +1,7 @@
 use numpy::ndarray::*;
 use crate::utils::*;
 
+#[derive(Clone)]
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),

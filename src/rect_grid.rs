@@ -1,6 +1,9 @@
 use numpy::ndarray::*;
 use crate::utils::*;
+use crate::tile::*;
+use crate::grid::*;
 
+#[derive(Clone)]
 pub struct RectGrid {
     pub _dx: f64,
     pub _dy: f64,
@@ -171,5 +174,72 @@ impl RectGrid {
             }
         }
         nearby_cells
+    }
+
+    pub fn tiles_from_bounds(&self, bounds: (f64,f64,f64,f64), nr_tiles_x: i64, nr_tiles_y: i64) -> Vec<Tile> {
+        let mut tiles = Vec::with_capacity((nr_tiles_x * nr_tiles_y) as usize);
+        let origin = self.cell_at_point(&(array![[bounds.0 + self.dx() / 2., bounds.1 + self.dy() / 2.]]).view());
+        let x_cells = origin[Ix2(0,0)]..(origin[Ix2(0,0)] + ((bounds.2 - bounds.0) / self.dx()) as i64);
+        let y_cells = origin[Ix2(0,1)]..(origin[Ix2(0,1)] + ((bounds.3 - bounds.1) / self.dy()) as i64);
+
+        let normal_nx = (x_cells.end - x_cells.start) / nr_tiles_x;
+        let remainder_x = (x_cells.end - x_cells.start) - (nr_tiles_x - 1) * normal_nx;
+        let normal_ny = (y_cells.end - y_cells.start) / nr_tiles_y;
+        let remainder_y = (y_cells.end - y_cells.start) - (nr_tiles_y - 1) * normal_ny;
+        
+        let mut nx = normal_nx as u64;
+        let mut ny = normal_ny as u64;
+
+        // Add every row but the last one
+        for i_y in 0..(nr_tiles_y-1) {
+            nx = normal_nx as u64;
+            // Add all but the last tiles in row
+            for i_x in 0..(nr_tiles_x-1) {
+                let start_id = (
+                    origin[Ix2(0,0)] + i_x * normal_nx,
+                    origin[Ix2(0,1)] + i_y * normal_ny
+                );
+                let grid = Grid::RectGrid(self.clone());
+                // let grid = *self.clone();
+                // let grid = Grid::RectGrid(grid);
+                tiles.push(
+                    Tile{grid, start_id, nx, ny}
+                );
+            }
+            // Add last x-tile in row
+            nx = remainder_x as u64;
+            let start_id = (
+                origin[Ix2(0,0)] + (nr_tiles_x-1) * normal_nx,
+                origin[Ix2(0,1)] + i_y * normal_ny
+            );
+            let grid = Grid::RectGrid(self.clone());
+            tiles.push(
+                Tile{grid, start_id, nx, ny}
+            );
+        }
+        // Add the final row, except the very last tile
+        ny = remainder_y as u64;
+        nx = normal_nx as u64;
+        for i_x in 0..(nr_tiles_x-1) {
+            let start_id = (
+                origin[Ix2(0,0)] + i_x * normal_nx,
+                origin[Ix2(0,1)] + (nr_tiles_y-1) * normal_ny
+            );
+            let grid = Grid::RectGrid(self.clone());
+            tiles.push(
+                Tile{grid, start_id, nx, ny}
+            );
+        }
+        // Add the final tile
+        nx = remainder_x as u64;
+        let start_id = (
+            origin[Ix2(0,0)] + (nr_tiles_x-1) * normal_nx,
+            origin[Ix2(0,1)] + (nr_tiles_y-1) * normal_ny
+        );
+        let grid = Grid::RectGrid(self.clone());
+        tiles.push(
+            Tile{grid, start_id, nx, ny}
+        );
+        return tiles
     }
 }

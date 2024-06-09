@@ -2,6 +2,7 @@ use numpy::ndarray::*;
 use crate::interpolate;
 use crate::utils::*;
 
+#[derive(Clone)]
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
