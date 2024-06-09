@@ -4,11 +4,53 @@ use pyo3::types::*;
 use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
 mod utils;
+mod tile;
+mod grid;
 mod tri_grid;
 mod rect_grid;
 mod hex_grid;
 mod vector_shapes;
 mod interpolate;
+
+// #[derive(Clone)]
+// pub enum PyGrid {
+//     PyTriGrid,
+//     PyRectGrid,
+//     PyHexGrid,
+// }
+
+#[pyclass]
+struct PyTile {
+    #[pyo3(get, set)]
+    grid: PyRectGrid,
+    #[pyo3(get, set)]
+    start_id: (i64, i64),
+    #[pyo3(get, set)]
+    nx: u64,
+    #[pyo3(get, set)]
+    ny: u64,
+    _tile: tile::Tile,
+}
+
+#[pymethods]
+impl PyTile {
+    #[new]
+    fn new(grid: PyRectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+        let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
+        let grid = grid::Grid::RectGrid(grid._grid);
+        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let grid = tmp;
+        PyTile { grid, start_id, nx, ny, _tile }
+    }
+
+    fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._tile.corner_ids().into_pyarray(py)
+    }
+
+    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.bounding_corners().into_pyarray(py)
+    }
+}
 
 #[pyclass]
 struct PyTriGrid {
@@ -175,6 +217,7 @@ impl PyTriGrid {
 }
 
 
+#[derive(Clone)]
 #[pyclass]
 struct PyRectGrid {
     dx: f64,
@@ -260,6 +303,26 @@ impl PyRectGrid {
         self._grid
             .cells_near_point(&point.as_array())
             .into_pyarray(py)
+    }
+
+    fn tiles_from_bounds<'py>(
+        &self,
+        py: Python<'py>,
+        bounds: (f64, f64, f64, f64),
+        nr_tiles_x: i64,
+        nr_tiles_y: i64,
+    ) -> PyObject {
+        let list = PyList::empty(py);
+        let tiles = self._grid.tiles_from_bounds(bounds, nr_tiles_x, nr_tiles_y);
+        for tile in tiles {
+            let start_id = tile.start_id;
+            let nx = tile.nx;
+            let ny = tile.ny;
+            let grid = self.clone();
+            let tile = PyTile::new(grid, start_id, nx, ny);
+            let _ = list.append(tile.into_py(py)); // let _ ignores the possible error returned by `into_py()`
+        }
+        list.into()
     }
 }
 
@@ -393,6 +456,7 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyTriGrid>()?;
     module.add_class::<PyRectGrid>()?;
     module.add_class::<PyHexGrid>()?;
+    module.add_class::<PyTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())
