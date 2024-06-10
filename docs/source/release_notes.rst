@@ -3,6 +3,14 @@
 Release notes
 ================
 
+Version 0.12.0 (May 10, 2024)
+-----------------------------
+
+Featrures
+ - Create a new grid with a smaller gridsize that fits perfectily inside the orignal grid using :meth:`.TriGrid.subdivide`, :meth:`.RectGrid.subdivide` or :meth:`.HexGrid.subdivide`
+
+Documentation
+ - Add tip to :ref:`triangles_in_hexes.py <example triangles in hexes>` hinting to the use of the new ``subdivide`` and ``anchor`` methods.
 
 Version 0.11.1 (June 01, 2024)
 ------------------------------
@@ -14,6 +22,9 @@ Features
 
 Version 0.11.0 (May 29, 2024)
 ------------------------------
+.. _release notes v0_11_0:
+
+
 Features
  - Easier shifting of grids using :meth:`.BaseGrid.anchor`
 
@@ -37,7 +48,7 @@ Known Issues
    Since 'flat' HexGrids will be deprecated in release v1.0.0, fixing this is not worth the effort, meaning this leaky abstraction will be deliberately ignored.
 
 Version 0.10.0 (April 21, 2024)
-------------------------------
+-------------------------------
 Features
  - Add :meth:`.GridIndex.sort`
  - Allow plotting of RGB(A) values in :func:`.doc_utils.plot_polygons`
