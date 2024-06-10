@@ -349,11 +349,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
         Returns True if grids are algined and False if they are not.
         Grids are considered to be aligned when:
-         - they are the same type of grid
-         - the CRS is the same
-         - the cell_size is the same
-         - the offset from origin is the same
-         - the cell shape is the same
+        - they are the same type of grid
+        - the CRS is the same
+        - the cell_size is the same
+        - the offset from origin is the same
+        - the cell shape is the same
 
         Returns
         -------
@@ -461,7 +461,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
             Currently only "centroid" and "corner" are supported.
             When "centroid" is specified, the cell is centered around the ``target_loc``.
             When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.
-        in_place: bool - Default: False
+        in_place: `bool` (Default: False)
             The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.
             If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.
 
