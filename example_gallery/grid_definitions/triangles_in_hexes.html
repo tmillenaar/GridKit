@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triangles in hexagons &mdash; GridKit v0.11.1 documentation</title>
+  <title>Triangles in hexagons &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -113,6 +113,14 @@ to download the full example code.</p>
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
 <p>In this example a triangle and a hexagon grid are defined in such a way
 that they perfectly line up. A hexagon can be neatly divided into six triangles.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The process in this example has been greatly simplified with the introduction
+of <a class="reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.subdivide" title="gridkit.hex_grid.HexGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.subdivide()</span></code></a> in v0.12.0.
+This example shows the more cumbersome approach, but I will leave this example
+up for now for educational purposes, for it shows how to manipulate cell size
+and offsets to position the grid the way you want.</p>
+</div>
 <dl class="simple">
 <dt>For the two grids to align, two things will need to match:</dt><dd><ul class="simple">
 <li><p>the length of the edge connecting two vertices needs to be the same</p></li>
@@ -131,7 +139,7 @@ At least this is the case if we use a ‘flat’ orientation for our hexagonal g
 which we will need to do in order for the grids to overlap.
 If this is not obvious, I encourage you to do this exercise with a ‘pointy’ hexagonal grid.
 It will be obvious from the plot.
-I should probable make grid definitions on side lengths possible to facilitate this process.
+I should probably make grid definitions on side lengths possible to facilitate this process.
 Feel free to raise a github issue if your are interested in this.</p>
 <p>Let’s first plot some cells of these two grids and compare them.
 From there we can figure out how to shift the grids in order to align them.</p>
@@ -162,7 +170,7 @@ From there we can figure out how to shift the grids in order to align them.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_triangles_in_hexes_001.png" srcset="../../_images/sphx_glr_triangles_in_hexes_001.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:85: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+<img src="../../_images/sphx_glr_triangles_in_hexes_001.png" srcset="../../_images/sphx_glr_triangles_in_hexes_001.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:86: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
   warnings.warn(
 /home/runner/work/GridKit/GridKit/gridkit/doc_utils.py:96: UserWarning: The argument &#39;filled&#39; for doc_utils has been deprecated in favor of &#39;fill&#39; and will be removed in a future version.
   warnings.warn(
@@ -181,8 +189,19 @@ so we’d need to either shift them half a side length to the left or
 3/4rth of a side length to the right.
 This works out to half a dx to the left or one and a half dx to the right.
 Let’s do the latter</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When dealing with a ‘flat’ hex grid, the x and y of <cite>offset</cite> need to
+be set in reverse order: (y,x). This is a known conceptual inconsistency
+but will not be fixed since ‘flat’ HexGrids will be removed in a future version
+in favor of <cite>rotation</cite>. See: <a class="reference internal" href="../../release_notes.html#release-notes-v0-11-0"><span class="std std-ref">release notes: v0.11.0</span></a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For simpler centering of grids around origin, see <a class="reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a></p>
+</div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tri_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">hex_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">hex_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">()</span>
 <span class="n">tri_geoms</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
@@ -256,7 +275,7 @@ in many cases.</p>
 Sensitivity of Precipitation Forecast Skill Scores to Bilinear Interpolation and
 a Simple Nearest-Neighbor Average Method on High-Resolution Verification Grids.
 Wea. Forecasting, 18, 918–932, <a class="reference external" href="https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2">https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2</a> .</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.505 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.555 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-triangles-in-hexes-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/3ef8508f3fe8d2ff60db217ac866cd81/triangles_in_hexes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">triangles_in_hexes.ipynb</span></code></a></p>

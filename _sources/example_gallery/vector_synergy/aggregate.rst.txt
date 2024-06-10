@@ -116,7 +116,7 @@ Now we can create a grid and aggregate our points onto that grid.
 
  .. code-block:: none
 
-    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:85: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:86: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
       warnings.warn(
 
 
@@ -189,7 +189,7 @@ we will have to convert that back into a GridIndex using :meth:`.GridIndex.from_
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.339 seconds)
+   **Total running time of the script:** (0 minutes 0.402 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate.py:

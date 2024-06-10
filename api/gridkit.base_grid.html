@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>base_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>base_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -378,16 +378,12 @@ The other axis are in the shape of the supplied index.</p>
 <dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.is_aligned_with">
 <span class="sig-name descname"><span class="pre">is_aligned_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.is_aligned_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.is_aligned_with" title="Permalink to this definition"></a></dt>
 <dd><p>Returns True if grids are algined and False if they are not.
-Grids are considered to be aligned when:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>they are the same type of grid</p></li>
-<li><p>the CRS is the same</p></li>
-<li><p>the cell_size is the same</p></li>
-<li><p>the offset from origin is the same</p></li>
-<li><p>the cell shape is the same</p></li>
-</ul>
-</div></blockquote>
+Grids are considered to be aligned when:
+- they are the same type of grid
+- the CRS is the same
+- the cell_size is the same
+- the offset from origin is the same
+- the cell shape is the same</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Whether or not the grids are aligned</p>
@@ -442,7 +438,7 @@ This is useful for example to align two grids by anchoring them to the same loca
 Currently only “centroid” and “corner” are supported.
 When “centroid” is specified, the cell is centered around the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.
 When “corner” is specified, a nearby cell_corner is placed onto the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.</p></li>
-<li><p><strong>in_place</strong> (<em>bool - Default: False</em>) – <p>The original grid instance is modified if <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and no return argument is specified.
+<li><p><strong>in_place</strong> (<cite>bool</cite> (Default: False)) – <p>The original grid instance is modified if <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and no return argument is specified.
 If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the original grid instance remains unchanged and a modified copy is returned.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

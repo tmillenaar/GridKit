@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.rect_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>gridkit.rect_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -714,6 +714,43 @@
 
         <span class="n">ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span> <span class="k">if</span> <span class="n">return_cell_count</span> <span class="k">else</span> <span class="n">ids</span></div>
+
+<div class="viewcode-block" id="RectGrid.subdivide"><a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.subdivide">[docs]</a>    <span class="k">def</span> <span class="nf">subdivide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new grid that is ``factor`` times smaller than the existing grid and aligns perfectly</span>
+<span class="sd">        with it.</span>
+
+<span class="sd">        If ``factor`` is one, the side lengths of the new cells will be of the same size as</span>
+<span class="sd">        the side lengths of the original cells, which means that the two grids will be exactly the same.</span>
+<span class="sd">        If ``factor`` is two, the new cell sides will be half the size of the original cell sides.</span>
+<span class="sd">        The number of cells grows quadratically with ``factor``.</span>
+<span class="sd">        A ``factor`` of 2 results in 4 cells that fit in the original, a `factor` of 3 results in 9</span>
+<span class="sd">        cells that fit in the original, etc..</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor: `int`</span>
+<span class="sd">            An integer (whole number) indicating how many times smaller the new gridsize will be.</span>
+<span class="sd">            It refers to the side of a grid cell. If ``factor`` is 1, the new grid will have cell sides</span>
+<span class="sd">            of the same length as the cell sides of the original.</span>
+<span class="sd">            If ``factor`` is 2, the side of the grid cell will be half the cell side length of the original.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.RectGrid`</span>
+<span class="sd">            A new grid that is ``factor`` times smaller then the original grid.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">factor</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Got a &#39;factor&#39; that is not a whole number. Please supply an integer. Got: </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">sub_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="n">factor</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="n">factor</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span>
+        <span class="p">)</span>
+        <span class="n">anchor_loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">sub_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">anchor_loc</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sub_grid</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.base_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>gridkit.base_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -434,11 +434,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns True if grids are algined and False if they are not.</span>
 <span class="sd">        Grids are considered to be aligned when:</span>
-<span class="sd">         - they are the same type of grid</span>
-<span class="sd">         - the CRS is the same</span>
-<span class="sd">         - the cell_size is the same</span>
-<span class="sd">         - the offset from origin is the same</span>
-<span class="sd">         - the cell shape is the same</span>
+<span class="sd">        - they are the same type of grid</span>
+<span class="sd">        - the CRS is the same</span>
+<span class="sd">        - the cell_size is the same</span>
+<span class="sd">        - the offset from origin is the same</span>
+<span class="sd">        - the cell shape is the same</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -546,7 +546,7 @@
 <span class="sd">            Currently only &quot;centroid&quot; and &quot;corner&quot; are supported.</span>
 <span class="sd">            When &quot;centroid&quot; is specified, the cell is centered around the ``target_loc``.</span>
 <span class="sd">            When &quot;corner&quot; is specified, a nearby cell_corner is placed onto the ``target_loc``.</span>
-<span class="sd">        in_place: bool - Default: False</span>
+<span class="sd">        in_place: `bool` (Default: False)</span>
 <span class="sd">            The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.</span>
 <span class="sd">            If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.</span>
 

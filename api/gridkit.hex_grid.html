@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -478,6 +478,54 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid.subdivide">
+<span class="sig-name descname"><span class="pre">subdivide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid.subdivide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid.subdivide" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller than the existing grid and aligns perfectly
+with it.</p>
+<p>Since a hexagonal grid that is divided into another hexagonal grid will always cut through
+some of the cells. They will never perfectly align. Therefore, this <code class="docutils literal notranslate"><span class="pre">subdivide</span></code> will
+return a triangular grid instead. This trianglar grid will perfectly subdivide the hexagonal one.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is one, the side lengths of the triangular cells will be of the same size as
+the side lengths of the hexagonal cells, which means there will be 6 trianglular cells
+that perfectly divide up the original hexagonal cell.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In order to properly align the new TriGrid, it will be rotated by 30 degrees
+if the <code class="docutils literal notranslate"><span class="pre">shape</span></code> of the hexagonal grid is ‘pointy’.</p>
+</div>
+<p>The number of cells scale with the supplied <code class="docutils literal notranslate"><span class="pre">factor</span></code> in the following way: <code class="docutils literal notranslate"><span class="pre">6</span> <span class="pre">*</span> <span class="pre">factor**2</span></code>.
+So if <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 1, there will be 6 times as many cells in the new grid.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 2, there will be 24 times as many cells in the new grid, etc..</p>
+<p>If you do, in fact, want to create a smaller HexGrid nd not a TriGrid,
+try something akin to the following code snippet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.hex_grid</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">anchor_point</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># take an arbitrary corner of the original grid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">anchor_point</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># put corner of new grid on that of the old one</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_grid</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+<span class="go">1.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="n">new_grid</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+<span class="go">2.0</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>factor</strong> (<cite>int</cite>) – An integer (whole number) indicating how many times smaller the new gridsize will be.
+It refers to the side of a grid cell. If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 1, the new grid will have cell sides
+of the same length as the cell sides of the original.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 2, the side of the grid cell will be half the cell side length of the original.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller then the original grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>rect_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>rect_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -518,6 +518,33 @@ such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.subdivide">
+<span class="sig-name descname"><span class="pre">subdivide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.subdivide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.subdivide" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller than the existing grid and aligns perfectly
+with it.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is one, the side lengths of the new cells will be of the same size as
+the side lengths of the original cells, which means that the two grids will be exactly the same.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is two, the new cell sides will be half the size of the original cell sides.
+The number of cells grows quadratically with <code class="docutils literal notranslate"><span class="pre">factor</span></code>.
+A <code class="docutils literal notranslate"><span class="pre">factor</span></code> of 2 results in 4 cells that fit in the original, a <cite>factor</cite> of 3 results in 9
+cells that fit in the original, etc..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>factor</strong> (<cite>int</cite>) – An integer (whole number) indicating how many times smaller the new gridsize will be.
+It refers to the side of a grid cell. If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 1, the new grid will have cell sides
+of the same length as the cell sides of the original.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 2, the side of the grid cell will be half the cell side length of the original.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller then the original grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>

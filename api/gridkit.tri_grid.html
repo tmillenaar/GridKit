@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>tri_grid &mdash; GridKit v0.11.1 documentation</title>
+  <title>tri_grid &mdash; GridKit v0.12.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=abf1f223"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9df6a8d1"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.11.1
+                v0.12.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -269,6 +269,33 @@ For a RectGrid there are 4 nearby points.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.subdivide">
+<span class="sig-name descname"><span class="pre">subdivide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.subdivide"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.subdivide" title="Permalink to this definition"></a></dt>
+<dd><p>Create a new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller than the existing grid and aligns perfectly
+with it.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is one, the side lengths of the new cells will be of the same size as
+the side lengths of the original cells, which means that the two grids will be exactly the same.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is two, the new cell sides will be half the size of the original cell sides.
+The number of cells grows quadratically with <code class="docutils literal notranslate"><span class="pre">factor</span></code>.
+A <code class="docutils literal notranslate"><span class="pre">factor</span></code> of 2 results in 4 cells that fit in the original, a <cite>factor</cite> of 3 results in 9
+cells that fit in the original, etc..</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>factor</strong> (<cite>int</cite>) – An integer (whole number) indicating how many times smaller the new gridsize will be.
+It refers to the side of a grid cell. If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 1, the new grid will have cell sides
+of the same length as the cell sides of the original.
+If <code class="docutils literal notranslate"><span class="pre">factor</span></code> is 2, the side of the grid cell will be half the cell side length of the original.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new grid that is <code class="docutils literal notranslate"><span class="pre">factor</span></code> times smaller then the original grid.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tri_grid.TriGrid.is_cell_upright">
 <span class="sig-name descname"><span class="pre">is_cell_upright</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tri_grid.html#TriGrid.is_cell_upright"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tri_grid.TriGrid.is_cell_upright" title="Permalink to this definition"></a></dt>
 <dd><p>Whether the selected cell points up or down.
@@ -434,7 +461,7 @@ This is useful for example to align two grids by anchoring them to the same loca
 Currently only “centroid” and “corner” are supported.
 When “centroid” is specified, the cell is centered around the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.
 When “corner” is specified, a nearby cell_corner is placed onto the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.</p></li>
-<li><p><strong>in_place</strong> (<em>bool - Default: False</em>) – <p>The original grid instance is modified if <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and no return argument is specified.
+<li><p><strong>in_place</strong> (<cite>bool</cite> (Default: False)) – <p>The original grid instance is modified if <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and no return argument is specified.
 If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the original grid instance remains unchanged and a modified copy is returned.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
