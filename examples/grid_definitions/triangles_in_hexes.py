@@ -37,8 +37,6 @@ At least this is the case if we use a 'flat' orientation for our hexagonal grid,
 which we will need to do in order for the grids to overlap.
 If this is not obvious, I encourage you to do this exercise with a 'pointy' hexagonal grid.
 It will be obvious from the plot.
-I should probably make grid definitions on side lengths possible to facilitate this process.
-Feel free to raise a github issue if your are interested in this.
 
 Let's first plot some cells of these two grids and compare them. 
 From there we can figure out how to shift the grids in order to align them.

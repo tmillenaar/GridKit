@@ -654,3 +654,34 @@ def test_subdivide(factor, rotation, offset, crs):
         assert subgrid.crs is None
     else:
         assert grid.crs.is_exact_same(subgrid.crs)
+
+
+@pytest.mark.parametrize("side_length", [0.1, 123, 987.6])
+def test_init_side_length(side_length):
+    grid = RectGrid(side_length=side_length)
+    numpy.testing.assert_allclose(grid.side_length, side_length)
+    geom = grid.to_shapely([0, 0])
+    numpy.testing.assert_allclose(grid.side_length, geom.exterior.length / 4)
+
+
+def test_init_multiple_sizes_error():
+    with pytest.raises(ValueError):
+        grid = RectGrid(size=1, dx=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid(dy=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid(size=1, area=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid(size=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid(area=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid(size=1, area=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = RectGrid()
