@@ -3,6 +3,12 @@
 Release notes
 ================
 
+Version 0.12.1 (May 17, 2024)
+-----------------------------
+
+Misc
+ - Make compatible with numpy v2.0.0 while remaining compatible with earlier versions
+
 Version 0.12.0 (May 10, 2024)
 -----------------------------
 
