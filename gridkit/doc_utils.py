@@ -63,7 +63,7 @@ def plot_polygons(
 
     Parameters
     ----------
-    geoms: List[shapely.Polygon]
+    geoms: `List[shapely.Polygon]`
         A list of shapely polygons to draw
     colors: `Union[numpy.ndarray, str]`
         If a string is supplied, the string is assumed to be the name of a matplotlib color, e.g. 'green'.

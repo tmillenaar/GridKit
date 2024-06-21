@@ -12,6 +12,16 @@ Introduction
 In this example a triangle and a hexagon grid are defined in such a way
 that they perfectly line up. A hexagon can be neatly divided into six triangles.
 
+.. Tip ::
+
+    The process in this example has been greatly simplified with the introduction
+    of :meth:`.HexGrid.subdivide` in v0.12.0.
+    This example shows the more cumbersome approach, but I will leave this example
+    up for now for educational purposes, for it shows how to manipulate cell size
+    and offsets to position the grid the way you want.
+
+..
+
 For the two grids to align, two things will need to match:
  - the length of the edge connecting two vertices needs to be the same
  - they need an origin point that lines them up properly
@@ -27,7 +37,7 @@ At least this is the case if we use a 'flat' orientation for our hexagonal grid,
 which we will need to do in order for the grids to overlap.
 If this is not obvious, I encourage you to do this exercise with a 'pointy' hexagonal grid.
 It will be obvious from the plot.
-I should probable make grid definitions on side lengths possible to facilitate this process.
+I should probably make grid definitions on side lengths possible to facilitate this process.
 Feel free to raise a github issue if your are interested in this.
 
 Let's first plot some cells of these two grids and compare them. 
@@ -78,9 +88,24 @@ plt.show()
 # 3/4rth of a side length to the right.
 # This works out to half a dx to the left or one and a half dx to the right.
 # Let's do the latter
+#
+# .. Warning ::
+#
+#    When dealing with a 'flat' hex grid, the x and y of `offset` need to
+#    be set in reverse order: (y,x). This is a known conceptual inconsistency
+#    but will not be fixed since 'flat' HexGrids will be removed in a future version
+#    in favor of `rotation`. See: :ref:`release notes: v0.11.0 <release notes v0_11_0>`
+#
+# ..
+#
+# .. Tip ::
+#
+#    For simpler centering of grids around origin, see :meth:`.BaseGrid.anchor`
+#
+# ..
 
 tri_grid.offset = (1.5 * tri_grid.dx, 0)
-hex_grid.offset = (hex_grid.dx / 2, 0)
+hex_grid.offset = (0, hex_grid.dx / 2)
 
 ax = plt.subplot()
 tri_geoms = tri_grid.to_shapely(tri_ids)

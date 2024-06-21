@@ -34,7 +34,12 @@ def test_unique():
 
     index_unique, inverse = index.unique(return_inverse=True)
     numpy.testing.assert_allclose(index_unique, expected_unique)
-    numpy.testing.assert_allclose(inverse, [1, 2, 0, 1] * 2)
+    if numpy.__version__.startswith("1"):
+        numpy.testing.assert_allclose(inverse, [1, 2, 0, 1] * 2)
+    elif numpy.__version__.startswith("2"):
+        numpy.testing.assert_allclose(inverse, [[1, 2, 0, 1]] * 2)
+    else:
+        raise Exception(f"Unsupported numpy version {numpy.__version__}")
 
     index_unique, counts = index.unique(return_counts=True)
     numpy.testing.assert_allclose(index_unique, expected_unique)

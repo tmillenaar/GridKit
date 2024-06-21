@@ -645,9 +645,9 @@ class HexGrid(BaseGrid):
 
         # determine what cells are outside of bounding box
         centroids = self.centroid(ids).T
-        error_margin = numpy.finfo(
-            numpy.float32
-        ).eps  # expect problems with machine precision since some cells are on the bounds by design
+        error_margin = numpy.float64(
+            numpy.finfo(numpy.float32).eps
+        )  # expect problems with machine precision since some cells are on the bounds by design
         oob_mask = centroids[0] < (bounds[0] - error_margin)
         oob_mask |= centroids[1] < (bounds[1] - error_margin)
         oob_mask |= centroids[0] >= (bounds[2] - error_margin)
@@ -660,7 +660,6 @@ class HexGrid(BaseGrid):
             if nr_cells_flat != 0
             else (0, 0)
         )
-
         ids = GridIndex(ids.reshape((*shape, 2)))
 
         return (ids, shape) if return_cell_count else ids
