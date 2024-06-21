@@ -1,37 +1,74 @@
 use numpy::ndarray::*;
 use crate::utils::*;
+use crate::grid::GridTraits;
 
 #[derive(Clone)]
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
-    pub rotation: f64,
-    pub rotation_matrix: Array2<f64>,
-    pub rotation_matrix_inv: Array2<f64>,
+    pub _rotation: f64,
+    pub _rotation_matrix: Array2<f64>,
+    pub _rotation_matrix_inv: Array2<f64>,
 }
 
-impl HexGrid {
-    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let rotation_matrix = _rotation_matrix(rotation);
-        let rotation_matrix_inv = _rotation_matrix(-rotation);
-        // TODO: Find a way to normalize_offset without having to instantiate tmp object
-        let self_tmp = HexGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv };
-        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
-        let rotation_matrix = _rotation_matrix(rotation);
-        let rotation_matrix_inv = _rotation_matrix(-rotation);
-        HexGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv }
-    }
-
-    pub fn radius(&self) -> f64 {
-        self.cellsize / 3_f64.powf(0.5)
-    }
-
-    pub fn dx(&self) -> f64 {
+impl GridTraits for HexGrid {
+    fn dx(&self) -> f64 {
         self.cellsize
     }
-
-    pub fn dy(&self) -> f64 {
+    fn dy(&self) -> f64 {
         3. / 2. * self.radius()
+    }
+    fn radius(&self) -> f64 {
+        self.cellsize / 3_f64.powf(0.5)
+    }
+    fn rotation(&self) -> f64 {
+        self._rotation
+    }
+    fn rotation_matrix(&self) -> Array2<f64> {
+        self._rotation_matrix.clone()
+    }
+    fn rotation_matrix_inv(&self) -> Array2<f64> {
+        self._rotation_matrix_inv.clone()
+    }
+    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
+        let mut centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
+        let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
+
+        if !iseven(y) {
+            centroid_x  = centroid_x + self.dx() / 2.;
+        }
+        (centroid_x, centroid_y)
+    }
+    fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
+        let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
+
+        for cell_id in 0..centroids.shape()[0] {
+            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            centroids[Ix2(cell_id, 0)] = point.0;
+            centroids[Ix2(cell_id, 1)] = point.1;
+        }
+
+        if self.rotation()!= 0. {
+            for cell_id in 0..centroids.shape()[0] {
+                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
+                let cent_rot = self._rotation_matrix.dot(&centroid);
+                centroid.assign(&cent_rot);
+            }
+        }
+        centroids
+    }
+}
+impl HexGrid {
+    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        // TODO: Find a way to normalize_offset without having to instantiate tmp object
+        let _rotation = rotation;
+        let self_tmp = HexGrid { cellsize, offset, _rotation, _rotation_matrix, _rotation_matrix_inv };
+        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        HexGrid { cellsize, offset, _rotation, _rotation_matrix, _rotation_matrix_inv }
     }
 
     pub fn cell_height(&self) -> f64 {
@@ -42,40 +79,11 @@ impl HexGrid {
         self.dx()
     }
 
-    pub fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
-        let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
-
-        for cell_id in 0..centroids.shape()[0] {
-            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            centroids[Ix2(cell_id, 0)] = point.0;
-            centroids[Ix2(cell_id, 1)] = point.1;
-        }
-
-        if self.rotation != 0. {
-            for cell_id in 0..centroids.shape()[0] {
-                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
-                let cent_rot = self.rotation_matrix.dot(&centroid);
-                centroid.assign(&cent_rot);
-            }
-        }
-        centroids
-    }
-
-    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
-        let mut centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
-        let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
-
-        if !iseven(y) {
-            centroid_x  = centroid_x + self.dx() / 2.;
-        }
-        (centroid_x, centroid_y)
-    }
-
     pub fn cell_at_location(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
-            let point = self.rotation_matrix_inv.dot(&point);
+            let point = self._rotation_matrix_inv.dot(&point);
             let x = point[Ix1(0)];
             let y = point[Ix1(1)];
 
@@ -145,11 +153,11 @@ impl HexGrid {
             }
         }
 
-        if self.rotation != 0. {
+        if self.rotation()!= 0. {
             for cell_id in 0..corners.shape()[0] {
                 for corner_id in 0..corners.shape()[1] {
                     let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                    let rotated_corner_xy = self.rotation_matrix.dot(&corner_xy);
+                    let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
                     corner_xy.assign(&rotated_corner_xy);
                 }
             }
@@ -171,10 +179,10 @@ impl HexGrid {
         // FIXME: Find a way to not clone points in the case of no rotation
         //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
         let mut points = points.to_owned();
-        if self.rotation != 0. {
+        if self.rotation()!= 0. {
             for cell_id in 0..points.shape()[0] {
                 let mut point = points.slice_mut(s![cell_id, ..]);
-                let point_rot = self.rotation_matrix_inv.dot(&point);
+                let point_rot = self._rotation_matrix_inv.dot(&point);
                 point.assign(&point_rot);
             }
         }

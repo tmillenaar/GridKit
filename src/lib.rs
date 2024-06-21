@@ -11,6 +11,7 @@ mod rect_grid;
 mod hex_grid;
 mod vector_shapes;
 mod interpolate;
+use crate::grid::GridTraits;
 
 // #[derive(Clone)]
 // pub enum PyGrid {
@@ -49,6 +50,14 @@ impl PyTile {
 
     fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         self._tile.bounding_corners().into_pyarray(py)
+    }
+
+    fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
+        self._tile.indices().into_pyarray(py)
+    }
+
+    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bbox()
     }
 }
 
@@ -95,14 +104,14 @@ impl PyTriGrid {
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix.clone().into_pyarray(py)
+        &self._grid.rotation_matrix().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -258,14 +267,14 @@ impl PyRectGrid {
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix.clone().into_pyarray(py)
+        &self._grid.rotation_matrix().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -305,25 +314,25 @@ impl PyRectGrid {
             .into_pyarray(py)
     }
 
-    fn tiles_from_bounds<'py>(
-        &self,
-        py: Python<'py>,
-        bounds: (f64, f64, f64, f64),
-        nr_tiles_x: i64,
-        nr_tiles_y: i64,
-    ) -> PyObject {
-        let list = PyList::empty(py);
-        let tiles = self._grid.tiles_from_bounds(bounds, nr_tiles_x, nr_tiles_y);
-        for tile in tiles {
-            let start_id = tile.start_id;
-            let nx = tile.nx;
-            let ny = tile.ny;
-            let grid = self.clone();
-            let tile = PyTile::new(grid, start_id, nx, ny);
-            let _ = list.append(tile.into_py(py)); // let _ ignores the possible error returned by `into_py()`
-        }
-        list.into()
-    }
+    // fn tiles_from_bounds<'py>(
+    //     &self,
+    //     py: Python<'py>,
+    //     bounds: (f64, f64, f64, f64),
+    //     nr_tiles_x: i64,
+    //     nr_tiles_y: i64,
+    // ) -> PyObject {
+    //     let list = PyList::empty(py);
+    //     let tiles = self._grid.tiles_from_bounds(bounds, nr_tiles_x, nr_tiles_y);
+    //     for tile in tiles {
+    //         let start_id = tile.start_id;
+    //         let nx = tile.nx;
+    //         let ny = tile.ny;
+    //         let grid = self.clone();
+    //         let tile = PyTile::new(grid, start_id, nx, ny);
+    //         let _ = list.append(tile.into_py(py)); // let _ ignores the possible error returned by `into_py()`
+    //     }
+    //     list.into()
+    // }
 }
 
 #[pyclass]
@@ -369,14 +378,14 @@ impl PyHexGrid {
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix.clone().into_pyarray(py)
+        &self._grid.rotation_matrix().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(
         &self,
         py: Python<'py>,
     ) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv.clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
     fn centroid<'py>(
