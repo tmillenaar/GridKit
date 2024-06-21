@@ -17,7 +17,7 @@ pub fn normalize_offset(offset: (f64, f64), dx: f64, dy: f64) -> (f64, f64) {
     (offset_x, offset_y)
 }
 
-pub fn _rotation_matrix(angle_deg: f64) -> Array2<f64> {
+pub fn rotation_matrix_from_angle(angle_deg: f64) -> Array2<f64> {
     let angle_rad = angle_deg.to_radians();
     let cos_angle = angle_rad.cos();
     let sin_angle = angle_rad.sin();
