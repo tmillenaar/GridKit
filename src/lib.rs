@@ -13,17 +13,10 @@ mod vector_shapes;
 mod interpolate;
 use crate::grid::GridTraits;
 
-// #[derive(Clone)]
-// pub enum PyGrid {
-//     PyTriGrid,
-//     PyRectGrid,
-//     PyHexGrid,
-// }
-
 #[pyclass]
-struct PyTile {
+struct PyTriTile {
     #[pyo3(get, set)]
-    grid: PyRectGrid,
+    grid: PyTriGrid,
     #[pyo3(get, set)]
     start_id: (i64, i64),
     #[pyo3(get, set)]
@@ -34,14 +27,14 @@ struct PyTile {
 }
 
 #[pymethods]
-impl PyTile {
+impl PyTriTile {
     #[new]
-    fn new(grid: PyRectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+    fn new(grid: PyTriGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
-        let grid = grid::Grid::RectGrid(grid._grid);
+        let grid = grid::Grid::TriGrid(grid._grid);
         let _tile = tile::Tile{ grid, start_id, nx, ny};
         let grid = tmp;
-        PyTile { grid, start_id, nx, ny, _tile }
+        PyTriTile { grid, start_id, nx, ny, _tile }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -61,6 +54,94 @@ impl PyTile {
     }
 }
 
+
+#[pyclass]
+struct PyRectTile {
+    #[pyo3(get, set)]
+    grid: PyRectGrid,
+    #[pyo3(get, set)]
+    start_id: (i64, i64),
+    #[pyo3(get, set)]
+    nx: u64,
+    #[pyo3(get, set)]
+    ny: u64,
+    _tile: tile::Tile,
+}
+
+#[pymethods]
+impl PyRectTile {
+    #[new]
+    fn new(grid: PyRectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+        let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
+        let grid = grid::Grid::RectGrid(grid._grid);
+        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let grid = tmp;
+        PyRectTile { grid, start_id, nx, ny, _tile }
+    }
+
+    fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._tile.corner_ids().into_pyarray(py)
+    }
+
+    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.bounding_corners().into_pyarray(py)
+    }
+
+    fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
+        self._tile.indices().into_pyarray(py)
+    }
+
+    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bbox()
+    }
+}
+
+
+
+#[pyclass]
+struct PyHexTile {
+    #[pyo3(get, set)]
+    grid: PyHexGrid,
+    #[pyo3(get, set)]
+    start_id: (i64, i64),
+    #[pyo3(get, set)]
+    nx: u64,
+    #[pyo3(get, set)]
+    ny: u64,
+    _tile: tile::Tile,
+}
+
+#[pymethods]
+impl PyHexTile {
+    #[new]
+    fn new(grid: PyHexGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+        let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
+        let grid = grid::Grid::HexGrid(grid._grid);
+        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let grid = tmp;
+        PyHexTile { grid, start_id, nx, ny, _tile }
+    }
+
+    fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._tile.corner_ids().into_pyarray(py)
+    }
+
+    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.bounding_corners().into_pyarray(py)
+    }
+
+    fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
+        self._tile.indices().into_pyarray(py)
+    }
+
+    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bbox()
+    }
+}
+
+
+
+#[derive(Clone)]
 #[pyclass]
 struct PyTriGrid {
     cellsize: f64,
@@ -335,6 +416,7 @@ impl PyRectGrid {
     // }
 }
 
+#[derive(Clone)]
 #[pyclass]
 struct PyHexGrid {
     cellsize: f64,
@@ -465,7 +547,9 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyTriGrid>()?;
     module.add_class::<PyRectGrid>()?;
     module.add_class::<PyHexGrid>()?;
-    module.add_class::<PyTile>()?;
+    module.add_class::<PyTriTile>()?;
+    module.add_class::<PyRectTile>()?;
+    module.add_class::<PyHexTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())
