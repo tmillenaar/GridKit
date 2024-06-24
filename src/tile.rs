@@ -1,6 +1,7 @@
 use crate::grid::*;
 use numpy::{ndarray::*, IntoPyArray};
 
+#[derive(Clone)]
 pub struct Tile {
     pub grid: Grid,
     pub start_id: (i64, i64),
@@ -13,9 +14,9 @@ impl Tile {
         let (x0, y0) = self.start_id;
         let ids = array![
             [x0, y0], // bottom-left
-            [x0, y0 + self.ny as i64], // top-left
-            [x0 + self.nx as i64, y0 + self.ny as i64], // top-right
-            [x0 + self.nx as i64, y0], // bottom-right
+            [x0, y0 + self.ny as i64 - 1], // top-left
+            [x0 + self.nx as i64 -1, y0 + self.ny as i64 - 1], // top-right
+            [x0 + self.nx as i64 -1, y0], // bottom-right
         ];
         ids
     }
@@ -54,9 +55,9 @@ impl Tile {
     }
 
     pub fn indices(&self) -> Array3<i64> {
-        let mut indices = Array3::<i64>::zeros(((self.ny + 1) as usize, (self.nx + 1) as usize, 2));
-        for iy in 0..(self.ny+1) {
-            for ix in 0..(self.nx+1) {
+        let mut indices = Array3::<i64>::zeros((self.ny as usize, self.nx as usize, 2));
+        for iy in 0..(self.ny) {
+            for ix in 0..(self.nx) {
                 indices[Ix3(iy as usize, ix as usize, 0)] = self.start_id.0 + ix as i64;
                 indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + iy as i64;
             }
