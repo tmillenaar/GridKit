@@ -21,7 +21,7 @@ impl Tile {
         ids
     }
 
-    pub fn bounding_corners(&self) -> Array2<f64> {
+    pub fn corners(&self) -> Array2<f64> {
         let corner_ids = self.corner_ids();
 
         // Determine coordinates of the centroids of the corner-cells in local (non-roated) space
@@ -65,8 +65,8 @@ impl Tile {
         indices
     }
 
-    pub fn bbox(&self) -> (f64, f64, f64, f64) {
-        let corners = self.bounding_corners();
+    pub fn bounds(&self) -> (f64, f64, f64, f64) {
+        let corners = self.corners();
         // FIXME: weird order of slices to get xmin, ymin, xmax, ymax
         (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
     }
