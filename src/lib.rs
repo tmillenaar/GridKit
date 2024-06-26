@@ -41,16 +41,16 @@ impl PyTriTile {
         self._tile.corner_ids().into_pyarray(py)
     }
 
-    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        self._tile.bounding_corners().into_pyarray(py)
+    fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.corners().into_pyarray(py)
     }
 
     fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._tile.bbox()
+    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bounds()
     }
 }
 
@@ -83,16 +83,16 @@ impl PyRectTile {
         self._tile.corner_ids().into_pyarray(py)
     }
 
-    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        self._tile.bounding_corners().into_pyarray(py)
+    fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.corners().into_pyarray(py)
     }
 
     fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._tile.bbox()
+    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bounds()
     }
 }
 
@@ -126,16 +126,16 @@ impl PyHexTile {
         self._tile.corner_ids().into_pyarray(py)
     }
 
-    fn bounding_corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        self._tile.bounding_corners().into_pyarray(py)
+    fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._tile.corners().into_pyarray(py)
     }
 
     fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn bbox<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._tile.bbox()
+    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._tile.bounds()
     }
 }
 
