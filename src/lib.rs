@@ -14,9 +14,9 @@ mod interpolate;
 use crate::grid::GridTraits;
 
 #[pyclass]
-struct PyTriTile {
+struct PyO3TriTile {
     #[pyo3(get, set)]
-    grid: PyTriGrid,
+    grid: PyO3TriGrid,
     #[pyo3(get, set)]
     start_id: (i64, i64),
     #[pyo3(get, set)]
@@ -27,14 +27,14 @@ struct PyTriTile {
 }
 
 #[pymethods]
-impl PyTriTile {
+impl PyO3TriTile {
     #[new]
-    fn new(grid: PyTriGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+    fn new(grid: PyO3TriGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::TriGrid(grid._grid);
         let _tile = tile::Tile{ grid, start_id, nx, ny};
         let grid = tmp;
-        PyTriTile { grid, start_id, nx, ny, _tile }
+        PyO3TriTile { grid, start_id, nx, ny, _tile }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -56,9 +56,9 @@ impl PyTriTile {
 
 
 #[pyclass]
-struct PyRectTile {
+struct PyO3RectTile {
     #[pyo3(get, set)]
-    grid: PyRectGrid,
+    grid: PyO3RectGrid,
     #[pyo3(get, set)]
     start_id: (i64, i64),
     #[pyo3(get, set)]
@@ -69,14 +69,14 @@ struct PyRectTile {
 }
 
 #[pymethods]
-impl PyRectTile {
+impl PyO3RectTile {
     #[new]
-    fn new(grid: PyRectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+    fn new(grid: PyO3RectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::RectGrid(grid._grid);
         let _tile = tile::Tile{ grid, start_id, nx, ny};
         let grid = tmp;
-        PyRectTile { grid, start_id, nx, ny, _tile }
+        PyO3RectTile { grid, start_id, nx, ny, _tile }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -99,9 +99,9 @@ impl PyRectTile {
 
 
 #[pyclass]
-struct PyHexTile {
+struct PyO3HexTile {
     #[pyo3(get, set)]
-    grid: PyHexGrid,
+    grid: PyO3HexGrid,
     #[pyo3(get, set)]
     start_id: (i64, i64),
     #[pyo3(get, set)]
@@ -112,14 +112,14 @@ struct PyHexTile {
 }
 
 #[pymethods]
-impl PyHexTile {
+impl PyO3HexTile {
     #[new]
-    fn new(grid: PyHexGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
+    fn new(grid: PyO3HexGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::HexGrid(grid._grid);
         let _tile = tile::Tile{ grid, start_id, nx, ny};
         let grid = tmp;
-        PyHexTile { grid, start_id, nx, ny, _tile }
+        PyO3HexTile { grid, start_id, nx, ny, _tile }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -143,18 +143,18 @@ impl PyHexTile {
 
 #[derive(Clone)]
 #[pyclass]
-struct PyTriGrid {
+struct PyO3TriGrid {
     cellsize: f64,
     rotation: f64,
     _grid: tri_grid::TriGrid,
 }
 
 #[pymethods]
-impl PyTriGrid {
+impl PyO3TriGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
         let _grid = tri_grid::TriGrid::new( cellsize, offset, rotation);
-        PyTriGrid { cellsize, rotation, _grid }
+        PyO3TriGrid { cellsize, rotation, _grid }
     }
 
     fn offset(&self) -> (f64, f64) {
@@ -309,7 +309,7 @@ impl PyTriGrid {
 
 #[derive(Clone)]
 #[pyclass]
-struct PyRectGrid {
+struct PyO3RectGrid {
     dx: f64,
     dy: f64,
     rotation: f64,
@@ -317,11 +317,11 @@ struct PyRectGrid {
 }
 
 #[pymethods]
-impl PyRectGrid {
+impl PyO3RectGrid {
     #[new]
     fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
         let _grid = rect_grid::RectGrid::new(dx, dy, offset, rotation);
-        PyRectGrid { dx, dy, rotation, _grid }
+        PyO3RectGrid { dx, dy, rotation, _grid }
     }
 
     fn cell_height(&self) -> f64 {
@@ -418,18 +418,18 @@ impl PyRectGrid {
 
 #[derive(Clone)]
 #[pyclass]
-struct PyHexGrid {
+struct PyO3HexGrid {
     cellsize: f64,
     rotation: f64,
     _grid: hex_grid::HexGrid,
 }
 
 #[pymethods]
-impl PyHexGrid {
+impl PyO3HexGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
         let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
-        PyHexGrid { cellsize, rotation, _grid}
+        PyO3HexGrid { cellsize, rotation, _grid}
     }
 
     fn cell_height(&self) -> f64 {
@@ -544,12 +544,12 @@ fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
 
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
-    module.add_class::<PyTriGrid>()?;
-    module.add_class::<PyRectGrid>()?;
-    module.add_class::<PyHexGrid>()?;
-    module.add_class::<PyTriTile>()?;
-    module.add_class::<PyRectTile>()?;
-    module.add_class::<PyHexTile>()?;
+    module.add_class::<PyO3TriGrid>()?;
+    module.add_class::<PyO3RectGrid>()?;
+    module.add_class::<PyO3HexGrid>()?;
+    module.add_class::<PyO3TriTile>()?;
+    module.add_class::<PyO3RectTile>()?;
+    module.add_class::<PyO3HexTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     Ok(())

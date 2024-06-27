@@ -1,6 +1,6 @@
 import numpy
 
-from gridkit.gridkit_rs import PyHexTile, PyRectTile, PyTriTile
+from gridkit.gridkit_rs import PyO3HexTile, PyO3RectTile, PyO3TriTile
 from gridkit.hex_grid import HexGrid
 from gridkit.index import GridIndex
 from gridkit.rect_grid import RectGrid
@@ -23,15 +23,15 @@ class Tile:
             raise ValueError(
                 "'start_id' must be a single pair of indices in the for (x,y), got: {start_id}"
             )
-        sart_id = tuple(start_id)
+        start_id = tuple(start_id)
 
         self.grid = grid
         if isinstance(grid, TriGrid):
-            self._tile = PyTriTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3TriTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, RectGrid):
-            self._tile = PyRectTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3RectTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, HexGrid):
-            self._tile = PyHexTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3HexTile(grid._grid, start_id, nx, ny)
         else:
             raise TypeError(
                 f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
