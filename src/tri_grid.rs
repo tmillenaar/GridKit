@@ -19,6 +19,9 @@ impl GridTraits for TriGrid {
     fn dy(&self) -> f64 {
         self.cell_height()
     }
+    fn offset(&self) -> (f64, f64) {
+        self.offset
+    }
     fn radius(&self) -> f64 {
         2. / 3. * self.cell_height()
     }

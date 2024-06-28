@@ -18,6 +18,9 @@ impl GridTraits for HexGrid {
     fn dy(&self) -> f64 {
         3. / 2. * self.radius()
     }
+    fn offset(&self) -> (f64, f64) {
+        self.offset
+    }
     fn radius(&self) -> f64 {
         self.cellsize / 3_f64.powf(0.5)
     }
