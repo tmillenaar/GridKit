@@ -22,24 +22,17 @@ impl Tile {
     }
 
     pub fn corners(&self) -> Array2<f64> {
-        let corner_ids = self.corner_ids();
+        let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset().0;
+        let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset().1;
+        let side_length_x = self.nx as f64 * self.grid.dx();
+        let side_length_y = self.ny as f64 * self.grid.dy();
 
-        // Determine coordinates of the centroids of the corner-cells in local (non-roated) space
-        let mut centroids = Array2::<f64>::zeros((corner_ids.shape()[0], 2));
-        for i in 0..corner_ids.shape()[0] {
-            let centroid = self.grid.centroid_xy_no_rot(corner_ids[Ix2(i,0)], corner_ids[Ix2(i, 1)]);
-            centroids[Ix2(i, 0)] = centroid.0;
-            centroids[Ix2(i, 1)] = centroid.1;
-        }
-
-        // Convert centroids at corner-cells to coordinates of the corners in local (non-roated) space
-        let dx: f64 = self.grid.dx();
-        let dy: f64 = self.grid.dy();
         let mut corners = array![
-            [centroids[Ix2(0,0)] - dx / 2., centroids[Ix2(0,1)] - dy / 2.],
-            [centroids[Ix2(1,0)] - dx / 2., centroids[Ix2(1,1)] + dy / 2.],
-            [centroids[Ix2(2,0)] + dx / 2., centroids[Ix2(2,1)] + dy / 2.],
-            [centroids[Ix2(3,0)] + dx / 2., centroids[Ix2(3,1)] - dy / 2.],
+            [start_corner_x, start_corner_y + side_length_y],
+            [start_corner_x + side_length_x, start_corner_y + side_length_y],
+            [start_corner_x + side_length_x, start_corner_y],
+            [start_corner_x, start_corner_y],
+
         ];
 
         // Rotate if necessary
@@ -66,8 +59,46 @@ impl Tile {
     }
 
     pub fn bounds(&self) -> (f64, f64, f64, f64) {
-        let corners = self.corners();
-        // FIXME: weird order of slices to get xmin, ymin, xmax, ymax
-        (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
+        let corners: ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>> = self.corners();
+
+        // Note: something like the following might have been neat:
+        //        (
+        //            corners.slice(s![..,0]).min(),
+        //            corners.slice(s![..,1]).min(),
+        //            corners.slice(s![..,0]).max(),
+        //            corners.slice(s![..,1]).max(),
+        //        ) 
+        //       But that likely is less performant and it does not work with n-dimensional arrays.
+        //       See: https://stackoverflow.com/questions/62544170/how-can-i-get-or-create-the-equivalent-of-numpys-amax-function-with-rusts-ndar/62547757
+        let mut xmin = f64::MAX;
+        let mut xmax = f64::MIN;
+        let mut ymin = f64::MAX;
+        let mut ymax = f64::MIN;
+        for corner in corners.axis_iter(Axis(0)) {
+            let x = corner[Ix1(0)];
+            let y = corner[Ix1(1)];
+            if x < xmin {
+                xmin = x;
+            }
+            if x > xmax {
+                xmax = x;
+            }
+            if y < ymin {
+                ymin = y;
+            }
+            if y > ymax {
+                ymax = y;
+            }
+        };
+        (xmin, ymin, xmax, ymax)
+        // (
+        //     corners.slice(s![..,0]).min(),
+        //     corners.slice(s![..,1]).min(),
+        //     corners.slice(s![..,0]).max(),
+        //     corners.slice(s![..,1]).max(),
+        // )
+        // // FIXME: weird order of slices to get xmin, ymin, xmax, ymax
+        // (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
+        // (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
     }
 }

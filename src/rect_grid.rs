@@ -20,6 +20,9 @@ impl GridTraits for RectGrid {
     fn dy(&self) -> f64 {
         self._dy
     }
+    fn offset(&self) -> (f64, f64) {
+        self.offset
+    }
     fn radius(&self) -> f64 {
         ((self._dy/2.).powi(2) + (self._dy/2.).powi(2)).powf(0.5)
     }

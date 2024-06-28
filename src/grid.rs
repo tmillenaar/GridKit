@@ -8,6 +8,7 @@ use enum_delegate;
 pub trait GridTraits {
     fn dx(&self) -> f64;
     fn dy(&self) -> f64;
+    fn offset(&self) -> (f64, f64);
     fn radius(&self) -> f64;
     fn rotation(&self) -> f64;
     fn rotation_matrix(&self) -> Array2<f64>;
