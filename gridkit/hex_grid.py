@@ -22,9 +22,11 @@ class HexGrid(BaseGrid):
     -------------------------
     size: float
         The spacing between two cell centroids in horizontal direction if ``shape`` is "pointy",
-        or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area`.
+        or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area` or 'side_length'.
     area: float
-        The area of a cell. Cannot be supplied together with `size`.
+        The area of a cell. Cannot be supplied together with `size` or 'side_length'.
+    side_length: float
+        The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or 'area'.
     shape: `Literal["pointy", "flat"]`
         The shape of the layout of the grid.
         If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
@@ -57,21 +59,32 @@ class HexGrid(BaseGrid):
         *args,
         size=None,
         area=None,
+        side_length=None,
         shape="pointy",
         offset=(0, 0),
         rotation=0,
         **kwargs,
     ):
-        if area is None and size is None:
+        supplied_sizes = set()
+        if area is not None:
+            supplied_sizes.add("area")
+        if size is not None:
+            supplied_sizes.add("size")
+        if side_length is not None:
+            supplied_sizes.add("side_length")
+
+        if len(supplied_sizes) == 0:
             raise ValueError(
-                "No cell size can be determined. Please supply either 'size' or 'area'"
+                f"No cell size can be determined. Please supply one of 'size' or 'area' or 'side_length'."
             )
-        if area is not None and size is not None:
+        if len(supplied_sizes) > 1:
             raise ValueError(
-                f"Argument conflict. Please supply either 'size' or 'area'. Got both"
+                f"Argument conflict. Please supply either 'size' or 'area' or 'side_length'. Got: {' AND '.join(supplied_sizes)}"
             )
         if area is not None:
             size = self._area_to_size(area)
+        if side_length is not None:
+            size = self._side_length_to_size(side_length)
 
         self._size = size
         self._radius = size / 3**0.5
@@ -142,10 +155,22 @@ class HexGrid(BaseGrid):
         """Find the ``size`` that corresponds to a specific area."""
         return (2 / 3 * area * 3**0.5) ** 0.5
 
+    def _side_length_to_size(self, side_length):
+        """Find the ``size`` that corresponds to the specified length of the side of a cell.
+        In the case of a HexGrid that is 1/6th the outline of the cell."""
+        return side_length * 3**0.5
+
     @property
     def area(self):
         """The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""
         return self.dx * self.dy
+
+    @property
+    def side_length(self):
+        """The lenght of the side of a cell.
+        The length is the same as that of :meth:`.HexGrid.r`.
+        The unit is the unit used for the cell's :meth:`.BaseGrid.size`."""
+        return self._radius
 
     @area.setter
     def area(self, value):

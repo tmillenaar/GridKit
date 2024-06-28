@@ -20,16 +20,18 @@ class RectGrid(BaseGrid):
     dx: :class:`float`
         The spacing between two cell centroids in horizontal direction.
         Has to be supplied together with `dx`.
-        Cannot be supplied together with `area` or `size`.
+        Cannot be supplied together with `area`, 'side_length' or `size`.
     dy: :class:`float`
         The spacing between two cell centroids in vertical direction
         Has to be supplied together with `dy`.
-        Cannot be supplied together with `area` or `size`.
+        Cannot be supplied together with `area`, 'side_length' or `size`.
     size: float
         The spacing between two cell centroids in horizontal and vertical direction.
-        Cannot be supplied together with `area` or `dx`&`dy`.
+        Cannot be supplied together with `area`, 'side_length' or `dx`&`dy`.
     area: float
-        The area of a cell. Cannot be supplied together with `size` or `dx`&`dy`.
+        The area of a cell. Cannot be supplied together with `size`, 'side_length' or `dx`&`dy`.
+    side_length: float
+        The lenght of the cell sides, i.e. the height and width of the cell. Cannot be supplied together with `size`, 'area' or `dx`&`dy`.
     offset: `Tuple(float, float)` (optional)
         The offset in dx and dy.
         Shifts the whole grid by the specified amount.
@@ -60,26 +62,34 @@ class RectGrid(BaseGrid):
         dy=None,
         size=None,
         area=None,
+        side_length=None,
         offset=(0, 0),
         rotation=0,
         **kwargs,
     ):
         # Make sure only one method of defining cell size is used
-        nr_input_methods = sum(
-            [
-                dx is not None or dy is not None,
-                size is not None,
-                area is not None,
-            ]
-        )
-        if nr_input_methods == 0:
+
+        if ((dx is not None) + (dy is not None)) == 1:
             raise ValueError(
-                "No cell size can be determined. Please supply either 'size', 'area' or both 'dx' and 'dy'."
+                f"Please supply both 'dx' and 'dy'. Got only '{'dx' if dx is not None else 'dy'}' and not '{'dx' if dx is None else 'dy'}'."
             )
-        if nr_input_methods > 1:
-            supplied_args = [arg for arg in [dx, dy, size, area] if arg is not None]
+
+        supplied_sizes = set()
+        if dx is not None and dy is not None:
+            supplied_sizes.add("dx+dy")
+        if area is not None:
+            supplied_sizes.add("area")
+        if size is not None:
+            supplied_sizes.add("size")
+        if side_length is not None:
+            supplied_sizes.add("side_length")
+        if len(supplied_sizes) == 0:
             raise ValueError(
-                f"Argument conflict. Please supply either 'size', 'area' or 'dx'&'dy' when instantiating a new RectGrid. Found: {supplied_args}."
+                "No cell size can be determined. Please supply either 'size', 'area', 'side_length' or both 'dx' and 'dy'."
+            )
+        if len(supplied_sizes) > 1:
+            raise ValueError(
+                f"Argument conflict. Please supply either 'size', 'area', 'side_length' or 'dx'&'dy' when instantiating a new RectGrid. Found: {supplied_sizes}."
             )
 
         # Determine cell size
@@ -87,6 +97,8 @@ class RectGrid(BaseGrid):
             self._size = dx = dy = size
         elif area is not None:
             self._size = dx = dy = self._area_to_size(area)
+        elif side_length is not None:
+            self._size = dx = dy = self._side_length_to_size(side_length)
         else:
             if dx is None or dy is None:
                 raise ValueError(
@@ -112,6 +124,26 @@ class RectGrid(BaseGrid):
             rotation=self.rotation,
             crs=self.crs,
         )
+
+    @property
+    def side_length(self):
+        """The lenght of the side of a cell.
+        The length is the same as that of :meth:`.RectGrid.cell_width`.
+        In the case that cell_width and cell_height are different, only cell_widht is returned and cell_height is ignored.
+        A warning is raised if that happens.
+        It is advised to use :meth"`.RectGrid.cell_width` and :meth"`.RectGrid.cell_width` when dealing with RectGrids.
+        This function is only implemented to keep the API aligned with the other grid types.
+        """
+        if not numpy.isclose(self.dx, self.dy):
+            warnings.warn(
+                "Not all side length are the same. Returning only 'cell_width' but note that it is different from 'cell_height'."
+            )
+        return self.cell_width
+
+    def _side_length_to_size(self, side_length):
+        """Find the ``size`` that corresponds to the specified length of the side of a cell.
+        In the case of a RectGrid that is 1/4th the outline of the cell."""
+        return side_length
 
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
