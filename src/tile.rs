@@ -13,10 +13,10 @@ impl Tile {
     pub fn corner_ids(&self) -> Array2<i64> {
         let (x0, y0) = self.start_id;
         let ids = array![
-            [x0, y0], // bottom-left
             [x0, y0 + self.ny as i64 - 1], // top-left
             [x0 + self.nx as i64 -1, y0 + self.ny as i64 - 1], // top-right
             [x0 + self.nx as i64 -1, y0], // bottom-right
+            [x0, y0], // bottom-left
         ];
         ids
     }
@@ -91,14 +91,5 @@ impl Tile {
             }
         };
         (xmin, ymin, xmax, ymax)
-        // (
-        //     corners.slice(s![..,0]).min(),
-        //     corners.slice(s![..,1]).min(),
-        //     corners.slice(s![..,0]).max(),
-        //     corners.slice(s![..,1]).max(),
-        // )
-        // // FIXME: weird order of slices to get xmin, ymin, xmax, ymax
-        // (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
-        // (corners[Ix2(1,0)], corners[Ix2(0,1)], corners[Ix2(3,0)], corners[Ix2(2,1)])
     }
 }
