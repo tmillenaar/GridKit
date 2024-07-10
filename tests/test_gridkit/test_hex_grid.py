@@ -21,6 +21,31 @@ def test_init_area(area):
     numpy.testing.assert_allclose(grid.area, area)
 
 
+@pytest.mark.parametrize("side_length", [0.1, 123, 987.6])
+def test_init_side_length(side_length):
+    grid = HexGrid(side_length=side_length)
+    numpy.testing.assert_allclose(grid.side_length, side_length)
+    geom = grid.to_shapely([0, 0])
+    numpy.testing.assert_allclose(grid.side_length, geom.exterior.length / 6)
+
+
+def test_init_multiple_sizes_error():
+    with pytest.raises(ValueError):
+        grid = HexGrid(size=1, area=1)
+
+    with pytest.raises(ValueError):
+        grid = HexGrid(size=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = HexGrid(area=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = HexGrid(size=1, area=1, side_length=1)
+
+    with pytest.raises(ValueError):
+        grid = HexGrid()
+
+
 @pytest.mark.parametrize(
     "shape, indices, expected_centroids",
     [
