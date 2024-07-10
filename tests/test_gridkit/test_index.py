@@ -274,6 +274,7 @@ def test_validate_index(index):
 @validate_index
 def test_isin(partial, index, result):
     assert (GridIndex(partial) in index) == result
+    assert (partial in GridIndex(index)) == result
 
 
 @pytest.mark.parametrize("in_place", [False, True])
