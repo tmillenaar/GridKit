@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>hex_grid &mdash; GridKit v0.12.1 documentation</title>
+  <title>hex_grid &mdash; GridKit v0.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=398e2cc8"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=ec23e288"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
         <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.12.1
+                v0.13.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -111,7 +111,7 @@
 <span id="hex-grid"></span><h1>hex_grid<a class="headerlink" href="#module-gridkit.hex_grid" title="Permalink to this heading"></a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.hex_grid.</span></span><span class="sig-name descname"><span class="pre">HexGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pointy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.hex_grid.</span></span><span class="sig-name descname"><span class="pre">HexGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">area</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">side_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pointy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/hex_grid.html#HexGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.hex_grid.HexGrid" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></p>
 <p>Abstraction that represents an infinite grid with hexagonal cell shape.</p>
 <p>The size of each cell can be specified through the <cite>size</cite> or <cite>area</cite> arguments.</p>
@@ -119,9 +119,11 @@
 <h2>Initialization parameters<a class="headerlink" href="#initialization-parameters" title="Permalink to this heading"></a></h2>
 <dl class="simple">
 <dt>size: float</dt><dd><p>The spacing between two cell centroids in horizontal direction if <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “pointy”,
-or in vertical direction if <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “flat”. Cannot be supplied together with <cite>area</cite>.</p>
+or in vertical direction if <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “flat”. Cannot be supplied together with <cite>area</cite> or ‘side_length’.</p>
 </dd>
-<dt>area: float</dt><dd><p>The area of a cell. Cannot be supplied together with <cite>size</cite>.</p>
+<dt>area: float</dt><dd><p>The area of a cell. Cannot be supplied together with <cite>size</cite> or ‘side_length’.</p>
+</dd>
+<dt>side_length: float</dt><dd><p>The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with <cite>size</cite> or ‘area’.</p>
 </dd>
 <dt>shape: <cite>Literal[“pointy”, “flat”]</cite></dt><dd><p>The shape of the layout of the grid.
 If <code class="docutils literal notranslate"><span class="pre">shape</span></code> is “pointy” the cells will be pointy side up and the regular axis will be in horizontal direction.
@@ -176,6 +178,14 @@ Note: makes a copy every time this is called.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotation_matrix_inv</span></span><a class="headerlink" href="#gridkit.hex_grid.HexGrid.rotation_matrix_inv" title="Permalink to this definition"></a></dt>
 <dd><p>The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
 Note: makes a copy every time this is called.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.hex_grid.HexGrid.side_length">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">side_length</span></span><a class="headerlink" href="#gridkit.hex_grid.HexGrid.side_length" title="Permalink to this definition"></a></dt>
+<dd><p>The lenght of the side of a cell.
+The length is the same as that of <a class="reference internal" href="#gridkit.hex_grid.HexGrid.r" title="gridkit.hex_grid.HexGrid.r"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.r()</span></code></a>.
+The unit is the unit used for the cell’s <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.size" title="gridkit.base_grid.BaseGrid.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.size()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py property">

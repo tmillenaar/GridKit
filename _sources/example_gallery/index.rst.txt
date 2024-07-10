@@ -201,6 +201,50 @@ These examples highlight the different ways grids can be constructed and manipul
    /example_gallery/grid_definitions/triangles_in_hexes
 
 
+Patterns created from regular grid interactions
+===============================================
+
+The following examples showcase patterns that can be created using regular grids.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The so called &#x27;flower of life&#x27; is a type of &#x27;overlapping circles grid&#x27; seen in many cultures. W...">
+
+.. only:: html
+
+  .. image:: /example_gallery/patterns/images/thumb/sphx_glr_flower_of_life_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_patterns_flower_of_life.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Flower of life</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/patterns/flower_of_life
+
+
 Raster operations
 =================
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.hex_grid &mdash; GridKit v0.12.1 documentation</title>
+  <title>gridkit.hex_grid &mdash; GridKit v0.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=398e2cc8"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ec23e288"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.12.1
+                v0.13.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -107,9 +107,11 @@
 <span class="sd">    -------------------------</span>
 <span class="sd">    size: float</span>
 <span class="sd">        The spacing between two cell centroids in horizontal direction if ``shape`` is &quot;pointy&quot;,</span>
-<span class="sd">        or in vertical direction if ``shape`` is &quot;flat&quot;. Cannot be supplied together with `area`.</span>
+<span class="sd">        or in vertical direction if ``shape`` is &quot;flat&quot;. Cannot be supplied together with `area` or &#39;side_length&#39;.</span>
 <span class="sd">    area: float</span>
-<span class="sd">        The area of a cell. Cannot be supplied together with `size`.</span>
+<span class="sd">        The area of a cell. Cannot be supplied together with `size` or &#39;side_length&#39;.</span>
+<span class="sd">    side_length: float</span>
+<span class="sd">        The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or &#39;area&#39;.</span>
 <span class="sd">    shape: `Literal[&quot;pointy&quot;, &quot;flat&quot;]`</span>
 <span class="sd">        The shape of the layout of the grid.</span>
 <span class="sd">        If ``shape`` is &quot;pointy&quot; the cells will be pointy side up and the regular axis will be in horizontal direction.</span>
@@ -142,21 +144,32 @@
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">side_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span>
         <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">supplied_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;area&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">side_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;side_length&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;No cell size can be determined. Please supply either &#39;size&#39; or &#39;area&#39;&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;No cell size can be determined. Please supply one of &#39;size&#39; or &#39;area&#39; or &#39;side_length&#39;.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Argument conflict. Please supply either &#39;size&#39; or &#39;area&#39;. Got both&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Argument conflict. Please supply either &#39;size&#39; or &#39;area&#39; or &#39;side_length&#39;. Got: </span><span class="si">{</span><span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_to_size</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">side_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_side_length_to_size</span><span class="p">(</span><span class="n">side_length</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="o">=</span> <span class="n">size</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
@@ -227,10 +240,22 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the ``size`` that corresponds to a specific area.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">area</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
 
+    <span class="k">def</span> <span class="nf">_side_length_to_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side_length</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the ``size`` that corresponds to the specified length of the side of a cell.</span>
+<span class="sd">        In the case of a HexGrid that is 1/6th the outline of the cell.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">side_length</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The area of a cell. The unit is the unit used for the cell&#39;s :meth:`.BaseGrid.size`, squared.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">side_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The lenght of the side of a cell.</span>
+<span class="sd">        The length is the same as that of :meth:`.HexGrid.r`.</span>
+<span class="sd">        The unit is the unit used for the cell&#39;s :meth:`.BaseGrid.size`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
 
     <span class="nd">@area</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>

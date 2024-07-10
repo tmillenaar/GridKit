@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rotation animation &mdash; GridKit v0.12.1 documentation</title>
+  <title>Rotation animation &mdash; GridKit v0.13.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
@@ -19,7 +19,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=398e2cc8"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ec23e288"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -41,7 +41,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.12.1
+                v0.13.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -66,6 +66,7 @@
 <li class="toctree-l3"><a class="reference internal" href="triangles_in_hexes.html">Triangles in hexagons</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#patterns-created-from-regular-grid-interactions">Patterns created from regular grid interactions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a></li>
 </ul>
@@ -304,42 +305,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img207b8ea3827645e88b0159f1537f12e3">
+  <img id="_anim_imgef0faf2c925144fd997477ec4a300d36">
   <div class="anim-controls">
-    <input id="_anim_slider207b8ea3827645e88b0159f1537f12e3" type="range" class="anim-slider"
+    <input id="_anim_slideref0faf2c925144fd997477ec4a300d36" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim207b8ea3827645e88b0159f1537f12e3.set_frame(parseInt(this.value));">
+           oninput="animef0faf2c925144fd997477ec4a300d36.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim207b8ea3827645e88b0159f1537f12e3.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animef0faf2c925144fd997477ec4a300d36.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim207b8ea3827645e88b0159f1537f12e3.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animef0faf2c925144fd997477ec4a300d36.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim207b8ea3827645e88b0159f1537f12e3.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animef0faf2c925144fd997477ec4a300d36.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim207b8ea3827645e88b0159f1537f12e3.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animef0faf2c925144fd997477ec4a300d36.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim207b8ea3827645e88b0159f1537f12e3.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animef0faf2c925144fd997477ec4a300d36.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim207b8ea3827645e88b0159f1537f12e3.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animef0faf2c925144fd997477ec4a300d36.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim207b8ea3827645e88b0159f1537f12e3.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animef0faf2c925144fd997477ec4a300d36.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim207b8ea3827645e88b0159f1537f12e3.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animef0faf2c925144fd997477ec4a300d36.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim207b8ea3827645e88b0159f1537f12e3.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animef0faf2c925144fd997477ec4a300d36.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select207b8ea3827645e88b0159f1537f12e3"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectef0faf2c925144fd997477ec4a300d36"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_207b8ea3827645e88b0159f1537f12e3"
+      <input type="radio" name="state" value="once" id="_anim_radio1_ef0faf2c925144fd997477ec4a300d36"
              >
-      <label for="_anim_radio1_207b8ea3827645e88b0159f1537f12e3">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_207b8ea3827645e88b0159f1537f12e3"
+      <label for="_anim_radio1_ef0faf2c925144fd997477ec4a300d36">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_ef0faf2c925144fd997477ec4a300d36"
              checked>
-      <label for="_anim_radio2_207b8ea3827645e88b0159f1537f12e3">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_207b8ea3827645e88b0159f1537f12e3"
+      <label for="_anim_radio2_ef0faf2c925144fd997477ec4a300d36">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_ef0faf2c925144fd997477ec4a300d36"
              >
-      <label for="_anim_radio3_207b8ea3827645e88b0159f1537f12e3">Reflect</label>
+      <label for="_anim_radio3_ef0faf2c925144fd997477ec4a300d36">Reflect</label>
     </form>
   </div>
 </div>
@@ -349,9 +350,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img207b8ea3827645e88b0159f1537f12e3";
-    var slider_id = "_anim_slider207b8ea3827645e88b0159f1537f12e3";
-    var loop_select_id = "_anim_loop_select207b8ea3827645e88b0159f1537f12e3";
+    var img_id = "_anim_imgef0faf2c925144fd997477ec4a300d36";
+    var slider_id = "_anim_slideref0faf2c925144fd997477ec4a300d36";
+    var loop_select_id = "_anim_loop_selectef0faf2c925144fd997477ec4a300d36";
     var frames = new Array(30);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -19132,7 +19133,7 @@ RESqnAKfiIiISJVT4BMRERGpcv8fWyiZRRE8aowAAAAASUVORK5CYII=\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim207b8ea3827645e88b0159f1537f12e3 = new Animation(frames, img_id, slider_id, 50.0,
+        animef0faf2c925144fd997477ec4a300d36 = new Animation(frames, img_id, slider_id, 50.0,
                                  loop_select_id);
     }, 0);
   })()
@@ -19172,7 +19173,7 @@ RESqnAKfiIiISJVT4BMRERGpcv8fWyiZRRE8aowAAAAASUVORK5CYII=\
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.413 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.292 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-rotation-animation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/74dae58d044794710477e56b8fe077ea/rotation_animation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">rotation_animation.ipynb</span></code></a></p>

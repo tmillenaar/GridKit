@@ -56,13 +56,11 @@ At least this is the case if we use a 'flat' orientation for our hexagonal grid,
 which we will need to do in order for the grids to overlap.
 If this is not obvious, I encourage you to do this exercise with a 'pointy' hexagonal grid.
 It will be obvious from the plot.
-I should probably make grid definitions on side lengths possible to facilitate this process.
-Feel free to raise a github issue if your are interested in this.
 
 Let's first plot some cells of these two grids and compare them. 
 From there we can figure out how to shift the grids in order to align them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-75
+.. GENERATED FROM PYTHON SOURCE LINES 45-73
 
 .. code-block:: Python
 
@@ -107,7 +105,7 @@ From there we can figure out how to shift the grids in order to align them.
 
  .. code-block:: none
 
-    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:86: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:99: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
       warnings.warn(
     /home/runner/work/GridKit/GridKit/gridkit/doc_utils.py:96: UserWarning: The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version.
       warnings.warn(
@@ -115,7 +113,7 @@ From there we can figure out how to shift the grids in order to align them.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-105
+.. GENERATED FROM PYTHON SOURCE LINES 75-103
 
 Hooray! The grids are already aligned.
 It looks like the default origin already works well for this case,
@@ -146,7 +144,7 @@ Let's do the latter
 
 ..
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-122
+.. GENERATED FROM PYTHON SOURCE LINES 104-120
 
 .. code-block:: Python
 
@@ -178,7 +176,7 @@ Let's do the latter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-140
+.. GENERATED FROM PYTHON SOURCE LINES 121-138
 
 Et voila. Our grids are centered around the origin.
 Now we can play with the interaction between these grids.
@@ -198,7 +196,7 @@ Then we plot the triangles using these values and expect the hexagon
 grid to be reflected in the colors
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-150
+.. GENERATED FROM PYTHON SOURCE LINES 139-148
 
 .. code-block:: Python
 
@@ -223,7 +221,7 @@ grid to be reflected in the colors
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-160
+.. GENERATED FROM PYTHON SOURCE LINES 149-158
 
 As mentioned above, we can use the order of the data to color the
 cells based on whether they are the first, second, third etc. occurrence
@@ -235,7 +233,7 @@ Then we create a colors list that will have a number for each triangle
 based on whether it was the first, second, etc. triangle in that hexagon.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-173
+.. GENERATED FROM PYTHON SOURCE LINES 159-171
 
 .. code-block:: Python
 
@@ -263,7 +261,7 @@ based on whether it was the first, second, etc. triangle in that hexagon.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-193
+.. GENERATED FROM PYTHON SOURCE LINES 172-191
 
 Ain't that pretty?
 
@@ -288,7 +286,7 @@ Wea. Forecasting, 18, 918–932, `https://doi.org/10.1175/1520-0434(2003)018\<09
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.558 seconds)
+   **Total running time of the script:** (0 minutes 0.547 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_triangles_in_hexes.py:
