@@ -102,7 +102,12 @@ class _IndexMeta(type):
     def _gen_comparisson_op(op):
         def comparison_op(left, right):
             if not (isinstance(left, GridIndex) and isinstance(right, GridIndex)):
-                return op
+                # First try the case where each arg is handled as a GridIndex
+                # Fall back to the case where one of the args cannot be turned into a GridIndex
+                try:
+                    return comparison_op(GridIndex(left), GridIndex(right))
+                except:
+                    return op(left, right)
             if left.index.ndim != right.index.ndim:
                 return False
             return numpy.all(left.ravel().x == right.ravel().x) and numpy.all(
