@@ -56,11 +56,10 @@ def test_corner_ids(grid, start_id, nx, ny, rotation):
     grid.rotation = rotation
     tile = Tile(grid, start_id, nx, ny)
     corners = tile.corner_ids()
-    assert GridIndex(start_id) in corners
-    # FIXME: Don't convert specifically to GridIndex when this ticket is resolved: https://github.com/tmillenaar/GridKit/issues/93
-    assert GridIndex((start_id[0] + nx - 1, start_id[1])) in corners
-    assert GridIndex((start_id[0], start_id[1] + ny - 1)) in corners
-    assert GridIndex((start_id[0] + nx - 1, start_id[1] + ny - 1)) in corners
+    assert start_id in corners
+    assert (start_id[0] + nx - 1, start_id[1]) in corners
+    assert (start_id[0], start_id[1] + ny - 1) in corners
+    assert (start_id[0] + nx - 1, start_id[1] + ny - 1) in corners
 
 
 @pytest.mark.parametrize("grid", [TriGrid(size=1), RectGrid(size=1), HexGrid(size=1)])
