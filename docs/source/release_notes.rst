@@ -3,7 +3,20 @@
 Release notes
 ================
 
-Version 0.12.1 (May 17, 2024)
+Version 0.13.0 (July 10, 2024)
+-----------------------------
+Features
+ - Option to initialize grid using ``side_length`` instead of ``size`` or ``area``
+
+Fixes
+ - Comparisson operators for :class:`.GridIndex` now also work when comparing to non-grid index classes.
+   For example ``GridIndex([1,2]) == (1,2)`` will result in ``True``.
+   By extension, ``(1,2) in GridIndex([[1,2], [0,0]])`` now also works as expected.
+
+Documentation
+ - Add example :ref:`flower_of_life.py <example flower of life>`
+
+Version 0.12.1 (Jun 17, 2024)
 -----------------------------
 
 Misc
