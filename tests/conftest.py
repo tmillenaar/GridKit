@@ -32,5 +32,6 @@ def basic_bounded_flat_grid():
 @pytest.fixture(scope="function")
 def basic_bounded_tri_grid():
     data = numpy.arange(3 * 5).reshape(5, 3)
-    bounds = (-1.0, -3.4641016151377544, 2.0, 5.196152422706632)
+    dy = 3**0.5 / 2
+    bounds = (-0.5, -2 * dy, 1.0, 3 * dy)
     return tri_grid.BoundedTriGrid(data, bounds=bounds, nodata_value=-9999)

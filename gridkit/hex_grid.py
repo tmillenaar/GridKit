@@ -750,7 +750,7 @@ class HexGrid(BaseGrid):
         definition.pop("shape")  # shape does not exist for TriGrids
         extra_rot = 30 if self.shape == "pointy" else 0
         definition["rotation"] += extra_rot
-        definition["size"] = self.r / factor / 2
+        definition["size"] = self.r / factor
         sub_grid = TriGrid(**definition)
 
         anchor_loc = self.cell_corners([0, 0])[0]
