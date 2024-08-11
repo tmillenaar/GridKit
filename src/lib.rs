@@ -394,26 +394,6 @@ impl PyO3RectGrid {
             .cells_near_point(&point.as_array())
             .into_pyarray(py)
     }
-
-    // fn tiles_from_bounds<'py>(
-    //     &self,
-    //     py: Python<'py>,
-    //     bounds: (f64, f64, f64, f64),
-    //     nr_tiles_x: i64,
-    //     nr_tiles_y: i64,
-    // ) -> PyObject {
-    //     let list = PyList::empty(py);
-    //     let tiles = self._grid.tiles_from_bounds(bounds, nr_tiles_x, nr_tiles_y);
-    //     for tile in tiles {
-    //         let start_id = tile.start_id;
-    //         let nx = tile.nx;
-    //         let ny = tile.ny;
-    //         let grid = self.clone();
-    //         let tile = PyTile::new(grid, start_id, nx, ny);
-    //         let _ = list.append(tile.into_py(py)); // let _ ignores the possible error returned by `into_py()`
-    //     }
-    //     list.into()
-    // }
 }
 
 #[derive(Clone)]

@@ -1,5 +1,5 @@
 """
-.. _example tile:
+.. _example tiles:
 
 Grid Tiles
 ==========
