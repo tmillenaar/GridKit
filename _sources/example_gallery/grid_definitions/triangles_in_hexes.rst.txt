@@ -286,7 +286,7 @@ Wea. Forecasting, 18, 918–932, `https://doi.org/10.1175/1520-0434(2003)018\<09
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.547 seconds)
+   **Total running time of the script:** (0 minutes 0.511 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_triangles_in_hexes.py:
@@ -302,6 +302,10 @@ Wea. Forecasting, 18, 918–932, `https://doi.org/10.1175/1520-0434(2003)018\<09
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: triangles_in_hexes.py <triangles_in_hexes.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: triangles_in_hexes.zip <triangles_in_hexes.zip>`
 
 
 .. only:: html

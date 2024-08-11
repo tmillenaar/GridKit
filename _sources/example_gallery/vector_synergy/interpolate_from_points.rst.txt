@@ -176,7 +176,7 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.626 seconds)
+   **Total running time of the script:** (0 minutes 0.684 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_interpolate_from_points.py:
@@ -192,6 +192,10 @@ but are within the selected bounds, get a `nodata_value` as specified in ``inter
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: interpolate_from_points.py <interpolate_from_points.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: interpolate_from_points.zip <interpolate_from_points.zip>`
 
 
 .. only:: html

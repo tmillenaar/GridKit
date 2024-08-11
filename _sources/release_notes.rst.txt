@@ -3,6 +3,25 @@
 Release notes
 ================
 
+Version 0.14.0 (August 11, 2024)
+--------------------------------
+Featrures
+ - A new :class:`.Tile` class that references a set of cells and has some convenience methods
+   that describe the tile, such as :attr:`.Tile.indices` and :attr:`.Tile.corners`.
+   This class is takes a similar role to the :meth:`.BaseGrid.cells_in_bounds` method,
+   but is able to work with rotated grids. The intent is that in the long run a DataTile
+   will replace the BoundedGrid for this reason.
+
+Documentation
+ - Add example :ref:`tiles.py <example tiles>` which explains the usage of the new :class:`.Tile` class.
+ - Use more neighbours in example :ref:`flower_of_life.py <example flower of life>` since the final flower
+   was missing some circles in the bottom left.
+
+Misc
+ - Rename the PyO3 classes PyTriGrid, PyRectGrid and PyHexGrid to PyO3TriGrid, PyO3RectGrid and PyO3HexGrid, respectively.
+   This is done to avoid confusion. From the Rust perspective these represent Python classes but from the Python perspective
+   these represent Rust classes. PyO3 seems to be less ambiguous for it makes sense from both perspectives.
+
 Version 0.13.0 (July 10, 2024)
 -----------------------------
 Features

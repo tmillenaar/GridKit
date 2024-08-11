@@ -43,7 +43,7 @@ I will anchor a corner to a chosen center such that it is easier to reason about
     from gridkit import HexGrid
 
     center = [0, 0]
-    depth = 2
+    depth = 3
 
     grid = HexGrid(size=1, rotation=0).anchor(center)
 
@@ -233,7 +233,7 @@ such that they do not cross the outer border.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.415 seconds)
+   **Total running time of the script:** (0 minutes 0.371 seconds)
 
 
 .. _sphx_glr_download_example_gallery_patterns_flower_of_life.py:
@@ -249,6 +249,10 @@ such that they do not cross the outer border.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: flower_of_life.py <flower_of_life.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: flower_of_life.zip <flower_of_life.zip>`
 
 
 .. only:: html

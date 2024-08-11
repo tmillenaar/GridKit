@@ -244,7 +244,7 @@ Now the purple grid is colored, based on it's relation to the orange grid.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.622 seconds)
+   **Total running time of the script:** (0 minutes 0.637 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_selecting_cells.py:
@@ -260,6 +260,10 @@ Now the purple grid is colored, based on it's relation to the orange grid.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: selecting_cells.py <selecting_cells.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: selecting_cells.zip <selecting_cells.zip>`
 
 
 .. only:: html

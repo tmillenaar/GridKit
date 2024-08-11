@@ -227,7 +227,7 @@ See :ref:`example selecting cells` for a example where this is done.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.522 seconds)
+   **Total running time of the script:** (0 minutes 0.418 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_hex_grids.py:
@@ -243,6 +243,10 @@ See :ref:`example selecting cells` for a example where this is done.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: hex_grids.py <hex_grids.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: hex_grids.zip <hex_grids.zip>`
 
 
 .. only:: html

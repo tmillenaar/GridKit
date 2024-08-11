@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit.hex_grid &mdash; GridKit v0.13.0 documentation</title>
+  <title>gridkit.hex_grid &mdash; GridKit v0.14.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -18,7 +18,7 @@
   
         <script src="../../_static/jquery.js?v=5d32c60e"></script>
         <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=ec23e288"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
         <script src="../../_static/doctools.js?v=888ff710"></script>
         <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -38,7 +38,7 @@
             GridKit
           </a>
               <div class="version">
-                v0.13.0
+                v0.14.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -92,7 +92,7 @@
 <span class="kn">from</span> <span class="nn">gridkit.base_grid</span> <span class="kn">import</span> <span class="n">BaseGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.bounded_grid</span> <span class="kn">import</span> <span class="n">BoundedGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.errors</span> <span class="kn">import</span> <span class="n">AlignmentError</span><span class="p">,</span> <span class="n">IntersectionError</span>
-<span class="kn">from</span> <span class="nn">gridkit.gridkit_rs</span> <span class="kn">import</span> <span class="n">PyHexGrid</span><span class="p">,</span> <span class="n">interp</span>
+<span class="kn">from</span> <span class="nn">gridkit.gridkit_rs</span> <span class="kn">import</span> <span class="n">PyO3HexGrid</span><span class="p">,</span> <span class="n">interp</span>
 <span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span><span class="p">,</span> <span class="n">validate_index</span>
 <span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
 <span class="kn">from</span> <span class="nn">gridkit.tri_grid</span> <span class="kn">import</span> <span class="n">TriGrid</span>
@@ -208,7 +208,7 @@
             <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span> <span class="o">=</span> <span class="n">shape</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyHexGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">PyO3HexGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span> <span class="o">=</span> <span class="n">BoundedHexGrid</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">HexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
@@ -855,7 +855,7 @@
             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
                 <span class="n">rotation</span> <span class="o">=</span> <span class="o">-</span><span class="n">rotation</span>
-        <span class="k">return</span> <span class="n">PyHexGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PyO3HexGrid</span><span class="p">(</span><span class="n">cellsize</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HexGrid.update"><a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

@@ -22,7 +22,7 @@ I will anchor a corner to a chosen center such that it is easier to reason about
 from gridkit import HexGrid
 
 center = [0, 0]
-depth = 2
+depth = 3
 
 grid = HexGrid(size=1, rotation=0).anchor(center)
 

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.415** total execution time for 1 file **from example_gallery/patterns**:
+**00:00.371** total execution time for 1 file **from example_gallery/patterns**:
 
 .. container::
 
@@ -33,5 +33,5 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_patterns_flower_of_life.py` (``flower_of_life.py``)
-     - 00:00.415
+     - 00:00.371
      - 0.0

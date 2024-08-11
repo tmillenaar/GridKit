@@ -241,7 +241,7 @@ This example can of course also be used to upsample your data.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.598 seconds)
+   **Total running time of the script:** (0 minutes 0.623 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_resampling.py:
@@ -257,6 +257,10 @@ This example can of course also be used to upsample your data.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: resampling.py <resampling.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: resampling.zip <resampling.zip>`
 
 
 .. only:: html
