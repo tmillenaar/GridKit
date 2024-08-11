@@ -68,7 +68,6 @@ class Tile:
             else tuple(start_id)
         )
 
-        self.grid = grid
         if isinstance(grid, TriGrid):
             self._tile = PyO3TriTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, RectGrid):
@@ -79,6 +78,7 @@ class Tile:
             raise TypeError(
                 f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
             )
+        self.grid = grid.update()
 
     @property
     def start_id(self):
@@ -121,6 +121,7 @@ class Tile:
         """
         return self._tile.corners()
 
+    @property
     def indices(self):
         """The ids of all cells in the Tile.
 
@@ -131,6 +132,7 @@ class Tile:
         """
         return GridIndex(self._tile.indices())
 
+    @property
     def bounds(self) -> Tuple[float, float, float, float]:
         """The bounding box of the Tile in (xmin, ymin, xmax, ymax).
         If the associated grid is rotated, the this represents the bounding box

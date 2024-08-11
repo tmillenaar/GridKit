@@ -91,7 +91,7 @@ def test_corners(grid, start_id, nx, ny, rotation):
 def test_indices(grid, start_id, nx, ny, rotation):
     grid.rotation = rotation
     tile = Tile(grid, start_id, nx, ny)
-    indices = tile.indices()
+    indices = tile.indices
     assert isinstance(indices, GridIndex)
     assert len(indices) == nx * ny
     assert len(indices.unique()) == nx * ny  # Make sure there are no duplicate indices
@@ -112,7 +112,7 @@ def test_indices(grid, start_id, nx, ny, rotation):
 def test_bounds(grid, start_id, nx, ny, rotation):
     grid.rotation = rotation
     tile = Tile(grid, start_id, nx, ny)
-    bounds = tile.bounds()
+    bounds = tile.bounds
     corners = tile.corners()
 
     numpy.testing.assert_allclose(bounds[0], corners[:, 0].min())
