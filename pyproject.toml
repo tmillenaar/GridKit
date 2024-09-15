@@ -6,8 +6,8 @@ build-backend = "maturin"
 name = "gridkit"
 version = "0.1.0.dev"
 readme = "README.md"
-authors = [{name="Timo Millenaar", email="tmillenaar@gmail.com"}]
-requires-python = ">=3.8"
+authors = [{ name = "Timo Millenaar", email = "tmillenaar@gmail.com" }]
+requires-python = ">=3.9"
 description = "Powerful abstractions of infinite grids for grid-vector interactions, tesselation, resampling and interactions between related grids."
 dependencies = ["numpy", "scipy", "shapely", "rasterio", "pyproj"]
 classifiers = [
@@ -25,7 +25,7 @@ doc = [
     "sphinxcontrib-plantuml",
     "geopandas",
     "dask",
-    "matplotlib"
+    "matplotlib",
 ]
 test = [
     "sphinx",
@@ -36,13 +36,13 @@ test = [
     "dask",
     "matplotlib",
     "black",
-    "pytest<8.0", # pin for error when running pytest: `pluggy._manager.PluginValidationError: Plugin 'black' for hook 'pytest_collect_file'`
+    "pytest<8.0",             # pin for error when running pytest: `pluggy._manager.PluginValidationError: Plugin 'black' for hook 'pytest_collect_file'`
     "pytest-cov",
     "pytest-pylint",
     "pytest-black",
     "pylint",
     "pre-commit",
-    "maturin"
+    "maturin",
 ]
 
 [tool.maturin]
