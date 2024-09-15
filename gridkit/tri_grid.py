@@ -94,7 +94,7 @@ class TriGrid(BaseGrid):
 
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
-        return (area / 3**0.5) ** 0.5
+        return 2 * (area / 3**0.5) ** 0.5
 
     @property
     def dx(self) -> float:
@@ -113,14 +113,14 @@ class TriGrid(BaseGrid):
 
     @property
     def side_length(self):
-        """The lenght of the side of a cell.
-        The length is the same as 2 * :meth:`.HexGrid.dx`."""
-        return 2 * self.dx
+        """The length of the side of a cell.
+        For a TriGrid, the side length is the same as :meth:`.HexGrid.size`."""
+        return self.size
 
     def _side_length_to_size(self, side_length):
         """Find the ``size`` that corresponds to the specified length of the side of a cell.
         In the case of a TriGrid that is 1/3rd the outline of the cell."""
-        return side_length / 2
+        return side_length
 
     @validate_index
     def centroid(self, index):
@@ -212,7 +212,7 @@ class TriGrid(BaseGrid):
                 f"Got a 'factor' that is not a whole number. Please supply an integer. Got: {factor}"
             )
 
-        sub_grid = self.update(size=self.dx / factor, rotation=self.rotation)
+        sub_grid = self.update(size=self.size / factor, rotation=self.rotation)
         anchor_loc = self.cell_corners([0, 0])[0]
         sub_grid.anchor(anchor_loc, cell_element="corner", in_place=True)
         return sub_grid
@@ -362,9 +362,7 @@ class TriGrid(BaseGrid):
         new_offset = transformer.transform(*self.offset)
         point_start = transformer.transform(0, 0)
 
-        point_end = transformer.transform(
-            self.dx, 0
-        )  # likely different for shape='flat'
+        point_end = transformer.transform(self.size, 0)
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
         return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
@@ -527,7 +525,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         dx = (bounds[2] - bounds[0]) / data.shape[1]
         dy = (bounds[3] - bounds[1]) / data.shape[0]
 
-        if not numpy.isclose(dy, dx * 3**0.5):
+        if not numpy.isclose(dy, (dx * 3**0.5)):
             raise ValueError(
                 "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
             )
@@ -542,7 +540,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         )
 
         super(BoundedTriGrid, self).__init__(
-            data, *args, size=dx, bounds=bounds, offset=offset, **kwargs
+            data, *args, size=2 * dx, bounds=bounds, offset=offset, **kwargs
         )
 
         if not self.are_bounds_aligned(bounds):
@@ -731,7 +729,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
         ids = numpy.array(
-            [index_topleft.x + np_index[1], index_topleft.y - np_index[0]]
+            [index_topleft.x + np_index[1] - 1, index_topleft.y - np_index[0]]
         )
         return GridIndex(ids.T)
 
@@ -741,6 +739,9 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
             raise ValueError(
                 "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
             )
-        centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
+        centroid_topleft = (
+            self.bounds[0] + self.cell_width / 2,
+            self.bounds[3] - self.cell_height / 2,
+        )
         index_topleft = self.cell_at_point(centroid_topleft)
-        return (index_topleft.y - index.y, index.x - index_topleft.x)
+        return (index_topleft.y - index.y, index.x - index_topleft.x + 1)

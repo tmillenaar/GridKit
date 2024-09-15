@@ -1,13 +1,13 @@
 import numpy
 import pytest
 
-from gridkit import RectGrid, TriGrid
+from gridkit import BoundedTriGrid, RectGrid, TriGrid
 from gridkit.index import GridIndex
 
 
 @pytest.mark.parametrize(
     "size, expected_radius",
-    [(0.5, 0.5773502691896257), (0.6, 0.6928203230275508), (1.55, 1.78978583448784)],
+    [(0.5, 0.28867513459481287), (0.6, 0.3464101615137754), (1.55, 0.89489291724392)],
 )
 def test_radius(size, expected_radius):
     grid = TriGrid(size=size)
@@ -52,13 +52,13 @@ def test_centroid(indices, offset, expected_centroids):
 @pytest.mark.parametrize(
     "indices, expected_corners",
     [
-        [(-1, -1), [[-2.25, -5.19615242], [-0.75, -2.59807621], [-3.75, -2.59807621]]],
+        [(-1, -1), [[0, 0], [0.75, -1.29903811], [-0.75, -1.29903811]]],
         [
             [(0, 0), (1, -1), (1, 1)],
             [
-                [[-0.75, -2.59807621], [0.75, 0.0], [-2.25, 0.0]],
-                [[0.75, -5.19615242], [2.25, -2.59807621], [-0.75, -2.59807621]],
-                [[0.75, 0.0], [2.25, 2.59807621], [-0.75, 2.59807621]],
+                [[0.75, 1.29903811], [1.5, 0.0], [0.0, 0.0]],
+                [[1.5, 0.0], [2.25, -1.29903811], [0.75, -1.29903811]],
+                [[1.5, 2.59807621], [2.25, 1.29903811], [0.75, 1.29903811]],
             ],
         ],
     ],
@@ -69,7 +69,6 @@ def test_cell_corners(indices, offset, expected_corners):
     corners = grid.cell_corners(indices)
     corners -= grid.offset
     expected_corners = numpy.array(expected_corners)
-
     numpy.testing.assert_allclose(corners, expected_corners, atol=1e-8)
 
 
@@ -78,21 +77,42 @@ def test_cell_corners(indices, offset, expected_corners):
     (
         [
             (-2.2, 5.7),
-            [-3, 5],
+            [-4, 4],
         ],
         [
             [(-0.3, -7.5), (3.6, -8.3)],
-            [[0, -6], [5, -6]],
+            [[-2, -7], [4, -7]],
         ],
     ),
 )
 @pytest.mark.parametrize("offset", ((0, 0), (-0.7, 0.3), (1, -0.2)))
 def test_cell_at_point(points, offset, expected_ids):
     points = numpy.array(points)
-    grid = TriGrid(size=0.7, offset=offset)
+    grid = TriGrid(size=1.4, offset=offset)
     points += grid.offset
     ids = grid.cell_at_point(points)
     numpy.testing.assert_allclose(ids, expected_ids)
+
+
+def test_cell_at_point_v2():
+    grid = TriGrid(size=0.3, offset=(0.25, 0.15))
+
+    b = (-2, -2, 2, 2)
+    px = numpy.linspace(b[0], b[2], 33)
+    py = numpy.linspace(b[1], b[3], 100)
+    xx, yy = numpy.meshgrid(px, py)
+    points = numpy.stack([xx.ravel(), yy.ravel()]).T
+
+    ids = grid.cell_at_point(points)
+    import shapely
+    import shapely.geometry
+
+    correct = []
+    geoms = grid.to_shapely(ids)
+    for id, point, geom in zip(ids, points, geoms):
+        assert geom.contains(
+            shapely.geometry.Point(point)
+        ), f"Shape does not contain point for point:{point} and id:{id}"
 
 
 @pytest.mark.parametrize(
@@ -101,72 +121,72 @@ def test_cell_at_point(points, offset, expected_ids):
         [
             (-2.2, -3, 2.3, 2.1),
             [
-                [-2, 2],
-                [-1, 2],
-                [0, 2],
-                [1, 2],
-                [2, 2],
-                [3, 2],
+                [-4, 1],
+                [-3, 1],
                 [-2, 1],
                 [-1, 1],
                 [0, 1],
                 [1, 1],
-                [2, 1],
-                [3, 1],
+                [-4, 0],
+                [-3, 0],
                 [-2, 0],
                 [-1, 0],
                 [0, 0],
                 [1, 0],
-                [2, 0],
-                [3, 0],
+                [-4, -1],
+                [-3, -1],
                 [-2, -1],
                 [-1, -1],
                 [0, -1],
                 [1, -1],
-                [2, -1],
-                [3, -1],
+                [-4, -2],
+                [-3, -2],
+                [-2, -2],
+                [-1, -2],
+                [0, -2],
+                [1, -2],
             ],
             (4, 6),
         ],
         [
             (2.2, 3, 5.3, 6.1),
             [
-                [4, 5],
-                [5, 5],
-                [6, 5],
-                [7, 5],
-                [8, 5],
+                [2, 4],
+                [3, 4],
                 [4, 4],
                 [5, 4],
                 [6, 4],
-                [7, 4],
-                [8, 4],
+                [2, 3],
+                [3, 3],
                 [4, 3],
                 [5, 3],
                 [6, 3],
-                [7, 3],
-                [8, 3],
+                [2, 2],
+                [3, 2],
+                [4, 2],
+                [5, 2],
+                [6, 2],
             ],
             (3, 5),
         ],
         [
             (-5.3, -6.1, -2.2, -3),
             [
-                [-7, -2],
-                [-6, -2],
-                [-5, -2],
-                [-4, -2],
-                [-3, -2],
+                [-9, -3],
+                [-8, -3],
                 [-7, -3],
                 [-6, -3],
                 [-5, -3],
-                [-4, -3],
-                [-3, -3],
+                [-9, -4],
+                [-8, -4],
                 [-7, -4],
                 [-6, -4],
                 [-5, -4],
-                [-4, -4],
-                [-3, -4],
+                [-9, -5],
+                [-8, -5],
+                [-7, -5],
+                [-6, -5],
+                [-5, -5],
             ],
             (3, 5),
         ],
@@ -174,10 +194,11 @@ def test_cell_at_point(points, offset, expected_ids):
 )
 @pytest.mark.parametrize("return_cell_count", [True, False])
 def test_cells_in_bounds(bounds, expected_ids, expected_shape, return_cell_count):
-    grid = TriGrid(size=0.7)
+    grid = TriGrid(size=1.4)
     bounds = grid.align_bounds(bounds, "nearest")
     result = grid.cells_in_bounds(bounds, return_cell_count=return_cell_count)
     expected_ids = numpy.array(expected_ids).reshape((*expected_shape, 2))
+
     if return_cell_count is False:
         numpy.testing.assert_allclose(result, expected_ids)
     else:
@@ -337,42 +358,42 @@ def test_is_cell_upright():
     xx, yy = numpy.meshgrid(cells, cells)
     cells = numpy.stack([xx.ravel(), yy.ravel()]).T
     expected_results = [
-        False,  # 1st row
-        True,
-        False,
-        True,
-        False,
-        True,
-        True,  # 2nd row
+        True,  # 1st row
         False,
         True,
         False,
         True,
         False,
-        False,  # 3rd row
+        False,  # 2nd row
         True,
         False,
         True,
         False,
         True,
-        True,  # 4rth row
+        True,  # 3rd row
         False,
         True,
         False,
         True,
         False,
-        False,  # 5th row
+        False,  # 4th row
         True,
         False,
         True,
         False,
         True,
-        True,  # 6th row
+        True,  # 5th row
         False,
         True,
         False,
         True,
         False,
+        False,  # 6th row
+        True,
+        False,
+        True,
+        False,
+        True,
     ]
     # test single cell as input
     result = grid.is_cell_upright(cells[0])
@@ -388,78 +409,57 @@ def test_is_cell_upright():
         # Quadrant 1 (++)
         (
             [
-                [2.6, 1.5],
-                [2.3, 1.75],
-                [2, 1.5],
-                [2, 1],
-                [2.3, 1],
-                [2.6, 1.1],
+                [2.1, 3.1],
+                [2.3, 3.1],
+                [2.5, 3.1],
+                [2.1, 2.7],
+                [2.3, 2.7],
+                [2.5, 2.7],
             ],
-            [
-                [3, 2],
-                [4, 2],
-                [5, 2],
-                [3, 1],
-                [4, 1],
-                [5, 1],
-            ],
+            [[5, 5], [6, 5], [7, 5], [5, 4], [6, 4], [7, 4]],
         ),
         # Quadrant 2 (-+)
         (
             [
-                [-2, 1.5],
-                [-2.5, 1.75],
-                [-2.8, 1.5],
-                [-2.8, 1],
-                [-2.5, 1],
-                [-2, 1],
+                [2.4, -2.8],
+                [2.6, -2.8],
+                [2.8, -2.8],
+                [2.4, -3],
+                [2.6, -3],
+                [2.8, -3],
             ],
-            [
-                [-5, 2],
-                [-4, 2],
-                [-3, 2],
-                [-5, 1],
-                [-4, 1],
-                [-3, 1],
-            ],
+            [[6, -6], [7, -6], [8, -6], [6, -7], [7, -7], [8, -7]],
         ),
         # Quadrant 3 (--)
         (
             [
-                [-2.2, -0.5],
-                [-2.5, -0.3],
-                [-2.8, -0.5],
-                [-2.8, -1],
-                [-2.5, -1],
-                [-2, -1],
+                [-2.4, -2.8],
+                [-2.2, -2.8],
+                [-2.0, -2.8],
+                [-2.4, -3],
+                [-2.2, -3],
+                [-2.0, -3],
             ],
             [
-                [-5, 0],
-                [-4, 0],
-                [-3, 0],
-                [-5, -1],
-                [-4, -1],
-                [-3, -1],
+                [-10, -6],
+                [-9, -6],
+                [-8, -6],
+                [-10, -7],
+                [-9, -7],
+                [-8, -7],
             ],
         ),
         # Quadrant 4 (+-)
         (
             [
-                [2.6, -0.5],
-                [2.3, -0.5],
-                [2, -0.5],
-                [2, -1],
-                [2.3, -1],
-                [2.6, -1],
+                [2.4, -0.6],
+                [2.6, -0.6],
+                [2.8, -0.6],
+                [2.4, -0.8],
+                [2.6, -0.8],
+                [2.8, -0.8],
             ],
-            [
-                [3, 0],
-                [4, 0],
-                [5, 0],
-                [3, -1],
-                [4, -1],
-                [5, -1],
-            ],
+            [[6, -2], [7, -2], [8, -2], [6, -3], [7, -3], [8, -3]],
         ),
     ],
 )
@@ -486,9 +486,9 @@ def test_bounded_crop(basic_bounded_tri_grid, crs):
     grid = basic_bounded_tri_grid
     grid.crs = 4326
     if crs == 3857:
-        bounds = (-55659.9, -334111.1714019596, 222639, 557305.2572745768)
+        bounds = (0.0, -111325.1428663851, 222638.98158654713, 222684.20850554405)
     else:
-        bounds = (-0.5, -3, 2, 5)
+        bounds = (0, -1, 2, 2)
     result = grid.crop(bounds, bounds_crs=crs)
     expected_result = numpy.array([[4, 5], [7, 8], [10, 11]])
     numpy.testing.assert_allclose(result, expected_result)
@@ -558,17 +558,17 @@ def test_to_crs(basic_bounded_tri_grid):
     numpy.testing.assert_allclose(
         grid_3857.bounds,
         (
-            -111319.49079327357,
-            -385622.02785329137,
-            222638.98158654713,
-            578433.041779937,
+            -55659.745397,
+            -192811.013927,
+            111319.490793,
+            289216.52089,
         ),
     )
 
     # make sure the original grid is not modified
     assert grid.crs.to_epsg() == 4326
     numpy.testing.assert_allclose(
-        grid.bounds, (-1.0, -3.4641016151377544, 2.0, 5.196152422706632)
+        grid.bounds, (-0.5, -1.7320508075688772, 1.0, 2.598076211353316)
     )
 
     numpy.testing.assert_allclose(grid.data, grid_3857.data)
@@ -582,7 +582,7 @@ def test_centroid(basic_bounded_tri_grid):
 
 
 @pytest.mark.parametrize(
-    "method, expected_result, expected_bounds",
+    "method, expected_result",
     (
         (
             "nearest",
@@ -593,29 +593,26 @@ def test_centroid(basic_bounded_tri_grid):
                 [9, 10, 11],
                 [12, 13, 14],
             ],
-            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
         ),
         (
             "bilinear",
             [
-                [0.55, 1.25625, 2.45],
-                [-371.9, -79.07916667, -286.8],
-                [6.1, 7.03125, 8.01875],
-                [8.95, 9.91875, 10.83125],
-                [-363.4625, -70.72916667, -278.2375],
+                [0.575, 1.3, 2.475],
+                [-330.21666667, 4.3, -328.45],
+                [6.125, 7.075, 8.025],
+                [8.975, 9.925, 10.875],
+                [-321.71666667, 12.7, -319.95],
             ],
-            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
         ),
         (
             "inverse_distance",
             [
-                [1.00661862e00, 1.13920527e00, 2.61187704e00],
-                [-1.91589670e03, -1.61174343e02, -1.72505596e03],
-                [6.79363706e00, 7.07606798e00, 8.33899655e00],
-                [8.63365569e00, 9.88625995e00, 1.01918447e01],
-                [-1.90876942e03, -1.53685443e02, -1.71776924e03],
+                [1.98492073e00, 1.98775171e00, 2.59223915e00],
+                [-3.11530678e03, -1.84398639e03, -3.11458621e03],
+                [7.89146730e00, 7.90130833e00, 8.49507949e00],
+                [8.50492051e00, 9.09869167e00, 9.10853270e00],
+                [-3.11033141e03, -1.83865101e03, -3.10961083e03],
             ],
-            (-0.95, -3.2908965343808667, 1.9, 4.9363448015713),
         ),
     ),
 )
@@ -623,12 +620,13 @@ def test_resample(
     basic_bounded_tri_grid,
     method,
     expected_result,
-    expected_bounds,
 ):
     grid = basic_bounded_tri_grid
     new_grid = TriGrid(size=0.95)
 
     resampled = grid.resample(new_grid, method=method)
+
+    expected_bounds = (-0.475, -1.6454482671904334, 0.95, 2.46817240078565)
 
     numpy.testing.assert_allclose(resampled.data, expected_result)
     numpy.testing.assert_allclose(resampled.bounds, expected_bounds)
@@ -637,8 +635,8 @@ def test_resample(
 @pytest.mark.parametrize("rot", (0, 15.5, 30, -26.2))
 def test_centering_with_offset(rot):
     grid = TriGrid(size=3, rotation=rot)
-    grid.offset = (grid.dx / 2, grid.dy - grid.r)
-    numpy.testing.assert_allclose(grid.centroid([0, 0]), [0, 0])
+    grid.offset = (grid.dx, grid.dy - grid.r)
+    numpy.testing.assert_allclose(grid.centroid([-2, -1]), [0, 0])
 
 
 @pytest.mark.parametrize(
@@ -677,7 +675,7 @@ def test_update():
     numpy.testing.assert_allclose(new_grid.rotation, 2.5)
 
     new_grid = grid.update(area=4)
-    numpy.testing.assert_allclose(grid.area, 3**0.5)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 4)
     numpy.testing.assert_allclose(new_grid.area, 4)
 
 
@@ -695,7 +693,7 @@ def test_size_setter():
 
 def test_area_setter():
     grid = TriGrid(size=1, rotation=10)
-    numpy.testing.assert_allclose(grid.area, 3**0.5)
+    numpy.testing.assert_allclose(grid.area, 3**0.5 / 4)
     grid.area = 3.21
     numpy.testing.assert_allclose(grid.area, 3.21)
 
@@ -727,6 +725,7 @@ def test_area(size):
 @pytest.mark.parametrize("cell_element", ["centroid", "corner"])
 def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
     grid = TriGrid(size=0.3, offset=starting_offset, rotation=rot)
+    # grid = TriGrid(size=1)
 
     if in_place:
         grid.anchor(target_loc, cell_element=cell_element, in_place=True)
@@ -735,6 +734,18 @@ def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
         new_grid = grid.anchor(target_loc, cell_element=cell_element, in_place=False)
 
     if cell_element == "centroid":
+        # from gridkit.doc_utils import plot_polygons
+        # import matplotlib.pyplot as plt
+        # id = new_grid.cell_at_point(target_loc)
+        # print(f"id: {id.index}")
+        # ids = new_grid.neighbours(id, depth=3, connect_corners=False, include_selected=False)
+        # # plot_polygons(grid.to_shapely(id, as_multipolygon=True), alpha=0.3)
+        # plot_polygons(grid.to_shapely(ids, as_multipolygon=True), fill=True, colors="pink", linewidth=2, alpha=0.8)
+        # ids2 = new_grid.neighbours(id, depth=6, connect_corners=True, include_selected=True)
+        # plot_polygons(grid.to_shapely(ids2, as_multipolygon=True), fill=False, colors="black", linewidth=2, alpha=0.8)
+        # plt.scatter(*target_loc, marker="d", s=300)
+        # plt.show()
+        # # breakpoint()
         numpy.testing.assert_allclose(
             new_grid.centroid(new_grid.cell_at_point(target_loc)),
             target_loc,
@@ -758,13 +769,13 @@ def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
     [
         (
             "centroid",
-            (-0.4, -1.809401076758503, 1.6, 5.118802153517006),
+            (-0.4, -0.9433756729740643, 0.6, 2.52072594216369),
             numpy.array([[0, 1], [3, 4], [6, 7], [9, 10]]),
         ),
         (
             "corner",
-            (-0.4, -2.9641016151377544, 1.6, 3.9641016151377544),
-            numpy.array([[3, 5], [7, 7], [9, 11], [13, 13]]),
+            (-0.4, -1.2320508075688772, 0.6, 2.232050807568877),
+            numpy.array([[0, 5], [7, 4], [6, 11], [13, 10]]),
         ),
     ],
 )
@@ -802,7 +813,7 @@ def test_subdivide(factor, rotation, offset, crs):
     subcells_near_cell = subgrid.neighbours(
         subgrid.cell_at_point(target),
         connect_corners=True,
-        depth=factor,
+        depth=factor + 1,
         include_selected=True,
     )
     centroids = subgrid.centroid(subcells_near_cell)
@@ -841,3 +852,16 @@ def test_init_multiple_sizes_error():
 
     with pytest.raises(ValueError):
         grid = TriGrid()
+
+
+@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
+def test_auto_bound_init(shape):
+    data = numpy.ones(shape)
+    grid = BoundedTriGrid(data)
+
+    numpy.testing.assert_allclose(grid.bounds[0], 0)
+    numpy.testing.assert_allclose(grid.bounds[1], 0)
+    numpy.testing.assert_allclose(grid.height, shape[0])
+    numpy.testing.assert_allclose(grid.width, shape[1])
+    numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[1])
+    numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[0])

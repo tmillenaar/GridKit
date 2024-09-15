@@ -559,31 +559,3 @@ def test_grid_id_to_numpy_id_back_and_forth(
     np_ids = grid.grid_id_to_numpy_id(grid.indices.ravel())
     grid_ids = grid.numpy_id_to_grid_id(np_ids)
     numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
-
-
-@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
-@pytest.mark.parametrize(
-    "GridType, init_kwargs",
-    [
-        (BoundedTriGrid, {}),
-        (BoundedRectGrid, {}),
-        (BoundedHexGrid, {"shape": "flat"}),
-        (BoundedHexGrid, {"shape": "pointy"}),
-    ],
-)
-def test_auto_bound_init(shape, GridType, init_kwargs):
-    data = numpy.ones(shape)
-    grid = GridType(data, **init_kwargs)
-
-    numpy.testing.assert_allclose(grid.bounds[0], 0)
-    numpy.testing.assert_allclose(grid.bounds[1], 0)
-    if init_kwargs.get("shape", None) == "flat":
-        numpy.testing.assert_allclose(grid.height, shape[1])
-        numpy.testing.assert_allclose(grid.width, shape[0])
-        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[0])
-        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[1])
-    else:
-        numpy.testing.assert_allclose(grid.height, shape[0])
-        numpy.testing.assert_allclose(grid.width, shape[1])
-        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[1])
-        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[0])

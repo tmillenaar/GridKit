@@ -685,3 +685,16 @@ def test_init_multiple_sizes_error():
 
     with pytest.raises(ValueError):
         grid = RectGrid()
+
+
+@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
+def test_auto_bound_init(shape):
+    data = numpy.ones(shape)
+    grid = BoundedRectGrid(data)
+
+    numpy.testing.assert_allclose(grid.bounds[0], 0)
+    numpy.testing.assert_allclose(grid.bounds[1], 0)
+    numpy.testing.assert_allclose(grid.height, shape[0])
+    numpy.testing.assert_allclose(grid.width, shape[1])
+    numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[1])
+    numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[0])

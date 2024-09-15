@@ -642,22 +642,22 @@ def test_subdivide(factor, rotation, offset, crs):
     subgrid = grid.subdivide(factor)
 
     # Test for new gridsize
-    numpy.testing.assert_allclose(grid.r / factor / 2, subgrid.dx)
+    numpy.testing.assert_allclose(grid.r / factor, subgrid.cell_width)
 
     # Test for overlapping corners
     corner = grid.cell_corners([-4, 23])[-1]
     sub_corners = subgrid.cell_corners(subgrid.cell_at_point(corner))
+
     assert numpy.any(numpy.isclose(sub_corners, corner))
 
     # Test for nr of cells in parent cell
     target_cell = GridIndex([3, -2])
     target = grid.centroid(target_cell)
 
-    # subcells_near_cell = subgrid.intersect_geometries(cell_geom)
     subcells_near_cell = subgrid.neighbours(
         subgrid.cell_at_point(target),
         connect_corners=True,
-        depth=factor,
+        depth=factor + 1,
         include_selected=True,
     )
     centroids = subgrid.centroid(subcells_near_cell)
@@ -665,10 +665,29 @@ def test_subdivide(factor, rotation, offset, crs):
     mask = subcells_in_cell.index_1d == target_cell.index_1d
     nr_subcells_in_cell = sum(mask)
     expected_nr_subcells_in_cell = 6 * factor**2
-
     assert nr_subcells_in_cell == expected_nr_subcells_in_cell
 
     if grid.crs is None:
         assert subgrid.crs is None
     else:
         assert grid.crs.is_exact_same(subgrid.crs)
+
+
+@pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
+@pytest.mark.parametrize("cell_shape", ["flat", "pointy"])
+def test_auto_bound_init(shape, cell_shape):
+    data = numpy.ones(shape)
+    grid = BoundedHexGrid(data, shape=cell_shape)
+
+    numpy.testing.assert_allclose(grid.bounds[0], 0)
+    numpy.testing.assert_allclose(grid.bounds[1], 0)
+    if cell_shape == "flat":
+        numpy.testing.assert_allclose(grid.height, shape[1])
+        numpy.testing.assert_allclose(grid.width, shape[0])
+        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[0])
+        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[1])
+    else:
+        numpy.testing.assert_allclose(grid.height, shape[0])
+        numpy.testing.assert_allclose(grid.width, shape[1])
+        numpy.testing.assert_allclose(grid.bounds[2] / grid.dx, shape[1])
+        numpy.testing.assert_allclose(grid.bounds[3] / grid.dy, shape[0])

@@ -50,10 +50,10 @@ import matplotlib.pyplot as plt
 from gridkit import HexGrid, TriGrid
 from gridkit.doc_utils import plot_polygons
 
-tri_grid = TriGrid(size=0.5)
+tri_grid = TriGrid(size=1)
 hex_grid = HexGrid(size=3 / 3**0.5, shape="flat")
 
-bounds = (-7.5, -5, 6, 5)
+bounds = [-6.8, -5, 6.75, 5]
 
 ax = plt.subplot()
 tri_bounds = tri_grid.align_bounds(bounds, mode="nearest")
@@ -73,19 +73,22 @@ plt.show()
 
 # %%
 #
-# Hooray! The grids are already aligned.
-# It looks like the default origin already works well for this case,
-# but let's say we want to position the hexagon around zero.
-# If the grids don't match I often find it easier to figure out
-# how to shift each grid to origin rather than figure out the
-# relative offset between the grids.
+# The grids seem to be similar in terms of side length. Let's verify this:
+#
+
+print(tri_grid.side_length, hex_grid.side_length)
+import numpy
+
+assert numpy.isclose(tri_grid.side_length, hex_grid.side_length)
+
+# %%
+#
+# The grids are not aligned however. We can use the `anchor` method on both grids
+# to force them to have a corner at the same location, but let's supply a manual offset
+# for educational purposes. Say we want to position the hexagon around zero.
 # From visually inspecting the plot I can tell we'd have to
 # shift the hexagon to the right by half a dx.
-# The triangles though will then need to cross at the origin,
-# so we'd need to either shift them half a side length to the left or
-# 3/4rth of a side length to the right.
-# This works out to half a dx to the left or one and a half dx to the right.
-# Let's do the latter
+# The triangles already cross at the origin so that will do for our usecase.
 #
 # .. Warning ::
 #
@@ -102,7 +105,6 @@ plt.show()
 #
 # ..
 
-tri_grid.offset = (1.5 * tri_grid.dx, 0)
 hex_grid.offset = (0, hex_grid.dx / 2)
 
 ax = plt.subplot()
