@@ -7,7 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.gridkit_rs import PyTriGrid
+from gridkit.gridkit_rs import PyO3TriGrid
 from gridkit.index import GridIndex, validate_index
 
 
@@ -81,7 +81,7 @@ class TriGrid(BaseGrid):
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation
-        self._grid = PyTriGrid(cellsize=size, offset=tuple(offset), rotation=rotation)
+        self._grid = PyO3TriGrid(cellsize=size, offset=tuple(offset), rotation=rotation)
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
@@ -440,7 +440,7 @@ class TriGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
-        return PyTriGrid(cellsize=size, offset=offset, rotation=rotation)
+        return PyO3TriGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
         self, size=None, area=None, offset=None, rotation=None, crs=None, **kwargs

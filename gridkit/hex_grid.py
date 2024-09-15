@@ -7,7 +7,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.gridkit_rs import PyHexGrid, interp
+from gridkit.gridkit_rs import PyO3HexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 from gridkit.tri_grid import TriGrid
@@ -123,7 +123,7 @@ class HexGrid(BaseGrid):
             offset = offset[::-1]
 
         self._shape = shape
-        self._grid = PyHexGrid(cellsize=size, offset=offset, rotation=self._rotation)
+        self._grid = PyO3HexGrid(cellsize=size, offset=offset, rotation=self._rotation)
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
@@ -770,7 +770,7 @@ class HexGrid(BaseGrid):
             rotation = self.rotation
             if self.shape == "flat":
                 rotation = -rotation
-        return PyHexGrid(cellsize=size, offset=offset, rotation=rotation)
+        return PyO3HexGrid(cellsize=size, offset=offset, rotation=rotation)
 
     def update(
         self,

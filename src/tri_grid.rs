@@ -1,69 +1,41 @@
 use std::fmt::Debug;
 
-use numpy::ndarray::*;
+use crate::grid::GridTraits;
 use crate::interpolate;
 use crate::utils::*;
+use numpy::ndarray::*;
 
+#[derive(Clone)]
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
-    pub rotation: f64,
-    pub rotation_matrix: Array2<f64>,
-    pub rotation_matrix_inv: Array2<f64>,
+    pub _rotation: f64,
+    pub _rotation_matrix: Array2<f64>,
+    pub _rotation_matrix_inv: Array2<f64>,
 }
 
-impl TriGrid {
-    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let rotation_matrix = _rotation_matrix(rotation);
-        let rotation_matrix_inv = _rotation_matrix(-rotation);
-        // TODO: Find a way to normalize_offset without having to instantiate tmp object
-        let self_tmp = TriGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv };
-        let offset = normalize_offset(offset, self_tmp.cell_width(), self_tmp.cell_height());
-        let rotation_matrix = _rotation_matrix(rotation);
-        let rotation_matrix_inv = _rotation_matrix(-rotation);
-        TriGrid { cellsize, offset, rotation, rotation_matrix, rotation_matrix_inv }
-    }
-
-    pub fn cell_height(&self) -> f64 {
-        self.dx() * (3_f64).sqrt()
-    }
-
-    pub fn cell_width(&self) -> f64 {
-        self.cellsize
-    }
-
-    pub fn radius(&self) -> f64 {
-        2. / 3. * self.cell_height()
-    }
-
-    pub fn dx(&self) -> f64 {
+impl GridTraits for TriGrid {
+    fn dx(&self) -> f64 {
         self.cellsize / 2.
     }
-
-    pub fn dy(&self) -> f64 {
+    fn dy(&self) -> f64 {
         self.cell_height()
     }
-
-    pub fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
-        let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
-
-        for cell_id in 0..centroids.shape()[0] {
-            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            centroids[Ix2(cell_id, 0)] = point.0;
-            centroids[Ix2(cell_id, 1)] = point.1;
-        }
-
-        if self.rotation != 0. {
-            for cell_id in 0..centroids.shape()[0] {
-                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
-                let cent_rot = self.rotation_matrix.dot(&centroid);
-                centroid.assign(&cent_rot);
-            }
-        }
-        
-        centroids
+    fn offset(&self) -> (f64, f64) {
+        self.offset
     }
-
+    fn radius(&self) -> f64 {
+        2. / 3. * self.cell_height()
+    }
+    fn rotation(&self) -> f64 {
+        self._rotation
+    }
+    fn rotation_matrix(&self) -> Array2<f64> {
+        self._rotation_matrix.clone()
+    }
+    fn rotation_matrix_inv(&self) -> Array2<f64> {
+        self._rotation_matrix_inv.clone()
+    }
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
         let centroid_x = x as f64 * self.dx() + self.dx() + self.offset.0;
         let mut centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
@@ -77,38 +49,87 @@ impl TriGrid {
 
         (centroid_x, centroid_y)
     }
+    fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
+        let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
+
+        for cell_id in 0..centroids.shape()[0] {
+            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            centroids[Ix2(cell_id, 0)] = point.0;
+            centroids[Ix2(cell_id, 1)] = point.1;
+        }
+
+        if self.rotation() != 0. {
+            for cell_id in 0..centroids.shape()[0] {
+                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
+                let cent_rot = self._rotation_matrix.dot(&centroid);
+                centroid.assign(&cent_rot);
+            }
+        }
+
+        centroids
+    }
+}
+impl TriGrid {
+    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        // TODO: Find a way to normalize_offset without having to instantiate tmp object
+        let _rotation = rotation;
+        let self_tmp = TriGrid {
+            cellsize,
+            offset,
+            _rotation,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        };
+        let offset = normalize_offset(offset, self_tmp.cell_width(), self_tmp.cell_height());
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        TriGrid {
+            cellsize,
+            offset,
+            _rotation,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        }
+    }
+
+    pub fn cell_height(&self) -> f64 {
+        self.dx() * (3_f64).sqrt()
+    }
+
+    pub fn cell_width(&self) -> f64 {
+        self.cellsize
+    }
 
     pub fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
         let mut corners = Array3::<f64>::zeros((index.shape()[0], 3, 2));
 
         for cell_id in 0..corners.shape()[0] {
-            let (centroid_x, centroid_y) = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            let (centroid_x, centroid_y) =
+                self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                 corners[Ix3(cell_id, 0, 0)] = centroid_x;
                 corners[Ix3(cell_id, 0, 1)] = centroid_y + self.radius();
                 corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx();
-                corners[Ix3(cell_id, 1, 1)] =
-                    centroid_y - (self.cell_height() - self.radius());
+                corners[Ix3(cell_id, 1, 1)] = centroid_y - (self.cell_height() - self.radius());
                 corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx();
-                corners[Ix3(cell_id, 2, 1)] =
-                    centroid_y - (self.cell_height() - self.radius());
+                corners[Ix3(cell_id, 2, 1)] = centroid_y - (self.cell_height() - self.radius());
             } else {
                 corners[Ix3(cell_id, 0, 0)] = centroid_x;
                 corners[Ix3(cell_id, 0, 1)] = centroid_y - self.radius();
                 corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx();
-                corners[Ix3(cell_id, 1, 1)] =
-                    centroid_y + (self.cell_height() - self.radius());
+                corners[Ix3(cell_id, 1, 1)] = centroid_y + (self.cell_height() - self.radius());
                 corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx();
-                corners[Ix3(cell_id, 2, 1)] =
-                    centroid_y + (self.cell_height() - self.radius());
+                corners[Ix3(cell_id, 2, 1)] = centroid_y + (self.cell_height() - self.radius());
             }
         }
 
-        if self.rotation != 0. {
+        if self.rotation() != 0. {
             for cell_id in 0..corners.shape()[0] {
                 for corner_id in 0..corners.shape()[1] {
                     let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                    let rotated_corner_xy = self.rotation_matrix.dot(&corner_xy);
+                    let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
                     corner_xy.assign(&rotated_corner_xy);
                 }
             }
@@ -120,26 +141,31 @@ impl TriGrid {
         let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
-            let point = self.rotation_matrix_inv.dot(&point);
-
-            let flip_x = if point[Ix1(0)] < self.offset.0 {true} else {false};
-
+            let point = self._rotation_matrix_inv.dot(&point);
+            index[Ix2(cell_id, 0)] =
+                (1. + (point[Ix1(0)] - self.offset.0) / self.dx()).floor() as i64;
             index[Ix2(cell_id, 1)] =
                 ((point[Ix1(1)] - self.offset.1) / self.cell_height()).floor() as i64;
-            index[Ix2(cell_id, 0)] =
-                2 * ((point[Ix1(0)] - self.offset.0 + self.dx() * !iseven(index[Ix2(cell_id, 1)]) as i64 as f64) / self.cell_width()).floor() as i64 -1 * (!iseven(index[Ix2(cell_id, 1)]) as i64);
+            index[Ix2(cell_id, 0)] = 2
+                * ((point[Ix1(0)] - self.offset.0
+                    + self.dx() * !iseven(index[Ix2(cell_id, 1)]) as i64 as f64)
+                    / self.cell_width())
+                .floor() as i64
+                - 1 * (!iseven(index[Ix2(cell_id, 1)]) as i64);
 
             // TODO: Fix this 3rd dimension of cell_id=0. I.e. fix cell_corners needing to take multiple ids at once
-            let cell_origin = self.cell_corners(&index.slice(s![cell_id..cell_id+1, ..]));
-            let cell_origin: ArrayBase<ViewRepr<&f64>, Dim<[usize; 1]>> = cell_origin.slice(s![0, 2, ..]);
+            let cell_origin = self.cell_corners(&index.slice(s![cell_id..cell_id + 1, ..]));
+            let cell_origin: ArrayBase<ViewRepr<&f64>, Dim<[usize; 1]>> =
+                cell_origin.slice(s![0, 2, ..]);
 
             // let cell_origin = self.rotation_matrix_inv.dot(&cell_origin.slice(s![0, .., ..]));
-            let cell_origin: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> = self.rotation_matrix_inv.dot(&cell_origin);
+            let cell_origin: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> =
+                self._rotation_matrix_inv.dot(&cell_origin);
             let cell_origin_x = cell_origin[Ix1(0)];
             let cell_origin_y = cell_origin[Ix1(1)];
             let mut rel_loc_x: f64 = point[Ix1(0)] - cell_origin_x;
             let mut rel_loc_y: f64 = point[Ix1(1)] - cell_origin_y;
-         
+
             let slope = self.dy() / self.dx();
 
             let left_eq = |x: f64| -> f64 {
@@ -148,7 +174,7 @@ impl TriGrid {
             };
             let right_eq = |x: f64| -> f64 {
                 // Descrtibes the equation that forms the right border of the triangle
-                -slope * x + 2.*self.cell_height()
+                -slope * x + 2. * self.cell_height()
             };
 
             let y_threshold_left = left_eq(rel_loc_x);
@@ -161,7 +187,7 @@ impl TriGrid {
             } else {
                 0
             };
-                                
+
             index[Ix2(cell_id, 0)] = index[Ix2(cell_id, 0)] + id_shift;
         }
         index
@@ -172,7 +198,8 @@ impl TriGrid {
         // TODO: allow calling of cell_at_point with single point (tuple or 1d array)
         let left_bottom: Array2<f64> =
             array![[bounds.0 + self.dx() / 4., bounds.1 + self.dy() / 4.]];
-        let right_top: Array2<f64> = array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
+        let right_top: Array2<f64> =
+            array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
 
         // translate the coordinates of the corner cells into indices
         let left_bottom_id = self.cell_at_point(&left_bottom.view());
@@ -197,7 +224,8 @@ impl TriGrid {
                 if (centroid_x >= bounds.0) & // x > minx
                    (centroid_x < bounds.2) & // x < maxx
                    (centroid_y > bounds.1) & // y > miny
-                   (centroid_y < bounds.3)   // y < maxy
+                   (centroid_y < bounds.3)
+                // y < maxy
                 {
                     index[Ix2(cell_id, 0)] = x;
                     index[Ix2(cell_id, 1)] = y;
@@ -238,8 +266,7 @@ impl TriGrid {
                 max_nr_cols - 2 * (depth - 1 - row_id);
         }
         for row_id in depth..(nr_rows) {
-            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                max_nr_cols - 2 * (row_id - depth);
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] = max_nr_cols - 2 * (row_id - depth);
         }
 
         let mut counter: usize = 0;
@@ -325,7 +352,8 @@ impl TriGrid {
         let mut nr_cells_per_colum: &Array1<i64>;
         for cell_id in 0..relative_neighbours.shape()[0] {
             counter = 0;
-            let upright_cell = self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            let upright_cell =
+                self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             let mut flip_vertically: i64;
             if upright_cell {
                 flip_vertically = 1;
@@ -334,7 +362,7 @@ impl TriGrid {
             }
             for rel_row_id in (0..nr_rows) {
                 let partial_row: i64;
-                let nr_cells_in_colum:i64;
+                let nr_cells_in_colum: i64;
                 if iseven(depth) {
                     partial_row = 0;
                     nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
@@ -342,7 +370,7 @@ impl TriGrid {
                     partial_row = nr_rows - 1;
                     nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                 }
-                
+
                 for rel_col_id in 0..nr_cells_in_colum {
                     if iseven(depth) {
                         skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
@@ -352,12 +380,12 @@ impl TriGrid {
                     y_offset = ((depth as f64 / 2.).floor() as i64);
                     if counter < relative_neighbours.shape()[1] {
                         if !skip_cell {
-                            relative_neighbours[Ix3(cell_id, counter, 0)] = 
-                                flip_vertically * (rel_col_id - (nr_cells_in_colum as f64 / 2.).floor() as i64)
+                            relative_neighbours[Ix3(cell_id, counter, 0)] = flip_vertically
+                                * (rel_col_id - (nr_cells_in_colum as f64 / 2.).floor() as i64)
                                 + (add_cell_id * index[Ix2(cell_id, 0)]);
-                            relative_neighbours[Ix3(cell_id, counter, 1)] =
-                                flip_vertically * ((depth - rel_row_id - y_offset - !iseven(depth) as i64))
-                                    + (add_cell_id * index[Ix2(cell_id, 1)]);
+                            relative_neighbours[Ix3(cell_id, counter, 1)] = flip_vertically
+                                * (depth - rel_row_id - y_offset - !iseven(depth) as i64)
+                                + (add_cell_id * index[Ix2(cell_id, 1)]);
                             counter = counter + 1;
                         }
                     }
@@ -381,12 +409,11 @@ impl TriGrid {
         let cell_ids = self.cell_at_point(points);
         let corners = self.cell_corners(&cell_ids.view());
 
-
-        if self.rotation != 0. {
+        if self.rotation() != 0. {
             let mut points = points.to_owned();
             for cell_id in 0..points.shape()[0] {
                 let mut point = points.slice_mut(s![cell_id, ..]);
-                let point_rot = self.rotation_matrix_inv.dot(&point);
+                let point_rot = self._rotation_matrix_inv.dot(&point);
                 point.assign(&point_rot);
             }
         }
@@ -463,7 +490,7 @@ impl TriGrid {
 
     fn _is_cell_upright(&self, id_x: i64, id_y: i64) -> bool {
         // if (id_x >= 0) == (id_y >= 0) {
-            iseven(id_x) == iseven(id_y)
+        iseven(id_x) == iseven(id_y)
         // } else {
         //     iseven(id_x) == iseven(id_y)
         // }
@@ -478,7 +505,7 @@ impl TriGrid {
         cells
     }
 
-    pub fn linear_interpolation (
+    pub fn linear_interpolation(
         &self,
         sample_points: &ArrayView2<f64>,
         nearby_value_locations: &ArrayView3<f64>,
@@ -489,12 +516,7 @@ impl TriGrid {
             .and(sample_points.axis_iter(Axis(0)))
             .and(nearby_value_locations.axis_iter(Axis(0)))
             .and(nearby_values.axis_iter(Axis(0)))
-            .for_each(|
-                new_val,
-                point,
-                val_locs,
-                near_vals
-            | {
+            .for_each(|new_val, point, val_locs, near_vals| {
                 // get 2 nearest point ids
                 let point_to_centroid_vecs = &val_locs - &point;
                 let mut near_pnt_1: usize = 0;
@@ -516,19 +538,19 @@ impl TriGrid {
                 // mean of 6 (val and centroid)
                 let mean_centroid = val_locs.mean_axis(Axis(0)).unwrap();
                 let mean_val = near_vals.mean().unwrap();
-                let near_pnt_locs =  array![
+                let near_pnt_locs = array![
                     [val_locs[Ix2(near_pnt_1, 0)], val_locs[Ix2(near_pnt_1, 1)]],
                     [val_locs[Ix2(near_pnt_2, 0)], val_locs[Ix2(near_pnt_2, 1)]],
                     [mean_centroid[Ix1(0)], mean_centroid[Ix1(1)]],
                 ];
-                let near_pnt_vals =  array![
+                let near_pnt_vals = array![
                     near_vals[Ix1(near_pnt_1)],
                     near_vals[Ix1(near_pnt_2)],
                     mean_val,
                 ];
                 let weights = crate::interpolate::linear_interp_weights_single_triangle(
                     &point,
-                    &near_pnt_locs.view()
+                    &near_pnt_locs.view(),
                 );
                 *new_val = (&weights * &near_pnt_vals).sum();
             });

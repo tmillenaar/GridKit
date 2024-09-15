@@ -8,7 +8,7 @@ from pyproj import CRS, Transformer
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.gridkit_rs import PyRectGrid
+from gridkit.gridkit_rs import PyO3RectGrid
 from gridkit.index import GridIndex, validate_index
 
 
@@ -110,7 +110,7 @@ class RectGrid(BaseGrid):
         self._dx = dx
         self._dy = dy
         self._rotation = rotation
-        self._grid = PyRectGrid(dx=dx, dy=dy, offset=tuple(offset), rotation=rotation)
+        self._grid = PyO3RectGrid(dx=dx, dy=dy, offset=tuple(offset), rotation=rotation)
         self.bounded_cls = BoundedRectGrid
 
         super(RectGrid, self).__init__(*args, **kwargs)
@@ -720,7 +720,7 @@ class RectGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
-        return PyRectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
+        return PyO3RectGrid(dx=dx, dy=dy, offset=offset, rotation=rotation)
 
     def update(
         self,
