@@ -9,8 +9,34 @@ pub struct Tile {
     pub ny: u64,
 }
 
-impl Tile {
-    pub fn corner_ids(&self) -> Array2<i64> {
+#[enum_delegate::register]
+pub trait TileTraits {
+    fn get_tile(&self) -> &Tile;
+    
+    fn corner_ids<'py>(&self) -> Array2<i64> {
+        self.get_tile().corner_ids()
+    }
+
+    fn corners<'py>(&self) -> Array2<f64> {
+        self.get_tile().corners()
+    }
+
+    fn indices<'py>(&self) -> Array3<i64> {
+        self.get_tile().indices()
+    }
+
+    fn bounds<'py>(&self) -> (f64, f64, f64, f64) {
+        self.get_tile().bounds()
+    }
+}
+
+impl TileTraits for Tile {
+
+    fn get_tile(&self) -> &Tile {
+        &self
+    }
+
+    fn corner_ids(&self) -> Array2<i64> {
         let (x0, y0) = self.start_id;
         let ids = array![
             [x0, y0 + self.ny as i64 - 1], // top-left
@@ -21,7 +47,7 @@ impl Tile {
         ids
     }
 
-    pub fn corners(&self) -> Array2<f64> {
+    fn corners(&self) -> Array2<f64> {
         let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset().0;
         let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset().1;
         let side_length_x = self.nx as f64 * self.grid.dx();
@@ -47,10 +73,10 @@ impl Tile {
         corners
     }
 
-    pub fn indices(&self) -> Array3<i64> {
+    fn indices(&self) -> Array3<i64> {
         let mut indices = Array3::<i64>::zeros((self.ny as usize, self.nx as usize, 2));
-        for iy in 0..(self.ny) {
-            for ix in 0..(self.nx) {
+        for iy in self.start_id.0..(self.start_id.0 + self.ny as i64) {
+            for ix in self.start_id.0..(self.start_id.0 + self.nx as i64) {
                 indices[Ix3(iy as usize, ix as usize, 0)] = self.start_id.0 + ix as i64;
                 indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + iy as i64;
             }
@@ -58,7 +84,7 @@ impl Tile {
         indices
     }
 
-    pub fn bounds(&self) -> (f64, f64, f64, f64) {
+    fn bounds(&self) -> (f64, f64, f64, f64) {
         let corners: ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>> = self.corners();
 
         // Note: something like the following might have been neat:

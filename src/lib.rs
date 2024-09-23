@@ -5,15 +5,56 @@ use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule
 
 mod utils;
 mod tile;
+mod data_tile;
 mod grid;
 mod tri_grid;
 mod rect_grid;
 mod hex_grid;
 mod vector_shapes;
 mod interpolate;
+
 use crate::grid::GridTraits;
+use crate::data_tile::DataTile;
+use crate::tile::TileTraits;
 
 #[pyclass]
+struct PyO3TriDataTile {
+    _data_tile: data_tile::DataTile,
+}
+
+#[pymethods]
+impl PyO3TriDataTile {
+    #[new]
+    fn new<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
+        let data = data.as_array().to_owned();
+        let tile = tile._tile;
+        let _data_tile = data_tile::DataTile{ tile, data };
+        PyO3TriDataTile { _data_tile }
+    }
+
+    fn to_numpy<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._data_tile.data.clone().into_pyarray(py)
+    }
+
+    fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._data_tile.corner_ids().into_pyarray(py)
+    }
+
+    fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+        self._data_tile.corners().into_pyarray(py)
+    }
+
+    fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
+        self._data_tile.indices().into_pyarray(py)
+    }
+
+    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
+        self._data_tile.bounds()
+    }
+}
+
+#[pyclass]
+#[derive(Clone)]
 struct PyO3TriTile {
     #[pyo3(get, set)]
     grid: PyO3TriGrid,
@@ -528,6 +569,7 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyO3RectGrid>()?;
     module.add_class::<PyO3HexGrid>()?;
     module.add_class::<PyO3TriTile>()?;
+    module.add_class::<PyO3TriDataTile>()?;
     module.add_class::<PyO3RectTile>()?;
     module.add_class::<PyO3HexTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
