@@ -123,6 +123,21 @@ impl PyO3TriTile {
     fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
         self._tile.bounds()
     }
+
+    fn intersects<'py>(&self, py: Python<'py>, other: &PyO3TriTile) -> bool {
+        self._tile.intersects(&other._tile)
+    }
+
+    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriTile) -> PyO3TriTile {
+        let new_tile = self._tile.overlap(&other._tile);
+        PyO3TriTile{
+            grid: self.grid.clone(),
+            start_id: new_tile.start_id,
+            nx: new_tile.nx,
+            ny: new_tile.ny,
+            _tile: new_tile,
+        }
+    }
 }
 
 

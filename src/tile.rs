@@ -1,3 +1,5 @@
+use std::f32::MAX;
+
 use crate::grid::*;
 use numpy::{ndarray::*, IntoPyArray};
 
@@ -27,6 +29,14 @@ pub trait TileTraits {
 
     fn bounds<'py>(&self) -> (f64, f64, f64, f64) {
         self.get_tile().bounds()
+    }
+
+    fn intersects(&self, other: &Tile) -> bool {
+        self.get_tile().intersects(other)
+    }
+
+    fn overlap(&self, other: &Tile) -> Tile {
+        self.get_tile().overlap(other)
     }
 }
 
@@ -118,4 +128,37 @@ impl TileTraits for Tile {
         };
         (xmin, ymin, xmax, ymax)
     }
+
+    fn intersects(&self, other: &Tile) -> bool {
+        let self_bounds = self.bounds();
+        let other_bounds = other.bounds();
+        return !(
+            self_bounds.0 >= other_bounds.2
+            || self_bounds.2 <= other_bounds.0
+            || self_bounds.1 >= other_bounds.3
+            || self_bounds.3 <= other_bounds.1
+        )
+    }
+    
+    fn overlap(&self, other: &Tile) -> Tile {
+        // return (
+        //     max(self.bounds[0], other_bounds[0]),
+        //     max(self.bounds[1], other_bounds[1]),
+        //     min(self.bounds[2], other_bounds[2]),
+        //     min(self.bounds[3], other_bounds[3]),
+        // )
+        let min_x = std::cmp::max(self.start_id.0, other.start_id.0);
+        let min_y = std::cmp::max(self.start_id.1, other.start_id.1);
+        let max_x = std::cmp::min(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
+        let max_y = std::cmp::min(self.start_id.1 + self.ny as i64, other.start_id.1 + other.ny as i64);
+
+        Tile{
+            grid: self.grid.clone(),
+            start_id: (min_x, min_y),
+            nx: (max_x - min_x) as u64,
+            ny: (max_y - min_y) as u64
+        }
+    }
+
+    
 }
