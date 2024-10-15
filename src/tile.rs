@@ -141,12 +141,11 @@ impl TileTraits for Tile {
     }
     
     fn overlap(&self, other: &Tile) -> Tile {
-        // return (
-        //     max(self.bounds[0], other_bounds[0]),
-        //     max(self.bounds[1], other_bounds[1]),
-        //     min(self.bounds[2], other_bounds[2]),
-        //     min(self.bounds[3], other_bounds[3]),
-        // )
+        if !self.intersects(&other) {
+            // Raise proper PyO3 error
+            panic!("Tiles do not overlap")   
+        }
+
         let min_x = std::cmp::max(self.start_id.0, other.start_id.0);
         let min_y = std::cmp::max(self.start_id.1, other.start_id.1);
         let max_x = std::cmp::min(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
