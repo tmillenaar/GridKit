@@ -75,8 +75,8 @@ impl TileTraits for Tile {
 
     fn indices(&self) -> Array3<i64> {
         let mut indices = Array3::<i64>::zeros((self.ny as usize, self.nx as usize, 2));
-        for iy in self.start_id.0..(self.start_id.0 + self.ny as i64) {
-            for ix in self.start_id.0..(self.start_id.0 + self.nx as i64) {
+        for iy in 0..self.ny {
+            for ix in 0..self.nx {
                 indices[Ix3(iy as usize, ix as usize, 0)] = self.start_id.0 + ix as i64;
                 indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + iy as i64;
             }

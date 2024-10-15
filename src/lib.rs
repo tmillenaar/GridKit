@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3};
 use pyo3::prelude::*;
 use pyo3::types::*;
@@ -18,6 +20,7 @@ use crate::data_tile::DataTile;
 use crate::tile::TileTraits;
 
 #[pyclass]
+#[derive(Clone)]
 struct PyO3TriDataTile {
     _data_tile: data_tile::DataTile,
 }
@@ -30,6 +33,18 @@ impl PyO3TriDataTile {
         let tile = tile._tile;
         let _data_tile = data_tile::DataTile{ tile, data };
         PyO3TriDataTile { _data_tile }
+    }
+
+    fn start_id(&self) -> (i64, i64) {
+        self._data_tile.tile.start_id
+    }
+
+    fn nx(&self) -> u64 {
+        self._data_tile.tile.nx
+    }
+
+    fn ny(&self) -> u64 {
+        self._data_tile.tile.ny
     }
 
     fn to_numpy<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
@@ -50,6 +65,21 @@ impl PyO3TriDataTile {
 
     fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
         self._data_tile.bounds()
+    }
+
+    fn __add_scalar__<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() + value;
+        PyO3TriDataTile { _data_tile }
+    }
+
+    fn __add_tile__<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() + other._data_tile;
+        PyO3TriDataTile { _data_tile }
+    }
+
+    fn _empty_combined_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
+        PyO3TriDataTile { _data_tile }
     }
 }
 
