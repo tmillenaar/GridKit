@@ -14,7 +14,9 @@ pub struct Tile {
 #[enum_delegate::register]
 pub trait TileTraits {
     fn get_tile(&self) -> &Tile;
-    
+
+    fn get_grid(&self) -> &Grid;
+
     fn corner_ids<'py>(&self) -> Array2<i64> {
         self.get_tile().corner_ids()
     }
@@ -35,7 +37,7 @@ pub trait TileTraits {
         self.get_tile().intersects(other)
     }
 
-    fn overlap(&self, other: &Tile) -> Tile {
+    fn overlap(&self, other: &Tile) -> Result<Tile, String> {
         self.get_tile().overlap(other)
     }
 }
@@ -44,6 +46,10 @@ impl TileTraits for Tile {
 
     fn get_tile(&self) -> &Tile {
         &self
+    }
+
+    fn get_grid(&self) -> &Grid {
+        &self.grid
     }
 
     fn corner_ids(&self) -> Array2<i64> {
@@ -103,7 +109,7 @@ impl TileTraits for Tile {
         //            corners.slice(s![..,1]).min(),
         //            corners.slice(s![..,0]).max(),
         //            corners.slice(s![..,1]).max(),
-        //        ) 
+        //        )
         //       But that likely is less performant and it does not work with n-dimensional arrays.
         //       See: https://stackoverflow.com/questions/62544170/how-can-i-get-or-create-the-equivalent-of-numpys-amax-function-with-rusts-ndar/62547757
         let mut xmin = f64::MAX;
@@ -139,11 +145,10 @@ impl TileTraits for Tile {
             || self_bounds.3 <= other_bounds.1
         )
     }
-    
-    fn overlap(&self, other: &Tile) -> Tile {
+
+    fn overlap(&self, other: &Tile) -> Result<Tile, String> {
         if !self.intersects(&other) {
-            // Raise proper PyO3 error
-            panic!("Tiles do not overlap")   
+            return Err("Tiles do not overlap".to_string());
         }
 
         let min_x = std::cmp::max(self.start_id.0, other.start_id.0);
@@ -151,13 +156,13 @@ impl TileTraits for Tile {
         let max_x = std::cmp::min(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
         let max_y = std::cmp::min(self.start_id.1 + self.ny as i64, other.start_id.1 + other.ny as i64);
 
-        Tile{
+        Ok(Tile{
             grid: self.grid.clone(),
             start_id: (min_x, min_y),
             nx: (max_x - min_x) as u64,
             ny: (max_y - min_y) as u64
-        }
+        })
     }
 
-    
+
 }
