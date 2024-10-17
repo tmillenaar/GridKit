@@ -87,18 +87,18 @@ impl PyO3TriDataTile {
     }
 
     fn __add_scalar__<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
-        let _data_tile = &self._data_tile + value;
+        let _data_tile = self._data_tile.clone() + value;
         PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
     }
 
     fn __add_tile__<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + other._data_tile;
-        PyO3TriDataTile { _data_tile }
+        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
     }
 
     fn _empty_combined_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
-        PyO3TriDataTile { _data_tile }
+        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
     }
 }
 

@@ -13,6 +13,10 @@ impl TileTraits for DataTile {
     fn get_tile(&self) -> &Tile {
         &self.tile
     }
+
+    fn get_grid(&self) -> &Grid {
+        &self.tile.grid
+    }
 }
 
 impl DataTile {
@@ -24,7 +28,7 @@ impl DataTile {
         let min_y_id = i64::min(self.tile.start_id.1, other.tile.start_id.1);
         let max_x_id = i64::max(self.tile.start_id.0 + self.tile.nx as i64, other.tile.start_id.0 + other.tile.nx as i64);
         let max_y_id = i64::max(self.tile.start_id.1 + self.tile.ny as i64, other.tile.start_id.1 + other.tile.ny as i64);
-        
+
         let nx = max_x_id - min_x_id;
         let ny = max_y_id - min_y_id;
 
@@ -45,7 +49,7 @@ impl Add<f64> for DataTile {
     fn add(self, scalar: f64) -> DataTile {
         DataTile {
             tile: self.tile,
-            data: &self.data + scalar, // Element-wise addition of scalar to array
+            data: &self.data + scalar,
         }
     }
 }
