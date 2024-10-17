@@ -3,6 +3,7 @@ use std::ops::Add;
 use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3};
 use pyo3::prelude::*;
 use pyo3::types::*;
+use pyo3::exceptions::*;
 use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
 
 mod utils;
@@ -23,16 +24,15 @@ use crate::tile::TileTraits;
 #[derive(Clone)]
 struct PyO3TriDataTile {
     _data_tile: data_tile::DataTile,
+    _tile: PyO3TriTile
 }
 
 #[pymethods]
 impl PyO3TriDataTile {
     #[new]
     fn new<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
-        let data = data.as_array().to_owned();
-        let tile = tile._tile;
-        let _data_tile = data_tile::DataTile{ tile, data };
-        PyO3TriDataTile { _data_tile }
+        let _data_tile = data_tile::DataTile{ tile: tile._tile.clone(), data: data.as_array().to_owned() };
+        PyO3TriDataTile { _data_tile:_data_tile, _tile: tile }
     }
 
     fn start_id(&self) -> (i64, i64) {
@@ -67,9 +67,28 @@ impl PyO3TriDataTile {
         self._data_tile.bounds()
     }
 
+    fn intersects<'py>(&self, py: Python<'py>, other: &PyO3TriTile) -> bool {
+        self._data_tile.intersects(&other._tile)
+    }
+
+    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriDataTile) -> PyResult<PyO3TriTile> {
+        match self._data_tile.overlap(&other._data_tile.get_tile()) {
+            Ok(new_tile) => {
+                Ok(PyO3TriTile {
+                grid: self._tile.grid.clone(),
+                start_id: new_tile.start_id,
+                nx: new_tile.nx,
+                ny: new_tile.ny,
+                _tile: new_tile,
+                })
+            },
+            Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
+        }
+    }
+
     fn __add_scalar__<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
-        let _data_tile = self._data_tile.clone() + value;
-        PyO3TriDataTile { _data_tile }
+        let _data_tile = &self._data_tile + value;
+        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
     }
 
     fn __add_tile__<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
@@ -128,14 +147,16 @@ impl PyO3TriTile {
         self._tile.intersects(&other._tile)
     }
 
-    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriTile) -> PyO3TriTile {
-        let new_tile = self._tile.overlap(&other._tile);
-        PyO3TriTile{
-            grid: self.grid.clone(),
-            start_id: new_tile.start_id,
-            nx: new_tile.nx,
-            ny: new_tile.ny,
-            _tile: new_tile,
+    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriTile) -> PyResult<PyO3TriTile> {
+        match self._tile.overlap(&other._tile) {
+            Ok(new_tile) => Ok(PyO3TriTile {
+                grid: self.grid.clone(),
+                start_id: new_tile.start_id,
+                nx: new_tile.nx,
+                ny: new_tile.ny,
+                _tile: new_tile,
+            }),
+            Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
 }
@@ -266,7 +287,7 @@ impl PyO3TriGrid {
     fn dy(&self) -> f64 {
         self._grid.dy()
     }
-    
+
     fn rotation_matrix<'py>(
         &self,
         py: Python<'py>,
@@ -521,7 +542,7 @@ impl PyO3HexGrid {
     fn dy(&self) -> f64 {
         self._grid.dy()
     }
-    
+
     fn rotation_matrix<'py>(
         &self,
         py: Python<'py>,
