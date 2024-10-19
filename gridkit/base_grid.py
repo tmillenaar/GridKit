@@ -357,13 +357,14 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
         Returns
         -------
-        :class:`bool`
-            Whether or not the grids are aligned
+        :class:(`bool`, `str`)
+            A tuple containing a boolean and a string.
+            The boolean indicates whether or not the grids are aligned.
+            The string contains the reason for the misalignment.
         """
         if not isinstance(other, BaseGrid):
             raise TypeError(f"Expected a (child of) BaseGrid, got {type(other)}")
         aligned = True
-        reason = ""
         reasons = []
         if not other.parent_grid_class == self.parent_grid_class:
             aligned = False
@@ -402,10 +403,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
             aligned = False
             reasons.append("shape")
 
+        if self.rotation != other.rotation:
+            aligned = False
+            reasons.append("rotation")
+
         reason = (
-            f"The following attributes are not the same: {reasons}"
-            if reasons
-            else reason
+            f"The following attributes are not the same: {reasons}" if reasons else ""
         )
         return aligned, reason
 

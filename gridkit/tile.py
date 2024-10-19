@@ -3,6 +3,7 @@ from typing import Tuple, Union
 import numpy
 
 from gridkit.base_grid import BaseGrid
+from gridkit.errors import AlignmentError
 from gridkit.gridkit_rs import *
 from gridkit.hex_grid import HexGrid
 from gridkit.index import GridIndex
@@ -258,6 +259,11 @@ class DataTile:
         return self._data_tile.bounds()
 
     def overlap(self, other):
+        is_aligned, reason = self.grid.is_aligned_with(other.grid)
+        if not is_aligned:
+            raise AlignmentError(
+                f"Cannot find overlap of grids that are not aligned. Reason for misalignemnt: {reason}"
+            )
         _data_tile = self._data_tile.overlap(other._data_tile)
         overlap = (
             self.update()
