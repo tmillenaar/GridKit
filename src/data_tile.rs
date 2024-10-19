@@ -20,6 +20,21 @@ impl TileTraits for DataTile {
 }
 
 impl DataTile {
+
+    pub fn new(
+        grid: Grid,
+        start_id: (i64, i64),
+        nx: u64,
+        ny: u64,
+        data: Array2<f64>
+    ) -> Self {
+        let tile = Tile{ grid, start_id, nx, ny};
+        DataTile {
+            tile: tile,
+            data,
+        }
+    }
+
     pub fn _empty_combined_tile(&self, other: &DataTile, nodata_value: f64) -> DataTile {
         // Determine start tile (bottom left) (get min of bot-left)
         // Determine dx and dy of combined tile (top right) (get max of top-right)
