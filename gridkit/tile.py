@@ -3,7 +3,7 @@ from typing import Tuple, Union
 import numpy
 
 from gridkit.base_grid import BaseGrid
-from gridkit.gridkit_rs import PyO3HexTile, PyO3RectTile, PyO3TriTile
+from gridkit.gridkit_rs import *
 from gridkit.hex_grid import HexGrid
 from gridkit.index import GridIndex
 from gridkit.rect_grid import RectGrid
@@ -145,3 +145,122 @@ class Tile:
             The bounding box in (xmin, ymin, xmax, ymax)
         """
         return self._tile.bounds()
+
+
+class DataTile:
+
+    def __init__(self, tile: Tile, data: numpy.ndarray):
+        self.grid = tile.grid
+        self._data_tile = PyO3TriDataTile(tile._tile, data.astype("float64"))
+
+    def to_numpy(self):
+        return self._data_tile.to_numpy()
+
+    def __getitem__(self, item):
+        return self.to_numpy()[item]
+
+    def __setitem__(self, item, value):
+        # Don't use update() but replace _data_tile in-place
+        new_data = self.to_numpy()
+        new_data[item] = value
+        tile = PyO3TriTile(
+            self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
+        )
+        self._data_tile = PyO3TriDataTile(tile, new_data)
+
+    def update(self, grid=None, data=None, start_id=None, nx=None, ny=None):
+        # TODO: Make clear that update copies the data
+        if grid is None:
+            grid = self.grid
+        if data is None:
+            data = self.to_numpy()
+        if start_id is None:
+            start_id = self.start_id
+            if isinstance(start_id, GridIndex):
+                start_id = start_id.index
+        start_id = tuple(start_id)
+        if nx is None:
+            nx = self.nx
+        if ny is None:
+            ny = self.ny
+
+        if data.shape != (ny, nx):
+            raise ValueError(
+                f"The shape of the supplied data ({data.shape}) does not match the shape of the tile where ny is {ny} and nx is {nx}"
+            )
+
+        return DataTile(Tile(grid, start_id, nx, ny), data)
+
+    @property
+    def start_id(self):
+        """The starting cell of the Tile.
+        The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.
+        """
+        return GridIndex(self._data_tile.start_id())
+
+    @property
+    def nx(self):
+        """The number of cells in x direction, starting from the ``start_id``"""
+        return self._data_tile.nx()
+
+    @property
+    def ny(self):
+        """The number of cells in y direction, starting from the ``start_id``"""
+        return self._data_tile.ny()
+
+    def corner_ids(self):
+        """The ids at the corners of the Tile
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The :class:`.GridIndex` that contains the ids of the cells at
+            the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
+            (assuming the assicaited grid is not rotated)
+        """
+        return GridIndex(self._data_tile.corner_ids())
+
+    def corners(self):
+        """The coordinates at the corners of the Tile
+
+        Returns
+        -------
+        `numpy.ndarray`
+            A two-dimensional array that contais the x and y coordinates of
+            the corners in order: top-left, top-right, bottom-right, bottom-left
+            (assuming the assicaited grid is not rotated)
+        """
+        return self._data_tile.corners()
+
+    @property
+    def indices(self):
+        """The ids of all cells in the Tile.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The :class:`.GridIndex` that contains the indices in the Tile
+        """
+        return GridIndex(self._data_tile.indices())
+
+    @property
+    def bounds(self) -> Tuple[float, float, float, float]:
+        """The bounding box of the Tile in (xmin, ymin, xmax, ymax).
+        If the associated grid is rotated, the this represents the bounding box
+        that fully encapsulates the Tile and will contain more area than is
+        covered by the rotated Tile.
+
+        Returns
+        -------
+        Tuple[float, float, float, float]
+            The bounding box in (xmin, ymin, xmax, ymax)
+        """
+        return self._data_tile.bounds()
+
+    def overlap(self, other):
+        _data_tile = self._data_tile.overlap(other._data_tile)
+        overlap = (
+            self.update()
+        )  # Make a copy TODO: allow creation of Tile from PyO3...Tile and DataTile from PyO3...DataTile
+        overlap._data_tile = _data_tile
+        return overlap
