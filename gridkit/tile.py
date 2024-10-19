@@ -152,7 +152,7 @@ class DataTile:
 
     def __init__(self, tile: Tile, data: numpy.ndarray):
         self.grid = tile.grid
-        self._data_tile = PyO3TriDataTile(tile._tile, data.astype("float64"))
+        self._data_tile = PyO3TriDataTile.from_tile(tile._tile, data.astype("float64"))
 
     def to_numpy(self):
         return self._data_tile.to_numpy()
@@ -167,7 +167,7 @@ class DataTile:
         tile = PyO3TriTile(
             self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
         )
-        self._data_tile = PyO3TriDataTile(tile, new_data)
+        self._data_tile = PyO3TriDataTile.from_tile(tile, new_data)
 
     def update(self, grid=None, data=None, start_id=None, nx=None, ny=None):
         # TODO: Make clear that update copies the data

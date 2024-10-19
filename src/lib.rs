@@ -30,7 +30,13 @@ struct PyO3TriDataTile {
 #[pymethods]
 impl PyO3TriDataTile {
     #[new]
-    fn new<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
+    fn new<'py>(grid: PyO3TriGrid, start_id: (i64, i64), nx: u64, ny: u64, data: PyReadonlyArray2<'py, f64>) -> Self {
+        let _grid = grid::Grid::TriGrid(grid._grid.clone());
+        let _data_tile = data_tile::DataTile::new( _grid, start_id, nx, ny, data.as_array().to_owned() );
+        PyO3TriDataTile { _data_tile, grid: grid }
+    }
+    #[staticmethod]
+    fn from_tile<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
         let _data_tile = data_tile::DataTile{ tile: tile._tile.clone(), data: data.as_array().to_owned() };
         PyO3TriDataTile { _data_tile: _data_tile, grid: tile.grid }
     }
