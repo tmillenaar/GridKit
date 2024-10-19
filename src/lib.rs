@@ -24,7 +24,7 @@ use crate::tile::TileTraits;
 #[derive(Clone)]
 struct PyO3TriDataTile {
     _data_tile: data_tile::DataTile,
-    _tile: PyO3TriTile
+    grid: PyO3TriGrid
 }
 
 #[pymethods]
@@ -32,7 +32,7 @@ impl PyO3TriDataTile {
     #[new]
     fn new<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
         let _data_tile = data_tile::DataTile{ tile: tile._tile.clone(), data: data.as_array().to_owned() };
-        PyO3TriDataTile { _data_tile:_data_tile, _tile: tile }
+        PyO3TriDataTile { _data_tile: _data_tile, grid: tile.grid }
     }
 
     fn start_id(&self) -> (i64, i64) {
@@ -75,11 +75,11 @@ impl PyO3TriDataTile {
         match self._data_tile.overlap(&other._data_tile.get_tile()) {
             Ok(new_tile) => {
                 Ok(PyO3TriTile {
-                grid: self._tile.grid.clone(),
+                grid: self.grid.clone(),
                 start_id: new_tile.start_id,
                 nx: new_tile.nx,
                 ny: new_tile.ny,
-                _tile: new_tile,
+                _tile: new_tile.clone(),
                 })
             },
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
@@ -88,17 +88,17 @@ impl PyO3TriDataTile {
 
     fn __add_scalar__<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + value;
-        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
 
     fn __add_tile__<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + other._data_tile;
-        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
 
     fn _empty_combined_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
-        PyO3TriDataTile { _data_tile, _tile: self._tile.clone() }
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
 }
 

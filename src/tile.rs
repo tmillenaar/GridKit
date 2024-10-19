@@ -94,7 +94,8 @@ impl TileTraits for Tile {
         for iy in 0..self.ny {
             for ix in 0..self.nx {
                 indices[Ix3(iy as usize, ix as usize, 0)] = self.start_id.0 + ix as i64;
-                indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + iy as i64;
+                // Note: index y from top to bottom to compy with numpy standard, hence self.ny - iy
+                indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + (self.ny - iy) as i64;
             }
         }
         indices
