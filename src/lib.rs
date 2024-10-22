@@ -92,20 +92,61 @@ impl PyO3TriDataTile {
         }
     }
 
-    fn __add_scalar__<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+    fn _add_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + value;
         PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
 
-    fn __add_tile__<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+    fn _add_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + other._data_tile;
         PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
 
-    fn _empty_combined_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+    fn _subtract_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() - value;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _subtract_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() - other._data_tile;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _multiply_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() * value;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _multiply_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() * other._data_tile;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _divide_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() / value;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _divide_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.clone() / other._data_tile;
+        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+    }
+
+    fn _empty_combined_data_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
         PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
     }
+
+    fn crop<'py>(&self, py: Python<'py>, crop_tile: PyO3TriTile, nodata_value: f64) -> PyResult<PyO3TriDataTile> {
+        match self._data_tile.crop(&crop_tile._tile, 0.) {
+            Ok(new_tile) => Ok(PyO3TriDataTile {
+                _data_tile: new_tile,
+                grid: self.grid.clone(),
+            }),
+            Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
+        }
+    }
+
 }
 
 #[pyclass]

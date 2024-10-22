@@ -40,6 +40,31 @@ pub trait TileTraits {
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
         self.get_tile().overlap(other)
     }
+
+    fn combined_tile(&self, other: &Tile) -> Tile {
+        self.get_tile().combined_tile(other)
+    }
+
+    fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y:i64) -> (i64, i64) {
+        // TODO: Check out of bounds
+        let tile = self.get_tile();
+        let tile_id_x = id_x - tile.start_id.0;
+        // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
+        let tile_id_y = (tile.ny as i64) - (id_y - tile.start_id.1);
+        return (tile_id_x, tile_id_y)
+    }
+
+    fn grid_id_to_tile_id(&self, index: ArrayView2<i64>) -> Array2<i64> {
+        let mut tile_ids = Array2::<i64>::zeros((index.shape()[0], 2));
+        for cell_id in 0..tile_ids.shape()[0] {
+            // TODO: Check out of bounds, set nodata_value if oob
+            let (id_x, id_y) = self.grid_id_to_tile_id_xy(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+            tile_ids[Ix2(cell_id, 0)] = id_x;
+            tile_ids[Ix2(cell_id, 1)] = id_y;
+        }
+        tile_ids
+    }
+
 }
 
 impl TileTraits for Tile {
@@ -95,7 +120,9 @@ impl TileTraits for Tile {
             for ix in 0..self.nx {
                 indices[Ix3(iy as usize, ix as usize, 0)] = self.start_id.0 + ix as i64;
                 // Note: index y from top to bottom to compy with numpy standard, hence self.ny - iy
-                indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + (self.ny - iy) as i64;
+                //       Also subtract -1. Best way to think about this is to reason from a tile with ny=1.
+                //       In that case there is only one tile, start_id so we need counter adding self.ny=1.
+                indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + (self.ny -1 - iy) as i64;
             }
         }
         indices
@@ -165,5 +192,24 @@ impl TileTraits for Tile {
         })
     }
 
+    fn combined_tile(&self, other: &Tile) -> Tile {
+        // Determine start tile (bottom left) (get min of bot-left)
+        // Determine dx and dy of combined tile (top right) (get max of top-right)
+        // Fill with nodata values
+        let min_x_id = i64::min(self.start_id.0, other.start_id.0);
+        let min_y_id = i64::min(self.start_id.1, other.start_id.1);
+        let max_x_id = i64::max(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
+        let max_y_id = i64::max(self.start_id.1 + self.ny as i64, other.start_id.1 + other.ny as i64);
+
+        let nx = max_x_id - min_x_id;
+        let ny = max_y_id - min_y_id;
+
+        Tile{
+            grid: self.grid.clone(),
+            start_id: (min_x_id, min_y_id),
+            nx: nx as u64,
+            ny: ny as u64
+        }
+    }
 
 }
