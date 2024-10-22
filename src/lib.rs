@@ -1,44 +1,64 @@
 use std::ops::Add;
 
-use numpy::{IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3};
+use numpy::{
+    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3,
+};
+use pyo3::exceptions::*;
 use pyo3::prelude::*;
 use pyo3::types::*;
-use pyo3::exceptions::*;
-use pyo3::{pymodule, pyfunction, wrap_pyfunction, wrap_pymodule, types::PyModule, PyResult, Python};
+use pyo3::{
+    pyfunction, pymodule, types::PyModule, wrap_pyfunction, wrap_pymodule, PyResult, Python,
+};
 
-mod utils;
-mod tile;
 mod data_tile;
 mod grid;
-mod tri_grid;
-mod rect_grid;
 mod hex_grid;
-mod vector_shapes;
 mod interpolate;
+mod rect_grid;
+mod tile;
+mod tri_grid;
+mod utils;
+mod vector_shapes;
 
-use crate::grid::GridTraits;
 use crate::data_tile::DataTile;
+use crate::grid::GridTraits;
 use crate::tile::TileTraits;
 
 #[pyclass]
 #[derive(Clone)]
 struct PyO3TriDataTile {
     _data_tile: data_tile::DataTile,
-    grid: PyO3TriGrid
+    grid: PyO3TriGrid,
 }
 
 #[pymethods]
 impl PyO3TriDataTile {
     #[new]
-    fn new<'py>(grid: PyO3TriGrid, start_id: (i64, i64), nx: u64, ny: u64, data: PyReadonlyArray2<'py, f64>) -> Self {
+    fn new<'py>(
+        grid: PyO3TriGrid,
+        start_id: (i64, i64),
+        nx: u64,
+        ny: u64,
+        data: PyReadonlyArray2<'py, f64>,
+    ) -> Self {
         let _grid = grid::Grid::TriGrid(grid._grid.clone());
-        let _data_tile = data_tile::DataTile::new( _grid, start_id, nx, ny, data.as_array().to_owned() );
-        PyO3TriDataTile { _data_tile, grid: grid }
+        let _data_tile =
+            data_tile::DataTile::new(_grid, start_id, nx, ny, data.as_array().to_owned());
+        PyO3TriDataTile {
+            _data_tile,
+            grid: grid,
+        }
     }
     #[staticmethod]
     fn from_tile<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
-        let _data_tile = data_tile::DataTile{ tile: tile._tile.clone(), data: data.as_array().to_owned() };
-        PyO3TriDataTile { _data_tile: _data_tile, grid: tile.grid }
+        let _data_tile = data_tile::DataTile {
+            tile: tile._tile.clone(),
+            data: data.as_array().to_owned(),
+        };
+        PyO3TriDataTile {
+            _data_tile: _data_tile,
+            grid: tile.grid,
+        }
     }
 
     fn start_id(&self) -> (i64, i64) {
@@ -79,65 +99,110 @@ impl PyO3TriDataTile {
 
     fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriDataTile) -> PyResult<PyO3TriTile> {
         match self._data_tile.overlap(&other._data_tile.get_tile()) {
-            Ok(new_tile) => {
-                Ok(PyO3TriTile {
+            Ok(new_tile) => Ok(PyO3TriTile {
                 grid: self.grid.clone(),
                 start_id: new_tile.start_id,
                 nx: new_tile.nx,
                 ny: new_tile.ny,
                 _tile: new_tile.clone(),
-                })
-            },
+            }),
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
 
     fn _add_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + value;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _add_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + other._data_tile;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _subtract_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() - value;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _subtract_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() - other._data_tile;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _multiply_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() * value;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _multiply_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() * other._data_tile;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _divide_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() / value;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
     fn _divide_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() / other._data_tile;
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
-    fn _empty_combined_data_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
+    fn _empty_combined_data_tile<'py>(
+        &self,
+        py: Python<'py>,
+        other: PyO3TriDataTile,
+    ) -> PyO3TriDataTile {
         let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
-        PyO3TriDataTile { _data_tile, grid: self.grid.clone() }
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
     }
 
-    fn crop<'py>(&self, py: Python<'py>, crop_tile: PyO3TriTile, nodata_value: f64) -> PyResult<PyO3TriDataTile> {
+    fn value<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        nodata_value: f64,
+    ) -> &'py PyArray1<f64> {
+        self._data_tile
+            .value(&index.as_array(), nodata_value)
+            .into_pyarray(py)
+    }
+
+    fn crop<'py>(
+        &self,
+        py: Python<'py>,
+        crop_tile: PyO3TriTile,
+        nodata_value: f64,
+    ) -> PyResult<PyO3TriDataTile> {
         match self._data_tile.crop(&crop_tile._tile, 0.) {
             Ok(new_tile) => Ok(PyO3TriDataTile {
                 _data_tile: new_tile,
@@ -146,7 +211,6 @@ impl PyO3TriDataTile {
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
-
 }
 
 #[pyclass]
@@ -169,9 +233,20 @@ impl PyO3TriTile {
     fn new(grid: PyO3TriGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::TriGrid(grid._grid);
-        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let _tile = tile::Tile {
+            grid,
+            start_id,
+            nx,
+            ny,
+        };
         let grid = tmp;
-        PyO3TriTile { grid, start_id, nx, ny, _tile }
+        PyO3TriTile {
+            grid,
+            start_id,
+            nx,
+            ny,
+            _tile,
+        }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -208,7 +283,6 @@ impl PyO3TriTile {
     }
 }
 
-
 #[pyclass]
 struct PyO3RectTile {
     #[pyo3(get, set)]
@@ -228,9 +302,20 @@ impl PyO3RectTile {
     fn new(grid: PyO3RectGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::RectGrid(grid._grid);
-        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let _tile = tile::Tile {
+            grid,
+            start_id,
+            nx,
+            ny,
+        };
         let grid = tmp;
-        PyO3RectTile { grid, start_id, nx, ny, _tile }
+        PyO3RectTile {
+            grid,
+            start_id,
+            nx,
+            ny,
+            _tile,
+        }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -249,8 +334,6 @@ impl PyO3RectTile {
         self._tile.bounds()
     }
 }
-
-
 
 #[pyclass]
 struct PyO3HexTile {
@@ -271,9 +354,20 @@ impl PyO3HexTile {
     fn new(grid: PyO3HexGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
         let grid = grid::Grid::HexGrid(grid._grid);
-        let _tile = tile::Tile{ grid, start_id, nx, ny};
+        let _tile = tile::Tile {
+            grid,
+            start_id,
+            nx,
+            ny,
+        };
         let grid = tmp;
-        PyO3HexTile { grid, start_id, nx, ny, _tile }
+        PyO3HexTile {
+            grid,
+            start_id,
+            nx,
+            ny,
+            _tile,
+        }
     }
 
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -293,8 +387,6 @@ impl PyO3HexTile {
     }
 }
 
-
-
 #[derive(Clone)]
 #[pyclass]
 struct PyO3TriGrid {
@@ -307,8 +399,12 @@ struct PyO3TriGrid {
 impl PyO3TriGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = tri_grid::TriGrid::new( cellsize, offset, rotation);
-        PyO3TriGrid { cellsize, rotation, _grid }
+        let _grid = tri_grid::TriGrid::new(cellsize, offset, rotation);
+        PyO3TriGrid {
+            cellsize,
+            rotation,
+            _grid,
+        }
     }
 
     fn offset(&self) -> (f64, f64) {
@@ -335,17 +431,11 @@ impl PyO3TriGrid {
         self._grid.dy()
     }
 
-    fn rotation_matrix<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix().into_pyarray(py)
     }
 
-    fn rotation_matrix_inv<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
@@ -451,15 +541,16 @@ impl PyO3TriGrid {
         sample_point: PyReadonlyArray2<'py, f64>,
         nearby_value_locations: PyReadonlyArray3<'py, f64>,
         nearby_values: PyReadonlyArray2<'py, f64>,
-    ) -> &'py PyArray1<f64>  {
-        self._grid.linear_interpolation(
-            &sample_point.as_array(),
-            &nearby_value_locations.as_array(),
-            &nearby_values.as_array(),
-        ).into_pyarray(py)
+    ) -> &'py PyArray1<f64> {
+        self._grid
+            .linear_interpolation(
+                &sample_point.as_array(),
+                &nearby_value_locations.as_array(),
+                &nearby_values.as_array(),
+            )
+            .into_pyarray(py)
     }
 }
-
 
 #[derive(Clone)]
 #[pyclass]
@@ -475,7 +566,12 @@ impl PyO3RectGrid {
     #[new]
     fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
         let _grid = rect_grid::RectGrid::new(dx, dy, offset, rotation);
-        PyO3RectGrid { dx, dy, rotation, _grid }
+        PyO3RectGrid {
+            dx,
+            dy,
+            rotation,
+            _grid,
+        }
     }
 
     fn cell_height(&self) -> f64 {
@@ -498,17 +594,11 @@ impl PyO3RectGrid {
         self._grid.offset
     }
 
-    fn rotation_matrix<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix().into_pyarray(py)
     }
 
-    fn rotation_matrix_inv<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
@@ -563,7 +653,11 @@ impl PyO3HexGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
         let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
-        PyO3HexGrid { cellsize, rotation, _grid}
+        PyO3HexGrid {
+            cellsize,
+            rotation,
+            _grid,
+        }
     }
 
     fn cell_height(&self) -> f64 {
@@ -590,17 +684,11 @@ impl PyO3HexGrid {
         self._grid.dy()
     }
 
-    fn rotation_matrix<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix().into_pyarray(py)
     }
 
-    fn rotation_matrix_inv<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> &'py PyArray2<f64> {
+    fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix_inv().into_pyarray(py)
     }
 
@@ -652,7 +740,7 @@ fn linear_interp_weights_triangles<'py>(
         &sample_point.as_array(),
         &nearby_value_locations.as_array(),
     );
-    return weights.into_pyarray(py)
+    return weights.into_pyarray(py);
 }
 
 #[pymodule]
@@ -662,10 +750,7 @@ fn interp(_py: Python, module: &PyModule) -> PyResult<()> {
 }
 
 #[pyfunction]
-fn multipolygon_wkb<'py>(
-    py: Python<'py>,
-    coords: PyReadonlyArray3<'py, f64>,
-) -> &'py PyByteArray {
+fn multipolygon_wkb<'py>(py: Python<'py>, coords: PyReadonlyArray3<'py, f64>) -> &'py PyByteArray {
     let geom_wkb = vector_shapes::coords_to_multipolygon_wkb(&coords.as_array());
     PyByteArray::new(py, &geom_wkb)
 }

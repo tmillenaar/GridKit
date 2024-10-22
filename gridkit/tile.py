@@ -284,76 +284,15 @@ class DataTile:
         return cropped
 
     @validate_index
-    def value(self, index=None, oob_value=None):
-        """Return the value at the given cell index.
-
-        Parameters
-        ----------
-        index: :class:`.GridIndex` (optional)
-            The index of the cell(s) of which to return the value.
-            If not supplied, all values will be returned in a flattened array.
-        oob_value: :class:`float` (optional)
-            The value assigned to values that are 'out of bounds'.
-            I.e. the value assigned to ``index`` entries not covered by the data.
-            Default: numpy.nan
-
-        Returns
-        -------
-        :class:`numpy.ndarray`
-            The values at the supplied `index` locations
-        """
-
-        if index is None:
-            index = self.indices
-
-        # Convert grid-ids into numpy-ids
-        np_id = numpy.stack(self.grid_id_to_numpy_id(index.ravel())[::-1])
-        if np_id.ndim == 1:
-            np_id = np_id[:, numpy.newaxis]
-
-        # Identify any id outside the bounds
-        oob_mask = numpy.where(np_id[0] >= self._data.shape[1])
-        oob_mask += numpy.where(np_id[0] < 0)
-        oob_mask += numpy.where(np_id[1] >= self._data.shape[0])
-        oob_mask += numpy.where(np_id[1] < 0)
-        oob_mask = numpy.hstack(oob_mask)
-
-        if numpy.any(
-            oob_mask
-        ):  # make sure we know what nodata value to set if ids are out of bounds
-            if oob_value is None and self.nodata_value is None:
-                raise ValueError(
-                    "Some indices do not have data. Please remove these ids, set a 'nodata_value' or supply an 'oob_value'."
-                )
-            oob_value = oob_value if oob_value else self.nodata_value
-        else:
-            oob_value = (
-                oob_value if oob_value else 0
-            )  # the oob_value does not matter if no ids are out of bounds
-
-        # Return array's `dtype` needs to be float instead of integer if an id falls outside of bounds
-        # For NaNs don't make sense as integer
-        if (
-            numpy.any(oob_mask)
-            and not numpy.isfinite(oob_value)
-            and not numpy.issubdtype(self._data.dtype, numpy.floating)
-        ):
-            print(
-                f"Warning: dtype `{self._data.dtype}` might not support an `oob_value` of `{oob_value}`."
-            )
-
-        values = numpy.full(np_id.shape[1], oob_value, dtype=self._data.dtype)
-
-        sample_mask = numpy.ones_like(values, dtype="bool")
-        sample_mask[oob_mask] = False
-
-        np_id = np_id[:, sample_mask]
-        values[sample_mask] = self._data[np_id[1], np_id[0]]
-
-        return values.reshape(index.shape)
+    def value(self, index=None, oob_value=numpy.nan):
+        oob_value = numpy.float64(oob_value)
+        original_shape = index.shape
+        result = self._data_tile.value(index.ravel().index, oob_value)
+        return result.reshape(original_shape)
 
     def __add__(self, other):
         if isinstance(other, DataTile):
+            breakpoint()
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:

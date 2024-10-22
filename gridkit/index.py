@@ -139,7 +139,7 @@ class GridIndex(metaclass=_IndexMeta):
         if not isinstance(index, numpy.ndarray) or not numpy.issubdtype(
             index.dtype, numpy.integer
         ):
-            index = numpy.array(index, dtype=int)
+            index = numpy.array(index, dtype=int, order="F")
         self.index = index.squeeze()
         if self.index.shape[-1] != 2 and self.index.size != 0:
             raise ValueError(

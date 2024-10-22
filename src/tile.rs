@@ -45,30 +45,31 @@ pub trait TileTraits {
         self.get_tile().combined_tile(other)
     }
 
-    fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y:i64) -> (i64, i64) {
+    fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
         // TODO: Check out of bounds
         let tile = self.get_tile();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
-        let tile_id_y = (tile.ny as i64) - (id_y - tile.start_id.1);
-        return (tile_id_x, tile_id_y)
-    }
+        let tile_id_y = (tile.ny as i64 - 1) - (id_y - tile.start_id.1);
 
-    fn grid_id_to_tile_id(&self, index: ArrayView2<i64>) -> Array2<i64> {
-        let mut tile_ids = Array2::<i64>::zeros((index.shape()[0], 2));
-        for cell_id in 0..tile_ids.shape()[0] {
-            // TODO: Check out of bounds, set nodata_value if oob
-            let (id_x, id_y) = self.grid_id_to_tile_id_xy(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            tile_ids[Ix2(cell_id, 0)] = id_x;
-            tile_ids[Ix2(cell_id, 1)] = id_y;
+        // Check out of bounds
+        if tile_id_x < 0
+            || tile_id_y < 0
+            || tile_id_x >= self.get_tile().nx as i64
+            || tile_id_y >= self.get_tile().ny as i64
+        {
+            let error_message = format!(
+                "Grid ID ({}, {}) not in Tile ID with start_id: ({}, {}), nx: {}, ny: {}",
+                id_x, id_y, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny
+            )
+            .to_string();
+            return Err(error_message);
         }
-        tile_ids
+        return Ok((tile_id_x, tile_id_y));
     }
-
 }
 
 impl TileTraits for Tile {
-
     fn get_tile(&self) -> &Tile {
         &self
     }
@@ -80,10 +81,10 @@ impl TileTraits for Tile {
     fn corner_ids(&self) -> Array2<i64> {
         let (x0, y0) = self.start_id;
         let ids = array![
-            [x0, y0 + self.ny as i64 - 1], // top-left
-            [x0 + self.nx as i64 -1, y0 + self.ny as i64 - 1], // top-right
-            [x0 + self.nx as i64 -1, y0], // bottom-right
-            [x0, y0], // bottom-left
+            [x0, y0 + self.ny as i64 - 1],                      // top-left
+            [x0 + self.nx as i64 - 1, y0 + self.ny as i64 - 1], // top-right
+            [x0 + self.nx as i64 - 1, y0],                      // bottom-right
+            [x0, y0],                                           // bottom-left
         ];
         ids
     }
@@ -96,10 +97,12 @@ impl TileTraits for Tile {
 
         let mut corners = array![
             [start_corner_x, start_corner_y + side_length_y],
-            [start_corner_x + side_length_x, start_corner_y + side_length_y],
+            [
+                start_corner_x + side_length_x,
+                start_corner_y + side_length_y
+            ],
             [start_corner_x + side_length_x, start_corner_y],
             [start_corner_x, start_corner_y],
-
         ];
 
         // Rotate if necessary
@@ -122,7 +125,8 @@ impl TileTraits for Tile {
                 // Note: index y from top to bottom to compy with numpy standard, hence self.ny - iy
                 //       Also subtract -1. Best way to think about this is to reason from a tile with ny=1.
                 //       In that case there is only one tile, start_id so we need counter adding self.ny=1.
-                indices[Ix3(iy as usize, ix as usize, 1)] = self.start_id.1 + (self.ny -1 - iy) as i64;
+                indices[Ix3(iy as usize, ix as usize, 1)] =
+                    self.start_id.1 + (self.ny - 1 - iy) as i64;
             }
         }
         indices
@@ -159,19 +163,17 @@ impl TileTraits for Tile {
             if y > ymax {
                 ymax = y;
             }
-        };
+        }
         (xmin, ymin, xmax, ymax)
     }
 
     fn intersects(&self, other: &Tile) -> bool {
         let self_bounds = self.bounds();
         let other_bounds = other.bounds();
-        return !(
-            self_bounds.0 >= other_bounds.2
+        return !(self_bounds.0 >= other_bounds.2
             || self_bounds.2 <= other_bounds.0
             || self_bounds.1 >= other_bounds.3
-            || self_bounds.3 <= other_bounds.1
-        )
+            || self_bounds.3 <= other_bounds.1);
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
@@ -181,14 +183,20 @@ impl TileTraits for Tile {
 
         let min_x = std::cmp::max(self.start_id.0, other.start_id.0);
         let min_y = std::cmp::max(self.start_id.1, other.start_id.1);
-        let max_x = std::cmp::min(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
-        let max_y = std::cmp::min(self.start_id.1 + self.ny as i64, other.start_id.1 + other.ny as i64);
+        let max_x = std::cmp::min(
+            self.start_id.0 + self.nx as i64,
+            other.start_id.0 + other.nx as i64,
+        );
+        let max_y = std::cmp::min(
+            self.start_id.1 + self.ny as i64,
+            other.start_id.1 + other.ny as i64,
+        );
 
-        Ok(Tile{
+        Ok(Tile {
             grid: self.grid.clone(),
             start_id: (min_x, min_y),
             nx: (max_x - min_x) as u64,
-            ny: (max_y - min_y) as u64
+            ny: (max_y - min_y) as u64,
         })
     }
 
@@ -198,18 +206,23 @@ impl TileTraits for Tile {
         // Fill with nodata values
         let min_x_id = i64::min(self.start_id.0, other.start_id.0);
         let min_y_id = i64::min(self.start_id.1, other.start_id.1);
-        let max_x_id = i64::max(self.start_id.0 + self.nx as i64, other.start_id.0 + other.nx as i64);
-        let max_y_id = i64::max(self.start_id.1 + self.ny as i64, other.start_id.1 + other.ny as i64);
+        let max_x_id = i64::max(
+            self.start_id.0 + self.nx as i64,
+            other.start_id.0 + other.nx as i64,
+        );
+        let max_y_id = i64::max(
+            self.start_id.1 + self.ny as i64,
+            other.start_id.1 + other.ny as i64,
+        );
 
         let nx = max_x_id - min_x_id;
         let ny = max_y_id - min_y_id;
 
-        Tile{
+        Tile {
             grid: self.grid.clone(),
             start_id: (min_x_id, min_y_id),
             nx: nx as u64,
-            ny: ny as u64
+            ny: ny as u64,
         }
     }
-
 }
