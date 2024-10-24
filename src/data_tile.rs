@@ -48,14 +48,18 @@ impl DataTile {
         let (start_slice_x, end_slice_y) = self
             .grid_id_to_tile_id_xy(crop_tile.start_id.0, crop_tile.start_id.1)
             .unwrap();
+        // Note: We first subtract one from nx and ny to get the id of the top left corner
+        //       For this tile we do not get out of bounds of the tile.
+        //       Because this is then used as the upper end of a slice we add the 1 back because
+        //       slice ends are exclusive.
         let end_id = (
-            crop_tile.start_id.0 + crop_tile.nx as i64,
-            crop_tile.start_id.1 + crop_tile.ny as i64,
+            crop_tile.start_id.0 + crop_tile.nx as i64 - 1,
+            crop_tile.start_id.1 + crop_tile.ny as i64 - 1,
         );
         let (end_slice_x, start_slice_y) = self.grid_id_to_tile_id_xy(end_id.0, end_id.1).unwrap();
         let data_slice = &self.data.slice(s![
-            start_slice_y as usize..(end_slice_y) as usize,
-            start_slice_x as usize..(end_slice_x) as usize
+            start_slice_y as usize..(end_slice_y+1) as usize,
+            start_slice_x as usize..(end_slice_x+1) as usize
         ]);
         let mut new_data_slice =
             new_data.slice_mut(s![0..crop_tile.ny as usize, 0..crop_tile.nx as usize,]);
@@ -86,15 +90,19 @@ impl DataTile {
     }
 
     fn _assign_data_in_place(&mut self, data_tile: &DataTile) -> Result<(), String> {
+        // Note: We first subtract one from nx and ny to get the id of the top left corner
+        //       For this tile we do not get out of bounds of the tile.
+        //       Because this is then used as the upper end of a slice we add the 1 back because
+        //       slice ends are exclusive.
         let (start_slice_x, end_slice_y) =
-            self.grid_id_to_tile_id_xy(data_tile.tile.start_id.0, data_tile.tile.start_id.1)?;
+            self.grid_id_to_tile_id_xy(data_tile.tile.start_id.0, data_tile.tile.start_id.1).unwrap();
         let (end_slice_x, start_slice_y) = self.grid_id_to_tile_id_xy(
-            data_tile.tile.start_id.0 + data_tile.tile.nx as i64,
-            data_tile.tile.start_id.1 + data_tile.tile.ny as i64,
-        )?;
+            data_tile.tile.start_id.0 + data_tile.tile.nx as i64 -1,
+            data_tile.tile.start_id.1 + data_tile.tile.ny as i64 -1,
+        ).unwrap();
         let mut data_slice = self.data.slice_mut(s![
-            start_slice_y as usize..(end_slice_y) as usize,
-            start_slice_x as usize..(end_slice_x) as usize
+            start_slice_y as usize..(end_slice_y + 1) as usize,
+            start_slice_x as usize..(end_slice_x + 1) as usize
         ]);
         data_slice.assign(&data_tile.data);
         Ok(())
@@ -235,9 +243,8 @@ impl Div<DataTile> for DataTile {
     fn div(self, other: DataTile) -> DataTile {
         // Create full span DataTile
         let mut out_data_tile = self._empty_combined_tile(&other, 0.);
-
-        let _ = out_data_tile._assign_data_in_place(&self);
         let _ = out_data_tile._assign_data_in_place(&other);
+        let _ = out_data_tile._assign_data_in_place(&self);
 
         // Insert added overlap between self and other
         if self.intersects(&other.tile) {

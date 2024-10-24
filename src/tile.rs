@@ -50,7 +50,8 @@ pub trait TileTraits {
         let tile = self.get_tile();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
-        let tile_id_y = (tile.ny as i64 - 1) - (id_y - tile.start_id.1);
+        // let tile_id_y = (tile.ny as i64 - 1) - (id_y - tile.start_id.1);
+        let tile_id_y = (tile.start_id.1 + tile.ny as i64 - 1) - id_y;
 
         // Check out of bounds
         if tile_id_x < 0
@@ -59,8 +60,8 @@ pub trait TileTraits {
             || tile_id_y >= self.get_tile().ny as i64
         {
             let error_message = format!(
-                "Grid ID ({}, {}) not in Tile ID with start_id: ({}, {}), nx: {}, ny: {}",
-                id_x, id_y, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny
+                "Grid ID ({}, {}) not in Tile ID with start_id: ({}, {}), nx: {}, ny: {}. Array id would have been ({},{})",
+                id_x, id_y, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny, tile_id_x, tile_id_y
             )
             .to_string();
             return Err(error_message);
