@@ -73,6 +73,10 @@ impl PyO3TriDataTile {
         self._data_tile.tile.ny
     }
 
+    fn get_tile<'py>(&self, py: Python<'py>) -> PyO3TriTile {
+        PyO3TriTile::new(self.grid.clone(), self.start_id(), self.nx(), self.ny())
+    }
+
     fn to_numpy<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         self._data_tile.data.clone().into_pyarray(py)
     }

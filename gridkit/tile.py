@@ -147,6 +147,21 @@ class Tile:
         """
         return self._tile.bounds()
 
+    def intersects(self, other):
+        if isinstance(other, DataTile):
+            other_tile = other._data_tile.get_tile()
+        elif isinstance(other, Tile):
+            other_tile = other._tile
+        elif isinstance(other, PyO3TriDataTile):
+            other_tile = other.get_tile()
+        elif isinstance(other, PyO3TriTile):
+            other_tile = other
+        else:
+            raise TypeError(
+                f"Cannot determine intersection between {type(self).__name__} and {type(other).__name__}"
+            )
+        return self._tile.intersects(other_tile)
+
 
 class DataTile:
 
@@ -208,6 +223,10 @@ class DataTile:
     def ny(self):
         """The number of cells in y direction, starting from the ``start_id``"""
         return self._data_tile.ny()
+
+    def get_tile(self):
+        """A Tile object with the same properties as this DataTile, but without the data attached."""
+        return Tile(self.grid, self.start_id, self.nx, self.ny)
 
     def corner_ids(self):
         """The ids at the corners of the Tile
@@ -290,9 +309,11 @@ class DataTile:
         result = self._data_tile.value(index.ravel().index, oob_value)
         return result.reshape(original_shape)
 
+    def intersects(self, other):
+        return self.get_tile().intersects(other)
+
     def __add__(self, other):
         if isinstance(other, DataTile):
-            breakpoint()
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:
