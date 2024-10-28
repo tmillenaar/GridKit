@@ -40,20 +40,29 @@ impl PyO3TriDataTile {
         nx: u64,
         ny: u64,
         data: PyReadonlyArray2<'py, f64>,
+        nodata_value: f64,
     ) -> Self {
         let _grid = grid::Grid::TriGrid(grid._grid.clone());
-        let _data_tile =
-            data_tile::DataTile::new(_grid, start_id, nx, ny, data.as_array().to_owned());
-        PyO3TriDataTile {
-            _data_tile,
-            grid: grid,
-        }
+        let _data_tile = data_tile::DataTile::new(
+            _grid,
+            start_id,
+            nx,
+            ny,
+            data.as_array().to_owned(),
+            nodata_value,
+        );
+        PyO3TriDataTile { _data_tile, grid }
     }
     #[staticmethod]
-    fn from_tile<'py>(tile: PyO3TriTile, data: PyReadonlyArray2<'py, f64>) -> Self {
+    fn from_tile<'py>(
+        tile: PyO3TriTile,
+        data: PyReadonlyArray2<'py, f64>,
+        nodata_value: f64,
+    ) -> Self {
         let _data_tile = data_tile::DataTile {
             tile: tile._tile.clone(),
             data: data.as_array().to_owned(),
+            nodata_value: nodata_value,
         };
         PyO3TriDataTile {
             _data_tile: _data_tile,
@@ -183,7 +192,9 @@ impl PyO3TriDataTile {
         py: Python<'py>,
         other: PyO3TriDataTile,
     ) -> PyO3TriDataTile {
-        let _data_tile = self._data_tile._empty_combined_tile(&other._data_tile, 0.);
+        let _data_tile = self
+            ._data_tile
+            ._empty_combined_tile(&other._data_tile, self._data_tile.nodata_value);
         PyO3TriDataTile {
             _data_tile,
             grid: self.grid.clone(),
@@ -207,7 +218,7 @@ impl PyO3TriDataTile {
         crop_tile: PyO3TriTile,
         nodata_value: f64,
     ) -> PyResult<PyO3TriDataTile> {
-        match self._data_tile.crop(&crop_tile._tile, 0.) {
+        match self._data_tile.crop(&crop_tile._tile, nodata_value) {
             Ok(new_tile) => Ok(PyO3TriDataTile {
                 _data_tile: new_tile,
                 grid: self.grid.clone(),

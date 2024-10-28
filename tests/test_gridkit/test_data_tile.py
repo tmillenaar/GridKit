@@ -63,3 +63,50 @@ def test_intersects(tile_init, expected):
     assert data_tile.intersects(data_tile2) == expected
     assert data_tile.intersects(tile2) == expected
     assert tile.intersects(data_tile2) == expected
+
+
+@pytest.mark.parametrize(
+    "start_id, expected_data",
+    (
+        [
+            [
+                ((2, 0)),
+                numpy.array(
+                    [
+                        [0, 1, 2, 1, 2],
+                        [3, 4, 8, 4, 5],
+                        [6, 7, 14, 7, 8],
+                    ]
+                ),
+            ],
+            [
+                ((2, 1)),
+                numpy.array(
+                    [
+                        [numpy.nan, numpy.nan, 0, 1, 2],
+                        [0, 1, 5, 4, 5],
+                        [3, 4, 11, 7, 8],
+                        [6, 7, 8, numpy.nan, numpy.nan],
+                    ]
+                ),
+            ],
+        ]
+    ),
+)
+def test_add_partial_overlap(start_id, expected_data):
+    grid = TriGrid(size=1)
+    data = numpy.arange(9).reshape((3, 3))
+    tile1 = Tile(grid, (0, 0), 3, 3)
+    tile2 = Tile(grid, start_id, 3, 3)
+    data_tile1 = DataTile(tile1, data)
+
+    # test with nodata_value of NaN
+    data_tile2 = DataTile(tile2, data, nodata_value=numpy.nan)
+    result = data_tile1 + data_tile2
+    numpy.testing.assert_allclose(result.to_numpy(), expected_data)
+
+    # test with nodata_value of 1
+    data_tile3 = DataTile(tile2, data, nodata_value=-1)
+    expected_data[numpy.isnan(expected_data)] = -1
+    result = data_tile3 + data_tile1  # Note that the nodatavalue of left is used
+    numpy.testing.assert_allclose(result.to_numpy(), expected_data)
