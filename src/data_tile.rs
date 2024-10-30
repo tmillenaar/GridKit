@@ -1,6 +1,7 @@
 use crate::grid::*;
 use crate::tile::*;
 use numpy::ndarray::*;
+use core::f64;
 use std::f64::NAN;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
@@ -127,15 +128,314 @@ impl DataTile {
         data_slice.assign(&data_tile.data);
         Ok(())
     }
+
+    pub fn powf(&self, exponent: f64) -> DataTile {
+        let mut new_tile = self.to_owned();
+        new_tile.data.mapv_inplace(|val| {
+            if val == self.nodata_value {
+                val
+            } else {
+                val.powf(exponent)
+            }
+        });
+        new_tile
+    }
+
+    pub fn powf_reverse(&self, base: f64) -> DataTile {
+        let mut new_tile = self.to_owned();
+        new_tile.data.mapv_inplace(|val| {
+            if val == self.nodata_value {
+                val
+            } else {
+                base.powf(val)
+            }
+        });
+        new_tile
+    }
+
+    pub fn powi(&self, exponent: i32) -> DataTile {
+        let mut new_tile = self.to_owned();
+        new_tile.data.mapv_inplace(|val| {
+            if val == self.nodata_value {
+                val
+            } else {
+                val.powi(exponent)
+            }
+        });
+        new_tile
+    }
+
+    pub fn equals_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] == value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn not_equals_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] != value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn greater_than_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] > value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn greater_equals_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] >= value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn lower_than_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] < value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn lower_equals_value(&self, value: f64) -> Array2<i64> {
+        let mut index_vec = Vec::new();
+
+        for id_y in 0..self.tile.ny {
+            for id_x in 0..self.tile.nx {
+                if self.data[Ix2(id_y as usize, id_x as usize)] <= value {
+                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    index_vec.push([grid_id_x, grid_id_y]);
+                }
+            }
+        }
+
+        // Convert the vector of results into an Array2
+        let nr_matches = index_vec.len();
+        let mut index = Array2::<i64>::zeros((nr_matches, 2));
+        for (i, [x, y]) in index_vec.iter().enumerate() {
+            index[(i, 0)] = *x;
+            index[(i, 1)] = *y;
+        }
+
+        index
+    }
+
+    pub fn max(&self) -> f64 {
+        let mut max_val = f64::NEG_INFINITY;
+        for val in self.data.iter() {
+            if *val != self.nodata_value && *val > max_val {
+                max_val = *val;
+            }
+        }
+        if max_val == f64::NEG_INFINITY {
+            max_val = self.nodata_value
+        }
+        max_val
+    }
+
+    pub fn min(&self) -> f64 {
+        let mut min_val = f64::INFINITY;
+        for val in self.data.iter() {
+            if *val != self.nodata_value && *val < min_val {
+                min_val = *val;
+            }
+        }
+        if min_val == f64::INFINITY {
+            min_val = self.nodata_value
+        }
+        min_val
+    }
+
+    pub fn sum(&self) -> f64 {
+        let mut summed = 0.;
+        for val in self.data.iter() {
+            if *val != self.nodata_value {
+                summed += *val;
+            }
+        }
+        summed
+    }
+
+    pub fn mean(&self) -> f64 {
+        let mut summed = 0.;
+        let mut nr_values_with_data = 0;
+        for val in self.data.iter() {
+            if *val != self.nodata_value {
+                summed += *val;
+                nr_values_with_data += 1;
+            }
+        }
+        summed / nr_values_with_data as f64
+    }
+
+    pub fn median(&self) -> f64 {
+        self.percentile(50.).unwrap()
+    }
+
+    pub fn percentile(&self, percentile: f64) -> Result<f64, String> {
+        // Validate percentile input
+        if percentile < 0.0 || percentile > 100.0 {
+            let error_message = format!("Percentile value needs to be between 0 and 100, got {}", percentile)
+            .to_string();
+            return Err(error_message);
+        }
+
+        let mut sorted: Vec<f64> = self.data.iter().cloned().collect();
+        sorted.retain(|&x| x != self.nodata_value);
+        sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let n = sorted.len();
+        if n == 0 {
+            return Err("Cannot find percentile of an empty array".to_string());
+        }
+
+        // Calculate the fractional index for the desired percentile
+        let rank = (percentile / 100.0) * (n as f64 - 1.0);
+        let lower_index = rank.floor() as usize;
+        let upper_index = rank.ceil() as usize;
+
+        // Interpolate if needed
+        if lower_index == upper_index {
+            return Ok(sorted[lower_index]) // Exact match at an integer index
+        }
+
+        let weight_upper = rank - lower_index as f64;
+        let weight_lower = 1.0 - weight_upper;
+        Ok(sorted[lower_index] * weight_lower + sorted[upper_index] * weight_upper)
+    }
+
+    pub fn std(&self) -> f64 {
+        let mean = self.mean();
+
+        // // Compute the squared differences from the mean
+        let filtered = self.data.iter().filter(|&&x| x != self.nodata_value);
+        let variance_sum: f64 = filtered.clone()
+            .map(|&x| (x - mean).powi(2))
+            .sum();
+        let variance = variance_sum / filtered.count() as f64;
+
+        variance.sqrt() // Return the square root of the variance
+    }
+
+}
+
+impl Add<DataTile> for f64 {
+    type Output = DataTile;
+
+    fn add(self, data_tile: DataTile) -> DataTile {
+        let mut data = data_tile.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == data_tile.nodata_value {
+                *val = data_tile.nodata_value;
+            } else {
+                *val = self + *val;
+            }
+        }
+        DataTile {
+            tile: data_tile.tile,
+            data: data,
+            nodata_value: data_tile.nodata_value,
+        }
+    }
 }
 
 impl Add<f64> for DataTile {
     type Output = DataTile;
 
     fn add(self, scalar: f64) -> DataTile {
+        let mut data = self.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == self.nodata_value {
+                *val = self.nodata_value;
+            } else {
+                *val = *val + scalar
+            }
+        }
         DataTile {
             tile: self.tile,
-            data: &self.data + scalar,
+            data: data,
             nodata_value: self.nodata_value,
         }
     }
@@ -170,13 +470,41 @@ impl Add<DataTile> for DataTile {
     }
 }
 
+impl Sub<DataTile> for f64 {
+    type Output = DataTile;
+
+    fn sub(self, data_tile: DataTile) -> DataTile {
+        let mut data = data_tile.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == data_tile.nodata_value {
+                *val = data_tile.nodata_value;
+            } else {
+                *val = self - *val;
+            }
+        }
+        DataTile {
+            tile: data_tile.tile,
+            data: data,
+            nodata_value: data_tile.nodata_value,
+        }
+    }
+}
+
 impl Sub<f64> for DataTile {
     type Output = DataTile;
 
     fn sub(self, scalar: f64) -> DataTile {
+        let mut data = self.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == self.nodata_value {
+                *val = self.nodata_value;
+            } else {
+                *val = *val - scalar
+            }
+        }
         DataTile {
             tile: self.tile,
-            data: &self.data - scalar,
+            data: data,
             nodata_value: self.nodata_value,
         }
     }
@@ -211,13 +539,41 @@ impl Sub<DataTile> for DataTile {
     }
 }
 
+impl Mul<DataTile> for f64 {
+    type Output = DataTile;
+
+    fn mul(self, data_tile: DataTile) -> DataTile {
+        let mut data = data_tile.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == data_tile.nodata_value {
+                *val = data_tile.nodata_value;
+            } else {
+                *val = self * *val;
+            }
+        }
+        DataTile {
+            tile: data_tile.tile,
+            data: data,
+            nodata_value: data_tile.nodata_value,
+        }
+    }
+}
+
 impl Mul<f64> for DataTile {
     type Output = DataTile;
 
     fn mul(self, scalar: f64) -> DataTile {
+        let mut data = self.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == self.nodata_value {
+                *val = self.nodata_value;
+            } else {
+                *val = *val * scalar
+            }
+        }
         DataTile {
             tile: self.tile,
-            data: &self.data * scalar,
+            data: data,
             nodata_value: self.nodata_value,
         }
     }
@@ -252,13 +608,41 @@ impl Mul<DataTile> for DataTile {
     }
 }
 
+impl Div<DataTile> for f64 {
+    type Output = DataTile;
+
+    fn div(self, data_tile: DataTile) -> DataTile {
+        let mut data = data_tile.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == data_tile.nodata_value {
+                *val = data_tile.nodata_value;
+            } else {
+                *val = self / *val;
+            }
+        }
+        DataTile {
+            tile: data_tile.tile,
+            data: data,
+            nodata_value: data_tile.nodata_value,
+        }
+    }
+}
+
 impl Div<f64> for DataTile {
     type Output = DataTile;
 
     fn div(self, scalar: f64) -> DataTile {
+        let mut data = self.data.to_owned();
+        for val in data.iter_mut() {
+            if *val == self.nodata_value {
+                *val = self.nodata_value;
+            } else {
+                *val = *val / scalar
+            }
+        }
         DataTile {
             tile: self.tile,
-            data: &self.data / scalar,
+            data: data,
             nodata_value: self.nodata_value,
         }
     }

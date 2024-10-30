@@ -131,6 +131,14 @@ impl PyO3TriDataTile {
         }
     }
 
+    fn _add_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = value + self._data_tile.clone();
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
     fn _add_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() + other._data_tile;
         PyO3TriDataTile {
@@ -141,6 +149,14 @@ impl PyO3TriDataTile {
 
     fn _subtract_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() - value;
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
+    fn _subtract_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = value - self._data_tile.clone();
         PyO3TriDataTile {
             _data_tile,
             grid: self.grid.clone(),
@@ -163,6 +179,14 @@ impl PyO3TriDataTile {
         }
     }
 
+    fn _multiply_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = value * self._data_tile.clone();
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
     fn _multiply_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() * other._data_tile;
         PyO3TriDataTile {
@@ -179,12 +203,99 @@ impl PyO3TriDataTile {
         }
     }
 
+    fn _divide_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = value / self._data_tile.clone();
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
     fn _divide_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3TriDataTile {
         let _data_tile = self._data_tile.clone() / other._data_tile;
         PyO3TriDataTile {
             _data_tile,
             grid: self.grid.clone(),
         }
+    }
+
+    fn _powf<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.powf(value);
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
+    fn _powf_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.powf_reverse(value);
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
+    fn _powi<'py>(&self, py: Python<'py>, value: i32) -> PyO3TriDataTile {
+        let _data_tile = self._data_tile.powi(value);
+        PyO3TriDataTile {
+            _data_tile,
+            grid: self.grid.clone(),
+        }
+    }
+
+    fn __eq__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.equals_value(value).into_pyarray(py)
+    }
+
+    fn __ne__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.not_equals_value(value).into_pyarray(py)
+    }
+
+    fn __gt__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.greater_than_value(value).into_pyarray(py)
+    }
+
+    fn __ge__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.greater_equals_value(value).into_pyarray(py)
+    }
+
+    fn __lt__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.lower_than_value(value).into_pyarray(py)
+    }
+
+    fn __le__<'py>(&self, py: Python<'py>, value: f64) -> &'py PyArray2<i64> {
+        self._data_tile.lower_equals_value(value).into_pyarray(py)
+    }
+
+    fn max<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.max()
+    }
+
+    fn min<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.min()
+    }
+
+    fn sum<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.sum()
+    }
+
+    fn mean<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.mean()
+    }
+
+    fn median<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.median()
+    }
+
+    fn percentile<'py>(&self, py: Python<'py>, percentile: f64) -> PyResult<f64> {
+        match self._data_tile.percentile(percentile) {
+            Ok(value) => Ok(value),
+            Err(e) => Err(PyValueError::new_err(e)),
+        }
+    }
+
+    fn std<'py>(&self, py: Python<'py>) -> f64 {
+        self._data_tile.std()
     }
 
     fn _empty_combined_data_tile<'py>(

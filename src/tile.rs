@@ -46,11 +46,9 @@ pub trait TileTraits {
     }
 
     fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
-        // TODO: Check out of bounds
         let tile = self.get_tile();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
-        // let tile_id_y = (tile.ny as i64 - 1) - (id_y - tile.start_id.1);
         let tile_id_y = (tile.start_id.1 + tile.ny as i64 - 1) - id_y;
 
         // Check out of bounds
@@ -67,6 +65,30 @@ pub trait TileTraits {
             return Err(error_message);
         }
         return Ok((tile_id_x, tile_id_y));
+    }
+
+    fn tile_id_to_grid_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
+        let tile = self.get_tile();
+        // Check out of bounds
+        if id_x < 0
+            || id_y < 0
+            || id_x >= self.get_tile().nx as i64
+            || id_y >= self.get_tile().ny as i64
+        {
+            let error_message = format!(
+                "Grid ID ({}, {}) not in Tile ID with start_id: ({}, {}), nx: {}, ny: {}. Supplied array id: ({},{})",
+                id_x, id_y, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny, id_x, id_y
+            )
+            .to_string();
+            return Err(error_message);
+        }
+
+        // Do conversion
+        let grid_id_x = id_x + tile.start_id.0;
+        // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
+        // Subtract 1 to account for base-0
+        let grid_id_y = (tile.ny as i64 - id_y) + tile.start_id.1 - 1;
+        return Ok((grid_id_x, grid_id_y));
     }
 }
 

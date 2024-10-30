@@ -166,7 +166,16 @@ class Tile:
 class DataTile:
 
     def __init__(self, tile: Tile, data: numpy.ndarray, nodata_value=numpy.nan):
+        if data.ndim != 2:
+            raise ValueError(f"Expected a 2D array, got {data.ndim} dimensions")
+        if tile.ny != data.shape[0] or tile.nx != data.shape[1]:
+            raise ValueError(
+                f"The shape of the data {data.shape} does not match the shape of the tile: {(tile.ny, tile.nx)}"
+            )
+
         self.grid = tile.grid
+        if nodata_value is None:
+            nodata_value = numpy.nan
         self._data_tile = PyO3TriDataTile.from_tile(
             tile._tile, data.astype("float64"), nodata_value
         )
@@ -174,6 +183,9 @@ class DataTile:
 
     def to_numpy(self):
         return self._data_tile.to_numpy()
+
+    def __array__(self, dtype=None):
+        return self.to_numpy() if dtype is None else self.to_numpy().astype(dtype)
 
     def __getitem__(self, item):
         return self.to_numpy()[item]
@@ -187,7 +199,9 @@ class DataTile:
         )
         self._data_tile = PyO3TriDataTile.from_tile(tile, new_data, self.nodata_value)
 
-    def update(self, grid=None, data=None, start_id=None, nx=None, ny=None):
+    def update(
+        self, grid=None, data=None, start_id=None, nx=None, ny=None, nodata_value=None
+    ):
         # TODO: Make clear that update copies the data
         if grid is None:
             grid = self.grid
@@ -202,13 +216,15 @@ class DataTile:
             nx = self.nx
         if ny is None:
             ny = self.ny
+        if nodata_value is None:
+            nodata_value = self.nodata_value
 
         if data.shape != (ny, nx):
             raise ValueError(
                 f"The shape of the supplied data ({data.shape}) does not match the shape of the tile where ny is {ny} and nx is {nx}"
             )
 
-        return DataTile(Tile(grid, start_id, nx, ny), data)
+        return DataTile(Tile(grid, start_id, nx, ny), data, nodata_value=nodata_value)
 
     @property
     def start_id(self):
@@ -301,8 +317,7 @@ class DataTile:
 
     def crop(self, crop_tile):
         _data_tile = self._data_tile.crop(crop_tile._tile, nodata_value=0)
-        cropped = self.update()
-        cropped._data_tile = _data_tile
+        cropped = DataTile(crop_tile, _data_tile.to_numpy())
         return cropped
 
     @validate_index
@@ -328,6 +343,19 @@ class DataTile:
         combined._data_tile = _data_tile
         return combined
 
+    def __radd__(self, other):
+        if isinstance(other, DataTile):
+            _data_tile = self._data_tile._add_tile(other._data_tile)
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._add_scalar_reverse(other)
+            except:
+                raise TypeError(f"Cannot add DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
     def __sub__(self, other):
         if isinstance(other, DataTile):
             _data_tile = self._data_tile._subtract_tile(other._data_tile)
@@ -335,6 +363,19 @@ class DataTile:
             try:
                 other = float(other)
                 _data_tile = self._data_tile._subtract_scalar(other)
+            except:
+                raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
+    def __rsub__(self, other):
+        if isinstance(other, DataTile):
+            _data_tile = self._data_tile._subtract_tile(other._data_tile)
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._subtract_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
         combined = self.update()
@@ -354,6 +395,19 @@ class DataTile:
         combined._data_tile = _data_tile
         return combined
 
+    def __rmul__(self, other):
+        if isinstance(other, DataTile):
+            _data_tile = self._data_tile._multiply_tile(other._data_tile)
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._multiply_scalar_reverse(other)
+            except:
+                raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
     def __truediv__(self, other):
         if isinstance(other, DataTile):
             _data_tile = self._data_tile._divide_tile(other._data_tile)
@@ -366,3 +420,135 @@ class DataTile:
         combined = self.update()
         combined._data_tile = _data_tile
         return combined
+
+    def __rtruediv__(self, other):
+        if isinstance(other, DataTile):
+            _data_tile = self._data_tile._divide_tile(other._data_tile)
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._divide_scalar_reverse(other)
+            except:
+                raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
+    def __pow__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError(
+                "Elementwise raising to the power between two DataTiles is not supported."
+            )
+        elif isinstance(other, int):
+            _data_tile = self._data_tile._powi(other)
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._powf(other)
+            except:
+                raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
+    def __rpow__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError(
+                "Elementwise raising to the power between two DataTiles is not supported."
+            )
+        else:
+            try:
+                other = float(other)
+                _data_tile = self._data_tile._powf_reverse(other)
+            except:
+                raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
+        combined = self.update()
+        combined._data_tile = _data_tile
+        return combined
+
+    def __eq__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile == other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def __ne__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile != other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def __ge__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile >= other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def __gt__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile > other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def __le__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile <= other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def __lt__(self, other):
+        if isinstance(other, DataTile):
+            raise NotImplementedError()
+        try:
+            other = float(other)
+            return GridIndex(self._data_tile < other)
+        except ValueError:
+            raise TypeError(
+                f"Cannot compare DataTile with object of type '{type(other)}'"
+            )
+
+    def max(self):
+        return self._data_tile.max()
+
+    def min(self):
+        return self._data_tile.min()
+
+    def mean(self):
+        return self._data_tile.mean()
+
+    def sum(self):
+        return self._data_tile.sum()
+
+    def median(self):
+        return self._data_tile.median()
+
+    def percentile(self, percentile):
+        return self._data_tile.percentile(percentile)
+
+    def std(self):
+        return self._data_tile.std()
