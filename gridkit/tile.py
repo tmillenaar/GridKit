@@ -70,7 +70,8 @@ class Tile:
         )
 
         if isinstance(grid, TriGrid):
-            self._tile = PyO3TriTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3Tile.from_tri_grid(grid._grid, start_id, nx, ny)
+            # self._tile = PyO3TriTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, RectGrid):
             self._tile = PyO3RectTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, HexGrid):
@@ -176,9 +177,7 @@ class DataTile:
         self.grid = tile.grid
         if nodata_value is None:
             nodata_value = numpy.nan
-        self._data_tile = PyO3TriDataTile.from_tile(
-            tile._tile, data.astype("float64"), nodata_value
-        )
+        self._data_tile = tile._tile.to_data_tile(data.astype("float64"), nodata_value)
         self.nodata_value = nodata_value
 
     def to_numpy(self):
@@ -194,10 +193,21 @@ class DataTile:
         # Don't use update() but replace _data_tile in-place
         new_data = self.to_numpy()
         new_data[item] = value
-        tile = PyO3TriTile(
-            self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
-        )
-        self._data_tile = PyO3TriDataTile.from_tile(tile, new_data, self.nodata_value)
+        if isinstance(self.grid, TriGrid):
+            tile = PyO3Tile.from_tri_grid(
+                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
+            )
+        elif isinstance(self.grid, TriGrid):
+            tile = PyO3Tile.from_rect_grid(
+                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
+            )
+        elif isinstance(self.grid, TriGrid):
+            tile = PyO3Tile.from_hex_grid(
+                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
+            )
+        else:
+            raise TypeError(f"Unrecognized grid type: {self.grid}")
+        self._data_tile = tile.to_data_tile(new_data, self.nodata_value)
 
     def update(
         self, grid=None, data=None, start_id=None, nx=None, ny=None, nodata_value=None
