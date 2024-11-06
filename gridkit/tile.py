@@ -71,11 +71,10 @@ class Tile:
 
         if isinstance(grid, TriGrid):
             self._tile = PyO3Tile.from_tri_grid(grid._grid, start_id, nx, ny)
-            # self._tile = PyO3TriTile(grid._grid, start_id, nx, ny)
         elif isinstance(grid, RectGrid):
-            self._tile = PyO3RectTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3Tile.from_rect_grid(grid._grid, start_id, nx, ny)
         elif isinstance(grid, HexGrid):
-            self._tile = PyO3HexTile(grid._grid, start_id, nx, ny)
+            self._tile = PyO3Tile.from_hex_grid(grid._grid, start_id, nx, ny)
         else:
             raise TypeError(
                 f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
