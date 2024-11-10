@@ -5,7 +5,8 @@ import numpy
 import rasterio
 from pyproj import CRS, Transformer
 
-from gridkit.rect_grid import BoundedRectGrid
+from gridkit.rect_grid import BoundedRectGrid, RectGrid
+from gridkit.tile import DataTile, Tile
 
 
 def read_raster(
@@ -115,3 +116,60 @@ def write_raster(grid, path):
     ) as dst:
         dst.write(numpy.expand_dims(grid._data.copy(), 0))
     return path
+
+
+def raster_to_data_tile(path, bounds=None):
+    with rasterio.open(path) as raster_file:
+        crs = str(raster_file.crs)
+
+        if bounds is not None:
+            raise NotImplementedError()
+
+            if bounds_crs is not None:
+                bounds_crs = CRS.from_user_input(bounds_crs)
+                transformer = Transformer.from_crs(bounds_crs, crs, always_xy=True)
+                bounds = transformer.transform_bounds(*bounds)
+            top, left = raster_file.index(bounds[0], bounds[3])
+            bottom, right = raster_file.index(bounds[2], bounds[1])
+
+            if border_buffer:  # note rasterio slices from top to bottom
+                left -= border_buffer
+                right += border_buffer
+                top -= border_buffer
+                bottom += border_buffer
+
+            # Create a window from the indices
+            window = rasterio.windows.Window.from_slices((top, bottom), (left, right))
+            bounds = rasterio.windows.bounds(
+                window, raster_file.transform
+            )  # update the bounds to those of the window
+        else:
+            window = None
+            b = raster_file.bounds if bounds is None else bounds
+            bounds = (b.left, b.bottom, b.right, b.top)
+
+        data = raster_file.read(1, window=window)
+        nodata = raster_file.nodata
+
+    if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
+        raise ValueError(
+            f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
+        )
+
+    dx = (bounds[2] - bounds[0]) / data.shape[1]
+    dy = (bounds[3] - bounds[1]) / data.shape[0]
+
+    offset_x = bounds[0] % dx
+    offset_y = bounds[1] % dy
+    offset_x = dx - offset_x if offset_x < 0 else offset_x
+    offset_y = dy - offset_y if offset_y < 0 else offset_y
+    offset = (
+        0 if numpy.isclose(offset_x, dx) else offset_x,
+        0 if numpy.isclose(offset_y, dy) else offset_y,
+    )
+
+    grid = RectGrid(dx=dx, dy=dy, offset=offset, crs=crs)
+    start_id = grid.cell_at_point(bounds[:2])
+    tile = Tile(grid, start_id, nx=data.shape[1], ny=data.shape[0])
+    data_tile = DataTile(tile, data, nodata_value=raster_file.nodata)
+    return data_tile
