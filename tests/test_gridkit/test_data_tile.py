@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from gridkit import DataTile, Tile, TriGrid
+from gridkit import DataTile, RectGrid, Tile, TriGrid
 
 
 def test_data_ravel_order():
@@ -292,3 +292,18 @@ def test_crop():
     cropped = data_tile.crop(Tile(grid, (1, 0), 2, 2))
     numpy.testing.assert_almost_equal(cropped, expected_data)
     numpy.testing.assert_almost_equal(cropped.start_id, (1, 0))
+
+
+def test_centroid():
+    # initialize grid
+    grid = RectGrid(size=1)
+    tile = Tile(grid, (-2, 0), 2, 2)
+    data = numpy.array([[0, 1], [2, 3]])
+    data_tile = DataTile(tile, data)
+
+    expected_centroids = [[[-1.5, 1.5], [-0.5, 1.5]], [[-1.5, 0.5], [-0.5, 0.5]]]
+    numpy.testing.assert_equal(data_tile.centroid(), expected_centroids)
+
+    # test using ids
+    ids = data_tile.indices
+    numpy.testing.assert_equal(grid.centroid(ids), expected_centroids)
