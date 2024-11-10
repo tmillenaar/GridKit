@@ -32,7 +32,6 @@ pub enum PyO3Grid {
     PyO3HexGrid(PyO3HexGrid),
 }
 
-
 #[pyclass]
 #[derive(Clone)]
 struct PyO3TriDataTile {
@@ -61,10 +60,8 @@ struct PyO3Tile {
     _tile: tile::Tile,
 }
 
-
 #[pymethods]
 impl PyO3Tile {
-
     #[staticmethod]
     fn from_tri_grid(grid: PyO3TriGrid, start_id: (i64, i64), nx: u64, ny: u64) -> Self {
         let tmp = grid.clone(); // FIXME: both PyTile and Tile need 'grid' but are in fact different structs (Py)...Grid
@@ -125,17 +122,15 @@ impl PyO3Tile {
         }
     }
 
-    fn to_data_tile<'py>(&self, data: PyReadonlyArray2<'py, f64>, nodata_value: f64) -> PyO3DataTile {
+    fn to_data_tile<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, f64>,
+        nodata_value: f64,
+    ) -> PyO3DataTile {
         let grid = match &self._grid {
-            PyO3Grid::PyO3TriGrid(grid) => {
-                grid::Grid::TriGrid(grid._grid.clone())
-            }
-            PyO3Grid::PyO3RectGrid(grid) => {
-                grid::Grid::RectGrid(grid._grid.clone())
-            }
-            PyO3Grid::PyO3HexGrid(grid) => {
-                grid::Grid::HexGrid(grid._grid.clone())
-            }
+            PyO3Grid::PyO3TriGrid(grid) => grid::Grid::TriGrid(grid._grid.clone()),
+            PyO3Grid::PyO3RectGrid(grid) => grid::Grid::RectGrid(grid._grid.clone()),
+            PyO3Grid::PyO3HexGrid(grid) => grid::Grid::HexGrid(grid._grid.clone()),
         };
         let _tile = tile::Tile {
             grid: grid,
@@ -143,10 +138,14 @@ impl PyO3Tile {
             nx: self.nx,
             ny: self.ny,
         };
-        let _data_tile = DataTile{tile: _tile, data: data.as_array().to_owned(), nodata_value: nodata_value};
+        let _data_tile = DataTile {
+            tile: _tile,
+            data: data.as_array().to_owned(),
+            nodata_value: nodata_value,
+        };
         PyO3DataTile {
             _data_tile: _data_tile,
-            _tile: self.clone()
+            _tile: self.clone(),
         }
     }
 
@@ -174,15 +173,22 @@ impl PyO3Tile {
         match self._tile.overlap(&other._tile) {
             Ok(new_tile) => {
                 let grid = match &new_tile.grid {
-                    grid::Grid::TriGrid(grid) => {
-                        PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(grid.cellsize, grid.offset, grid.rotation()))
-                    }
-                    grid::Grid::RectGrid(grid) => {
-                        PyO3Grid::PyO3RectGrid(PyO3RectGrid::new(grid.dx(), grid.dy(), grid.offset, grid.rotation()))
-                    }
-                    grid::Grid::HexGrid(grid) => {
-                        PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(grid.cellsize, grid.offset, grid.rotation()))
-                    }
+                    grid::Grid::TriGrid(grid) => PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(
+                        grid.cellsize,
+                        grid.offset,
+                        grid.rotation(),
+                    )),
+                    grid::Grid::RectGrid(grid) => PyO3Grid::PyO3RectGrid(PyO3RectGrid::new(
+                        grid.dx(),
+                        grid.dy(),
+                        grid.offset,
+                        grid.rotation(),
+                    )),
+                    grid::Grid::HexGrid(grid) => PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(
+                        grid.cellsize,
+                        grid.offset,
+                        grid.rotation(),
+                    )),
                 };
                 Ok(PyO3Tile {
                     _grid: grid,
@@ -191,7 +197,7 @@ impl PyO3Tile {
                     ny: new_tile.ny,
                     _tile: new_tile,
                 })
-            },
+            }
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
@@ -199,7 +205,6 @@ impl PyO3Tile {
 
 #[pymethods]
 impl PyO3DataTile {
-
     fn start_id(&self) -> (i64, i64) {
         self._data_tile.tile.start_id
     }
@@ -244,12 +249,27 @@ impl PyO3DataTile {
         match self._data_tile.overlap(&other._data_tile.get_tile()) {
             Ok(new_tile) => {
                 let tile = match &self._tile._grid {
-                    PyO3Grid::PyO3TriGrid(grid) => {PyO3Tile::from_tri_grid(grid.clone(), new_tile.start_id, new_tile.nx, new_tile.ny)}
-                    PyO3Grid::PyO3RectGrid(grid) => {PyO3Tile::from_rect_grid(grid.clone(), new_tile.start_id, new_tile.nx, new_tile.ny)}
-                    PyO3Grid::PyO3HexGrid(grid) => {PyO3Tile::from_hex_grid(grid.clone(), new_tile.start_id, new_tile.nx, new_tile.ny)}
+                    PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
+                        grid.clone(),
+                        new_tile.start_id,
+                        new_tile.nx,
+                        new_tile.ny,
+                    ),
+                    PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
+                        grid.clone(),
+                        new_tile.start_id,
+                        new_tile.nx,
+                        new_tile.ny,
+                    ),
+                    PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
+                        grid.clone(),
+                        new_tile.start_id,
+                        new_tile.nx,
+                        new_tile.ny,
+                    ),
                 };
                 Ok(tile)
-            },
+            }
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
@@ -438,20 +458,29 @@ impl PyO3DataTile {
             ._data_tile
             ._empty_combined_tile(&other._data_tile, self._data_tile.nodata_value);
         let tile = match &self._tile._grid {
-            PyO3Grid::PyO3TriGrid(grid) => {
-                PyO3Tile::from_tri_grid(grid.clone(), _data_tile.tile.start_id, _data_tile.tile.nx, _data_tile.tile.ny)
-            }
-            PyO3Grid::PyO3RectGrid(grid) => {
-                PyO3Tile::from_rect_grid(grid.clone(), _data_tile.tile.start_id, _data_tile.tile.nx, _data_tile.tile.ny)
-            }
-            PyO3Grid::PyO3HexGrid(grid) => {
-                PyO3Tile::from_hex_grid(grid.clone(), _data_tile.tile.start_id, _data_tile.tile.nx, _data_tile.tile.ny)
-            }
+            PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
+                grid.clone(),
+                _data_tile.tile.start_id,
+                _data_tile.tile.nx,
+                _data_tile.tile.ny,
+            ),
+            PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
+                grid.clone(),
+                _data_tile.tile.start_id,
+                _data_tile.tile.nx,
+                _data_tile.tile.ny,
+            ),
+            PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
+                grid.clone(),
+                _data_tile.tile.start_id,
+                _data_tile.tile.nx,
+                _data_tile.tile.ny,
+            ),
         };
 
         PyO3DataTile {
             _data_tile: _data_tile,
-            _tile: tile
+            _tile: tile,
         }
     }
 
