@@ -162,8 +162,13 @@ class Tile:
             )
         return self._tile.intersects(other_tile)
 
+    def centroid(self, index=None):
+        if index is None:
+            index = self.indices
+        return self.grid.centroid(index)
 
-class DataTile:
+
+class DataTile(Tile):
 
     def __init__(self, tile: Tile, data: numpy.ndarray, nodata_value=numpy.nan):
         if data.ndim != 2:
@@ -177,6 +182,8 @@ class DataTile:
         if nodata_value is None:
             nodata_value = numpy.nan
         self._data_tile = tile._tile.to_data_tile(data.astype("float64"), nodata_value)
+        # _tile is used by the Tile parent class
+        self._tile = self._data_tile.get_tile()
         self.nodata_value = nodata_value
 
     def to_numpy(self):
@@ -235,23 +242,6 @@ class DataTile:
 
         return DataTile(Tile(grid, start_id, nx, ny), data, nodata_value=nodata_value)
 
-    @property
-    def start_id(self):
-        """The starting cell of the Tile.
-        The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.
-        """
-        return GridIndex(self._data_tile.start_id())
-
-    @property
-    def nx(self):
-        """The number of cells in x direction, starting from the ``start_id``"""
-        return self._data_tile.nx()
-
-    @property
-    def ny(self):
-        """The number of cells in y direction, starting from the ``start_id``"""
-        return self._data_tile.ny()
-
     def get_tile(self):
         """A Tile object with the same properties as this DataTile, but without the data attached."""
         return Tile(self.grid, self.start_id, self.nx, self.ny)
@@ -267,43 +257,6 @@ class DataTile:
             (assuming the assicaited grid is not rotated)
         """
         return GridIndex(self._data_tile.corner_ids())
-
-    def corners(self):
-        """The coordinates at the corners of the Tile
-
-        Returns
-        -------
-        `numpy.ndarray`
-            A two-dimensional array that contais the x and y coordinates of
-            the corners in order: top-left, top-right, bottom-right, bottom-left
-            (assuming the assicaited grid is not rotated)
-        """
-        return self._data_tile.corners()
-
-    @property
-    def indices(self):
-        """The ids of all cells in the Tile.
-
-        Returns
-        -------
-        :class:`.GridIndex`
-            The :class:`.GridIndex` that contains the indices in the Tile
-        """
-        return GridIndex(self._data_tile.indices())
-
-    @property
-    def bounds(self) -> Tuple[float, float, float, float]:
-        """The bounding box of the Tile in (xmin, ymin, xmax, ymax).
-        If the associated grid is rotated, the this represents the bounding box
-        that fully encapsulates the Tile and will contain more area than is
-        covered by the rotated Tile.
-
-        Returns
-        -------
-        Tuple[float, float, float, float]
-            The bounding box in (xmin, ymin, xmax, ymax)
-        """
-        return self._data_tile.bounds()
 
     def overlap(self, other):
         is_aligned, reason = self.grid.is_aligned_with(other.grid)
