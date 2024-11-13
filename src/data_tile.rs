@@ -1,7 +1,7 @@
 use crate::grid::*;
 use crate::tile::*;
-use numpy::ndarray::*;
 use core::f64;
+use numpy::ndarray::*;
 use std::f64::NAN;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
@@ -171,7 +171,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] == value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -194,7 +197,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] != value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -217,7 +223,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] > value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -240,7 +249,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] >= value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -263,7 +275,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] < value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -286,7 +301,10 @@ impl DataTile {
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 if self.data[Ix2(id_y as usize, id_x as usize)] <= value {
-                    let (grid_id_x, grid_id_y) = self.tile.tile_id_to_grid_id_xy(id_x as i64, id_y as i64).unwrap();
+                    let (grid_id_x, grid_id_y) = self
+                        .tile
+                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
             }
@@ -358,7 +376,10 @@ impl DataTile {
     pub fn percentile(&self, percentile: f64) -> Result<f64, String> {
         // Validate percentile input
         if percentile < 0.0 || percentile > 100.0 {
-            let error_message = format!("Percentile value needs to be between 0 and 100, got {}", percentile)
+            let error_message = format!(
+                "Percentile value needs to be between 0 and 100, got {}",
+                percentile
+            )
             .to_string();
             return Err(error_message);
         }
@@ -378,7 +399,7 @@ impl DataTile {
 
         // Interpolate if needed
         if lower_index == upper_index {
-            return Ok(sorted[lower_index]) // Exact match at an integer index
+            return Ok(sorted[lower_index]); // Exact match at an integer index
         }
 
         let weight_upper = rank - lower_index as f64;
@@ -391,14 +412,11 @@ impl DataTile {
 
         // // Compute the squared differences from the mean
         let filtered = self.data.iter().filter(|&&x| x != self.nodata_value);
-        let variance_sum: f64 = filtered.clone()
-            .map(|&x| (x - mean).powi(2))
-            .sum();
+        let variance_sum: f64 = filtered.clone().map(|&x| (x - mean).powi(2)).sum();
         let variance = variance_sum / filtered.count() as f64;
 
         variance.sqrt() // Return the square root of the variance
     }
-
 }
 
 impl Add<DataTile> for f64 {
@@ -457,7 +475,23 @@ impl Add<DataTile> for DataTile {
             // crop() should not return an error. If it does, something more fundamental is wrong.
             let overlap_self = self.crop(&other.tile, self.nodata_value).unwrap();
             let overlap_other = other.crop(&self.tile, self.nodata_value).unwrap();
-            let overlap_data = overlap_self.data + overlap_other.data;
+
+            // Calculate overlapping values taking nodata values into account
+            // The nodata value will be taken from self and not other.
+            // If the the value of the element in question is nodata for either self or other,
+            // the result is set to be nodata value of self.
+            let mut overlap_data = Array::zeros(overlap_self.data.raw_dim());
+            Zip::from(&mut overlap_data)
+                .and(&overlap_self.data)
+                .and(&overlap_other.data)
+                .for_each(|result_val, &self_val, &other_val| {
+                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                        *result_val = self.nodata_value;
+                    } else {
+                        *result_val = self_val + other_val;
+                    }
+                });
+
             let overlap_tile = overlap_self.tile; // Might as well have taken overlap_other.tile, they should be the same
             let overlap_data_tile = DataTile {
                 tile: overlap_tile,
@@ -526,7 +560,23 @@ impl Sub<DataTile> for DataTile {
             // crop() should not return an error. If it does, something more fundamental is wrong.
             let overlap_self = self.crop(&other.tile, self.nodata_value).unwrap();
             let overlap_other = other.crop(&self.tile, self.nodata_value).unwrap();
-            let overlap_data = overlap_self.data - overlap_other.data;
+
+            // Calculate overlapping values taking nodata values into account
+            // The nodata value will be taken from self and not other.
+            // If the the value of the element in question is nodata for either self or other,
+            // the result is set to be nodata value of self.
+            let mut overlap_data = Array::zeros(overlap_self.data.raw_dim());
+            Zip::from(&mut overlap_data)
+                .and(&overlap_self.data)
+                .and(&overlap_other.data)
+                .for_each(|result_val, &self_val, &other_val| {
+                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                        *result_val = self.nodata_value;
+                    } else {
+                        *result_val = self_val - other_val;
+                    }
+                });
+
             let overlap_tile = overlap_self.tile; // Might as well have taken overlap_other.tile, they should be the same
             let overlap_data_tile = DataTile {
                 tile: overlap_tile,
@@ -595,7 +645,23 @@ impl Mul<DataTile> for DataTile {
             // crop() should not return an error. If it does, something more fundamental is wrong.
             let overlap_self = self.crop(&other.tile, self.nodata_value).unwrap();
             let overlap_other = other.crop(&self.tile, self.nodata_value).unwrap();
-            let overlap_data = overlap_self.data * overlap_other.data;
+
+            // Calculate overlapping values taking nodata values into account
+            // The nodata value will be taken from self and not other.
+            // If the the value of the element in question is nodata for either self or other,
+            // the result is set to be nodata value of self.
+            let mut overlap_data = Array::zeros(overlap_self.data.raw_dim());
+            Zip::from(&mut overlap_data)
+                .and(&overlap_self.data)
+                .and(&overlap_other.data)
+                .for_each(|result_val, &self_val, &other_val| {
+                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                        *result_val = self.nodata_value;
+                    } else {
+                        *result_val = self_val * other_val;
+                    }
+                });
+
             let overlap_tile = overlap_self.tile; // Might as well have taken overlap_other.tile, they should be the same
             let overlap_data_tile = DataTile {
                 tile: overlap_tile,
@@ -663,7 +729,23 @@ impl Div<DataTile> for DataTile {
             // crop() should not return an error. If it does, something more fundamental is wrong.
             let overlap_self = self.crop(&other.tile, self.nodata_value).unwrap();
             let overlap_other = other.crop(&self.tile, self.nodata_value).unwrap();
-            let overlap_data = overlap_self.data / overlap_other.data;
+
+            // Calculate overlapping values taking nodata values into account
+            // The nodata value will be taken from self and not other.
+            // If the the value of the element in question is nodata for either self or other,
+            // the result is set to be nodata value of self.
+            let mut overlap_data = Array::zeros(overlap_self.data.raw_dim());
+            Zip::from(&mut overlap_data)
+                .and(&overlap_self.data)
+                .and(&overlap_other.data)
+                .for_each(|result_val, &self_val, &other_val| {
+                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                        *result_val = self.nodata_value;
+                    } else {
+                        *result_val = self_val / other_val;
+                    }
+                });
+
             let overlap_tile = overlap_self.tile; // Might as well have taken overlap_other.tile, they should be the same
             let overlap_data_tile = DataTile {
                 tile: overlap_tile,

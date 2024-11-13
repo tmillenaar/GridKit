@@ -210,22 +210,22 @@ def test_comparissons_with_scalars(nodata):
     expected = numpy.array([[0, 1], [0, 0], [1, 0]])
     numpy.testing.assert_allclose(result.index, expected)
 
-    # # test greater than
+    # test greater than
     result = data_tile > 1
     expected = numpy.array([[0, 0], [1, 0]])
     numpy.testing.assert_allclose(result.index, expected)
 
-    # # test smaller than
+    # test smaller than
     result = data_tile < 1
     expected = numpy.array([0, 1])
     numpy.testing.assert_allclose(result.index, expected)
 
-    # # test greater than or equal
+    # test greater than or equal
     result = data_tile >= 1
     expected = numpy.array([[1, 1], [0, 0], [1, 0]])
     numpy.testing.assert_allclose(result.index, expected)
 
-    # # test smaller than or equal
+    # test smaller than or equal
     result = data_tile <= 1
     expected = numpy.array([[0, 1], [1, 1]])
     numpy.testing.assert_allclose(result.index, expected)
@@ -274,6 +274,127 @@ def test_reduction_operators():
     numpy.testing.assert_allclose(result, 6)
     result = data_tile_nodata.sum()
     numpy.testing.assert_allclose(result, 3)
+
+
+def test_basic_operations_with_otehr_grids():
+    """The setup for this tests is as follows
+
+    Tile 1:
+        __ __ __
+     __|_0|_1|_2|
+    |__|_3|_4|_5|
+    |__|_6|_7|_8|
+    |__|__|__|
+
+    Tile 2:
+        __ __ __
+     __|__|__|__|
+    |_0|_1|_2|__|
+    |_3|_4|_5|__|
+    |_6|_7|_8|
+
+    Overlap is:
+     __ __      __ __
+    |_3|_4|    |_1|_2|
+    |_6|_7| vs |_4|_5|
+
+    """
+
+    # initialize grid
+    grid = TriGrid(size=1)
+    tile1 = Tile(grid, (0, 0), 3, 3)
+    tile2 = Tile(grid, (-1, -1), 3, 3)
+    data = numpy.arange(9).reshape((3, 3))
+    data_tile1 = DataTile(tile1, data, nodata_value=4)
+    data_tile2 = DataTile(tile2, data, nodata_value=4)
+
+    # test addition
+    result = data_tile1 + data_tile2
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 4, 4, 5],
+            [3, 4, 12, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+    result = data_tile2 + data_tile1
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 4, 4, 5],
+            [3, 4, 12, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+
+    # test subtraction
+    result = data_tile1 - data_tile2
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 2, 4, 5],
+            [3, 4, 2, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+    result = data_tile2 - data_tile1
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, -2, 4, 5],
+            [3, 4, -2, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+
+    # test multiplication
+    result = data_tile1 * data_tile2
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 3, 4, 5],
+            [3, 4, 35, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+    result = data_tile2 * data_tile1
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 3, 4, 5],
+            [3, 4, 35, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+
+    # test division
+    result = data_tile1 / data_tile2
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 3, 4, 5],
+            [3, 4, 7 / 5, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
+    result = data_tile2 / data_tile1
+    expected = numpy.array(
+        [
+            [4, 0, 1, 2],
+            [0, 1 / 3, 4, 5],
+            [3, 4, 5 / 7, 8],
+            [6, 7, 8, 4],
+        ]
+    )
+    numpy.testing.assert_allclose(result, expected)
 
 
 def test_crop():

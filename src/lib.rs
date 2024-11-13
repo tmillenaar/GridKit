@@ -34,13 +34,6 @@ pub enum PyO3Grid {
 
 #[pyclass]
 #[derive(Clone)]
-struct PyO3TriDataTile {
-    _data_tile: data_tile::DataTile,
-    grid: PyO3TriGrid,
-}
-
-#[pyclass]
-#[derive(Clone)]
 struct PyO3DataTile {
     _data_tile: data_tile::DataTile,
     _tile: PyO3Tile,
@@ -245,7 +238,7 @@ impl PyO3DataTile {
         self._data_tile.intersects(&other._tile)
     }
 
-    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3TriDataTile) -> PyResult<PyO3Tile> {
+    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3DataTile) -> PyResult<PyO3Tile> {
         match self._data_tile.overlap(&other._data_tile.get_tile()) {
             Ok(new_tile) => {
                 let tile = match &self._tile._grid {
@@ -314,7 +307,7 @@ impl PyO3DataTile {
         }
     }
 
-    fn _subtract_tile<'py>(&self, py: Python<'py>, other: PyO3TriDataTile) -> PyO3DataTile {
+    fn _subtract_tile<'py>(&self, py: Python<'py>, other: PyO3DataTile) -> PyO3DataTile {
         let _data_tile = self._data_tile.clone() - other._data_tile;
         PyO3DataTile {
             _data_tile,
@@ -449,11 +442,7 @@ impl PyO3DataTile {
         self._data_tile.std()
     }
 
-    fn _empty_combined_data_tile<'py>(
-        &self,
-        py: Python<'py>,
-        other: PyO3TriDataTile,
-    ) -> PyO3DataTile {
+    fn _empty_combined_data_tile<'py>(&self, py: Python<'py>, other: PyO3DataTile) -> PyO3DataTile {
         let _data_tile = self
             ._data_tile
             ._empty_combined_tile(&other._data_tile, self._data_tile.nodata_value);
@@ -891,8 +880,6 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyO3RectGrid>()?;
     module.add_class::<PyO3HexGrid>()?;
     module.add_class::<PyO3Tile>()?;
-    // module.add_class::<PyO3TriTile>()?;
-    // module.add_class::<PyO3TriDataTile>()?;
     module.add_class::<PyO3DataTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
