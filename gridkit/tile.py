@@ -203,11 +203,11 @@ class DataTile(Tile):
             tile = PyO3Tile.from_tri_grid(
                 self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
             )
-        elif isinstance(self.grid, TriGrid):
+        elif isinstance(self.grid, RectGrid):
             tile = PyO3Tile.from_rect_grid(
                 self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
             )
-        elif isinstance(self.grid, TriGrid):
+        elif isinstance(self.grid, HexGrid):
             tile = PyO3Tile.from_hex_grid(
                 self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
             )
