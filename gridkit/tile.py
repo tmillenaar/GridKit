@@ -148,13 +148,13 @@ class Tile:
         return self._tile.bounds()
 
     def intersects(self, other):
+        """Only checks bounds, not grid type, alignment etc."""
+        # TODO: Do check CRS
         if isinstance(other, DataTile):
             other_tile = other._data_tile.get_tile()
         elif isinstance(other, Tile):
             other_tile = other._tile
-        elif isinstance(other, PyO3TriDataTile):
-            other_tile = other.get_tile()
-        elif isinstance(other, PyO3TriTile):
+        elif isinstance(other, PyO3Tile):
             other_tile = other
         else:
             raise TypeError(

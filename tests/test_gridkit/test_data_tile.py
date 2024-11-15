@@ -61,8 +61,14 @@ def test_intersects(tile_init, expected):
     data_tile2 = DataTile(tile2, numpy.ones((tile2.ny, tile2.nx)))
 
     assert data_tile.intersects(data_tile2) == expected
+    assert data_tile.intersects(data_tile2._tile) == expected
     assert data_tile.intersects(tile2) == expected
+    assert data_tile.intersects(tile2._tile) == expected
     assert tile.intersects(data_tile2) == expected
+
+    with pytest.raises(TypeError):
+        # Check if appropriate error is raised when non-tile is supplied
+        tile.intersects(tile.grid)
 
 
 @pytest.mark.parametrize(
