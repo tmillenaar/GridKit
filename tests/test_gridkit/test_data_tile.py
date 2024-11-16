@@ -1,11 +1,18 @@
 import numpy
 import pytest
 
-from gridkit import DataTile, RectGrid, Tile, TriGrid
+from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 
-def test_data_ravel_order():
-    grid = TriGrid(size=1)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_data_ravel_order(grid):
     tile = Tile(grid, (0, 0), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
     data_tile = DataTile(tile, data)
@@ -17,16 +24,30 @@ def test_data_ravel_order():
     numpy.testing.assert_equal(value, data)
 
 
-def test_data_immutability():
-    grid = TriGrid(size=1)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_data_immutability(grid):
     tile = Tile(grid, (0, 0), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
     data_tile = DataTile(tile, data)
     assert id(data) != id(data_tile.to_numpy())
 
 
-def test_data_setter():
-    grid = TriGrid(size=1)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_data_setter(grid):
     tile = Tile(grid, (0, 0), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
     data_tile = DataTile(tile, data)
@@ -42,6 +63,14 @@ def test_data_setter():
 
 
 @pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+@pytest.mark.parametrize(
     "tile_init, expected",
     [
         [((0, 0), 2, 2), True],
@@ -51,8 +80,7 @@ def test_data_setter():
         [((-2, -2), 3, 3), True],
     ],
 )
-def test_intersects(tile_init, expected):
-    grid = TriGrid(size=1)
+def test_intersects(grid, tile_init, expected):
     tile = Tile(grid, (0, 0), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
     data_tile = DataTile(tile, data)
@@ -71,6 +99,14 @@ def test_intersects(tile_init, expected):
         tile.intersects(tile.grid)
 
 
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
 @pytest.mark.parametrize(
     "start_id, expected_data",
     (
@@ -99,8 +135,7 @@ def test_intersects(tile_init, expected):
         ]
     ),
 )
-def test_add_partial_overlap(start_id, expected_data):
-    grid = TriGrid(size=1)
+def test_add_partial_overlap(grid, start_id, expected_data):
     data = numpy.arange(9).reshape((3, 3))
     tile1 = Tile(grid, (0, 0), 3, 3)
     tile2 = Tile(grid, start_id, 3, 3)
@@ -113,14 +148,22 @@ def test_add_partial_overlap(start_id, expected_data):
 
     # test with nodata_value of 1
     data_tile3 = DataTile(tile2, data, nodata_value=-1)
+    # Copy before mutating in-place to prevent it carrying over to test with next grid type
+    expected_data = expected_data.copy()
     expected_data[numpy.isnan(expected_data)] = -1
     result = data_tile3 + data_tile1  # Note that the nodatavalue of left is used
     numpy.testing.assert_allclose(result.to_numpy(), expected_data)
 
 
-def test_basic_operations_with_scalars():
-    # initialize grid
-    grid = TriGrid(size=1)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_basic_operations_with_scalars(grid):
     tile = Tile(grid, (0, 0), 2, 2)
     data = numpy.arange(4).reshape((2, 2))
     data_tile = DataTile(tile, data)
@@ -198,10 +241,17 @@ def test_basic_operations_with_scalars():
     numpy.testing.assert_allclose(result, expected)
 
 
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
 @pytest.mark.parametrize("nodata", [None, 1])
-def test_comparissons_with_scalars(nodata):
+def test_comparissons_with_scalars(grid, nodata):
     # initialize grid
-    grid = TriGrid(size=1)
     tile = Tile(grid, (0, 0), 2, 2)
     data = numpy.arange(4).reshape((2, 2))
     data_tile = DataTile(tile, data, nodata_value=nodata)
@@ -237,9 +287,16 @@ def test_comparissons_with_scalars(nodata):
     numpy.testing.assert_allclose(result.index, expected)
 
 
-def test_reduction_operators():
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_reduction_operators(grid):
     # initialize grid
-    grid = TriGrid(size=1)
     tile = Tile(grid, (0, 0), 2, 2)
     data = numpy.arange(4).reshape((2, 2))
     data_tile = DataTile(tile, data)
@@ -282,7 +339,15 @@ def test_reduction_operators():
     numpy.testing.assert_allclose(result, 3)
 
 
-def test_basic_operations_with_otehr_grids():
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_basic_operations_with_otehr_grids(grid):
     """The setup for this tests is as follows
 
     Tile 1:
@@ -305,9 +370,6 @@ def test_basic_operations_with_otehr_grids():
     |_6|_7| vs |_4|_5|
 
     """
-
-    # initialize grid
-    grid = TriGrid(size=1)
     tile1 = Tile(grid, (0, 0), 3, 3)
     tile2 = Tile(grid, (-1, -1), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
@@ -403,9 +465,15 @@ def test_basic_operations_with_otehr_grids():
     numpy.testing.assert_allclose(result, expected)
 
 
-def test_crop():
-    # initialize grid
-    grid = TriGrid(size=1)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_crop(grid):
     tile = Tile(grid, (0, 0), 3, 3)
     data = numpy.arange(9).reshape((3, 3))
     data_tile = DataTile(tile, data)
@@ -421,16 +489,33 @@ def test_crop():
     numpy.testing.assert_almost_equal(cropped.start_id, (1, 0))
 
 
-def test_centroid():
-    # initialize grid
-    grid = RectGrid(size=1)
+@pytest.mark.parametrize(
+    "grid, expected_centroids",
+    [
+        (
+            TriGrid(size=1),
+            [
+                [[-0.5, 1.44337567], [0, 1.15470054]],
+                [[-0.5, 0.28867513], [0, 0.57735027]],
+            ],
+        ),
+        (RectGrid(size=1), [[[-1.5, 1.5], [-0.5, 1.5]], [[-1.5, 0.5], [-0.5, 0.5]]]),
+        (
+            HexGrid(size=1),
+            [
+                [[-1, 1.29903811], [0, 1.29903811]],
+                [[-1.5, 0.4330127], [-0.5, 0.4330127]],
+            ],
+        ),
+    ],
+)
+def test_centroid(grid, expected_centroids):
     tile = Tile(grid, (-2, 0), 2, 2)
     data = numpy.array([[0, 1], [2, 3]])
     data_tile = DataTile(tile, data)
 
-    expected_centroids = [[[-1.5, 1.5], [-0.5, 1.5]], [[-1.5, 0.5], [-0.5, 0.5]]]
-    numpy.testing.assert_equal(data_tile.centroid(), expected_centroids)
+    numpy.testing.assert_allclose(data_tile.centroid(), expected_centroids)
 
     # test using ids
     ids = data_tile.indices
-    numpy.testing.assert_equal(grid.centroid(ids), expected_centroids)
+    numpy.testing.assert_allclose(grid.centroid(ids), expected_centroids)
