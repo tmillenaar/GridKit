@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Literal, Tuple, Union
 
 import numpy
 
@@ -85,6 +85,22 @@ class Tile:
     def from_pyo3_tile(grid, pyo3_tile):
         return Tile(grid, pyo3_tile.start_id, pyo3_tile.nx, pyo3_tile.ny)
 
+    @staticmethod
+    def from_bounds(grid, bounds):
+        if not grid.are_bounds_aligned(bounds):
+            raise ValueError(
+                f"The supplied bounds are not aligned with the supplied grid. Consider calling 'grid.align_bounds' first."
+            )
+        bottom_left = (bounds[0] + grid.dx / 2, bounds[1] + grid.dy / 2)
+        top_right = (bounds[2] * grid.dx / 2, bounds[3] - grid.dy / 2)
+        bottom_left_cell = grid.cell_at_point(bottom_left)
+        top_right_cell = grid.cell_at_point(top_right)
+
+        # Take absolute values because rotated grids can cause flipped indices
+        nx = abs(top_right_cell.x - bottom_left_cell.x)
+        ny = abs(top_right_cell.y - bottom_left_cell.y)
+        return Tile(grid, bottom_left_cell, nx, ny)
+
     @property
     def start_id(self):
         """The starting cell of the Tile.
@@ -151,6 +167,18 @@ class Tile:
         """
         return self._tile.bounds()
 
+    @property
+    def mpl_extent(self) -> tuple:
+        """Raster Bounds
+
+        Returns
+        -------
+        :class:`tuple`
+            The extent of the data as defined expected by matplotlib in (left, right, bottom, top) or equivalently (min-x, max-x, min-y, max-y)
+        """
+        b = self.bounds
+        return (b[0], b[2], b[1], b[3])
+
     def intersects(self, other):
         """Only checks bounds, not grid type, alignment etc."""
         # TODO: Do check CRS
@@ -179,6 +207,12 @@ class Tile:
             )
         _tile = self._tile.overlap(other._tile)
         return Tile.from_pyo3_tile(self.grid, _tile)
+
+    @validate_index
+    def to_shapely(self, index=None, as_multipolygon=True):
+        if index is None:
+            index = self.indices
+        return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
 
 
 class DataTile(Tile):
@@ -277,7 +311,11 @@ class DataTile(Tile):
         return cropped
 
     @validate_index
-    def value(self, index=None, oob_value=numpy.nan):
+    def value(self, index=None, oob_value=None):
+        if oob_value is None:
+            oob_value = (
+                self.nodata_value if not self.nodata_value is None else numpy.nan
+            )
         oob_value = numpy.float64(oob_value)
         original_shape = index.shape
         result = self._data_tile.value(index.ravel().index, oob_value)
