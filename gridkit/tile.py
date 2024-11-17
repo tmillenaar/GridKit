@@ -271,13 +271,6 @@ class DataTile(Tile):
         """
         return GridIndex(self._data_tile.corner_ids())
 
-    def _empty_combined_data_tile(self, other):
-        _data_tile = self._data_tile._empty_combined_data_tile(other._data_tile)
-        # Make a copy TODO: allow creation of Tile from PyO3...Tile and DataTile from PyO3...DataTile
-        combined = self.update()
-        combined._data_tile = _data_tile
-        return combined
-
     def crop(self, crop_tile):
         _data_tile = self._data_tile.crop(crop_tile._tile, nodata_value=0)
         cropped = DataTile(crop_tile, _data_tile.to_numpy())
