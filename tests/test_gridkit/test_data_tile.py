@@ -519,3 +519,37 @@ def test_centroid(grid, expected_centroids):
     # test using ids
     ids = data_tile.indices
     numpy.testing.assert_allclose(grid.centroid(ids), expected_centroids)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_overlap(grid):
+    tile = Tile(grid, (-2, 0), 2, 2)
+    data = numpy.array([[0, 1], [2, 3]])
+    data_tile = DataTile(tile, data)
+
+    tile2 = Tile(grid, (-1, 1), 2, 2)
+    data_tile2 = DataTile(tile2, data)
+
+    def check(overlap_tile):
+        assert isinstance(overlap_tile, Tile)
+        assert isinstance(overlap_tile.grid, type(grid))
+        numpy.testing.assert_allclose(overlap_tile.start_id, tile2.start_id)
+        assert overlap_tile.nx == 1
+        assert overlap_tile.ny == 1
+
+    # Check all combinations of data_tile and tile
+    check(data_tile.overlap(data_tile2))
+    check(data_tile2.overlap(data_tile))
+    check(data_tile.overlap(tile2))
+    check(tile.overlap(data_tile2))
+    check(data_tile2.overlap(tile))
+    check(tile2.overlap(data_tile))
+    check(tile2.overlap(tile))
+    check(tile.overlap(tile2))

@@ -81,6 +81,10 @@ class Tile:
             )
         self.grid = grid.update()
 
+    @staticmethod
+    def from_pyo3_tile(grid, pyo3_tile):
+        return Tile(grid, pyo3_tile.start_id, pyo3_tile.nx, pyo3_tile.ny)
+
     @property
     def start_id(self):
         """The starting cell of the Tile.
@@ -166,6 +170,15 @@ class Tile:
         if index is None:
             index = self.indices
         return self.grid.centroid(index)
+
+    def overlap(self, other):
+        is_aligned, reason = self.grid.is_aligned_with(other.grid)
+        if not is_aligned:
+            raise AlignmentError(
+                f"Cannot find overlap of grids that are not aligned. Reason for misalignemnt: {reason}"
+            )
+        _tile = self._tile.overlap(other._tile)
+        return Tile.from_pyo3_tile(self.grid, _tile)
 
 
 class DataTile(Tile):
@@ -257,18 +270,6 @@ class DataTile(Tile):
             (assuming the assicaited grid is not rotated)
         """
         return GridIndex(self._data_tile.corner_ids())
-
-    def overlap(self, other):
-        is_aligned, reason = self.grid.is_aligned_with(other.grid)
-        if not is_aligned:
-            raise AlignmentError(
-                f"Cannot find overlap of grids that are not aligned. Reason for misalignemnt: {reason}"
-            )
-        _data_tile = self._data_tile.overlap(other._data_tile)
-        # Make a copy TODO: allow creation of Tile from PyO3...Tile and DataTile from PyO3...DataTile
-        overlap = self.update()
-        overlap._data_tile = _data_tile
-        return overlap
 
     def _empty_combined_data_tile(self, other):
         _data_tile = self._data_tile._empty_combined_data_tile(other._data_tile)
