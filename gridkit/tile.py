@@ -233,6 +233,16 @@ class DataTile(Tile):
         self._tile = self._data_tile.get_tile()
         self.nodata_value = nodata_value
 
+    @staticmethod
+    def from_PyO3DataTile(grid, pyo3_data_tile):
+        tile = Tile(
+            grid, pyo3_data_tile.start_id(), pyo3_data_tile.nx(), pyo3_data_tile.ny()
+        )
+        data_tile = DataTile(
+            tile, pyo3_data_tile.to_numpy(), nodata_value=pyo3_data_tile.nodata_value()
+        )
+        return data_tile
+
     def to_numpy(self):
         return self._data_tile.to_numpy()
 
@@ -333,8 +343,8 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._add_scalar(other)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+
+        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
         return combined
 
     def __radd__(self, other):
@@ -346,8 +356,8 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._add_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+
+        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
         return combined
 
     def __sub__(self, other):

@@ -210,6 +210,10 @@ impl PyO3DataTile {
         self._data_tile.tile.ny
     }
 
+    fn nodata_value(&self) -> f64 {
+        self._data_tile.nodata_value
+    }
+
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
         self._tile.clone()
     }
