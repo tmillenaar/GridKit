@@ -1,7 +1,7 @@
-use numpy::ndarray::*;
-use crate::utils::*;
-use crate::tile::*;
 use crate::grid::GridTraits;
+use crate::tile::*;
+use crate::utils::*;
+use numpy::ndarray::*;
 
 #[derive(Clone)]
 pub struct RectGrid {
@@ -24,7 +24,7 @@ impl GridTraits for RectGrid {
         self.offset
     }
     fn radius(&self) -> f64 {
-        ((self._dy/2.).powi(2) + (self._dy/2.).powi(2)).powf(0.5)
+        ((self._dy / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
     }
     fn rotation(&self) -> f64 {
         self._rotation
@@ -58,27 +58,16 @@ impl GridTraits for RectGrid {
         }
         centroids
     }
-}
-impl RectGrid {
-    pub fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        let offset = normalize_offset(offset, dx, dy);
-        // rename in order to pass to struct
-        let (_dx, _dy) = (dx, dy);
-        let _rotation = rotation;
-        RectGrid { _dx, _dy, offset, _rotation, _rotation_matrix, _rotation_matrix_inv }
-    }
 
-    pub fn cell_height(&self) -> f64 {
+    fn cell_height(&self) -> f64 {
         self._dy
     }
 
-    pub fn cell_width(&self) -> f64 {
+    fn cell_width(&self) -> f64 {
         self._dx
     }
 
-    pub fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         let shape = points.shape();
         let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
         for cell_id in 0..points.shape()[0] {
@@ -92,7 +81,7 @@ impl RectGrid {
         index
     }
 
-    pub fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
+    fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
         let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
         for cell_id in 0..index.shape()[0] {
             let id_x = index[Ix2(cell_id, 0)];
@@ -107,7 +96,7 @@ impl RectGrid {
             corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
             corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
         }
-        
+
         if self.rotation() != 0. {
             for cell_id in 0..corners.shape()[0] {
                 for corner_id in 0..corners.shape()[1] {
@@ -120,8 +109,7 @@ impl RectGrid {
         corners
     }
 
-    pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
-
+    fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
         let index = self.cell_at_point(points);
 
@@ -145,49 +133,68 @@ impl RectGrid {
                 // Top-left quadrant
                 (x, y) if x <= self.dx() / 2. && y >= self.dy() / 2. => {
                     nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] =  1 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] =  1 + id_y;
+                    nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
                     nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] =  0 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
                 }
                 // Top-right quadrant
                 (x, y) if x >= self.dx() / 2. && y >= self.dy() / 2. => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] =  1 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] =  1 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] =  1 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] =  0 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] =  1 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
+                    nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
                 }
                 // Bottom-left quadrant
                 (x, y) if x <= self.dx() / 2. && y <= self.dy() / 2. => {
                     nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] =  0 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] =  0 + id_y;
+                    nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
                     nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
                     nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
                     nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
                 }
                 // Bottom-right quadrant
                 _ => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] =  0 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] =  0 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] =  1 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] =  0 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] =  0 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
+                    nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
+                    nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
+                    nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
+                    nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
                     nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] =  1 + id_x;
+                    nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
                     nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
                 }
             }
         }
         nearby_cells
+    }
+}
+
+impl RectGrid {
+    pub fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        let offset = normalize_offset(offset, dx, dy);
+        // rename in order to pass to struct
+        let (_dx, _dy) = (dx, dy);
+        let _rotation = rotation;
+        RectGrid {
+            _dx,
+            _dy,
+            offset,
+            _rotation,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        }
     }
 }

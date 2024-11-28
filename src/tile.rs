@@ -1,6 +1,6 @@
 use std::f32::MAX;
 
-use crate::grid::*;
+use crate::{grid::*, hex_grid::HexGrid};
 use numpy::{ndarray::*, IntoPyArray};
 
 #[derive(Clone)]

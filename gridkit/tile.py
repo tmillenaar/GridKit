@@ -334,6 +334,80 @@ class DataTile(Tile):
     def intersects(self, other):
         return self.get_tile().intersects(other)
 
+    def _linear_interpolation(self, sample_points):
+        if not isinstance(sample_points, numpy.ndarray):
+            sample_points = numpy.array(sample_points, dtype=float)
+        else:
+            sample_points = sample_points.astype(float)
+
+        original_shape = sample_points.shape
+        if not original_shape[-1] == 2:
+            raise ValueError(
+                f"Expected the last axis of sample_points to have two elements (x,y). Got {original_shape[-1]} elements"
+            )
+        sample_points = sample_points.reshape(-1, 2)
+        return self._data_tile.linear_interpolation(sample_points)
+        # # nearby_points = self.grid._grid.cells_near_point(sample_points)
+        # breakpoint()
+        # values = self.grid._grid.linear_interpolation(
+        #     sample_points,
+        #     nearby_centroids,
+        #     nearby_values.astype(
+        #         float  # FIXME: figure out generics in rust to allow for other dtypes
+        #     ),
+        # )
+
+    def _inverse_distance_interpolation(self, sample_points, decay_constant=1):
+        return self._data_tile.inverse_distance_interpolation(
+            sample_points, decay_constant
+        )
+
+    def interpolate(
+        self,
+        sample_points,
+        method: Literal["nearest", "bilinear", "inverse_distance"] = "nearest",
+        **interp_kwargs,
+    ):
+        """Interpolate the value at the location of ``sample_points``.
+
+        Points that are outside of the bounds of the tile are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.
+
+        Parameters
+        ----------
+        sample_points: :class:`numpy.ndarray`
+            The coordinates of the points at which to sample the data
+        method: :class:`str`, `'nearest', 'bilinear'`, optional
+            The interpolation method used to determine the value at the supplied `sample_points`.
+            Supported methods:
+            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+            - "bilinear", linear interpolation using the four cells surrounding the point
+            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+            Default: "nearest"
+        **interp_kwargs: `dict`
+            The keyword argument passed to the interpolation function corresponding to the specified `method`
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.resample`
+        :py:meth:`.BaseGrid.interp_from_points`
+        """
+        if method == "nearest":
+            new_ids = self.grid.cell_at_point(sample_points)
+            return self.value(new_ids)
+        elif method == "bilinear" or method == "linear":
+            return_shape = sample_points.shape[:-1]
+            result = self._linear_interpolation(sample_points.reshape(-1, 2))
+            return result.reshape(return_shape)
+        elif method == "inverse_distance":
+            decay_constant = interp_kwargs.pop("decay_constant", 1)
+            return self._inverse_distance_interpolation(sample_points, decay_constant)
+        raise ValueError(f"Resampling method '{method}' is not supported.")
+
     def __add__(self, other):
         if isinstance(other, DataTile):
             _data_tile = self._data_tile._add_tile(other._data_tile)

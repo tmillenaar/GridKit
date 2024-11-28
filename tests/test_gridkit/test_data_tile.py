@@ -1,5 +1,7 @@
 import numpy
 import pytest
+import shapely
+import shapely.geometry
 
 from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
@@ -347,7 +349,7 @@ def test_reduction_operators(grid):
         HexGrid(size=1),
     ],
 )
-def test_basic_operations_with_otehr_grids(grid):
+def test_basic_operations_with_other_grids(grid):
     """The setup for this tests is as follows
 
     Tile 1:
@@ -553,3 +555,81 @@ def test_overlap(grid):
     check(tile2.overlap(data_tile))
     check(tile2.overlap(tile))
     check(tile.overlap(tile2))
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1, rotation=13),
+        RectGrid(size=1, rotation=13),
+        HexGrid(size=1, rotation=13),
+    ],
+)
+@pytest.mark.parametrize("interp_method", ["nearest", "linear", "inverse_distance"])
+def test_interpolate(grid, interp_method):
+    tile = Tile(grid, (-1, -1), 5, 5)
+
+    data = numpy.arange(tile.nx * tile.ny).reshape((tile.ny, tile.nx))
+    data_tile = DataTile(tile, data, nodata_value=-10)
+
+    n = 100
+    numpy.random.seed(0)
+    bounds = (
+        data_tile.bounds[0] - data_tile.grid.dx,
+        data_tile.bounds[1] - data_tile.grid.dy,
+        data_tile.bounds[2] + data_tile.grid.dx,
+        data_tile.bounds[3] + data_tile.grid.dy,
+    )
+    x = ((bounds[2] - bounds[0]) * numpy.random.rand(n)) + bounds[0]
+    numpy.random.seed(1)
+    y = ((bounds[3] - bounds[1]) * numpy.random.rand(n)) + bounds[1]
+    points = numpy.stack([x, y]).T
+
+    result = data_tile.interpolate(points, method=interp_method)
+
+    # replace nodata_value with nan so we can check with numpy
+    result[result == data_tile.nodata_value] = numpy.nan
+
+    assert numpy.nanmax(result) <= data_tile.max()
+    assert numpy.nanmin(result) >= data_tile.min()
+
+    if interp_method == "nearest":
+        ref_geoms = data_tile.to_shapely(as_multipolygon=True)
+    elif interp_method == "linear" or interp_method == "inverse_distance":
+        # Create a reference grid and spcify the cells in which the points should contain data
+        if isinstance(grid, TriGrid):
+            # Because the 6 nearby cells are used, we get a hexagonal shape for the reference grid
+            ref_grid = HexGrid(size=grid.size, rotation=grid.rotation)
+            ref_grid = ref_grid.update(offset=(0, ref_grid.dy / 2))
+            ref_geoms = ref_grid.to_shapely(
+                [[1, 2], [0, 2], [0, 1], [0, 0], [1, 0], [0, -1]], as_multipolygon=True
+            )
+        elif isinstance(grid, RectGrid):
+            ref_grid = grid.update(
+                offset=(grid.offset[0] + grid.dx / 2, grid.offset[1] - grid.dy / 2)
+            )
+            ref_tile = Tile(ref_grid, (-1, -1), 4, 4)
+            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+        elif isinstance(grid, HexGrid):
+            ref_grid = TriGrid(
+                side_length=grid.dx,
+                rotation=grid.rotation,
+                offset=(grid.dx / 2, grid.dy / 2),
+            )
+            ref_tile = Tile(ref_grid, (-2, -1), 8, 4)
+            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+
+    for i, (point, val) in enumerate(zip(points, result)):
+        # Unfortunately we have to check the point for every cell in python.
+        # Ideally we would leave the looping over geometries to shapely and do:
+        # intersects = geoms.contains(shapely.geometry.Point(*point))
+        # But that does not work because the geoms is not valid and
+        # shapely.make_valid returns a collection of polygons, lines and points, which we cannot work with.
+        # Since we have sufficiently few cells to check this is fine for this test and no effort is made to speed this up.
+        intersects = numpy.any(
+            [shapely.geometry.Point(*point).within(geom) for geom in ref_geoms.geoms]
+        )
+        if intersects:
+            assert numpy.isfinite(val)
+        else:
+            assert numpy.isnan(val)

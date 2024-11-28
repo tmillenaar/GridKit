@@ -1,7 +1,9 @@
 use crate::grid::*;
 use crate::tile::*;
 use core::f64;
+use std::any::Any;
 use numpy::ndarray::*;
+use std::f64::consts::E;
 use std::f64::NAN;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
@@ -88,28 +90,227 @@ impl DataTile {
         })
     }
 
-    pub fn value(&self, index: &ArrayView2<i64>, nodata_value: f64) -> Array1<f64> {
+    pub fn value(&self, i_x: i64, i_y: i64, nodata_value: f64) -> f64 {
+        let id_result = self.grid_id_to_tile_id_xy(i_x, i_y);
+        match id_result {
+            Ok((id_x, id_y)) => {
+                // Note: indexing into array is in order y,x
+                return self.data[Ix2(id_y as usize, id_x as usize)];
+            }
+            Err(e) => {
+                // If id is out of bounds, set value to nodata_value
+                return nodata_value;
+            }
+        }
+    }
+
+    pub fn values(&self, index: &ArrayView2<i64>, nodata_value: f64) -> Array1<f64> {
         let mut values = Array1::<f64>::zeros(index.shape()[0]);
         for cell_id in 0..values.shape()[0] {
-            let id_result =
-                self.grid_id_to_tile_id_xy(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            match id_result {
-                Ok((id_x, id_y)) => {
-                    // Note: indexing into array is in order y,x
-                    values[Ix1(cell_id)] = self.data[Ix2(id_y as usize, id_x as usize)];
+            values[Ix1(cell_id)] =
+                self.value(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)], nodata_value);
+        }
+        values
+    }
+
+    pub fn linear_interpolation(&self, sample_points: &ArrayView2<f64>) -> Array1<f64> {
+        let grid = self.get_grid();
+        let nearby_cells = grid.cells_near_point(sample_points);
+
+        let original_shape = nearby_cells.raw_dim();
+        let raveled_shape = (original_shape[0] * original_shape[1], original_shape[2]);
+
+        // Get values at nearby cells
+        let nearby_cells = nearby_cells.into_shape(raveled_shape).unwrap();
+        let nearby_values = self.values(&nearby_cells.view(), self.nodata_value);
+        let nearby_values: Array2<f64> = nearby_values
+            .into_shape((original_shape[0], original_shape[1]))
+            .unwrap();
+
+        // Get coordinates of nearby cells
+        let nearby_centroids = grid.centroid(&nearby_cells.view());
+        let nearby_centroids: Array3<f64> = nearby_centroids.into_shape(original_shape).unwrap();
+
+        let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
+        match grid {
+            // FIXME: I think the interpolation logic should not live on the grid, but it is used by BoundedGrid implementation
+            Grid::TriGrid(grid) => {
+                Zip::from(&mut values)
+                    .and(sample_points.axis_iter(Axis(0)))
+                    .and(nearby_centroids.axis_iter(Axis(0)))
+                    .and(nearby_values.axis_iter(Axis(0)))
+                    .for_each(|new_val, point, val_locs, near_vals| {
+                        let mut nodata_present: bool = false;
+                        for val in near_vals {
+                            if *val == self.nodata_value {
+                                *new_val = self.nodata_value;
+                                nodata_present = true;
+                                break;
+                            }
+                        }
+                        // I wanted to break but it seems the foreach does not count as a loop
+                        if nodata_present == false {
+                            // get 2 nearest point ids
+                            let point_to_centroid_vecs = &val_locs - &point;
+                            let mut near_pnt_1: usize = 0;
+                            let mut near_pnt_2: usize = 0;
+                            let mut near_dist_1: f64 = f64::MAX;
+                            let mut near_dist_2: f64 = f64::MAX;
+                            for (i, vec) in point_to_centroid_vecs.axis_iter(Axis(0)).enumerate() {
+                                let dist = crate::interpolate::vec_norm_1d(&vec);
+                                if (dist <= near_dist_1) {
+                                    near_dist_2 = near_dist_1;
+                                    near_dist_1 = dist;
+                                    near_pnt_2 = near_pnt_1;
+                                    near_pnt_1 = i;
+                                } else if (dist <= near_dist_2) {
+                                    near_dist_2 = dist;
+                                    near_pnt_2 = i;
+                                }
+                            }
+                            // mean of 6 (val and centroid)
+                            let mean_centroid = val_locs.mean_axis(Axis(0)).unwrap();
+                            let mean_val = near_vals.mean().unwrap();
+                            let near_pnt_locs = array![
+                                [val_locs[Ix2(near_pnt_1, 0)], val_locs[Ix2(near_pnt_1, 1)]],
+                                [val_locs[Ix2(near_pnt_2, 0)], val_locs[Ix2(near_pnt_2, 1)]],
+                                [mean_centroid[Ix1(0)], mean_centroid[Ix1(1)]],
+                            ];
+                            let near_pnt_vals = array![
+                                near_vals[Ix1(near_pnt_1)],
+                                near_vals[Ix1(near_pnt_2)],
+                                mean_val,
+                            ];
+
+                            let weights = crate::interpolate::linear_interp_weights_single_triangle(
+                                &point,
+                                &near_pnt_locs.view(),
+                            );
+                            *new_val = (&weights * &near_pnt_vals).sum();
+                        }
+                    });
+            }
+            Grid::RectGrid(grid) => {
+                let mut nearby_cells = grid.cells_near_point(sample_points);
+                let mut sliced_ids = nearby_cells.slice_mut(s![.., 0, ..]);
+                let tl_val = self.values(&sliced_ids.view(), self.nodata_value);
+                sliced_ids = nearby_cells.slice_mut(s![.., 1, ..]);
+                let tr_val = self.values(&sliced_ids.view(), self.nodata_value);
+                sliced_ids = nearby_cells.slice_mut(s![.., 3, ..]);
+                let br_val = self.values(&sliced_ids.view(), self.nodata_value);
+                // Note: End with slice 2, which are the ids at bottom left.
+                //       These are used again so we take these as the last slice.
+                //       That way they don't get overwritten again.
+                sliced_ids = nearby_cells.slice_mut(s![.., 2, ..]);
+                let bl_val = self.values(&sliced_ids.view(), self.nodata_value);
+
+                // Sliced_ids here should contain the bottom-left ids
+                let mut abs_diff = sample_points - grid.centroid(&sliced_ids.view());
+                if grid.rotation() != 0. {
+                    for i in 0..abs_diff.shape()[0] {
+                        let mut diff = abs_diff.slice_mut(s![i, ..]);
+                        let diff_local = grid._rotation_matrix_inv.dot(&diff);
+                        diff.assign(&diff_local);
+                    }
                 }
-                Err(e) => {
-                    // If id is out of bounds, set value to nodata_value
-                    values[Ix1(cell_id)] = nodata_value;
+                let x_diff = &abs_diff.slice(s![.., 0]) / grid.dx();
+                let y_diff = &abs_diff.slice(s![.., 1]) / grid.dy();
+
+                let top_val = &tl_val + (&tr_val - &tl_val) * &x_diff;
+                let bot_val = &bl_val + (&br_val - &bl_val) * &x_diff;
+                values = &bot_val + (&top_val - &bot_val) * &y_diff;
+
+                for i in 0..sample_points.shape()[0] {
+                    let is_nodata = tl_val[Ix1(i)] == self.nodata_value
+                        || tr_val[Ix1(i)] == self.nodata_value
+                        || bl_val[Ix1(i)] == self.nodata_value
+                        || br_val[Ix1(i)] == self.nodata_value;
+                    if is_nodata {
+                        values[Ix1(i)] = self.nodata_value;
+                    }
+                }
+            }
+            Grid::HexGrid(grid) => {
+                let all_nearby_cells = grid.cells_near_point(sample_points); // (points, nearby_cells, xy)
+
+                let original_shape = all_nearby_cells.raw_dim();
+                let raveled_shape = (original_shape[0] * original_shape[1], original_shape[2]);
+
+                // Get values at nearby cells
+                let all_nearby_cells = all_nearby_cells.into_shape(raveled_shape).unwrap();
+                let nearby_centroids = grid
+                    .centroid(&all_nearby_cells.view())
+                    .into_shape(original_shape)
+                    .unwrap();
+                let weights = crate::interpolate::linear_interp_weights_triangles(
+                    &sample_points,
+                    &nearby_centroids.view(),
+                );
+
+                let all_nearby_values = self
+                    .values(&all_nearby_cells.view(), self.nodata_value)
+                    .into_shape((original_shape[0], original_shape[1]))
+                    .unwrap();
+                for i in 0..values.shape()[0] {
+                    let nearby_values_slice = all_nearby_values.slice(s![i, ..]);
+                    let mut is_nodata = false;
+                    for val in nearby_values_slice.iter() {
+                        if *val == self.nodata_value {
+                            is_nodata = true;
+                            break;
+                        }
+                    }
+                    if is_nodata {
+                        values[Ix1(i)] = self.nodata_value;
+                    } else {
+                        values[Ix1(i)] = (&weights.slice(s![i, ..]) * &nearby_values_slice).sum();
+                    }
                 }
             }
         }
         values
     }
 
+    pub fn inverse_distance_interpolation(
+        &self,
+        sample_points: &ArrayView2<f64>,
+        decay_constant: f64,
+    ) -> Array1<f64> {
+        let grid = self.get_grid();
+        let mut result = Array1::<f64>::zeros(sample_points.shape()[0]);
+        // Nearby_cells shape: (nr_sample_points, nearby_cells, xy)
+        let all_nearby_cells = grid.cells_near_point(sample_points);
+        for i in 0..sample_points.shape()[0] {
+            let nearby_cells = all_nearby_cells.slice(s![i, .., ..]);
+            let nearby_values = self.values(&nearby_cells, self.nodata_value);
+            let nearby_centroids = grid.centroid(&nearby_cells);
+            let point_corner_vec = (nearby_centroids - sample_points.slice(s![i, ..]));
+            let distances = point_corner_vec.map_axis(Axis(1), |row| {
+                row.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
+            });
+
+            // TODO: allow for different weighting equations, sch as Shepard's interpolation with different power parameters
+            let mut weights =
+                (-(distances / decay_constant).map(|x| x.powi(2))).map(|x| E.powf(*x));
+            weights = &weights / &weights.sum_axis(Axis(0));
+
+            let mut result_val = 0.;
+            for j in 0..weights.shape()[0] {
+                let val = nearby_values[Ix1(j)];
+                if val == self.nodata_value {
+                    result_val = self.nodata_value;
+                    break;
+                }
+                result_val += weights[Ix1(j)] * val;
+            }
+            result[Ix1(i)] = result_val;
+        }
+        result
+    }
+
     fn _assign_data_in_place(&mut self, data_tile: &DataTile) -> Result<(), String> {
-        // Note: We first subtract one from nx and ny to get the id of the top left corner
-        //       For this tile we do not get out of bounds of the tile.
+        // Note: We first subtract one from nx and ny to get the id of the top left corner.
+        //       For this cell we do not get out of bounds of the tile.
         //       Because this is then used as the upper end of a slice we add the 1 back because
         //       slice ends are exclusive.
         let (start_slice_x, end_slice_y) = self

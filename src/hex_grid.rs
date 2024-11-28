@@ -1,6 +1,6 @@
-use numpy::ndarray::*;
-use crate::utils::*;
 use crate::grid::GridTraits;
+use crate::utils::*;
+use numpy::ndarray::*;
 
 #[derive(Clone)]
 pub struct HexGrid {
@@ -33,12 +33,21 @@ impl GridTraits for HexGrid {
     fn rotation_matrix_inv(&self) -> Array2<f64> {
         self._rotation_matrix_inv.clone()
     }
+
+    fn cell_height(&self) -> f64 {
+        self.radius() * 2.
+    }
+
+    fn cell_width(&self) -> f64 {
+        self.dx()
+    }
+
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
         let mut centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
         let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
 
         if !iseven(y) {
-            centroid_x  = centroid_x + self.dx() / 2.;
+            centroid_x = centroid_x + self.dx() / 2.;
         }
         (centroid_x, centroid_y)
     }
@@ -51,7 +60,7 @@ impl GridTraits for HexGrid {
             centroids[Ix2(cell_id, 1)] = point.1;
         }
 
-        if self.rotation()!= 0. {
+        if self.rotation() != 0. {
             for cell_id in 0..centroids.shape()[0] {
                 let mut centroid = centroids.slice_mut(s![cell_id, ..]);
                 let cent_rot = self._rotation_matrix.dot(&centroid);
@@ -60,29 +69,8 @@ impl GridTraits for HexGrid {
         }
         centroids
     }
-}
-impl HexGrid {
-    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        // TODO: Find a way to normalize_offset without having to instantiate tmp object
-        let _rotation = rotation;
-        let self_tmp = HexGrid { cellsize, offset, _rotation, _rotation_matrix, _rotation_matrix_inv };
-        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        HexGrid { cellsize, offset, _rotation, _rotation_matrix, _rotation_matrix_inv }
-    }
 
-    pub fn cell_height(&self) -> f64 {
-        self.radius() * 2.
-    }
-
-    pub fn cell_width(&self) -> f64 {
-        self.dx()
-    }
-
-    pub fn cell_at_location(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
@@ -105,7 +93,8 @@ impl HexGrid {
 
             // refine id_x and id_y
             // Example: points at the top of the cell can be in this cell or in the cell to the top right or top left
-            let rel_loc_y = modulus(y - self.offset.1 - self.radius() / 4., self.dy()) + self.radius() / 4.;
+            let rel_loc_y =
+                modulus(y - self.offset.1 - self.radius() / 4., self.dy()) + self.radius() / 4.;
             let rel_loc_x = modulus(x - self.offset.0, self.dx());
 
             let mut in_top_left: bool;
@@ -120,8 +109,7 @@ impl HexGrid {
                 if in_top_left == true {
                     id_y = id_y + 1.;
                     id_x = id_x + 1.;
-                }
-                else if in_top_right == true {
+                } else if in_top_right == true {
                     id_y = id_y + 1.;
                 }
             } else {
@@ -132,31 +120,31 @@ impl HexGrid {
                 if in_top_left == true {
                     id_y = id_y + 1.;
                     id_x = id_x - 1.;
-                }
-                else if in_top_right == true {
+                } else if in_top_right == true {
                     id_y = id_y + 1.;
                 }
             }
             index[Ix2(cell_id, 0)] = id_x as i64;
             index[Ix2(cell_id, 1)] = id_y as i64;
         }
-    index
+        index
     }
 
-    pub fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
+    fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
         let mut corners = Array3::<f64>::zeros((index.shape()[0], 6, 2));
 
         for cell_id in 0..index.shape()[0] {
             for corner_id in 0..6 {
                 let angle_deg = 60. * corner_id as f64 - 30.;
                 let angle_rad = angle_deg * std::f64::consts::PI / 180.;
-                let centroid = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                let centroid =
+                    self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
                 corners[Ix3(cell_id, corner_id, 0)] = centroid.0 + self.radius() * angle_rad.cos();
                 corners[Ix3(cell_id, corner_id, 1)] = centroid.1 + self.radius() * angle_rad.sin();
             }
         }
 
-        if self.rotation()!= 0. {
+        if self.rotation() != 0. {
             for cell_id in 0..corners.shape()[0] {
                 for corner_id in 0..corners.shape()[1] {
                     let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
@@ -168,7 +156,7 @@ impl HexGrid {
         corners
     }
 
-    pub fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
+    fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
         // There are 6 options for the nearby cells,
         // based on where in a cell the point is located.
         // Hence there are 6 sections within the cell,
@@ -177,12 +165,12 @@ impl HexGrid {
         // the point and pure up, as measured from the centroid of the cell.
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
 
-        let cell_ids = self.cell_at_location(points);
+        let cell_ids = self.cell_at_point(points);
 
         // FIXME: Find a way to not clone points in the case of no rotation
         //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
         let mut points = points.to_owned();
-        if self.rotation()!= 0. {
+        if self.rotation() != 0. {
             for cell_id in 0..points.shape()[0] {
                 let mut point = points.slice_mut(s![cell_id, ..]);
                 let point_rot = self._rotation_matrix_inv.dot(&point);
@@ -192,12 +180,13 @@ impl HexGrid {
 
         for cell_id in 0..points.shape()[0] {
             // Determine the azimuth based on the direction vector from the cell centroid to the point
-            let centroid = self.centroid_xy_no_rot(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
+            let centroid =
+                self.centroid_xy_no_rot(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
             let direction_x = points[Ix2(cell_id, 0)] - centroid.0;
             let direction_y = points[Ix2(cell_id, 1)] - centroid.1;
             let mut azimuth = direction_x.atan2(direction_y) * 180. / std::f64::consts::PI;
             azimuth += 30.; // it is easier to work with ranges starting at 0 rather than -30;
-            // make sure azimuth is inbetween 0 and 360, and not between -180 and 180
+                            // make sure azimuth is inbetween 0 and 360, and not between -180 and 180
             azimuth += 360. * (azimuth <= 0.) as i64 as f64;
             azimuth -= 360. * (azimuth > 360.) as i64 as f64;
             // Determine which of the 6 quadratns is in based on the azimuth
@@ -209,29 +198,35 @@ impl HexGrid {
             // Offset the nearby cells by one depending whether the cell points up or down
             let offset = !iseven(cell_ids[Ix2(cell_id, 1)]) as i64;
             match quadrant_id {
-                0 => { // azimuth 0-60
+                0 => {
+                    // azimuth 0-60
                     nearby_cells_slice.assign(&array![[-1, 1], [0, 1]]);
                     nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
                     nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
                 }
-                1 => { // azimuth 60-120
+                1 => {
+                    // azimuth 60-120
                     nearby_cells_slice.assign(&array![[0, 1], [1, 0]]);
                     nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
                 }
-                2 => { // azimuth 120-180
+                2 => {
+                    // azimuth 120-180
                     nearby_cells_slice.assign(&array![[1, 0], [0, -1]]);
                     nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
                 }
-                3 => { // azimuth 180-240
+                3 => {
+                    // azimuth 180-240
                     nearby_cells_slice.assign(&array![[0, -1], [-1, -1]]);
                     nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
                     nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
                 }
-                4 => { // azimuth 240- 300
+                4 => {
+                    // azimuth 240- 300
                     nearby_cells_slice.assign(&array![[-1, -1], [-1, 0]]);
                     nearby_cells[Ix3(cell_id, 1, 0)] += 1 * offset;
                 }
-                _ => { // azimuth 300- 360
+                _ => {
+                    // azimuth 300- 360
                     nearby_cells_slice.assign(&array![[-1, 0], [-1, 1]]);
                     nearby_cells[Ix3(cell_id, 2, 0)] += 1 * offset;
                 }
@@ -244,5 +239,31 @@ impl HexGrid {
             }
         }
         nearby_cells
+    }
+}
+
+impl HexGrid {
+    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        // TODO: Find a way to normalize_offset without having to instantiate tmp object
+        let _rotation = rotation;
+        let self_tmp = HexGrid {
+            cellsize,
+            offset,
+            _rotation,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        };
+        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
+        let _rotation_matrix = rotation_matrix_from_angle(rotation);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+        HexGrid {
+            cellsize,
+            offset,
+            _rotation,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        }
     }
 }

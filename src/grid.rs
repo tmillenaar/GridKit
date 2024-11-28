@@ -1,8 +1,8 @@
-use numpy::ndarray::*;
-use crate::tri_grid::*;
-use crate::rect_grid::*;
 use crate::hex_grid::*;
+use crate::rect_grid::*;
+use crate::tri_grid::*;
 use enum_delegate;
+use numpy::ndarray::*;
 
 #[enum_delegate::register]
 pub trait GridTraits {
@@ -13,8 +13,20 @@ pub trait GridTraits {
     fn rotation(&self) -> f64;
     fn rotation_matrix(&self) -> Array2<f64>;
     fn rotation_matrix_inv(&self) -> Array2<f64>;
+    fn cell_height(&self) -> f64;
+    fn cell_width(&self) -> f64;
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64);
     fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64>;
+    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64>;
+    fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64>;
+    fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64>;
+    // fn linear_interpolation(
+    //     &self,
+    //     sample_points: &ArrayView2<f64>,
+    //     nearby_value_locations: &ArrayView3<f64>,
+    //     nearby_values: &ArrayView2<f64>,
+    //     nodata_value: f64,
+    // ) -> Array1<f64>;
 }
 
 #[derive(Clone)]

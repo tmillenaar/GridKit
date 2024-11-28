@@ -536,7 +536,7 @@ class HexGrid(BaseGrid):
         point = point.reshape(-1, 2)
         if self.shape == "flat":
             point = point.T[::-1].T
-        cell_at_point = self._grid.cell_at_location(points=point)
+        cell_at_point = self._grid.cell_at_point(points=point)
         if self.shape == "flat":
             cell_at_point = cell_at_point.T[::-1].T
         return GridIndex(cell_at_point.squeeze().reshape(original_shape))

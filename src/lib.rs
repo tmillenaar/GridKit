@@ -271,6 +271,27 @@ impl PyO3DataTile {
         }
     }
 
+    fn linear_interpolation<'py>(
+        &self,
+        py: Python<'py>,
+        sample_point: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray1<f64> {
+        self._data_tile
+            .linear_interpolation(&sample_point.as_array())
+            .into_pyarray(py)
+    }
+
+    fn inverse_distance_interpolation<'py>(
+        &self,
+        py: Python<'py>,
+        sample_point: PyReadonlyArray2<'py, f64>,
+        decay_constant: f64,
+    ) -> &'py PyArray1<f64> {
+        self._data_tile
+            .inverse_distance_interpolation(&sample_point.as_array(), decay_constant)
+            .into_pyarray(py)
+    }
+
     fn _add_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
         let _data_tile = self._data_tile.clone() + value;
         PyO3DataTile {
@@ -484,7 +505,7 @@ impl PyO3DataTile {
         nodata_value: f64,
     ) -> &'py PyArray1<f64> {
         self._data_tile
-            .value(&index.as_array(), nodata_value)
+            .values(&index.as_array(), nodata_value)
             .into_pyarray(py)
     }
 
@@ -818,13 +839,13 @@ impl PyO3HexGrid {
         self._grid.centroid(&index).into_pyarray(py)
     }
 
-    fn cell_at_location<'py>(
+    fn cell_at_point<'py>(
         &self,
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_location(&points).into_pyarray(py)
+        self._grid.cell_at_point(&points).into_pyarray(py)
     }
 
     fn cell_corners<'py>(
