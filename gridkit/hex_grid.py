@@ -558,7 +558,7 @@ class HexGrid(BaseGrid):
             corners = corners[:, :, ::-1]
         return corners.reshape(return_shape)
 
-    def to_crs(self, crs):
+    def to_crs(self, crs, location=(0, 0)):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
 
@@ -570,6 +570,16 @@ class HexGrid(BaseGrid):
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+        location: [float, float]
+            The location at which to perform the conversion.
+            When transforming to a new coordinate system, it matters at which location the transformation is performed.
+            The chosen location will be used to determinde the cell size of the new grid.
+            If you are unsure what location to use, pich the center of the area you are interested in.
+
+            .. Warning ::
+
+                The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.
 
         Returns
         -------
@@ -603,11 +613,21 @@ class HexGrid(BaseGrid):
 
         transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
 
-        new_offset = transformer.transform(*self.offset)
-        point_start = transformer.transform(0, 0)
+        new_offset = transformer.transform(
+            location[0] + self.offset[0], location[1] + self.offset[1]
+        )
+        point_start = numpy.array(transformer.transform(*location))
 
-        point_end = transformer.transform(self.dx, self.dy)
-        new_dx, new_dy = [end - start for (end, start) in zip(point_end, point_start)]
+        point_end = transformer.transform(location[0] + self.dx, location[1] + self.dy)
+
+        new_dx = numpy.linalg.norm(
+            point_start
+            - numpy.array(transformer.transform(location[0] + self.dx, location[1]))
+        )
+        new_dy = numpy.linalg.norm(
+            point_start
+            - numpy.array(transformer.transform(location[0], location[1] + self.dy))
+        )
 
         if self.shape == "pointy":
             size = new_dx
