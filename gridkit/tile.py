@@ -1,6 +1,8 @@
+import warnings
 from typing import Literal, Tuple, Union
 
 import numpy
+from pyproj import Transformer
 
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError
@@ -92,9 +94,18 @@ class Tile:
                 f"The supplied bounds are not aligned with the supplied grid. Consider calling 'grid.align_bounds' first."
             )
         bottom_left = (bounds[0] + grid.dx / 2, bounds[1] + grid.dy / 2)
-        top_right = (bounds[2] * grid.dx / 2, bounds[3] - grid.dy / 2)
-        bottom_left_cell = grid.cell_at_point(bottom_left)
-        top_right_cell = grid.cell_at_point(top_right)
+        top_right = (bounds[2] + grid.dx / 2, bounds[3] - grid.dy / 2)
+
+        # TODO: This still does not work nicely for rotated grids
+        if grid.rotation != 0:
+            bottom_left = grid.rotation_matrix_inv.dot(bottom_left)
+            top_right = grid.rotation_matrix_inv.dot(top_right)
+            tmp_grid = grid.update(rotation=0)
+            bottom_left_cell = tmp_grid.cell_at_point(bottom_left)
+            top_right_cell = tmp_grid.cell_at_point(top_right)
+        else:
+            bottom_left_cell = grid.cell_at_point(bottom_left)
+            top_right_cell = grid.cell_at_point(top_right)
 
         # Take absolute values because rotated grids can cause flipped indices
         nx = abs(top_right_cell.x - bottom_left_cell.x)
@@ -347,15 +358,6 @@ class DataTile(Tile):
             )
         sample_points = sample_points.reshape(-1, 2)
         return self._data_tile.linear_interpolation(sample_points)
-        # # nearby_points = self.grid._grid.cells_near_point(sample_points)
-        # breakpoint()
-        # values = self.grid._grid.linear_interpolation(
-        #     sample_points,
-        #     nearby_centroids,
-        #     nearby_values.astype(
-        #         float  # FIXME: figure out generics in rust to allow for other dtypes
-        #     ),
-        # )
 
     def _inverse_distance_interpolation(self, sample_points, decay_constant=1):
         return self._data_tile.inverse_distance_interpolation(
@@ -407,6 +409,126 @@ class DataTile(Tile):
             decay_constant = interp_kwargs.pop("decay_constant", 1)
             return self._inverse_distance_interpolation(sample_points, decay_constant)
         raise ValueError(f"Resampling method '{method}' is not supported.")
+
+    def resample(self, alignment_grid, method="nearest", **interp_kwargs):
+        """Resample the grid onto another grid.
+        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
+        and determine the value on these location based on the values of the original grid (``self``).
+
+        The steps are as follows:
+         1. Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
+            No transformation is done if any of the grids has no CRS set.
+         2. Find the cells of the alignment grid within these transformed bounds
+         3. Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
+            How many nearby cells are selected depends on the selected ``method``
+         4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
+         5. Create a new bounded grid using the attributes of the alignment grid
+
+        Parameters
+        ----------
+        alignment_grid: :class:`.BaseGrid`
+            The grid with the desired attributes on which to resample.
+
+        method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
+            The interpolation method used to determine the value at the supplied `sample_points`.
+            Supported methods:
+            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+            - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+            Default: "nearest"
+        **interp_kwargs: `dict`
+            The keyword argument passed to the interpolation function corresponding to the specified `method`
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The interpolated values at the supplied points
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.BaseGrid.interp_from_points`
+        """
+        if self.grid.crs is None or alignment_grid.crs is None:
+            warnings.warn(
+                "`crs` not set for one or both grids. Assuming both grids have an identical CRS."
+            )
+            different_crs = False
+        else:
+            different_crs = not self.grid.crs.is_exact_same(alignment_grid.crs)
+
+        # make sure the bounds align with the grid
+        if different_crs:
+            # Create array that contains points around the bounds of the tile.
+            # Then transform these points to the new CRS.
+            # From the transformed coordinates we can determine the shape of the new bounds
+            nr_cells_y = numpy.max((self.ny - 2), 0)
+
+            top_left, top_right, bottom_right, bottom_left = self.corners()
+            top_x = numpy.linspace(top_left[0], top_right[0], 2 * self.nx)
+            top_y = numpy.linspace(top_left[1], top_right[1], 2 * self.nx)
+            top_xy = numpy.stack([top_x, top_y])
+
+            right_x = numpy.linspace(top_right[0], bottom_right[0], 2 * nr_cells_y)
+            right_y = numpy.linspace(top_right[1], bottom_right[1], 2 * nr_cells_y)
+            right_xy = numpy.stack([right_x, right_y])
+
+            bottom_x = numpy.linspace(bottom_right[0], bottom_left[0], 2 * self.nx)
+            bootom_y = numpy.linspace(bottom_right[1], bottom_left[1], 2 * self.nx)
+            bottom_xy = numpy.stack([bottom_x, bootom_y])
+
+            left_x = numpy.linspace(bottom_left[0], top_left[0], 2 * nr_cells_y)
+            left_y = numpy.linspace(bottom_left[1], top_left[1], 2 * nr_cells_y)
+            left_xy = numpy.stack([left_x, left_y])
+
+            coords = numpy.hstack([top_xy, right_xy, bottom_xy, left_xy])
+
+            transformer = Transformer.from_crs(
+                self.grid.crs, alignment_grid.crs, always_xy=True
+            )
+            corners_transformed = numpy.array(transformer.transform(*coords)).T
+
+            ids = alignment_grid.cell_at_point(corners_transformed).ravel()
+        else:
+            ids = alignment_grid.cell_at_point(self.corners()).ravel()
+        min_x, min_y = numpy.min(ids, axis=0)
+        max_x, max_y = numpy.max(ids, axis=0)
+
+        tile = Tile(
+            alignment_grid, (min_x, min_y), max_x - min_x + 1, max_y - min_y + 1
+        )
+
+        new_ids = tile.indices
+        shape = new_ids.shape
+
+        new_points = alignment_grid.centroid(new_ids)
+
+        if different_crs:
+            transformer = Transformer.from_crs(
+                alignment_grid.crs, self.grid.crs, always_xy=True
+            )
+            original_shape = new_points.shape
+            raveled_new_points = new_points.reshape(-1, 2)
+            transformed_points = transformer.transform(*raveled_new_points.T)
+            new_points = numpy.vstack(transformed_points).T.reshape(original_shape)
+
+        value = self.interpolate(new_points, method=method, **interp_kwargs)
+
+        # If value id 1D, turn into 2D
+        # Take into account if the 1D line of cells runs in x or y direction
+        if 1 in shape:
+            empty_axis = 0 if shape[0] == 1 else 1
+            value = numpy.expand_dims(value, axis=empty_axis)
+
+        nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
+
+        tile = Tile(
+            alignment_grid,
+            start_id=new_ids[-1, 0],
+            nx=new_ids.shape[1],
+            ny=new_ids.shape[0],
+        )
+
+        return DataTile(tile, value)
 
     def __add__(self, other):
         if isinstance(other, DataTile):
