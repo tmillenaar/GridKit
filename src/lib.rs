@@ -10,15 +10,15 @@ use pyo3::{
     pyfunction, pymodule, types::PyModule, wrap_pyfunction, wrap_pymodule, PyResult, Python,
 };
 
-mod data_tile;
-mod grid;
-mod hex_grid;
-mod interpolate;
-mod rect_grid;
-mod tile;
-mod tri_grid;
-mod utils;
-mod vector_shapes;
+pub mod data_tile;
+pub mod grid;
+pub mod hex_grid;
+pub mod interpolate;
+pub mod rect_grid;
+pub mod tile;
+pub mod tri_grid;
+pub mod utils;
+pub mod vector_shapes;
 
 use crate::data_tile::DataTile;
 use crate::grid::GridTraits;

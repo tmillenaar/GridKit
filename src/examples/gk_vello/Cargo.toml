@@ -1,0 +1,20 @@
+[package]
+name = "gk_vello"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lints]
+workspace = true
+
+# The dependencies here are independent from the workspace versions
+[dependencies]
+# When using this example outside of the original Vello workspace,
+# remove the path property of the following Vello dependency requirement.
+vello = { version = "0.3.0"}
+anyhow = "1.0.89"
+pollster = "0.3.0"
+winit = "0.30.5"
+numpy = "0.21.0"
+gridkit_rs = { version = "0.1.0", path = "../../.." }

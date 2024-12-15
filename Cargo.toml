@@ -6,11 +6,28 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
 name = "gridkit_rs"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
+
+[workspace]
+# resolver = "2"
+members = [
+    "src/examples/gk_vello",
+]
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0 OR MIT"
+repository = ""
+
+[workspace.lints]
+clippy.doc_markdown = "warn"
+clippy.semicolon_if_nothing_returned = "warn"
 
 [dependencies]
 enum_delegate = "0.2.0"
 geo-types = "0.7.12"
 numpy = "0.21.0"
 pyo3 = "0.21.2"
+rand = "0.8.5"
+vello = "0.3.0"
 wkb = "0.7.1"
