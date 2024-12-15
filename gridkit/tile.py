@@ -3,6 +3,7 @@ from typing import Literal, Tuple, Union
 
 import numpy
 from pyproj import Transformer
+from shapely.geometry import MultiPoint
 
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError
@@ -412,41 +413,41 @@ class DataTile(Tile):
 
     def resample(self, alignment_grid, method="nearest", **interp_kwargs):
         """Resample the grid onto another grid.
-        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
+            This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
         and determine the value on these location based on the values of the original grid (``self``).
 
-        The steps are as follows:
-         1. Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
-            No transformation is done if any of the grids has no CRS set.
-         2. Find the cells of the alignment grid within these transformed bounds
-         3. Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
-            How many nearby cells are selected depends on the selected ``method``
-         4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
-         5. Create a new bounded grid using the attributes of the alignment grid
+            The steps are as follows:
+             1. Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
+                No transformation is done if any of the grids has no CRS set.
+             2. Find the cells of the alignment grid within these transformed bounds
+             3. Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
+                How many nearby cells are selected depends on the selected ``method``
+             4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
+             5. Create a new bounded grid using the attributes of the alignment grid
 
-        Parameters
-        ----------
-        alignment_grid: :class:`.BaseGrid`
-            The grid with the desired attributes on which to resample.
+            Parameters
+            ----------
+            alignment_grid: :class:`.BaseGrid`
+                The grid with the desired attributes on which to resample.
 
-        method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
-            The interpolation method used to determine the value at the supplied `sample_points`.
-            Supported methods:
-            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
-            - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
-            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
-            Default: "nearest"
-        **interp_kwargs: `dict`
-            The keyword argument passed to the interpolation function corresponding to the specified `method`
-        Returns
-        -------
-        :class:`.BoundedGrid`
-            The interpolated values at the supplied points
+            method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
+                The interpolation method used to determine the value at the supplied `sample_points`.
+                Supported methods:
+                - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+                - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+                - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+                Default: "nearest"
+            **interp_kwargs: `dict`
+                The keyword argument passed to the interpolation function corresponding to the specified `method`
+            Returns
+            -------
+            :class:`.BoundedGrid`
+                The interpolated values at the supplied points
 
-        See also
-        --------
-        :py:meth:`.BoundedGrid.interpolate`
-        :py:meth:`.BaseGrid.interp_from_points`
+            See also
+            --------
+            :py:meth:`.BoundedGrid.interpolate`
+            :py:meth:`.BaseGrid.interp_from_points`
         """
         if self.grid.crs is None or alignment_grid.crs is None:
             warnings.warn(
@@ -486,6 +487,29 @@ class DataTile(Tile):
                 self.grid.crs, alignment_grid.crs, always_xy=True
             )
             corners_transformed = numpy.array(transformer.transform(*coords)).T
+
+            # # Find the optimal new rotation
+            # bounding_rect = MultiPoint(corners_transformed).minimum_rotated_rectangle
+            # corners = numpy.array(bounding_rect.exterior.xy).T
+            # distances = numpy.linalg.norm(corners[1:] - corners[:-1], axis=1)
+            # longest_side_id = numpy.argmax(distances)
+            # longest_line = numpy.array([corners[longest_side_id], corners[longest_side_id+1]])
+            # horizontal_line = numpy.array([
+            #     longest_line[0],
+            #     [longest_line[1,0], longest_line[0,1]]
+            # ])
+            # # # angle_radians = numpy.arctan2(longest_line[1], horizontal_line[0])
+            # # vector = longest_line[0] - longest_line[1]
+            # # angle_radians = numpy.arctan2(vector[1], vector[0])
+            # # angle_degrees = numpy.degrees(angle_radians)
+            # #
+
+            # new_points = numpy.array(transformer.transform([bottom_left[0], bottom_right[0]], [bottom_left[1], bottom_right[1]])).T
+            # new_points = numpy.array(transformer.transform([bottom_left[0], top_left[0]], [bottom_left[1], top_left[1]])).T
+            # vector = new_points[1] - new_points[0]
+            # rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
+            # alignment_grid = alignment_grid.update(rotation=rotation)
+            # breakpoint()
 
             ids = alignment_grid.cell_at_point(corners_transformed).ravel()
         else:

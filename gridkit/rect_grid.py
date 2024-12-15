@@ -614,8 +614,14 @@ class RectGrid(BaseGrid):
             location[0] + self.offset[0], location[1] + self.offset[1]
         )
         point_start = numpy.array(transformer.transform(*location))
-
         point_end = transformer.transform(location[0] + self.dx, location[1] + self.dy)
+
+        vector = (
+            numpy.array(transformer.transform(location[0] + self.dx, location[1]))
+            - point_start
+        )
+        # vector = numpy.array(transformer.transform(location[0], location[1] + self.dy)) - point_start
+        rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
 
         new_dx = numpy.linalg.norm(
             point_start
@@ -626,12 +632,36 @@ class RectGrid(BaseGrid):
             - numpy.array(transformer.transform(location[0], location[1] + self.dy))
         )
 
+        # Corner order is bottom-left, bottom-right, top-right, top-left
+        trans_corners = numpy.array(
+            transformer.transform(*self.cell_corners(self.cell_at_point(location)).T)
+        ).T
+        # vector = trans_corners[1] - trans_corners[0]
+        vector = trans_corners[2] - trans_corners[1]
+        rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
+        if rotation > 90:
+            rotation -= 90
+            dx = numpy.linalg.norm(trans_corners[1] - trans_corners[0])
+            dy = numpy.linalg.norm(trans_corners[2] - trans_corners[1])
+        elif rotation < -90:
+            rotation -= 90
+            dx = numpy.linalg.norm(trans_corners[1] - trans_corners[0])
+            dy = numpy.linalg.norm(trans_corners[2] - trans_corners[1])
+        else:
+            dx = numpy.linalg.norm(trans_corners[2] - trans_corners[1])
+            dy = numpy.linalg.norm(trans_corners[1] - trans_corners[0])
+        # breakpoint()
+
+        # size = numpy.mean([
+        #     numpy.linalg.norm(trans_corners[1] - trans_corners[0]),
+        #     numpy.linalg.norm(trans_corners[2] - trans_corners[1]),
+        # ])
         return self.parent_grid_class(
-            dx=abs(new_dx),
-            dy=abs(new_dy),
+            dx=dx,
+            dy=dy,
             offset=new_offset,
             crs=crs,
-            rotation=self.rotation,
+            rotation=rotation,
         )
 
     def cells_in_bounds(self, bounds, return_cell_count: bool = False):
