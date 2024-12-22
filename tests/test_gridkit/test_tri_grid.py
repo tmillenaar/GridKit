@@ -275,25 +275,28 @@ def test_neighbours(index, depth, include_selected, connect_corners):
             )
 
 
-def test_to_crs():
+@pytest.mark.parametrize("adjust_rotation", [False, True])
+def test_to_crs(adjust_rotation):
     grid = TriGrid(size=1.5, crs=None)
     # Expect error when `to_crs` is called on a grid where the CRS is not set
     with pytest.raises(ValueError):
         grid.to_crs(4326)
 
     grid = TriGrid(size=1.5, crs=3857)
-    grid_degrees = grid.to_crs(4326)
+    grid_degrees = grid.to_crs(4326, adjust_rotation=adjust_rotation)
 
     # Check cell size has changed after changing crs
     numpy.testing.assert_allclose(
         [grid_degrees.dx, grid_degrees.dy],
-        [2.42919136381939e-05, 4.2074828634427165e-05],
+        [6.737364630896411e-06, 1.1669457849830117e-05],
     )
     # Make sure original grid is unaffected
-    numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5, 2.598076211353316])
+    numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5 / 2, 2.598076211353316 / 2])
     # Make sure nothing changed when setting to current CRS
-    new_grid = grid.to_crs(3857)
-    numpy.testing.assert_allclose([new_grid.dx, new_grid.dy], [1.5, 2.598076211353316])
+    new_grid = grid.to_crs(3857, adjust_rotation=adjust_rotation)
+    numpy.testing.assert_allclose(
+        [new_grid.dx, new_grid.dy], [1.5 / 2, 2.598076211353316 / 2]
+    )
 
 
 def test_is_aligned_with():
@@ -549,7 +552,7 @@ def test_numpy_and_grid_ids(basic_bounded_tri_grid):
     numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
 
 
-def test_to_crs(basic_bounded_tri_grid):
+def test_to_crs_bounded(basic_bounded_tri_grid):
     grid = basic_bounded_tri_grid
     grid.crs = 4326
     grid_3857 = grid.to_crs(3857)

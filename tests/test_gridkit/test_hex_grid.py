@@ -161,11 +161,12 @@ def test_cells_near_point(shape, point, expected_nearby_cells, expand_axes):
 
 
 @pytest.mark.parametrize("shape", ["pointy", "flat"])
-def test_crs(shape):
+@pytest.mark.parametrize("adjust_rotation", [False, True])
+def test_crs(shape, adjust_rotation):
     offset = (5, 10)
     crs = 3857
     grid = HexGrid(size=10, offset=offset, crs=crs, shape=shape)
-    new_grid = grid.to_crs(crs=4326)
+    new_grid = grid.to_crs(crs=4326, adjust_rotation=adjust_rotation)
 
     expected_size = 8.983152841195213e-05
 
