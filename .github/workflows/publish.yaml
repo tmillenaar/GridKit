@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.9"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.9'
           architecture: ${{ matrix.target }}
       - name: Set the gridkit version in version.py to that of the tag
         run: (Get-Content -Path .\gridkit\version.py -Raw) -replace '\"[0-9]+\.[0-9]+\.[0-9]+.+', ('"{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\gridkit\version.py ; Get-Content .\gridkit\version.py
@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
@@ -127,4 +127,3 @@ jobs:
         with:
           command: upload
           args: --non-interactive --skip-existing *
-
