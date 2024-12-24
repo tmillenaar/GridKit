@@ -309,7 +309,7 @@ class TriGrid(BaseGrid):
             crs=self.crs,
         )
 
-    def to_crs(self, crs):
+    def to_crs(self, crs, location=(0, 0), adjust_rotation=False):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
 
@@ -321,6 +321,22 @@ class TriGrid(BaseGrid):
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+
+        location: (float, float) (default: (0,0))
+            The location at which to perform the conversion.
+            When transforming to a new coordinate system, it matters at which location the transformation is performed.
+            The chosen location will be used to determinde the cell size of the new grid.
+            If you are unsure what location to use, pich the center of the area you are interested in.
+
+            .. Warning ::
+
+                The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.
+
+        adjust_rotation: bool (default: False)
+            If False, the grid in the new crs has the same rotation as the original grid.
+            Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
+            If True, set the new rotation to match the orientation of the grid at ``location`` after coordinate transformation.
 
         Returns
         -------
@@ -359,15 +375,40 @@ class TriGrid(BaseGrid):
 
         transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
 
-        new_offset = transformer.transform(*self.offset)
-        point_start = transformer.transform(0, 0)
+        new_offset = transformer.transform(
+            location[0] + self.offset[0], location[1] + self.offset[1]
+        )
+
+        point_start = numpy.array(transformer.transform(*location))
+        point_end = transformer.transform(location[0] + self.size, location[1])
+
+        if adjust_rotation:
+            cell_id = self.cell_at_point(location)
+            # move over two cells for the next cell is flipped and thus it's centroid not at the same y position
+            centroids = self.centroid([cell_id, (cell_id.x + 2, cell_id.y)])
+            trans_centroids = numpy.array(transformer.transform(*centroids.T)).T
+            vector = trans_centroids[1] - trans_centroids[0]
+            rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
+        else:
+            rotation = self.rotation
 
         point_end = transformer.transform(
             self.dx, 0
         )  # likely different for shape='flat'
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
-        return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+        new_grid = self.parent_grid_class(
+            size=size, offset=new_offset, crs=crs, rotation=rotation
+        )
+
+        if adjust_rotation:
+            trans_corners = numpy.array(
+                transformer.transform(
+                    *self.cell_corners(self.cell_at_point(location)).T
+                )
+            ).T
+            new_grid.anchor(trans_corners[0], cell_element="corner", in_place=True)
+        return new_grid
 
     def anchor(
         self,

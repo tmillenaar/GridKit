@@ -115,13 +115,15 @@ def test_cells_in_bounds():
     assert ids.shape == shape
 
 
-def test_crs():
+@pytest.mark.parametrize("adjust_rotation", [False, True])
+def test_crs(adjust_rotation):
     dx = 10
     dy = 20
     offset = (5, 10)
     crs = 3857
-    grid = RectGrid(dx=dx, dy=dy, offset=offset, crs=crs)
-    new_grid = grid.to_crs(crs=4326)
+    rotation = 13.5
+    grid = RectGrid(dx=dx, dy=dy, offset=offset, crs=crs, rotation=rotation)
+    new_grid = grid.to_crs(crs=4326, adjust_rotation=adjust_rotation)
 
     expected_dx = 8.983152841195213e-05
     expected_dy = 2 * expected_dx
