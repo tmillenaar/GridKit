@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tiled aggregation from points with Dask &mdash; GridKit v0.14.0 documentation</title>
+  <title>Tiled aggregation from points with Dask &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -111,10 +106,10 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="tiled-aggregation-from-points-with-dask">
-<span id="example-aggregate-dask"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-dask-py"></span><h1>Tiled aggregation from points with Dask<a class="headerlink" href="#tiled-aggregation-from-points-with-dask" title="Permalink to this heading"></a></h1>
+<span id="example-aggregate-dask"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-dask-py"></span><h1>Tiled aggregation from points with Dask<a class="headerlink" href="#tiled-aggregation-from-points-with-dask" title="Link to this heading"></a></h1>
 <p>Group points into grid cells in a tiled manner, using Dask.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>In example <a class="reference internal" href="aggregate.html#example-aggregate"><span class="std std-ref">aggregate.py</span></a> an approach is demonstrated where points
 are grouped in cells and averaged per cell.
 This example does the same, but in a tiled manner.
@@ -139,7 +134,7 @@ though you will find references to ‘map_blocks()’ for Arrays and ‘map_part
 </div>
 </section>
 <section id="generate-input-data">
-<h2>Generate input data<a class="headerlink" href="#generate-input-data" title="Permalink to this heading"></a></h2>
+<h2>Generate input data<a class="headerlink" href="#generate-input-data" title="Link to this heading"></a></h2>
 <p>Let’s start by generating some points.
 The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
@@ -161,12 +156,19 @@ I will print <code class="docutils literal notranslate"><span class="pre">nparti
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">npartitions</span><span class="p">)</span>  <span class="c1"># show the number of chunks</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>4
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages/dask/dataframe/__init__.py:42: FutureWarning:
+Dask dataframe query planning is disabled because dask-expr is not installed.
+
+You can install it with `pip install dask[dataframe]` or `conda install dask`.
+This will raise in a future version.
+
+  warnings.warn(msg, FutureWarning)
+4
 </pre></div>
 </div>
 </section>
 <section id="relate-points-to-grid-cells">
-<h2>Relate points to grid cells<a class="headerlink" href="#relate-points-to-grid-cells" title="Permalink to this heading"></a></h2>
+<h2>Relate points to grid cells<a class="headerlink" href="#relate-points-to-grid-cells" title="Link to this heading"></a></h2>
 <p>Now we can create a grid and determine the cell associated to each point.
 No advanced knowledge of Dask is required to follow this example.
 It suffices to know that ‘map_blocks’ and ‘map_partitions’ will apply the supplied function to all chunks.
@@ -190,7 +192,7 @@ DataFrame will need to be ignored for this operation.</p>
 <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:99: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:100: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
   warnings.warn(
 Dask DataFrame Structure:
                  pnt_x    pnt_y cell_id nr_points
@@ -227,7 +229,7 @@ Also, for the sake of the example I will plot the data with matplotlib.</p>
 </div>
 </section>
 <section id="visualize-the-results">
-<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Permalink to this heading"></a></h2>
+<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Link to this heading"></a></h2>
 <p>Note how the results are identical to the pandas version.
 The input data was the same so this should indeed be the case.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
@@ -237,7 +239,7 @@ The input data was the same so this should indeed be the case.</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.406 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_dask_001.png" srcset="../../_images/sphx_glr_aggregate_dask_001.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.385 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-dask-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/38f8786a96f33fa721d3497600e2357d/aggregate_dask.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate_dask.ipynb</span></code></a></p>

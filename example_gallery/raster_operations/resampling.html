@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resampling &mdash; GridKit v0.14.0 documentation</title>
+  <title>Resampling &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -110,10 +105,10 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="resampling">
-<span id="example-resampling"></span><span id="sphx-glr-example-gallery-raster-operations-resampling-py"></span><h1>Resampling<a class="headerlink" href="#resampling" title="Permalink to this heading"></a></h1>
+<span id="example-resampling"></span><span id="sphx-glr-example-gallery-raster-operations-resampling-py"></span><h1>Resampling<a class="headerlink" href="#resampling" title="Link to this heading"></a></h1>
 <p>Resample data from one grid onto another.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>Resampling is a general term for creating a new dataset based on an existing one.
 This new dataset can have a different resolution, cell shape or Coordinate Reference System (CRS).</p>
 <p>In GridKit, resampling is generally done by defining a new grid and resampling onto that new grid.
@@ -142,7 +137,7 @@ defined in degrees but either meters or feet.</p>
 </div>
 </section>
 <section id="resampling-onto-the-a-grid">
-<h2>Resampling onto the a grid<a class="headerlink" href="#resampling-onto-the-a-grid" title="Permalink to this heading"></a></h2>
+<h2>Resampling onto the a grid<a class="headerlink" href="#resampling-onto-the-a-grid" title="Link to this heading"></a></h2>
 <p>Now we have read the DEM, we can define a new grid and resample onto it
 Let’s define a coarser grid, effectively downsampling the data.
 The reason for this is that we can better compare grids if we can actually distinguish the cells.
@@ -176,7 +171,7 @@ for a fair visual comparison.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:99: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:100: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
   warnings.warn(
 </pre></div>
 </div>
@@ -222,7 +217,7 @@ The visual difference results from the difference in positioning of the cells.
 Generally hexagon grids better represent rounded features,
 whereas rectangular grids are generally easier to work with and are more widespread.</p>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.623 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.535 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-resampling-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8257f21b83038543fbccd29c885d0293/resampling.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">resampling.ipynb</span></code></a></p>

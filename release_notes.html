@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release notes &mdash; GridKit v0.14.0 documentation</title>
+  <title>Release notes &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=62781346"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=911007c9"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -39,9 +37,6 @@
           <a href="index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -58,6 +53,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-14-1-december-25-2024">Version 0.14.1 (December 25, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-14-0-august-11-2024">Version 0.14.0 (August 11, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-13-0-july-10-2024">Version 0.13.0 (July 10, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-12-1-jun-17-2024">Version 0.12.1 (Jun 17, 2024)</a></li>
@@ -119,9 +115,22 @@
            <div itemprop="articleBody">
              
   <section id="release-notes">
-<span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
+<section id="version-0-14-1-december-25-2024">
+<h2>Version 0.14.1 (December 25, 2024)<a class="headerlink" href="#version-0-14-1-december-25-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add arguments <code class="docutils literal notranslate"><span class="pre">location</span></code> and <code class="docutils literal notranslate"><span class="pre">adjust_rotation</span></code> to <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.to_crs" title="gridkit.tri_grid.TriGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.to_crs()</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_crs" title="gridkit.rect_grid.RectGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_crs()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs" title="gridkit.hex_grid.HexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_crs()</span></code></a> for more accurate conversions.</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Build using python3.9 because for 3.8 the geopandas/fiona documentation dependency installs incompatible versions</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-0-14-0-august-11-2024">
-<h2>Version 0.14.0 (August 11, 2024)<a class="headerlink" href="#version-0-14-0-august-11-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.14.0 (August 11, 2024)<a class="headerlink" href="#version-0-14-0-august-11-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Featrures</dt><dd><ul class="simple">
 <li><p>A new <a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile" title="gridkit.tile.Tile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tile</span></code></a> class that references a set of cells and has some convenience methods
@@ -146,7 +155,7 @@ these represent Rust classes. PyO3 seems to be less ambiguous for it makes sense
 </dl>
 </section>
 <section id="version-0-13-0-july-10-2024">
-<h2>Version 0.13.0 (July 10, 2024)<a class="headerlink" href="#version-0-13-0-july-10-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.13.0 (July 10, 2024)<a class="headerlink" href="#version-0-13-0-july-10-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Option to initialize grid using <code class="docutils literal notranslate"><span class="pre">side_length</span></code> instead of <code class="docutils literal notranslate"><span class="pre">size</span></code> or <code class="docutils literal notranslate"><span class="pre">area</span></code></p></li>
@@ -165,7 +174,7 @@ By extension, <code class="docutils literal notranslate"><span class="pre">(1,2)
 </dl>
 </section>
 <section id="version-0-12-1-jun-17-2024">
-<h2>Version 0.12.1 (Jun 17, 2024)<a class="headerlink" href="#version-0-12-1-jun-17-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.12.1 (Jun 17, 2024)<a class="headerlink" href="#version-0-12-1-jun-17-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Misc</dt><dd><ul class="simple">
 <li><p>Make compatible with numpy v2.0.0 while remaining compatible with earlier versions</p></li>
@@ -174,7 +183,7 @@ By extension, <code class="docutils literal notranslate"><span class="pre">(1,2)
 </dl>
 </section>
 <section id="version-0-12-0-may-10-2024">
-<h2>Version 0.12.0 (May 10, 2024)<a class="headerlink" href="#version-0-12-0-may-10-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.12.0 (May 10, 2024)<a class="headerlink" href="#version-0-12-0-may-10-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Featrures</dt><dd><ul class="simple">
 <li><p>Create a new grid with a smaller gridsize that fits perfectily inside the orignal grid using <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.subdivide" title="gridkit.tri_grid.TriGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.subdivide()</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.subdivide" title="gridkit.rect_grid.RectGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.subdivide()</span></code></a> or <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.subdivide" title="gridkit.hex_grid.HexGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.subdivide()</span></code></a></p></li>
@@ -187,7 +196,7 @@ By extension, <code class="docutils literal notranslate"><span class="pre">(1,2)
 </dl>
 </section>
 <section id="version-0-11-1-june-01-2024">
-<h2>Version 0.11.1 (June 01, 2024)<a class="headerlink" href="#version-0-11-1-june-01-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.11.1 (June 01, 2024)<a class="headerlink" href="#version-0-11-1-june-01-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add method <code class="docutils literal notranslate"><span class="pre">anchor</span></code> to Bounded Grids (grids with data) that resamples the data after shifting, see <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.anchor" title="gridkit.tri_grid.BoundedTriGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedTriGrid.anchor()</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.anchor" title="gridkit.rect_grid.BoundedRectGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.anchor()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.anchor" title="gridkit.hex_grid.BoundedHexGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.anchor()</span></code></a></p></li>
@@ -198,7 +207,7 @@ By extension, <code class="docutils literal notranslate"><span class="pre">(1,2)
 </dl>
 </section>
 <section id="version-0-11-0-may-29-2024">
-<h2>Version 0.11.0 (May 29, 2024)<a class="headerlink" href="#version-0-11-0-may-29-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.11.0 (May 29, 2024)<a class="headerlink" href="#version-0-11-0-may-29-2024" title="Link to this heading"></a></h2>
 <dl class="simple" id="release-notes-v0-11-0">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Easier shifting of grids using <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a></p></li>
@@ -230,7 +239,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-10-0-april-21-2024">
-<h2>Version 0.10.0 (April 21, 2024)<a class="headerlink" href="#version-0-10-0-april-21-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.10.0 (April 21, 2024)<a class="headerlink" href="#version-0-10-0-april-21-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.sort" title="gridkit.index.GridIndex.sort"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.sort()</span></code></a></p></li>
@@ -250,7 +259,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-9-2-april-03-2024">
-<h2>Version 0.9.2 (April 03, 2024)<a class="headerlink" href="#version-0-9-2-april-03-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.9.2 (April 03, 2024)<a class="headerlink" href="#version-0-9-2-april-03-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add new initialization argument <code class="docutils literal notranslate"><span class="pre">area</span></code> to <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> for specifying the cell area of the grid</p></li>
@@ -270,7 +279,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-9-1-march-17-2024">
-<h2>Version 0.9.1 (March 17, 2024)<a class="headerlink" href="#version-0-9-1-march-17-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.9.1 (March 17, 2024)<a class="headerlink" href="#version-0-9-1-march-17-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Change the following attributes using a setter: <code class="docutils literal notranslate"><span class="pre">rotation</span></code>, <code class="docutils literal notranslate"><span class="pre">offset</span></code> and (<code class="docutils literal notranslate"><span class="pre">size</span></code> for <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>) or (<code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> for <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>)</p></li>
@@ -291,7 +300,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-9-0-march-10-2024">
-<h2>Version 0.9.0 (March 10, 2024)<a class="headerlink" href="#version-0-9-0-march-10-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.9.0 (March 10, 2024)<a class="headerlink" href="#version-0-9-0-march-10-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><dl class="simple">
@@ -314,7 +323,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-8-0-march-03-2024">
-<h2>Version 0.8.0 (March 03, 2024)<a class="headerlink" href="#version-0-8-0-march-03-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.8.0 (March 03, 2024)<a class="headerlink" href="#version-0-8-0-march-03-2024" title="Link to this heading"></a></h2>
 <dl>
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Return <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> from <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point" title="gridkit.hex_grid.HexGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cells_near_point()</span></code></a></p></li>
@@ -336,7 +345,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-7-3-february-25-2024">
-<h2>Version 0.7.3 (February 25, 2024)<a class="headerlink" href="#version-0-7-3-february-25-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.7.3 (February 25, 2024)<a class="headerlink" href="#version-0-7-3-february-25-2024" title="Link to this heading"></a></h2>
 <dl>
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Properly handle negative offsets in Rust grid classes</p></li>
@@ -363,7 +372,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-7-2-february-18-2024">
-<h2>Version 0.7.2 (February 18, 2024)<a class="headerlink" href="#version-0-7-2-february-18-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.7.2 (February 18, 2024)<a class="headerlink" href="#version-0-7-2-february-18-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Replace <code class="docutils literal notranslate"><span class="pre">GridIndex._1d_view</span></code> with <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a>, which is an int64 instead of a custom data type.</p></li>
@@ -382,7 +391,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-7-1-february-11-2024">
-<h2>Version 0.7.1 (February 11, 2024)<a class="headerlink" href="#version-0-7-1-february-11-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.7.1 (February 11, 2024)<a class="headerlink" href="#version-0-7-1-february-11-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Remove allocation of unused array</p></li>
@@ -399,7 +408,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-7-0-february-04-2024">
-<h2>Version 0.7.0 (February 04, 2024)<a class="headerlink" href="#version-0-7-0-february-04-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.7.0 (February 04, 2024)<a class="headerlink" href="#version-0-7-0-february-04-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid" title="gridkit.tri_grid.BoundedTriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a></p></li>
@@ -415,7 +424,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-6-0-january-07-2024">
-<h2>Version 0.6.0 (January 07, 2024)<a class="headerlink" href="#version-0-6-0-january-07-2024" title="Permalink to this heading"></a></h2>
+<h2>Version 0.6.0 (January 07, 2024)<a class="headerlink" href="#version-0-6-0-january-07-2024" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a> (Only base variant, BoundedTriGrid is yet to come)</p></li>
@@ -446,7 +455,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-5-1-october-08-2023">
-<h2>Version 0.5.1 (October 08, 2023)<a class="headerlink" href="#version-0-5-1-october-08-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.5.1 (October 08, 2023)<a class="headerlink" href="#version-0-5-1-october-08-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a> now returns single Polygon if a single GridIndex was supplied</p></li>
@@ -459,7 +468,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-5-0-october-01-2023">
-<h2>Version 0.5.0 (October 01, 2023)<a class="headerlink" href="#version-0-5-0-october-01-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.5.0 (October 01, 2023)<a class="headerlink" href="#version-0-5-0-october-01-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Make return argument <cite>shape</cite> optional in <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_in_bounds" title="gridkit.base_grid.BaseGrid.cells_in_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cells_in_bounds()</span></code></a> by adding the <cite>return_cell_shape</cite> argument (default False)</p></li>
@@ -478,7 +487,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-8-september-18-2023">
-<h2>Version 0.4.8 (September 18, 2023)<a class="headerlink" href="#version-0-4-8-september-18-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.8 (September 18, 2023)<a class="headerlink" href="#version-0-4-8-september-18-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add methods <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_bounded" title="gridkit.rect_grid.RectGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_bounded()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_bounded" title="gridkit.hex_grid.HexGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_bounded()</span></code></a> to turn an infinite grid into a bounded grid.</p></li>
@@ -487,7 +496,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-7-september-10-2023">
-<h2>Version 0.4.7 (September 10, 2023)<a class="headerlink" href="#version-0-4-7-september-10-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.7 (September 10, 2023)<a class="headerlink" href="#version-0-4-7-september-10-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.concat" title="gridkit.index.concat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">concat()</span></code></a> for combining <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> objects</p></li>
@@ -512,7 +521,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-6-september-4-2023">
-<h2>Version 0.4.6 (September 4, 2023)<a class="headerlink" href="#version-0-4-6-september-4-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.6 (September 4, 2023)<a class="headerlink" href="#version-0-4-6-september-4-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Make ‘index’ argument optional in <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value" title="gridkit.bounded_grid.BoundedGrid.value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.value()</span></code></a></p></li>
@@ -527,7 +536,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-5-august-27-2023">
-<h2>Version 0.4.5 (August 27, 2023)<a class="headerlink" href="#version-0-4-5-august-27-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.5 (August 27, 2023)<a class="headerlink" href="#version-0-4-5-august-27-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Replace all mentions of <code class="docutils literal notranslate"><span class="pre">read_geotiff</span></code> in example gallery to <code class="docutils literal notranslate"><span class="pre">write_geotiff</span></code></p></li>
@@ -543,7 +552,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-4-august-27-2023">
-<h2>Version 0.4.4 (August 27, 2023)<a class="headerlink" href="#version-0-4-4-august-27-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.4 (August 27, 2023)<a class="headerlink" href="#version-0-4-4-august-27-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Add missing matplotlib to docs_require</p></li>
@@ -552,7 +561,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-3-august-27-2023">
-<h2>Version 0.4.3 (August 27, 2023)<a class="headerlink" href="#version-0-4-3-august-27-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.3 (August 27, 2023)<a class="headerlink" href="#version-0-4-3-august-27-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Pin sphinx version to prevent docs build step from erroring</p></li>
@@ -561,7 +570,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-2-august-27-2023">
-<h2>Version 0.4.2 (August 27, 2023)<a class="headerlink" href="#version-0-4-2-august-27-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.2 (August 27, 2023)<a class="headerlink" href="#version-0-4-2-august-27-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Fix <code class="docutils literal notranslate"><span class="pre">to_crs</span></code> on <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> and <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> (only worked on bounded equivalents)</p></li>
@@ -581,7 +590,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-1-august-20-2023">
-<h2>Version 0.4.1 (August 20, 2023)<a class="headerlink" href="#version-0-4-1-august-20-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.1 (August 20, 2023)<a class="headerlink" href="#version-0-4-1-august-20-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>make <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> hashable so it works as pandas index</p></li>
@@ -597,7 +606,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-4-0-august-13-2023">
-<h2>Version 0.4.0 (August 13, 2023)<a class="headerlink" href="#version-0-4-0-august-13-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.4.0 (August 13, 2023)<a class="headerlink" href="#version-0-4-0-august-13-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> class to unify index representation</p></li>
@@ -608,7 +617,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-3-1-july-23-2023">
-<h2>Version 0.3.1 (July 23, 2023)<a class="headerlink" href="#version-0-3-1-july-23-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.3.1 (July 23, 2023)<a class="headerlink" href="#version-0-3-1-july-23-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>add <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id" title="gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy_id_to_grid_id()</span></code></a> to <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></p></li>
@@ -626,7 +635,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-3-0-july-16-2023">
-<h2>Version 0.3.0 (July 16, 2023)<a class="headerlink" href="#version-0-3-0-july-16-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.3.0 (July 16, 2023)<a class="headerlink" href="#version-0-3-0-july-16-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Resample method for BoundedHexGrid</p></li>
@@ -651,7 +660,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-2-0-july-10-2023">
-<h2>Version 0.2.0 (July 10, 2023)<a class="headerlink" href="#version-0-2-0-july-10-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.2.0 (July 10, 2023)<a class="headerlink" href="#version-0-2-0-july-10-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Add hex_grid.HexGrid class</p></li>
@@ -676,7 +685,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-1-1-march-17-2023">
-<h2>Version 0.1.1 (March 17, 2023)<a class="headerlink" href="#version-0-1-1-march-17-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.1.1 (March 17, 2023)<a class="headerlink" href="#version-0-1-1-march-17-2023" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Fixes</dt><dd><ul class="simple">
 <li><p>Fix <cite>__version__`</cite> missing an ending quotation mark</p></li>
@@ -685,7 +694,7 @@ Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is n
 </dl>
 </section>
 <section id="version-0-1-0-march-17-2023">
-<h2>Version 0.1.0 (March 17, 2023)<a class="headerlink" href="#version-0-1-0-march-17-2023" title="Permalink to this heading"></a></h2>
+<h2>Version 0.1.0 (March 17, 2023)<a class="headerlink" href="#version-0-1-0-march-17-2023" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>release first version to PyPi</p></li>

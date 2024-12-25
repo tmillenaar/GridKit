@@ -1,26 +1,24 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gridkit._statistical_functions &mdash; GridKit v0.14.0 documentation</title>
+  <title>gridkit._statistical_functions &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -37,9 +35,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -97,7 +92,9 @@
     <span class="p">)</span>
 
 
-<div class="viewcode-block" id="total_bounds"><a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.total_bounds">[docs]</a><span class="k">def</span> <span class="nf">total_bounds</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+<div class="viewcode-block" id="total_bounds">
+<a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.total_bounds">[docs]</a>
+<span class="k">def</span> <span class="nf">total_bounds</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">grids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
 
@@ -105,6 +102,7 @@
     <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
         <span class="n">combined_bounds</span> <span class="o">=</span> <span class="n">_total_bounds</span><span class="p">(</span><span class="n">combined_bounds</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">combined_bounds</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_empty_combined_grid</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
@@ -127,7 +125,9 @@
     <span class="k">return</span> <span class="n">reference</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">combined_data</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">combined_bounds</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">reference</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="count"><a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.count">[docs]</a><span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+<div class="viewcode-block" id="count">
+<a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.count">[docs]</a>
+<span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
     <span class="n">empty_grid</span> <span class="o">=</span> <span class="n">_empty_combined_grid</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">empty_grid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">grid</span> <span class="ow">in</span> <span class="n">grids</span><span class="p">:</span>
@@ -140,7 +140,10 @@
     <span class="k">return</span> <span class="n">combined_grid</span></div>
 
 
-<div class="viewcode-block" id="sum"><a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum">[docs]</a><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+
+<div class="viewcode-block" id="sum">
+<a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum">[docs]</a>
+<span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
     <span class="n">empty_grid</span> <span class="o">=</span> <span class="n">_empty_combined_grid</span><span class="p">(</span><span class="n">grids</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
     <span class="n">combined_grid</span> <span class="o">=</span> <span class="n">empty_grid</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="p">(</span>
@@ -155,8 +158,12 @@
     <span class="k">return</span> <span class="n">combined_grid</span></div>
 
 
-<div class="viewcode-block" id="mean"><a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean">[docs]</a><span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
+
+<div class="viewcode-block" id="mean">
+<a class="viewcode-back" href="../../api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean">[docs]</a>
+<span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">grids</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span> <span class="o">/</span> <span class="n">count</span><span class="p">(</span><span class="n">grids</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>

@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Partial overlap &mdash; GridKit v0.14.0 documentation</title>
+  <title>Partial overlap &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -110,10 +105,10 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="partial-overlap">
-<span id="example-partial-overlap"></span><span id="sphx-glr-example-gallery-raster-operations-parial-overlap-py"></span><h1>Partial overlap<a class="headerlink" href="#partial-overlap" title="Permalink to this heading"></a></h1>
+<span id="example-partial-overlap"></span><span id="sphx-glr-example-gallery-raster-operations-parial-overlap-py"></span><h1>Partial overlap<a class="headerlink" href="#partial-overlap" title="Link to this heading"></a></h1>
 <p>Merge rasters with different spatial extent</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>Since each BoundedGrid in GridKit has information on the bounds,
 multiple grids can be combined in a way where their spatial extend is taken into account.
 Basic mathematical operations were shown in the example <a class="reference internal" href="ndvi.html#example-ndvi"><span class="std std-ref">ndvi.py</span></a>,
@@ -215,12 +210,12 @@ have a look at <a class="reference external" href="https://docs.astropy.org/en/s
 </div>
 </section>
 <section id="nodata-values">
-<h2>Nodata values<a class="headerlink" href="#nodata-values" title="Permalink to this heading"></a></h2>
+<h2>Nodata values<a class="headerlink" href="#nodata-values" title="Link to this heading"></a></h2>
 <p>For each grid, the nodata value of that grid is also taken into account.
 This means that values outside of the original extent of each respective data grid are not considered in the calculation.
 If the data grids have different nodata_values, this still works, for each grid’s nodata_value is considered separately.
 In that scenario the resulting product will have the nodata_value of the first grid.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.764 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.660 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-parial-overlap-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/ba020d52505c3a4aae7bfdefbbeefaa7/parial_overlap.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">parial_overlap.ipynb</span></code></a></p>

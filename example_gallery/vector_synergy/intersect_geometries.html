@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Geometry intersections &mdash; GridKit v0.14.0 documentation</title>
+  <title>Geometry intersections &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -110,11 +105,11 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="geometry-intersections">
-<span id="sphx-glr-example-gallery-vector-synergy-intersect-geometries-py"></span><h1>Geometry intersections<a class="headerlink" href="#geometry-intersections" title="Permalink to this heading"></a></h1>
+<span id="sphx-glr-example-gallery-vector-synergy-intersect-geometries-py"></span><h1>Geometry intersections<a class="headerlink" href="#geometry-intersections" title="Link to this heading"></a></h1>
 <p>Obtain the cells that intersect with vector geometries.</p>
 <p>DEM data source: <a class="reference external" href="https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem">https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem</a></p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>Vector geometries can be used to obtain the ID of the intersecting grid cells.
 These vector geometries can be either in the form of Shapely (Multi) Geometries or GeoPandas GeoSeries.
 A list of geometries can be supplied. This list can contain a mix of geometry types.</p>
@@ -130,7 +125,7 @@ Try to avoid this if possible.</p>
 </div>
 </section>
 <section id="reading-and-preparing-the-data">
-<h2>Reading and preparing the data<a class="headerlink" href="#reading-and-preparing-the-data" title="Permalink to this heading"></a></h2>
+<h2>Reading and preparing the data<a class="headerlink" href="#reading-and-preparing-the-data" title="Link to this heading"></a></h2>
 <p>After reading the streams and lakes vector files, they are concatenated into a single GeoDataFrame.
 This allows us to obtain the intersecting cells in one function call.
 Of course it is also an option to obtain the intersecting cell IDs for the strams and lakes separately and combine them after using <cite>numpy.vstack</cite>.
@@ -152,7 +147,7 @@ With that approach it might be worthwhile to call a <cite>numpy.unique</cite> on
 </div>
 </section>
 <section id="visualization">
-<h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this heading"></a></h2>
+<h2>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h2>
 <p>For a clear plot, we only need to plot the DEM near the vecor geometries as a backround.
 For that reason, the dem is cropped to the extent of the water bodies with a little buffer.
 Since <code class="docutils literal notranslate"><span class="pre">intersect_geometries</span></code> does it’s own cropping, cropping the grid before <code class="docutils literal notranslate"><span class="pre">intersect_geometries</span></code> does not increase performance.
@@ -192,7 +187,7 @@ A plot showing DEM, the geometries (orange) and the selected cells (red) is then
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_intersect_geometries_002.png" srcset="../../_images/sphx_glr_intersect_geometries_002.png" alt="intersect geometries" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.014 seconds)</p>
+<img src="../../_images/sphx_glr_intersect_geometries_002.png" srcset="../../_images/sphx_glr_intersect_geometries_002.png" alt="intersect geometries" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.736 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-intersect-geometries-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4f897756f108f82a8f2e7e9c3eb00ccd/intersect_geometries.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">intersect_geometries.ipynb</span></code></a></p>

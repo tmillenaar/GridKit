@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hexagon grids &mdash; GridKit v0.14.0 documentation</title>
+  <title>Hexagon grids &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -111,10 +106,10 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="hexagon-grids">
-<span id="example-hexagon-grids"></span><span id="sphx-glr-example-gallery-grid-definitions-hex-grids-py"></span><h1>Hexagon grids<a class="headerlink" href="#hexagon-grids" title="Permalink to this heading"></a></h1>
+<span id="example-hexagon-grids"></span><span id="sphx-glr-example-gallery-grid-definitions-hex-grids-py"></span><h1>Hexagon grids<a class="headerlink" href="#hexagon-grids" title="Link to this heading"></a></h1>
 <p>Adjusting shapes and sizes</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>In this example a variety of hexagonal grids is created and compared.
 The goal of this exercise is to familiarize the reader with the various configurations of hexagonal grids
 and how they compare to one another.</p>
@@ -159,7 +154,7 @@ Let’s plot the shapes to see what we are dealing with.</p>
 We can modify this using the ‘offset’.</p>
 </section>
 <section id="shifting-grids">
-<h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Permalink to this heading"></a></h2>
+<h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Link to this heading"></a></h2>
 <p>Let’s shift the whole grid vertically to center it around coordinate (0,0)
 Also, let’s zoom in a bit to the center</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
@@ -197,7 +192,7 @@ than it is to calculate the desired shift beforehand. The advantage of determini
 is that we can use the already available <cite>dx</cite>, <cite>dy</cite> and <cite>r</cite> properties of the created grid.</p>
 </section>
 <section id="grid-sizes">
-<h2>Grid sizes<a class="headerlink" href="#grid-sizes" title="Permalink to this heading"></a></h2>
+<h2>Grid sizes<a class="headerlink" href="#grid-sizes" title="Link to this heading"></a></h2>
 <p>Finally, let’s play with the size of the grid. If we keep the grids centered around zero but vary the size,
 we also obtain interesting patterns.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
@@ -217,7 +212,7 @@ we also obtain interesting patterns.</p>
 </div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.418 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.369 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a7ba0282faa773492ac8af4740356e0/hex_grids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hex_grids.ipynb</span></code></a></p>

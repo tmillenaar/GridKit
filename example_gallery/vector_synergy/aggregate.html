@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aggregate from points &mdash; GridKit v0.14.0 documentation</title>
+  <title>Aggregate from points &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -40,9 +38,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -112,14 +107,14 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="aggregate-from-points">
-<span id="example-aggregate"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-py"></span><h1>Aggregate from points<a class="headerlink" href="#aggregate-from-points" title="Permalink to this heading"></a></h1>
+<span id="example-aggregate"></span><span id="sphx-glr-example-gallery-vector-synergy-aggregate-py"></span><h1>Aggregate from points<a class="headerlink" href="#aggregate-from-points" title="Link to this heading"></a></h1>
 <p>Group points into grid cells</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For a tiled implementation of this approach using Dask, see example <a class="reference internal" href="aggregate_dask.html#example-aggregate-dask"><span class="std std-ref">aggregate_dask.py</span></a></p>
 </div>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>Grouping points in cells (here referred to as ‘aggregation’) is a common occurrence in spatial data processing.
 This is often used to generate heatmaps, obtain statistics of the data or to reduce the size of the data for easier processing.
 By grouping nearby points in the same cell,
@@ -135,7 +130,7 @@ If this is of interest to you, have a look at <a class="reference external" href
 </div>
 </section>
 <section id="generate-input-data">
-<h2>Generate input data<a class="headerlink" href="#generate-input-data" title="Permalink to this heading"></a></h2>
+<h2>Generate input data<a class="headerlink" href="#generate-input-data" title="Link to this heading"></a></h2>
 <p>Let’s start by generating some points.
 The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
@@ -157,7 +152,7 @@ I’ll plot the input here to show what it looks like.</p>
 </div>
 <img src="../../_images/sphx_glr_aggregate_001.png" srcset="../../_images/sphx_glr_aggregate_001.png" alt="Doughnut with Gaussian Scattering" class = "sphx-glr-single-img"/></section>
 <section id="relate-points-to-grid-cells">
-<h2>Relate points to grid cells<a class="headerlink" href="#relate-points-to-grid-cells" title="Permalink to this heading"></a></h2>
+<h2>Relate points to grid cells<a class="headerlink" href="#relate-points-to-grid-cells" title="Link to this heading"></a></h2>
 <p>Now we can create a grid and aggregate our points onto that grid.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
 
@@ -165,13 +160,13 @@ I’ll plot the input here to show what it looks like.</p>
 <span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:99: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:100: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
   warnings.warn(
 </pre></div>
 </div>
 </section>
 <section id="count-the-points-per-cell">
-<h2>Count the points per cell<a class="headerlink" href="#count-the-points-per-cell" title="Permalink to this heading"></a></h2>
+<h2>Count the points per cell<a class="headerlink" href="#count-the-points-per-cell" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">cell_ids</span></code> obtained in the previous step can be used to group the points.
 Each point with the same ‘cell_id’ will be regarded as being in the same ‘bin’.
 We can then do statistics on these bins. In our case we will count the number of points per bin.
@@ -188,7 +183,7 @@ In the latter the x and y ids are split, which does not work well with DataFrame
 </div>
 </section>
 <section id="visualize-the-results">
-<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Permalink to this heading"></a></h2>
+<h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Link to this heading"></a></h2>
 <p>Now we have the number of points per cell, let’s obtain the corresponding cell shapes from the grid object and plot them.
 Since we used <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a>,
 we will have to convert that back into a GridIndex using <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.from_index_1d" title="gridkit.index.GridIndex.from_index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.from_index_1d()</span></code></a>.</p>
@@ -201,7 +196,7 @@ we will have to convert that back into a GridIndex using <a class="reference int
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.326 seconds)</p>
+<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.349 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/59a915f944b0f9e57a3c5fbf3640acb8/aggregate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate.ipynb</span></code></a></p>

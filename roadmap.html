@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Roadmap &mdash; GridKit v0.14.0 documentation</title>
+  <title>Roadmap &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=62781346"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=911007c9"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +38,6 @@
           <a href="index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -101,7 +96,7 @@
            <div itemprop="articleBody">
              
   <section id="roadmap">
-<h1>Roadmap<a class="headerlink" href="#roadmap" title="Permalink to this heading"></a></h1>
+<h1>Roadmap<a class="headerlink" href="#roadmap" title="Link to this heading"></a></h1>
 <p>This page provides an overview of the major themes in GridKit’s development.
 Each of these topics fits in the vision of what the package is meant to become.
 These items are estimated to requires a significant amount of effort to implement.</p>
@@ -111,9 +106,9 @@ Unexpected issues may prevent the adoption of this feature.</p>
 <p>A topic not being on this page, naturally, does not exclude it from possible adoption.
 Smaller topics are not on this page and recommendations for new features can be made in the <a class="reference external" href="https://github.com/tmillenaar/GridKit/issues">issue tracker</a>.</p>
 <section id="on-the-roadmap">
-<h2>On the roadmap<a class="headerlink" href="#on-the-roadmap" title="Permalink to this heading"></a></h2>
+<h2>On the roadmap<a class="headerlink" href="#on-the-roadmap" title="Link to this heading"></a></h2>
 <section id="hexagonal-and-triangular-cells">
-<h3>Hexagonal and triangular cells<a class="headerlink" href="#hexagonal-and-triangular-cells" title="Permalink to this heading"></a></h3>
+<h3>Hexagonal and triangular cells<a class="headerlink" href="#hexagonal-and-triangular-cells" title="Link to this heading"></a></h3>
 <p>Rectangular grids are far from the only types of grids that can tile the plane.
 However, there are only three types of primitive shapes that can tile the plane without the need of a second shape to make it fit.
 These shapes are triangles, rectangles and hexagons.
@@ -122,7 +117,7 @@ Combinations of shapes that tile the plane come in an infinite veriety.
 While these can yield interesting patterns, for practical purposes GridKit will only support single shapes that tile the plane.</p>
 </section>
 <section id="sparse-data-grids">
-<h3>Sparse data grids<a class="headerlink" href="#sparse-data-grids" title="Permalink to this heading"></a></h3>
+<h3>Sparse data grids<a class="headerlink" href="#sparse-data-grids" title="Link to this heading"></a></h3>
 <p>The most common way to store rasters is as a 2D-array.
 This is also the way the data of the grid is stored in GridKit, through the <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a> mixin.
 This approach makes sense for continuous datasets, possibly with a nodata value here and there.
@@ -135,7 +130,7 @@ Other operations are more suitable for sparse data, like aggregation and possibl
 Some operations (such as aggregation) might get the keyword argument ‘<cite>sparse</cite>’, specifying whether a sparse or bounded grid is to be returned.</p>
 </section>
 <section id="aggregation">
-<h3>Aggregation<a class="headerlink" href="#aggregation" title="Permalink to this heading"></a></h3>
+<h3>Aggregation<a class="headerlink" href="#aggregation" title="Link to this heading"></a></h3>
 <p>There are several ways of converting a dataset of points to a grid.
 Currently, only interpolation is supported.
 Another method is aggregation, where all points contained within the same cell are <cite>aggregated</cite>, or combined.
@@ -152,7 +147,7 @@ The value of the operation is then stored on that grid cell.</p>
 </div></blockquote>
 </section>
 <section id="fft-and-convolutions">
-<h3>FFT and convolutions<a class="headerlink" href="#fft-and-convolutions" title="Permalink to this heading"></a></h3>
+<h3>FFT and convolutions<a class="headerlink" href="#fft-and-convolutions" title="Link to this heading"></a></h3>
 <p>The most common image processing operations use Fast Fourier Transforms (FFT) and/or convolutions.
 In fact, a convolution <a class="reference external" href="https://en.wikipedia.org/wiki/Convolution_theorem">can be done through the use of an FFT</a>.
 While GridKit is not trying to be an image processing library, these operations can be very powerful.
@@ -165,7 +160,7 @@ This can be implemented in gridkit to allow for basic image processing on hexago
 Because of the hexagonal grids better represend curves, and each neighbour is equidistant, image processing on hexagonal data can be beneficial.</p>
 </section>
 <section id="pathfinding">
-<h3>Pathfinding<a class="headerlink" href="#pathfinding" title="Permalink to this heading"></a></h3>
+<h3>Pathfinding<a class="headerlink" href="#pathfinding" title="Link to this heading"></a></h3>
 <p>Pathfinding is a common usecase for grids and is not currently part of GridKit.
 Adding a weighted A* pathfinding algorithm only makes sense.
 Other pathfinding algorithm could be added too, but A* would be a good start.
@@ -174,14 +169,14 @@ The obstacles could be defined either as bounded or sparse data, see the section
 </section>
 </section>
 <section id="not-on-the-roadmap">
-<h2>Not on the Roadmap<a class="headerlink" href="#not-on-the-roadmap" title="Permalink to this heading"></a></h2>
+<h2>Not on the Roadmap<a class="headerlink" href="#not-on-the-roadmap" title="Link to this heading"></a></h2>
 <p>Some operations make sense for grids, but are not on the roadmap for GridKit.
 Sometimes this is simply because it has not been considered yet,
 but sometimes this is because it does not fit with the project’s vision, dispite it being a common operation to perform on grids.
 Some features that fall in the latter category are mentioned here, in an attempt to explain why this is not being considered at the moment.</p>
 <p>If you think one of these features should, in fact, be considered for the roadmap, you can try to make a compelling case in the <a class="reference external" href="https://github.com/tmillenaar/GridKit/issues">issue tracker</a></p>
 <section id="storing-data-on-edges-and-vertices">
-<h3>Storing data on edges and vertices<a class="headerlink" href="#storing-data-on-edges-and-vertices" title="Permalink to this heading"></a></h3>
+<h3>Storing data on edges and vertices<a class="headerlink" href="#storing-data-on-edges-and-vertices" title="Link to this heading"></a></h3>
 <p>There are many types of operations that could benefit from storing the values not in the cell center, but on the vertices or edges instead.
 Some solutions utilize some or all of these in combination.
 An example would be storing temperature values in a cell and flux at the edges.</p>
@@ -189,7 +184,7 @@ An example would be storing temperature values in a cell and flux at the edges.<
 Every new feature would have to work on cells, edges and vertices, or specifically exclude a data type and yield the appropriate error.</p>
 </section>
 <section id="irregualr-grids">
-<h3>Irregualr grids<a class="headerlink" href="#irregualr-grids" title="Permalink to this heading"></a></h3>
+<h3>Irregualr grids<a class="headerlink" href="#irregualr-grids" title="Link to this heading"></a></h3>
 <p>Not all grids are regular grids. Irregular grids often are grids where the cell shapes vary in shape or size.
 This approach, does not match with the architecture of GridKit’s implementation.
 Implementations involving irregualr grids need to store the information of each cell, such as the location of the vertices.

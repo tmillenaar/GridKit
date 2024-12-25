@@ -1,28 +1,26 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2D Diffusion &mdash; GridKit v0.14.0 documentation</title>
+  <title>2D Diffusion &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=62781346"></script>
-        <script src="../../_static/doctools.js?v=888ff710"></script>
-        <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=911007c9"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -41,9 +39,6 @@
           <a href="../../index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -113,17 +108,17 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="d-diffusion">
-<span id="sphx-glr-example-gallery-cell-centric-operations-2d-diff-hex-anim-py"></span><h1>2D Diffusion<a class="headerlink" href="#d-diffusion" title="Permalink to this heading"></a></h1>
+<span id="sphx-glr-example-gallery-cell-centric-operations-2d-diff-hex-anim-py"></span><h1>2D Diffusion<a class="headerlink" href="#d-diffusion" title="Link to this heading"></a></h1>
 <p id="example-diffusion">2D Diffusion on a HexGrid</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>This example shows basic 2D diffusion on a HexGrid.
 We start with a cold region surrounded by hot borders.
 We will also add some hot patches in the middle of the cold region to make it look interesting.
 The heat is then spread out by diffusion.</p>
 </section>
 <section id="diffusion">
-<h2>Diffusion<a class="headerlink" href="#diffusion" title="Permalink to this heading"></a></h2>
+<h2>Diffusion<a class="headerlink" href="#diffusion" title="Link to this heading"></a></h2>
 <p>Diffusion is a description of the spread of a physical property through time.
 An easy example is the spread of temperature, which is what we will use in this example,
 but other physical properties can also be modelled using diffusion.
@@ -131,7 +126,7 @@ Diffusion is often coupled with advection (the transport of a substance) in mode
 Here we will only focus on the diffusion.</p>
 </section>
 <section id="d-diffusion-equation-derivation">
-<h2>1D diffusion equation derivation<a class="headerlink" href="#d-diffusion-equation-derivation" title="Permalink to this heading"></a></h2>
+<h2>1D diffusion equation derivation<a class="headerlink" href="#d-diffusion-equation-derivation" title="Link to this heading"></a></h2>
 <p>First I will derive the diffusion equation for one dimension, and then extrapolate to multiple dimensions.</p>
 <p>Let’s start by viewing the distribution of temperature in a given space as being divided
 into many small regions where the temperature is the same.
@@ -178,7 +173,7 @@ We can therefore rewrite the equation given above as:</p>
 \[\frac{ \delta T }{ \delta t } = D \frac{ \delta ^2 T }{ \delta x^2 }\]</div>
 <p>This is the basic form of the 1D thermal diffusion equation.</p>
 <section id="multi-dimensional-diffusion-equation">
-<h3>Multi-dimensional diffusion equation<a class="headerlink" href="#multi-dimensional-diffusion-equation" title="Permalink to this heading"></a></h3>
+<h3>Multi-dimensional diffusion equation<a class="headerlink" href="#multi-dimensional-diffusion-equation" title="Link to this heading"></a></h3>
 <p>Usually, the 1D diffusion equation described above is extrapolated to 2D by considering
 two perpendicular directions of flow, <cite>dx</cite> and <cite>dy</cite>. The diffusion equation then becomes:</p>
 <div class="math notranslate nohighlight">
@@ -267,7 +262,7 @@ Taking some artistic liberty with mathematical notation, this can then be writte
 </section>
 </section>
 <section id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Permalink to this heading"></a></h2>
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h2>
 <p>Now we have the theory covered, let’s define a setup with some parameters.
 The setup is inspired by the following article: <a class="reference external" href="https://scipython.com/book/chapter-7-matplotlib/examples/the-two-dimensional-diffusion-equation/">https://scipython.com/book/chapter-7-matplotlib/examples/the-two-dimensional-diffusion-equation/</a>
 Though we will modify it a bit, to make it look a bit more interesting.
@@ -330,7 +325,7 @@ make it look more interesting.</p>
 <img src="../../_images/sphx_glr_2d_diff_hex_anim_002.png" srcset="../../_images/sphx_glr_2d_diff_hex_anim_002.png" alt="2d diff hex anim" class = "sphx-glr-single-img"/><p>Here, all beige cells are the cells that start out hot and the black cells start out cool.</p>
 </section>
 <section id="the-model">
-<h2>The model<a class="headerlink" href="#the-model" title="Permalink to this heading"></a></h2>
+<h2>The model<a class="headerlink" href="#the-model" title="Link to this heading"></a></h2>
 <p>For this grid, the important variables we will need for the diffusion equation are:</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">cell_width</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">dx</span>
 <span class="n">dt</span> <span class="o">=</span> <span class="n">cell_width</span><span class="o">**</span><span class="mi">4</span> <span class="o">/</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">D</span><span class="p">)</span>
@@ -363,7 +358,7 @@ Loop through time, solve the diffusion equation and save the intermediate data f
 </div>
 </section>
 <section id="animation">
-<h2>Animation<a class="headerlink" href="#animation" title="Permalink to this heading"></a></h2>
+<h2>Animation<a class="headerlink" href="#animation" title="Link to this heading"></a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.animation</span> <span class="kn">import</span> <span class="n">FuncAnimation</span>
 
 <span class="n">all_geoms</span> <span class="o">=</span> <span class="n">datagrid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">()</span>
@@ -578,42 +573,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img93c66212c2fe477bac66c4506d6aa118">
+  <img id="_anim_imgd37a3005ab78441588d03a0cdad540d2">
   <div class="anim-controls">
-    <input id="_anim_slider93c66212c2fe477bac66c4506d6aa118" type="range" class="anim-slider"
+    <input id="_anim_sliderd37a3005ab78441588d03a0cdad540d2" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim93c66212c2fe477bac66c4506d6aa118.set_frame(parseInt(this.value));">
+           oninput="animd37a3005ab78441588d03a0cdad540d2.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim93c66212c2fe477bac66c4506d6aa118.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animd37a3005ab78441588d03a0cdad540d2.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim93c66212c2fe477bac66c4506d6aa118.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animd37a3005ab78441588d03a0cdad540d2.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim93c66212c2fe477bac66c4506d6aa118.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animd37a3005ab78441588d03a0cdad540d2.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim93c66212c2fe477bac66c4506d6aa118.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animd37a3005ab78441588d03a0cdad540d2.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim93c66212c2fe477bac66c4506d6aa118.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animd37a3005ab78441588d03a0cdad540d2.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim93c66212c2fe477bac66c4506d6aa118.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animd37a3005ab78441588d03a0cdad540d2.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim93c66212c2fe477bac66c4506d6aa118.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animd37a3005ab78441588d03a0cdad540d2.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim93c66212c2fe477bac66c4506d6aa118.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animd37a3005ab78441588d03a0cdad540d2.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim93c66212c2fe477bac66c4506d6aa118.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animd37a3005ab78441588d03a0cdad540d2.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select93c66212c2fe477bac66c4506d6aa118"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd37a3005ab78441588d03a0cdad540d2"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_93c66212c2fe477bac66c4506d6aa118"
+      <input type="radio" name="state" value="once" id="_anim_radio1_d37a3005ab78441588d03a0cdad540d2"
              >
-      <label for="_anim_radio1_93c66212c2fe477bac66c4506d6aa118">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_93c66212c2fe477bac66c4506d6aa118"
+      <label for="_anim_radio1_d37a3005ab78441588d03a0cdad540d2">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_d37a3005ab78441588d03a0cdad540d2"
              checked>
-      <label for="_anim_radio2_93c66212c2fe477bac66c4506d6aa118">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_93c66212c2fe477bac66c4506d6aa118"
+      <label for="_anim_radio2_d37a3005ab78441588d03a0cdad540d2">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_d37a3005ab78441588d03a0cdad540d2"
              >
-      <label for="_anim_radio3_93c66212c2fe477bac66c4506d6aa118">Reflect</label>
+      <label for="_anim_radio3_d37a3005ab78441588d03a0cdad540d2">Reflect</label>
     </form>
   </div>
 </div>
@@ -623,13 +618,13 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img93c66212c2fe477bac66c4506d6aa118";
-    var slider_id = "_anim_slider93c66212c2fe477bac66c4506d6aa118";
-    var loop_select_id = "_anim_loop_select93c66212c2fe477bac66c4506d6aa118";
+    var img_id = "_anim_imgd37a3005ab78441588d03a0cdad540d2";
+    var slider_id = "_anim_sliderd37a3005ab78441588d03a0cdad540d2";
+    var loop_select_id = "_anim_loop_selectd37a3005ab78441588d03a0cdad540d2";
     var frames = new Array(9);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAABfpUlEQVR4nO3dd3gU5RoF8PPNbjoEktBJ6L0qSgdFsaCgqHSsqHRCb4Ig0ou0\
 BBEL0qxgu6JYUMBGbyo9obfQewnZmff+kSIlZWfZsLuT83se5N7Aybwhm8nZknmViAiIiIiIyLI0\
 Tw9ARERERNmLhY+IiIjI4lj4iIiIiCyOhY+IiIjI4lj4iIiIiCyOhY+IiIjI4lj4iIiIiCyOhY+I\
@@ -1063,7 +1058,7 @@ EREREVkcCx8RERGRxbHwEREREVkcCx8RERGRxbHwEREREVkcCx8RERGRxf0fQ9/oXXA+S8wAAAAA\
 SUVORK5CYII=\
 "
   frames[1] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAD8OUlEQVR4nOz9d7Qs2V3ejX92pY4n53RznJxH0ihbQhISQmABEgihBQYbGTD2\
 wji8r3/Y67W9WGADfg3C5gUhhMEEIWQFEJJQQGhGk/O9c3M+OffpVGHv3x/VfVKnqp474bb2Z607\
 d26fes7eFbrqqb2rvo9QSik0Go1Go9FoNB2L8Up3QKPRaDQajUbz0qINn0aj0Wg0Gk2How2fRqPR\
@@ -2200,7 +2195,7 @@ BEEQhD5HCj5BEARBEIQ+Rwo+QRAEQRCEPkcKPkEQBEEQhD5HCj5BEARBEIQ+Rwo+QRAEQRCEPuf/\
 D0FfSFaSQh4dAAAAAElFTkSuQmCC\
 "
   frames[2] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAEAAElEQVR4nOz9eZBk2V2fDz/n3DUzK5fau6qr9+7ZN82mBS2DAAM/ELKNEMsP\
 DAoHOGwcDgjAEQThN17sCLOFI95wEAo7wsZgwAuSwTJYSALECCFpNELLaPbe96rq2qtyv/ee8/5x\
 M2vL7d6cnqVL55no6ZmsfOqcu+b3nnvzfITWWmMwGAwGg8FgOLDIN7sDBoPBYDAYDIbXF1PwGQwG\
@@ -3421,7 +3416,7 @@ EREREZkcBz4iIiIik+PAR0RERGRyHPiIiIiITI4DHxEREZHJceAjIiIiMjkOfEREREQmx4GPiIiI\
 yOQ48BERERGZHAc+IiIiIpP7f2alaRgux/6MAAAAAElFTkSuQmCC\
 "
   frames[3] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAEAAElEQVR4nOz9WZAt2V2fDT9r5bDH2jVXnTrz2JPU3UIttST7tRAIZBsQk2Qw\
 HkO2A+4c2Bh/4fjsC64IzEfYOOIFc2HCNiEHARa8jEK8YGQwGrtbanW3uvt0n9NnPqdOzVV7zGH9\
 v4vMXdOeMrd6LNaj6C71rv3UWjnszH+uzL1+SkQEi8VisVgsFsuRRb/VHbBYLBaLxWKxvLHYgs9i\
@@ -4640,7 +4635,7 @@ p4FPREREJOQ08ImIiIiEnAY+ERERkZDTwCciIiISchr4REREREJOA5+IiIhIyGngExEREQk5DXwi\
 IiIiIaeBT0RERCTkNPCJiIiIhJwGPhEREZGQ+39i3DongxWYiAAAAABJRU5ErkJggg==\
 "
   frames[4] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAEAAElEQVR4nOz9aYwk2X2fjT7nxJZbZe3VXb1PT/fsQ1ILSYnaKMsSZdmwfE3J\
 NnAN2ZYAGRBkwbJsyBK8fZAhG68kAwYE2JINL7I/XIsf7vWmV5ZeiRIt7jSHM+TM9Mx0T/f03rVX\
 rrGd//0QmVWVVblEJGd6povnIaabXZVPnhNLRvzjROT5KRERLBaLxWKxWCzHFv1ud8BisVgsFovF\
@@ -5841,7 +5836,7 @@ iYiIiAScBj4RERGRgNPAJyIiIhJwGvhEREREAk4Dn4iIiEjAaeATERERCbj/BwHCWkW1lw0IAAAA\
 AElFTkSuQmCC\
 "
   frames[5] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAEAAElEQVR4nOz9eYwlWV7fDX/OifUuuWfWXtXV+0zPxmyA8eNhbF4h2XiwDGgM\
 yP5jsGXhBQsbYwsJZGHLQjaybCOxyTaL/IIsBoPwa2yDzMOY58GAYfbeq7q6urr2rNzzLrGd3/tH\
 xM28mXeLiKnecs5nVJU9Wfdzz4nlRvziRNzzVSIiWCwWi8VisVhOLPqt7oDFYrFYLBaL5Y3FFnwW\
@@ -7008,7 +7003,7 @@ ACA5gw8AIDmDDwAgOYMPACA5gw8AIDmDDwAgOYMPACA5gw8AIDmDDwAgOYMPACA5gw8AIDmDDwAg\
 OYMPACA5gw8AIDmDDwAgOYMPACA5gw8AIDmDDwAguf8A10XG7NT73N0AAAAASUVORK5CYII=\
 "
   frames[6] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAD8gElEQVR4nOz9aawlWXqXjz7vimmPZ86xsuahZ1e7sd3gi7kNRmoECIQ8CIMY\
 BFKDLIMwNlhYGPHBYAkElpAs+Y9BDJYt2e4rg0BCXHyNwUC7PTTd1V3dNWRlZVVWVk4nz7TnGNZ7\
 P8TeZ9pTRFTWkKfXU6rMqnPOc9aK2LEj3lgr9vqJqioOh8PhcDgcjjOLeb874HA4HA6Hw+F4d3EF\
@@ -8146,7 +8141,7 @@ x5bjCj6Hw+FwOByOLccVfA6Hw+FwOBxbjiv4HA6Hw+FwOLYcV/A5HA6Hw+FwbDmu4HM4HA6Hw+HY\
 clzB53A4HA6Hw7Hl/P8BD96lxvGtv3MAAAAASUVORK5CYII=\
 "
   frames[7] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAAD2N0lEQVR4nOz9aaxk637Xh39+z5pq2LXHnk/3mYc7X4MHiCUbIyQQGUzkaxKS\
 oESZ/ALdWCKEREAkEElI3mCkSHZCokhRLBMMUSQI/A0ScgwGbMfDne89Y5+p+/Swu3uPNa3h+f1f\
 PFV7V+1dw1rrnNPndN3nc9Xd9+yqz37WVGv91vOser6iqorH4/F4PB6PZ2Uxn/QCeDwej8fj8Xg+\
@@ -9256,7 +9251,7 @@ luMLPo/H4/F4PJ4txxd8Ho/H4/F4PFuOL/g8Ho/H4/F4thxf8Hk8Ho/H4/FsOb7g83g8Ho/H49ly\
 /v/4aExWr1Gd9gAAAABJRU5ErkJggg==\
 "
   frames[8] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnwAAAHeCAYAAAAB0dYuAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjcuNSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/xnp5ZAAAACXBIWXMAAA9h\
+bGliIHZlcnNpb24zLjkuNCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy8ekN5oAAAACXBIWXMAAA9h\
 AAAPYQGoP6dpAADwYklEQVR4nOz9acxs2X7Xh3/W2lNNz3jmoefhTrbvxTFEQsCfRGBhCRykECmD\
 gpWAsHBEwguUSCGRlSiyktxXkREkvADEoCAgChhIQE4UFAxRMMTGvnbfvn1On+7TZx6euaY9rN//\
 xdpV9dTz7Kraa/fpc/vUXZ/W6dP9PPWptWqPv732rvVVIiJ4PB6Px+PxeNYW/f3ugMfj8Xg8Ho/n\
@@ -10344,12 +10339,12 @@ AAAASUVORK5CYII=\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim93c66212c2fe477bac66c4506d6aa118 = new Animation(frames, img_id, slider_id, 200.0,
+        animd37a3005ab78441588d03a0cdad540d2 = new Animation(frames, img_id, slider_id, 200.0,
                                  loop_select_id);
     }, 0);
   })()
 </script></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.392 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.302 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-2d-diff-hex-anim-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/be9a205be0e4825e42f57a2d24e3f803/2d_diff_hex_anim.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">2d_diff_hex_anim.ipynb</span></code></a></p>

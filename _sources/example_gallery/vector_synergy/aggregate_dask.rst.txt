@@ -92,6 +92,13 @@ I will print ``npartitions`` to show the number of chunks the array is divided i
 
  .. code-block:: none
 
+    /opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages/dask/dataframe/__init__.py:42: FutureWarning: 
+    Dask dataframe query planning is disabled because dask-expr is not installed.
+
+    You can install it with `pip install dask[dataframe]` or `conda install dask`.
+    This will raise in a future version.
+
+      warnings.warn(msg, FutureWarning)
     4
 
 
@@ -139,7 +146,7 @@ The column 'nr_points' will contain the nr of points per cell once '.count()' is
 
  .. code-block:: none
 
-    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:99: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+    /home/runner/work/GridKit/GridKit/gridkit/hex_grid.py:100: UserWarning: A 'flat' ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
       warnings.warn(
     Dask DataFrame Structure:
                      pnt_x    pnt_y cell_id nr_points
@@ -238,7 +245,7 @@ The input data was the same so this should indeed be the case.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.406 seconds)
+   **Total running time of the script:** (0 minutes 0.385 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate_dask.py:

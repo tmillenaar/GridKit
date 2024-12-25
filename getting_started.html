@@ -1,27 +1,25 @@
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Getting Started &mdash; GridKit v0.14.0 documentation</title>
+  <title>Getting Started &mdash; GridKit v0.14.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=62781346"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=911007c9"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +38,6 @@
           <a href="index.html" class="icon icon-home">
             GridKit
           </a>
-              <div class="version">
-                v0.14.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -97,9 +92,9 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <section id="quick-example">
-<h2>Quick example<a class="headerlink" href="#quick-example" title="Permalink to this heading"></a></h2>
+<h2>Quick example<a class="headerlink" href="#quick-example" title="Link to this heading"></a></h2>
 <p>As a quick demonstration a grid and two points are created.
 Then the grid cells that cover those points will be obtained
 and finally the polygon description of these cells will be obtained.</p>
@@ -117,7 +112,7 @@ and finally the polygon description of these cells will be obtained.</p>
 <p>More elaborate examples can be found in the <a class="reference internal" href="example_gallery/index.html#example-gallery"><span class="std std-ref">Example gallery</span></a></p>
 </section>
 <section id="what-is-gridkit">
-<h2>What is GridKit?<a class="headerlink" href="#what-is-gridkit" title="Permalink to this heading"></a></h2>
+<h2>What is GridKit?<a class="headerlink" href="#what-is-gridkit" title="Link to this heading"></a></h2>
 <p>GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids.</p>
 <p><strong>Core features:</strong></p>
 <blockquote>
@@ -162,7 +157,7 @@ and finally the polygon description of these cells will be obtained.</p>
 </aside>
 </section>
 <section id="what-gridkit-is-not">
-<h2>What GridKit is not<a class="headerlink" href="#what-gridkit-is-not" title="Permalink to this heading"></a></h2>
+<h2>What GridKit is not<a class="headerlink" href="#what-gridkit-is-not" title="Link to this heading"></a></h2>
 <p>Many common operations are done on grids or rasters.
 Restrictions therefore keep clarity around which features make sense for GridKit, and which are best left to to other packages.</p>
 <p>Most notably, there are many software solutions out there that focuss on rasters, or bounded rectangular grids (some of these are mentioned below).
@@ -219,7 +214,7 @@ If this is the kind of data you are most likely to use, you may consider one of 
 </div></blockquote>
 </section>
 <section id="infinite-grids-the-fundamentals">
-<h2>Infinite grids, the fundamentals<a class="headerlink" href="#infinite-grids-the-fundamentals" title="Permalink to this heading"></a></h2>
+<h2>Infinite grids, the fundamentals<a class="headerlink" href="#infinite-grids-the-fundamentals" title="Link to this heading"></a></h2>
 <p>A grid is little more than a surface that is subdivided into cells.
 We chan choose how we subdivide this surface by choosing the type shape and size of the cells, as well as an origin (a starting point).
 Once we have chose these parameters, we can say something about each cell, like it’s position relative to the origin or relative other cells.
@@ -227,7 +222,7 @@ Since this plane has no defined end, the cells can keep on tiling to infinity. H
 <p>A grid that is defined by it’s cell shape, size and the grid’s origin does not need to store a lot of data in memory.
 All other information regarding grid cells of interest (such as their area, center location, corner locations or neighbours) can be calculated on demand.</p>
 <section id="bounded-vs-infinite-grids-an-example">
-<h3>Bounded vs infinite grids, an example<a class="headerlink" href="#bounded-vs-infinite-grids-an-example" title="Permalink to this heading"></a></h3>
+<h3>Bounded vs infinite grids, an example<a class="headerlink" href="#bounded-vs-infinite-grids-an-example" title="Link to this heading"></a></h3>
 <p>Out of practicality, most data that can be thought of as a grid is bounded in the real world.
 A computer screen can be thought of as a rectangular grid of say 1920x1080 pixels.
 This is clearly a bounded grid, where pixel (2000, 500) has little meaning, for it is out of the bounds of the screen and hence does not reflect a real-world pixel.
@@ -238,7 +233,7 @@ Conceptually, these two screens then sare the same grid.
 This is an illustration of bounded data living on an infinte grid.</p>
 </section>
 <section id="cell-indices-what-are-they">
-<h3>Cell indices, what are they?<a class="headerlink" href="#cell-indices-what-are-they" title="Permalink to this heading"></a></h3>
+<h3>Cell indices, what are they?<a class="headerlink" href="#cell-indices-what-are-they" title="Link to this heading"></a></h3>
 <p>In GridKit, one cell in a grid is set to be cell (0,0), the starting cell.
 From this cell you can move one or more cells to the left, right, down or up.
 The first number indicates how many cells you moved in the x-direction (left or right).
@@ -250,7 +245,7 @@ Similarly, cell (-1,3) is one cell right of cell (-2,3), but on the same row.</p
 For example, a rectangular grid where the cell size in x-direciton is 1, and in y-direction is 2, the center of the first cell (0,0) is at location <em>x=0.5</em>, <em>y=1</em>).</p>
 </section>
 <section id="offsets">
-<h3>Offsets<a class="headerlink" href="#offsets" title="Permalink to this heading"></a></h3>
+<h3>Offsets<a class="headerlink" href="#offsets" title="Link to this heading"></a></h3>
 <p>Two grids with the same cell shape and the same cell dimentions, are not nesecarily the same.
 If their origin differs, the grids are shifted with respect to each other.
 This shift can be less then the size of a cell.
