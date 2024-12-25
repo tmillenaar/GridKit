@@ -3,6 +3,14 @@
 Release notes
 ================
 
+Version 0.14.1 (December 25, 2024)
+----------------------------------
+Features
+ - Add arguments ``location`` and ``adjust_rotation`` to :meth:`.TriGrid.to_crs`, :meth:`.RectGrid.to_crs` and :meth:`.HexGrid.to_crs` for more accurate conversions.
+
+Misc
+ - Build using python3.9 because for 3.8 the geopandas/fiona documentation dependency installs incompatible versions
+
 Version 0.14.0 (August 11, 2024)
 --------------------------------
 Featrures
@@ -23,7 +31,7 @@ Misc
    these represent Rust classes. PyO3 seems to be less ambiguous for it makes sense from both perspectives.
 
 Version 0.13.0 (July 10, 2024)
------------------------------
+------------------------------
 Features
  - Option to initialize grid using ``side_length`` instead of ``size`` or ``area``
 
@@ -325,7 +333,7 @@ Version 0.4.1 (August 20, 2023)
 Features
  - make :class:`~gridkit.index.GridIndex` hashable so it works as pandas index
  - remove any empty axis on :class:`~gridkit.index.GridIndex` initialization
- 
+
 Documentation
  - create example script :ref:`aggregate.py <example aggregate>`
  - rename ``Shape interactions`` section to ``Vector data interactions``
@@ -336,7 +344,7 @@ Version 0.4.0 (August 13, 2023)
 Features
  - :class:`~gridkit.index.GridIndex` class to unify index representation
  - :func:`~gridkit.index.validate_index` decorator to turn any index represetntation into a GridIndex on function call
- - Operations that return grid indices now return GridIndex instances instead of numpy arrays 
+ - Operations that return grid indices now return GridIndex instances instead of numpy arrays
 
 Version 0.3.1 (July 23, 2023)
 -----------------------------
@@ -345,7 +353,7 @@ Features
  - add :meth:`~gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id()` to :class:`~gridkit.hex_grid.BoundedHexGrid`
 
 Fixes
- - resolve shift in data when using comparisson and mathematical operators on BoudedHexGrid 
+ - resolve shift in data when using comparisson and mathematical operators on BoudedHexGrid
 
 Documentation
  - Add examle on coordinate transformations
