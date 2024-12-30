@@ -22,24 +22,25 @@ In order to maintain the DEM's higher resolution, we resample the land cover dat
 
 The datasets can be large and we may not want to read the whole dataset into RAM if we don't have to.
 We can supply a bounding box when reading the data to only read the data we need.
-If this bounding box is not defined in the coordinates native to the file, 
+If this bounding box is not defined in the coordinates native to the file,
 ``bounds_crs`` can be supplied to transform the bounds before reading.
 We can make use of this to read out a crop of the same area form different files.
 
 .. Note ::
     After reading a crop from a different CRS, the area is often not an exact match.
     When bounds are transformed to a different CRS, the bounds are warped.
-    A bounding box is a rectagnle in it's original CRS, 
+    A bounding box is a rectagnle in it's original CRS,
     but due to this warping it is often a paralellogram in a different CRS.
     In the current implementation, the furthest extent of the paralellogram define what data to crop.
     This means that more data is read when the bounds are warped more severely after the transformation.
 
 
 """
+
 import matplotlib.pyplot as plt
 import numpy
 
-from gridkit import read_raster
+from gridkit.io import raster_to_data_tile
 
 # Define the bounding box of interest and the corresponding CRS
 bounds_matterhorn = (817723, 5826030, 964482, 5893982)
@@ -50,10 +51,10 @@ path_landuse = "../../tests/data/alps_landuse.tiff"
 path_dem = "../../tests/data/alps_dem.tiff"
 
 # Read a part of the digital elevation model (DEM) and set to desired CRS
-dem = read_raster(path_dem, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
+dem = raster_to_data_tile(path_dem, bounds=bounds_matterhorn, bounds_crs=bounds_crs)
 
 # Read the same part of the landuse dataset and resample onto the DEM
-landuse = read_raster(
+landuse = raster_to_data_tile(
     path_landuse, bounds=bounds_matterhorn, bounds_crs=bounds_crs
 ).resample(dem, method="nearest")
 
@@ -145,7 +146,7 @@ ids_per_landuse = dict(
 
 # Plot forest histograms
 fig, ax = plt.subplots(1)
-bins = list(range(dem.min(), dem.max(), 50))
+bins = list(range(int(dem.min()), int(dem.max()), 50))
 colors = iter(
     ["palegreen", "lightsalmon", "lightseagreen", "darkgreen", "yellowgreen", "orange"]
 )

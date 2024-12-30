@@ -118,12 +118,16 @@ def write_raster(grid, path):
     return path
 
 
-def raster_to_data_tile(path, bounds=None):
+def raster_to_data_tile(
+    path,
+    bounds=None,
+    bounds_crs: CRS = None,
+    border_buffer: float = 0,
+):
     with rasterio.open(path) as raster_file:
         crs = str(raster_file.crs)
 
         if bounds is not None:
-            raise NotImplementedError()
 
             if bounds_crs is not None:
                 bounds_crs = CRS.from_user_input(bounds_crs)

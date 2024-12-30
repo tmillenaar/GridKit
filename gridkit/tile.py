@@ -449,6 +449,8 @@ class DataTile(Tile):
             :py:meth:`.BoundedGrid.interpolate`
             :py:meth:`.BaseGrid.interp_from_points`
         """
+        if isinstance(alignment_grid, Tile):
+            alignment_grid = alignment_grid.grid
         if self.grid.crs is None or alignment_grid.crs is None:
             warnings.warn(
                 "`crs` not set for one or both grids. Assuming both grids have an identical CRS."
@@ -553,6 +555,36 @@ class DataTile(Tile):
         )
 
         return DataTile(tile, value)
+
+    def to_crs(self, crs, resample_method="nearest"):
+        """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+        This will modify the cell size and the bounds accordingly.
+
+        The ``crs`` attribute on the current grid must be set.
+
+        Parameters
+        ----------
+        crs: Union[int, str, pyproj.CRS]
+            The value can be anything accepted
+            by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
+            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+        resample_method: :class:`str`
+            The resampling method to be used for :meth:`.DataTile.resample`.
+
+        Returns
+        -------
+        :class:`~.rect_grid.BoundedRectGrid`
+            A copy of the grid with modified cell spacing and bounds to match the specified CRS
+
+        See also
+        --------
+        Examples:
+
+        :ref:`Example: coordinate transformations <example coordinate transformations>`
+
+        """
+        new_inf_grid = self.grid.to_crs(crs)
+        return self.resample(new_inf_grid, method=resample_method)
 
     def __add__(self, other):
         if isinstance(other, DataTile):

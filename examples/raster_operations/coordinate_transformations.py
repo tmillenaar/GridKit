@@ -25,22 +25,22 @@ To demonstrate this, let's create a grid in WGS84 (epsg code 4326) and transform
 
 import numpy
 
-from gridkit import BoundedRectGrid
+from gridkit import DataTile, RectGrid, Tile
 
 # Create a new grid
-grid_wgs84 = BoundedRectGrid(
-    numpy.arange(25 * 25).reshape(25, 25),
-    bounds=(-40, -30, 10, 20),
-    crs=4236,
+data = numpy.arange(25 * 25).reshape(25, 25)
+grid = RectGrid(size=2, crs=4326)
+tile = Tile(grid, (-20, -15), data.shape[1], data.shape[0])
+data_tile_wgs84 = DataTile(
+    tile,
+    data,
     nodata_value=numpy.nan,
-).astype(
-    "float32"
-)  # use float dtype to be able to represent nans as nodata
+)
 
 # Plot the grid in it's native CRS
 import matplotlib.pyplot as plt
 
-plt.imshow(grid_wgs84, extent=grid_wgs84.mpl_extent)
+plt.imshow(data_tile_wgs84, extent=data_tile_wgs84.mpl_extent)
 plt.title("Original grid in WGS84")
 plt.xlabel("$^\circ$Lon")
 plt.ylabel("$^\circ$Lat")
@@ -55,15 +55,17 @@ from pyproj.transformer import CRS, Transformer
 
 utm_epsg = 32629
 transformer = Transformer.from_crs(
-    grid_wgs84.crs, CRS.from_user_input(utm_epsg), always_xy=True
+    data_tile_wgs84.grid.crs, CRS.from_user_input(utm_epsg), always_xy=True
 )  # UTM zone 28N
 
 wgs84_centroids_utm = transformer.transform(
-    *grid_wgs84.centroid().T
+    *data_tile_wgs84.centroid().T
 )  # transform each cell
 
 # Plot the cell centers as a scatter plot, color them using their data value
-plt.scatter(*wgs84_centroids_utm, s=20, c=grid_wgs84.data.ravel(), cmap="viridis")
+plt.scatter(
+    *wgs84_centroids_utm, s=20, c=data_tile_wgs84.to_numpy().ravel(), cmap="viridis"
+)
 plt.title("WGS84 grid cells transformed to UTM")
 plt.xlabel("x [metre]")
 plt.ylabel("y [metre]")
@@ -79,10 +81,12 @@ plt.show()
 # A new grid is crated that is straigt in the desired CRS. The values of the new grid cells are interpolated from the transformed values of the source grid.
 # To demonstrate this principle, let's plot the straight grid as red dots on top of the warped one, containing the original data.
 
-grid_utm = grid_wgs84.to_crs(utm_epsg)  # resample using to_crs
+grid_utm = data_tile_wgs84.to_crs(utm_epsg)  # resample using to_crs
 
 # Plot the cells of the source grid in the new CRS
-plt.scatter(*wgs84_centroids_utm, s=20, c=grid_wgs84.data.ravel(), cmap="viridis")
+plt.scatter(
+    *wgs84_centroids_utm, s=20, c=data_tile_wgs84.to_numpy().ravel(), cmap="viridis"
+)
 # Plot the location of the new cells
 plt.scatter(*grid_utm.centroid().T, s=3, color="red")
 plt.title("New UTM grid on top of WGS84 grid in UTM")
@@ -109,7 +113,7 @@ plt.show()
 # This does lead to artifacts at the boundaries.
 #
 
-grid_utm = grid_wgs84.to_crs(utm_epsg, resample_method="bilinear")
+grid_utm = data_tile_wgs84.to_crs(utm_epsg, resample_method="bilinear")
 plt.imshow(grid_utm, extent=grid_utm.mpl_extent)
 plt.scatter(*wgs84_centroids_utm, s=3, color="orange")
 

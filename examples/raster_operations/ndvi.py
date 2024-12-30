@@ -12,23 +12,20 @@ Since these bands are already from the same Sentinel 2 acquisition, they are alr
 This means none of the bands have to be resampled before we combine them.
 
 .. tip ::
-    
+
     If this example matches your use case, you may also be interested in the packages Rasterio or Rioxarray.
     This example is created to get the reader familiar with the synax of GridKit and to highlight some of the intricacies when working with this package.
-    
-Also, a numpy warning is raised because we devide by zero for some cells.
-These turn into NaN-values.
-This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 """
+
 import matplotlib.pyplot as plt
 import numpy
 
-from gridkit import read_raster
+from gridkit.io import raster_to_data_tile
 
 # Read in the bands required to determine the NDVI
-band_4 = read_raster("../../tests/data/20220708_S2_L2A_B04_raw.tiff").astype("int32")
-band_8 = read_raster("../../tests/data/20220708_S2_L2A_B08_raw.tiff").astype("int32")
+band_4 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B04_raw.tiff")
+band_8 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B08_raw.tiff")
 
 # %%
 #
@@ -42,7 +39,7 @@ band_8 = read_raster("../../tests/data/20220708_S2_L2A_B08_raw.tiff").astype("in
 
 # Determine the NDVI
 ndvi = (band_8 - band_4) / (band_8 + band_4)
-ndvi.data[~numpy.isfinite(ndvi)] = 0  # fill NaN values resulting from a division by 0
+ndvi[~numpy.isfinite(ndvi)] = 0  # fill NaN values resulting from a division by 0
 
 # %%
 #
@@ -61,6 +58,6 @@ im_ndvi = ax.imshow(ndvi, cmap="RdYlGn", extent=mpl_extent, vmin=-1, vmax=1)
 fig.colorbar(im_ndvi, ax=ax, fraction=0.022, pad=0.01)
 ax.set_xlabel("lon")
 ax.set_ylabel("lat")
-ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.crs.to_epsg()}")
+ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.grid.crs.to_epsg()}")
 
 plt.show()
