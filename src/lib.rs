@@ -1,5 +1,6 @@
 use std::ops::Add;
 
+use grid::Orientation;
 use numpy::{
     IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3,
 };
@@ -179,9 +180,10 @@ impl PyO3Tile {
                     )),
                     grid::Grid::HexGrid(grid) => PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(
                         grid.cellsize,
+                        &grid.cell_orientation.to_string(),
                         grid.offset,
                         grid.rotation(),
-                    )),
+                    )?),
                 };
                 Ok(PyO3Tile {
                     _grid: grid,
@@ -537,7 +539,9 @@ struct PyO3TriGrid {
 impl PyO3TriGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = tri_grid::TriGrid::new(cellsize, offset, rotation);
+        let mut _grid = tri_grid::TriGrid::new(cellsize);
+        _grid.set_offset(offset);
+        _grid.set_rotation(rotation);
         PyO3TriGrid {
             cellsize,
             rotation,
@@ -570,11 +574,11 @@ impl PyO3TriGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -703,7 +707,9 @@ struct PyO3RectGrid {
 impl PyO3RectGrid {
     #[new]
     fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = rect_grid::RectGrid::new(dx, dy, offset, rotation);
+        let mut _grid = rect_grid::RectGrid::new(dx, dy);
+        _grid.set_offset(offset);
+        _grid.set_rotation(rotation);
         PyO3RectGrid {
             dx,
             dy,
@@ -733,11 +739,11 @@ impl PyO3RectGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -789,12 +795,41 @@ struct PyO3HexGrid {
 #[pymethods]
 impl PyO3HexGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
-        PyO3HexGrid {
-            cellsize,
-            rotation,
-            _grid,
+    fn new(
+        cellsize: f64,
+        cell_orientation: &str,
+        offset: (f64, f64),
+        rotation: f64,
+    ) -> PyResult<Self> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => {
+                let mut _grid = hex_grid::HexGrid::new(cellsize, cell_orientation);
+                _grid.set_offset(offset);
+                _grid.set_rotation(rotation);
+                Ok(PyO3HexGrid {
+                    cellsize,
+                    rotation,
+                    _grid,
+                })
+            }
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
+        }
+    }
+
+    fn cell_orientation<'py>(&self, py: Python<'py>) -> &'py PyString {
+        PyString::new(py, &self._grid.cell_orientation.to_string())
+    }
+
+    fn set_cell_orientation(&mut self, cell_orientation: &str) -> PyResult<()> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => Ok(self._grid.set_cell_orientation(cell_orientation)),
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
         }
     }
 
@@ -823,11 +858,11 @@ impl PyO3HexGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(

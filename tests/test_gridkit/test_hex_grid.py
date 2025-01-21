@@ -446,7 +446,7 @@ def test_centering_with_offset(shape, rot):
         #       The offsets are reversed.
         #       Rather than attempting to address this, 'flat' shapes will be discontinued from v1.0.0
         grid.offset = (0, grid.dx / 2)
-    numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0])
+    numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0], atol=1e-15)
 
 
 @pytest.mark.parametrize("shape", ["flat", "pointy"])

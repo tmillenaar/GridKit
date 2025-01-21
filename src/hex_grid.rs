@@ -1,4 +1,4 @@
-use crate::grid::GridTraits;
+use crate::grid::{GridTraits, Orientation};
 use crate::utils::*;
 use numpy::ndarray::*;
 
@@ -6,6 +6,7 @@ use numpy::ndarray::*;
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: (f64, f64),
+    pub cell_orientation: Orientation,
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
@@ -13,42 +14,82 @@ pub struct HexGrid {
 
 impl GridTraits for HexGrid {
     fn dx(&self) -> f64 {
-        self.cellsize
+        match self.cell_orientation {
+            Orientation::Pointy => self.cellsize,
+            Orientation::Flat => 3. / 2. * self.radius(),
+        }
     }
     fn dy(&self) -> f64 {
-        3. / 2. * self.radius()
+        match self.cell_orientation {
+            Orientation::Pointy => 3. / 2. * self.radius(),
+            Orientation::Flat => self.cellsize,
+        }
     }
+
+    fn set_cellsize(&mut self, cellsize: f64) {
+        self.cellsize = cellsize;
+    }
+
     fn offset(&self) -> (f64, f64) {
         self.offset
     }
-    fn radius(&self) -> f64 {
-        self.cellsize / 3_f64.powf(0.5)
+
+    fn set_offset(&mut self, offset: (f64, f64)) {
+        self.offset = normalize_offset(offset, self.cell_width(), self.cell_height())
     }
+
     fn rotation(&self) -> f64 {
         self._rotation
     }
-    fn rotation_matrix(&self) -> Array2<f64> {
-        self._rotation_matrix.clone()
+
+    fn set_rotation(&mut self, rotation: f64) {
+        self._rotation = rotation;
+        self._rotation_matrix = rotation_matrix_from_angle(rotation);
+        self._rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
     }
-    fn rotation_matrix_inv(&self) -> Array2<f64> {
-        self._rotation_matrix_inv.clone()
+
+    fn rotation_matrix(&self) -> &Array2<f64> {
+        &self._rotation_matrix
+    }
+    fn rotation_matrix_inv(&self) -> &Array2<f64> {
+        &self._rotation_matrix_inv
+    }
+
+    fn radius(&self) -> f64 {
+        self.cellsize / 3_f64.powf(0.5)
     }
 
     fn cell_height(&self) -> f64 {
-        self.radius() * 2.
+        match self.cell_orientation {
+            Orientation::Pointy => self.radius() * 2.,
+            Orientation::Flat => self.dx(),
+        }
     }
 
     fn cell_width(&self) -> f64 {
-        self.dx()
+        match self.cell_orientation {
+            Orientation::Pointy => self.dx(),
+            Orientation::Flat => self.radius() * 2.,
+        }
     }
 
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
         let mut centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
-        let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
+        let mut centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
 
-        if !iseven(y) {
-            centroid_x = centroid_x + self.dx() / 2.;
+        match self.cell_orientation() {
+            Orientation::Pointy => {
+                if !iseven(y) {
+                    centroid_x = centroid_x + self.dx() / 2.;
+                }
+            }
+            Orientation::Flat => {
+                if !iseven(x) {
+                    centroid_y = centroid_y + self.dy() / 2.;
+                }
+            }
         }
+
         (centroid_x, centroid_y)
     }
     fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
@@ -243,27 +284,24 @@ impl GridTraits for HexGrid {
 }
 
 impl HexGrid {
-    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        // TODO: Find a way to normalize_offset without having to instantiate tmp object
-        let _rotation = rotation;
-        let self_tmp = HexGrid {
-            cellsize,
-            offset,
-            _rotation,
-            _rotation_matrix,
-            _rotation_matrix_inv,
-        };
-        let offset = normalize_offset(offset, self_tmp.dx(), self_tmp.dy());
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+    pub fn new(cellsize: f64, cell_orientation: Orientation) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(0.);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         HexGrid {
             cellsize,
-            offset,
-            _rotation,
+            offset: (0., 0.),
+            cell_orientation,
+            _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
         }
+    }
+
+    pub fn cell_orientation(&self) -> &Orientation {
+        &self.cell_orientation
+    }
+
+    pub fn set_cell_orientation(&mut self, cell_orientation: Orientation) {
+        self.cell_orientation = cell_orientation;
     }
 }

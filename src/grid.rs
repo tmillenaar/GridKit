@@ -8,11 +8,14 @@ use numpy::ndarray::*;
 pub trait GridTraits {
     fn dx(&self) -> f64;
     fn dy(&self) -> f64;
+    fn set_cellsize(&mut self, cellsize: f64);
     fn offset(&self) -> (f64, f64);
-    fn radius(&self) -> f64;
+    fn set_offset(&mut self, offset: (f64, f64));
     fn rotation(&self) -> f64;
-    fn rotation_matrix(&self) -> Array2<f64>;
-    fn rotation_matrix_inv(&self) -> Array2<f64>;
+    fn set_rotation(&mut self, rotation: f64);
+    fn rotation_matrix(&self) -> &Array2<f64>;
+    fn rotation_matrix_inv(&self) -> &Array2<f64>;
+    fn radius(&self) -> f64;
     fn cell_height(&self) -> f64;
     fn cell_width(&self) -> f64;
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64);
@@ -35,4 +38,29 @@ pub enum Grid {
     TriGrid(TriGrid),
     RectGrid(RectGrid),
     HexGrid(HexGrid),
+}
+
+#[derive(Clone)]
+pub enum Orientation {
+    Flat,
+    Pointy,
+}
+
+impl ToString for Orientation {
+    fn to_string(&self) -> String {
+        match self {
+            Orientation::Flat => "falt".to_string(),
+            Orientation::Pointy => "pointy".to_string(),
+        }
+    }
+}
+
+impl Orientation {
+    pub fn from_string(cell_orientation: &str) -> Option<Self> {
+        match cell_orientation.to_lowercase().as_str() {
+            "flat" => Some(Orientation::Flat),
+            "pointy" => Some(Orientation::Pointy),
+            _ => None,
+        }
+    }
 }

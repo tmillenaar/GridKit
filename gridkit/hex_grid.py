@@ -124,7 +124,12 @@ class HexGrid(BaseGrid):
             offset = offset[::-1]
 
         self._shape = shape
-        self._grid = PyO3HexGrid(cellsize=size, offset=offset, rotation=self._rotation)
+        self._grid = PyO3HexGrid(
+            cellsize=size,
+            cell_orientation=shape,
+            offset=offset,
+            rotation=self._rotation,
+        )
         self.bounded_cls = BoundedHexGrid
         super(HexGrid, self).__init__(*args, **kwargs)
 
@@ -474,11 +479,11 @@ class HexGrid(BaseGrid):
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
-        if self.shape == "flat":
-            index = index.T[::-1].T
+        # if self.shape == "flat":
+        #     index = index.T[::-1].T
         centroids = self._grid.centroid(index=index)
-        if self.shape == "flat":
-            centroids = centroids.T[::-1].T
+        # if self.shape == "flat":
+        #     centroids = centroids.T[::-1].T
         return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):

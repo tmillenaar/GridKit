@@ -20,21 +20,39 @@ impl GridTraits for RectGrid {
     fn dy(&self) -> f64 {
         self._dy
     }
+
+    fn set_cellsize(&mut self, cellsize: f64) {
+        self._dx = cellsize;
+        self._dy = cellsize;
+    }
+
     fn offset(&self) -> (f64, f64) {
         self.offset
     }
-    fn radius(&self) -> f64 {
-        ((self._dy / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
+
+    fn set_offset(&mut self, offset: (f64, f64)) {
+        self.offset = normalize_offset(offset, self.cell_width(), self.cell_height())
     }
+
     fn rotation(&self) -> f64 {
         self._rotation
     }
-    fn rotation_matrix(&self) -> Array2<f64> {
-        self._rotation_matrix.clone()
+    fn set_rotation(&mut self, rotation: f64) {
+        self._rotation = rotation;
+        self._rotation_matrix = rotation_matrix_from_angle(rotation);
+        self._rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
     }
-    fn rotation_matrix_inv(&self) -> Array2<f64> {
-        self._rotation_matrix_inv.clone()
+    fn rotation_matrix(&self) -> &Array2<f64> {
+        &self._rotation_matrix
     }
+    fn rotation_matrix_inv(&self) -> &Array2<f64> {
+        &self._rotation_matrix_inv
+    }
+
+    fn radius(&self) -> f64 {
+        ((self._dy / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
+    }
+
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
         let centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
         let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
@@ -181,20 +199,24 @@ impl GridTraits for RectGrid {
 }
 
 impl RectGrid {
-    pub fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        let offset = normalize_offset(offset, dx, dy);
-        // rename in order to pass to struct
-        let (_dx, _dy) = (dx, dy);
-        let _rotation = rotation;
+    pub fn new(dx: f64, dy: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(0.);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         RectGrid {
-            _dx,
-            _dy,
-            offset,
-            _rotation,
+            _dx: dx,
+            _dy: dy,
+            offset: (0., 0.),
+            _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
         }
+    }
+
+    fn set_cellsize_x(&mut self, cellsize_x: f64) {
+        self._dx = cellsize_x;
+    }
+
+    fn set_cellsize_y(&mut self, cellsize_y: f64) {
+        self._dy = cellsize_y;
     }
 }

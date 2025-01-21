@@ -21,20 +21,35 @@ impl GridTraits for TriGrid {
     fn dy(&self) -> f64 {
         self.cell_height()
     }
+
+    fn set_cellsize(&mut self, cellsize: f64) {
+        self.cellsize = cellsize;
+    }
+
     fn offset(&self) -> (f64, f64) {
         self.offset
     }
-    fn radius(&self) -> f64 {
-        2. / 3. * self.cell_height()
+    fn set_offset(&mut self, offset: (f64, f64)) {
+        self.offset = normalize_offset(offset, self.cell_width(), self.cell_height());
     }
+
     fn rotation(&self) -> f64 {
         self._rotation
     }
-    fn rotation_matrix(&self) -> Array2<f64> {
-        self._rotation_matrix.clone()
+    fn set_rotation(&mut self, rotation: f64) {
+        self._rotation = rotation;
+        self._rotation_matrix = rotation_matrix_from_angle(rotation);
+        self._rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
     }
-    fn rotation_matrix_inv(&self) -> Array2<f64> {
-        self._rotation_matrix_inv.clone()
+    fn rotation_matrix(&self) -> &Array2<f64> {
+        &self._rotation_matrix
+    }
+    fn rotation_matrix_inv(&self) -> &Array2<f64> {
+        &self._rotation_matrix_inv
+    }
+
+    fn radius(&self) -> f64 {
+        2. / 3. * self.cell_height()
     }
 
     fn cell_height(&self) -> f64 {
@@ -257,25 +272,13 @@ impl GridTraits for TriGrid {
 }
 
 impl TriGrid {
-    pub fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
-        // TODO: Find a way to normalize_offset without having to instantiate tmp object
-        let _rotation = rotation;
-        let self_tmp = TriGrid {
-            cellsize,
-            offset,
-            _rotation,
-            _rotation_matrix,
-            _rotation_matrix_inv,
-        };
-        let offset = normalize_offset(offset, self_tmp.cell_width(), self_tmp.cell_height());
-        let _rotation_matrix = rotation_matrix_from_angle(rotation);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
+    pub fn new(cellsize: f64) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(0.);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         TriGrid {
             cellsize,
-            offset,
-            _rotation,
+            offset: (0., 0.),
+            _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
         }
