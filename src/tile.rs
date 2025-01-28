@@ -113,8 +113,8 @@ impl TileTraits for Tile {
     }
 
     fn corners(&self) -> Array2<f64> {
-        let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset().0;
-        let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset().1;
+        let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset()[0];
+        let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset()[1];
         let side_length_x = self.nx as f64 * self.grid.dx();
         let side_length_y = self.ny as f64 * self.grid.dy();
 

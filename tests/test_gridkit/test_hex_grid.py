@@ -134,6 +134,7 @@ def test_cells_in_bounds(shape, bounds, expected_ids, expected_shape):
         ["flat", (0.0, 1.5), [(0, 0), (-1, 0), (-1, -1)]],
         ["flat", (1.0, 0.5), [(0, 0), (-1, -1), (0, -1)]],
         ["flat", (2.0, 0.5), [(0, 0), (0, -1), (1, -1)]],
+        ["flat", (4.5, 4), [[1, 0], [2, 1], [1, 1]]],
         [
             "flat",
             [(5, 3), (4.5, 4), (3.5, 4), (2.5, 3), (3.5, 2), (4.5, 2)],
@@ -346,12 +347,12 @@ def test_to_shapely(as_mp, shape):
             "flat",
             numpy.array(
                 [
-                    [-3.68060797, 5.25],
-                    [-2.81458256, 5.25],
                     [-2.38156986, 4.5],
-                    [-2.81458256, 3.75],
-                    [-3.68060797, 3.75],
+                    [-2.81458256, 5.25],
+                    [-3.68060797, 5.25],
                     [-4.11362067, 4.5],
+                    [-3.68060797, 3.75],
+                    [-2.81458256, 3.75],
                 ]
             ),
         ],
@@ -375,6 +376,7 @@ def test_cell_corners(shape, expected_corners):
     ids = [[-3, 2], [-3, 2]]
 
     corners = grid.cell_corners(ids)
+
     for cell_corners in corners:
         numpy.testing.assert_allclose(cell_corners, expected_corners)
 
@@ -440,12 +442,7 @@ def test_centering_with_offset(shape, rot):
     if shape == "pointy":
         grid.offset = (0, grid.dy / 2)
     else:
-        # grid.offset = (grid.dx / 2, 0) # <- intended but does not work
-        # Note: conceptually flat offsets are confusing.
-        #       Since a shortcut was taken by transposing the axes for flat grids,
-        #       The offsets are reversed.
-        #       Rather than attempting to address this, 'flat' shapes will be discontinued from v1.0.0
-        grid.offset = (0, grid.dx / 2)
+        grid.offset = (grid.dx / 2, 0)
     numpy.testing.assert_allclose(grid.centroid([-1, -1]), [0, 0], atol=1e-15)
 
 

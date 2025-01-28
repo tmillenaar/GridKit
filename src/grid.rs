@@ -9,8 +9,8 @@ pub trait GridTraits {
     fn dx(&self) -> f64;
     fn dy(&self) -> f64;
     fn set_cellsize(&mut self, cellsize: f64);
-    fn offset(&self) -> (f64, f64);
-    fn set_offset(&mut self, offset: (f64, f64));
+    fn offset(&self) -> [f64; 2];
+    fn set_offset(&mut self, offset: [f64; 2]);
     fn rotation(&self) -> f64;
     fn set_rotation(&mut self, rotation: f64);
     fn rotation_matrix(&self) -> &Array2<f64>;
@@ -18,7 +18,7 @@ pub trait GridTraits {
     fn radius(&self) -> f64;
     fn cell_height(&self) -> f64;
     fn cell_width(&self) -> f64;
-    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64);
+    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2];
     fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64>;
     fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64>;
     fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64>;

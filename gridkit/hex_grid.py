@@ -89,7 +89,7 @@ class HexGrid(BaseGrid):
 
         self._size = size
         self._radius = size / 3**0.5
-        self._rotation = rotation if shape == "pointy" else -rotation
+        self._rotation = rotation
 
         if shape == "pointy":
             self._dx = size
@@ -105,23 +105,18 @@ class HexGrid(BaseGrid):
                 f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
             )
 
-        if shape == "flat":
-            offset = offset[::-1]
-
         offset_x, offset_y = offset[0], offset[1]
-
         if shape == "pointy":
             if ((offset_y // self.dy) % 2) != 0:  # Row is odd
                 offset_x -= self.dx / 2
         elif shape == "flat":
             if ((offset_x // self.dx) % 2) != 0:  # Row is odd
                 offset_y -= self.dy / 2
+
         offset_x = offset_x % self.dx
         offset_y = offset_y % self.dy
-        offset = (offset_x, offset_y)
 
-        if shape == "flat":
-            offset = offset[::-1]
+        offset = (offset_x, offset_y)
 
         self._shape = shape
         self._grid = PyO3HexGrid(
@@ -142,20 +137,6 @@ class HexGrid(BaseGrid):
             rotation=self.rotation,
             crs=self.crs,
         )
-
-    @property
-    def rotation_matrix(self):
-        """The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
-        Note: makes a copy every time this is called."""
-        rot_mat = self._grid.rotation_matrix()
-        return rot_mat if self.shape == "pointy" else rot_mat.T
-
-    @property
-    def rotation_matrix_inv(self):
-        """The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
-        Note: makes a copy every time this is called."""
-        rot_mat = self._grid.rotation_matrix_inv()
-        return rot_mat if self.shape == "pointy" else rot_mat.T
 
     def _area_to_size(self, area):
         """Find the ``size`` that corresponds to a specific area."""
@@ -202,8 +183,6 @@ class HexGrid(BaseGrid):
         """Sets the x and y value of the offset"""
         if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
-            value = value[::-1]  # swap xy to yx
         offset_x, offset_y = value[0], value[1]
         if self.shape == "pointy":
             if ((offset_y // self.dy) % 2) != 0:  # Row is odd
@@ -215,8 +194,6 @@ class HexGrid(BaseGrid):
         offset_y = offset_y % self.dy
         new_offset = (offset_x, offset_y)
 
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
-            new_offset = new_offset[::-1]  # swap xy to yx
         self._grid = self._update_inner_grid(offset=new_offset)
         self._offset = new_offset
 
@@ -479,11 +456,7 @@ class HexGrid(BaseGrid):
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
-        # if self.shape == "flat":
-        #     index = index.T[::-1].T
         centroids = self._grid.centroid(index=index)
-        # if self.shape == "flat":
-        #     centroids = centroids.T[::-1].T
         return centroids.reshape(original_shape)
 
     def cells_near_point(self, point):
@@ -511,11 +484,7 @@ class HexGrid(BaseGrid):
         original_shape = (*point.shape[:-1], 3, 2)
         point = point[None] if point.ndim == 1 else point
         point = point.reshape(-1, 2)
-        if self.shape == "flat":
-            point = point.T[::-1].T
         ids = self._grid.cells_near_point(point)
-        if self.shape == "flat":
-            ids = ids.T[::-1].T
         return GridIndex(ids.squeeze().reshape(original_shape))
 
     def cell_at_point(self, point):
@@ -540,11 +509,7 @@ class HexGrid(BaseGrid):
         original_shape = point.shape
         point = point[None] if point.ndim == 1 else point
         point = point.reshape(-1, 2)
-        if self.shape == "flat":
-            point = point.T[::-1].T
         cell_at_point = self._grid.cell_at_point(points=point)
-        if self.shape == "flat":
-            cell_at_point = cell_at_point.T[::-1].T
         return GridIndex(cell_at_point.squeeze().reshape(original_shape))
 
     @validate_index
@@ -557,11 +522,7 @@ class HexGrid(BaseGrid):
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
-        if self.shape == "flat":
-            index = index.T[::-1].T
         corners = self._grid.cell_corners(index=index)
-        if self.shape == "flat":
-            corners = corners[:, :, ::-1]
         return corners.reshape(return_shape)
 
     def to_crs(self, crs, location=(0, 0), adjust_rotation=False):
@@ -816,9 +777,9 @@ class HexGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
-            if self.shape == "flat":
-                rotation = -rotation
-        return PyO3HexGrid(cellsize=size, offset=offset, rotation=rotation)
+        return PyO3HexGrid(
+            cellsize=size, offset=offset, rotation=rotation, cell_orientation=self.shape
+        )
 
     def update(
         self,

@@ -8,7 +8,7 @@ use numpy::ndarray::*;
 #[derive(Clone)]
 pub struct TriGrid {
     pub cellsize: f64,
-    pub offset: (f64, f64),
+    pub offset: [f64; 2],
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
@@ -26,10 +26,10 @@ impl GridTraits for TriGrid {
         self.cellsize = cellsize;
     }
 
-    fn offset(&self) -> (f64, f64) {
+    fn offset(&self) -> [f64; 2] {
         self.offset
     }
-    fn set_offset(&mut self, offset: (f64, f64)) {
+    fn set_offset(&mut self, offset: [f64; 2]) {
         self.offset = normalize_offset(offset, self.cell_width(), self.cell_height());
     }
 
@@ -60,9 +60,9 @@ impl GridTraits for TriGrid {
         self.cellsize
     }
 
-    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
-        let centroid_x = x as f64 * self.dx() + self.dx() + self.offset.0;
-        let mut centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
+    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2] {
+        let centroid_x = x as f64 * self.dx() + self.dx() + self.offset[0];
+        let mut centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset[1];
 
         let vertical_offset = self.radius() - 0.5 * self.dy();
         if iseven(x) == iseven(y) {
@@ -71,15 +71,15 @@ impl GridTraits for TriGrid {
             centroid_y = centroid_y + vertical_offset;
         }
 
-        (centroid_x, centroid_y)
+        [centroid_x, centroid_y]
     }
     fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
         let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
 
         for cell_id in 0..centroids.shape()[0] {
             let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            centroids[Ix2(cell_id, 0)] = point.0;
-            centroids[Ix2(cell_id, 1)] = point.1;
+            centroids[Ix2(cell_id, 0)] = point[0];
+            centroids[Ix2(cell_id, 1)] = point[1];
         }
 
         if self.rotation() != 0. {
@@ -99,11 +99,11 @@ impl GridTraits for TriGrid {
             let point = points.slice(s![cell_id, ..]);
             let point = self._rotation_matrix_inv.dot(&point);
             index[Ix2(cell_id, 0)] =
-                (1. + (point[Ix1(0)] - self.offset.0) / self.dx()).floor() as i64;
+                (1. + (point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
             index[Ix2(cell_id, 1)] =
-                ((point[Ix1(1)] - self.offset.1) / self.cell_height()).floor() as i64;
+                ((point[Ix1(1)] - self.offset[1]) / self.cell_height()).floor() as i64;
             index[Ix2(cell_id, 0)] = 2
-                * ((point[Ix1(0)] - self.offset.0
+                * ((point[Ix1(0)] - self.offset[0]
                     + self.dx() * !iseven(index[Ix2(cell_id, 1)]) as i64 as f64)
                     / self.cell_width())
                 .floor() as i64
@@ -153,7 +153,7 @@ impl GridTraits for TriGrid {
         let mut corners = Array3::<f64>::zeros((index.shape()[0], 3, 2));
 
         for cell_id in 0..corners.shape()[0] {
-            let (centroid_x, centroid_y) =
+            let [centroid_x, centroid_y] =
                 self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                 corners[Ix3(cell_id, 0, 0)] = centroid_x;
@@ -277,7 +277,7 @@ impl TriGrid {
         let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         TriGrid {
             cellsize,
-            offset: (0., 0.),
+            offset: [0., 0.],
             _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
@@ -311,7 +311,7 @@ impl TriGrid {
         let mut cell_id: usize = 0;
         for y in (miny..=maxy).rev() {
             for x in minx..=maxx {
-                let (centroid_x, centroid_y) = self.centroid_xy_no_rot(x, y);
+                let [centroid_x, centroid_y] = self.centroid_xy_no_rot(x, y);
                 if (centroid_x >= bounds.0) & // x > minx
                    (centroid_x < bounds.2) & // x < maxx
                    (centroid_y > bounds.1) & // y > miny

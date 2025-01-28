@@ -130,15 +130,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
     def rotation(self) -> float:
         """The counter-clockwise rotation of the grid around the origin in degrees."""
         rotation = self._rotation
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
-            rotation = -rotation
         return rotation
 
     @rotation.setter
     def rotation(self, value):
         """The counter-clockwise rotation of the grid around the origin in degrees."""
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
-            value = -value
         self._rotation = value
         self._grid = self._update_inner_grid(rotation=value)
 
@@ -488,7 +484,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :meth:`.BoundedHexGrid.anchor`
 
         """
-        current_cell = self.cell_at_point(target_loc)
 
         # Force rotation to zer before determining new offset
         orig_rot = self.rotation
@@ -496,6 +491,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
             orig_target_loc = target_loc
             target_loc = self.rotation_matrix_inv.dot(target_loc)
             self.rotation = 0
+
+        current_cell = self.cell_at_point(target_loc)
 
         # Determine the offset
         if cell_element == "centroid":
@@ -513,11 +510,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         # Rotate original grid back
         if orig_rot:
             self.rotation = orig_rot
-            target_loc = orig_target_loc
 
         # Apply the offset
-        if getattr(self, "shape", None) == "flat":
-            diff = diff[::-1]
         new_offset = self.offset + diff
         if not in_place:
             return self.update(offset=new_offset)

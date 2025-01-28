@@ -169,19 +169,19 @@ impl PyO3Tile {
                 let grid = match &new_tile.grid {
                     grid::Grid::TriGrid(grid) => PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(
                         grid.cellsize,
-                        grid.offset,
+                        grid.offset.into(),
                         grid.rotation(),
                     )),
                     grid::Grid::RectGrid(grid) => PyO3Grid::PyO3RectGrid(PyO3RectGrid::new(
                         grid.dx(),
                         grid.dy(),
-                        grid.offset,
+                        grid.offset.into(),
                         grid.rotation(),
                     )),
                     grid::Grid::HexGrid(grid) => PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(
                         grid.cellsize,
                         &grid.cell_orientation.to_string(),
-                        grid.offset,
+                        grid.offset.into(),
                         grid.rotation(),
                     )?),
                 };
@@ -540,7 +540,7 @@ impl PyO3TriGrid {
     #[new]
     fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
         let mut _grid = tri_grid::TriGrid::new(cellsize);
-        _grid.set_offset(offset);
+        _grid.set_offset(offset.into());
         _grid.set_rotation(rotation);
         PyO3TriGrid {
             cellsize,
@@ -550,7 +550,7 @@ impl PyO3TriGrid {
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn cell_height(&self) -> f64 {
@@ -708,7 +708,7 @@ impl PyO3RectGrid {
     #[new]
     fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
         let mut _grid = rect_grid::RectGrid::new(dx, dy);
-        _grid.set_offset(offset);
+        _grid.set_offset(offset.into());
         _grid.set_rotation(rotation);
         PyO3RectGrid {
             dx,
@@ -735,7 +735,7 @@ impl PyO3RectGrid {
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
@@ -804,7 +804,7 @@ impl PyO3HexGrid {
         match Orientation::from_string(cell_orientation) {
             Some(cell_orientation) => {
                 let mut _grid = hex_grid::HexGrid::new(cellsize, cell_orientation);
-                _grid.set_offset(offset);
+                _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
                 Ok(PyO3HexGrid {
                     cellsize,
@@ -842,7 +842,7 @@ impl PyO3HexGrid {
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn radius(&self) -> f64 {

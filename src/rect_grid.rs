@@ -7,7 +7,7 @@ use numpy::ndarray::*;
 pub struct RectGrid {
     pub _dx: f64,
     pub _dy: f64,
-    pub offset: (f64, f64),
+    pub offset: [f64; 2],
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
@@ -26,11 +26,11 @@ impl GridTraits for RectGrid {
         self._dy = cellsize;
     }
 
-    fn offset(&self) -> (f64, f64) {
+    fn offset(&self) -> [f64; 2] {
         self.offset
     }
 
-    fn set_offset(&mut self, offset: (f64, f64)) {
+    fn set_offset(&mut self, offset: [f64; 2]) {
         self.offset = normalize_offset(offset, self.cell_width(), self.cell_height())
     }
 
@@ -53,18 +53,18 @@ impl GridTraits for RectGrid {
         ((self._dy / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
     }
 
-    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> (f64, f64) {
-        let centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset.0;
-        let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset.1;
-        (centroid_x, centroid_y)
+    fn centroid_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2] {
+        let centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset[0];
+        let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset[1];
+        [centroid_x, centroid_y]
     }
     fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
         let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
 
         for cell_id in 0..centroids.shape()[0] {
             let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            centroids[Ix2(cell_id, 0)] = point.0;
-            centroids[Ix2(cell_id, 1)] = point.1;
+            centroids[Ix2(cell_id, 0)] = point[0];
+            centroids[Ix2(cell_id, 1)] = point[1];
         }
 
         if self.rotation() != 0. {
@@ -91,8 +91,8 @@ impl GridTraits for RectGrid {
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
             let point = self._rotation_matrix_inv.dot(&point);
-            let id_x = ((point[Ix1(0)] - self.offset.0) / self.dx()).floor() as i64;
-            let id_y = ((point[Ix1(1)] - self.offset.1) / self.dy()).floor() as i64;
+            let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
+            let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
             index[Ix2(cell_id, 0)] = id_x;
             index[Ix2(cell_id, 1)] = id_y;
         }
@@ -104,7 +104,7 @@ impl GridTraits for RectGrid {
         for cell_id in 0..index.shape()[0] {
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
-            let (centroid_x, centroid_y) = self.centroid_xy_no_rot(id_x, id_y);
+            let [centroid_x, centroid_y] = self.centroid_xy_no_rot(id_x, id_y);
             corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
             corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
             corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
@@ -143,8 +143,8 @@ impl GridTraits for RectGrid {
         }
 
         for cell_id in 0..points.shape()[0] {
-            let rel_loc_x: f64 = modulus((points[Ix2(cell_id, 0)] - self.offset.0), self.dx());
-            let rel_loc_y: f64 = modulus((points[Ix2(cell_id, 1)] - self.offset.1), self.dy());
+            let rel_loc_x: f64 = modulus((points[Ix2(cell_id, 0)] - self.offset[0]), self.dx());
+            let rel_loc_y: f64 = modulus((points[Ix2(cell_id, 1)] - self.offset[1]), self.dy());
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
             match (rel_loc_x, rel_loc_y) {
@@ -205,7 +205,7 @@ impl RectGrid {
         RectGrid {
             _dx: dx,
             _dy: dy,
-            offset: (0., 0.),
+            offset: [0., 0.],
             _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
