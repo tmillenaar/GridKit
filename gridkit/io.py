@@ -123,7 +123,44 @@ def raster_to_data_tile(
     bounds=None,
     bounds_crs: CRS = None,
     border_buffer: float = 0,
+    band=1,
 ):
+    """Read a raster as a DataTile. Only a single band can be read.
+
+    Parameters
+    ----------
+    path: str, file object, PathLike object, FilePath, or MemoryFile
+        A filename or URL, a file object opened in binary ('rb') mode, a
+        Path object, or one of the rasterio classes that provides the
+        dataset-opening interface.
+    bounds: Tuple(float, float, float, float)
+        The bounding box of the data to read. Can be used to read a smaller
+        section of the dataset. If the bounds are larger than the raster bounds,
+        the full raster will be read.
+    bounds_crs: CRS
+        The Coordinate Reference System (CRS) that matches the supplied `bounds` argument.
+        The `bounds` are then converted to the CRS that matches the dataset before reading
+        the tile. This allows for reading a section of the dataset defined in any CRS,
+        unrelated to the CRS of the dataset.
+
+        .. Note ::
+
+            The dataset will be read in the CRS corresponding to the data file,
+            not the bounds_crs.
+
+    border_buffer: float
+        Enlarge the supplied `bounds` with the specified border_radius.
+        A negative border_radius can be supplied to decrease the bounds.
+    band: int
+        The index of the band to read. Default: 1.
+        Note that raster bands start at 1, so if you
+        want to read the first band, supply band=1, not band=0.
+
+    Returns
+    -------
+    class:`.DataTile`
+        A data tile with spatial properties based on the input raster
+    """
     with rasterio.open(path) as raster_file:
         crs = str(raster_file.crs)
 
@@ -152,7 +189,7 @@ def raster_to_data_tile(
             b = raster_file.bounds if bounds is None else bounds
             bounds = (b.left, b.bottom, b.right, b.top)
 
-        data = raster_file.read(1, window=window)
+        data = raster_file.read(band, window=window)
         nodata = raster_file.nodata
 
     if bounds[2] <= bounds[0] or bounds[3] <= bounds[1]:
