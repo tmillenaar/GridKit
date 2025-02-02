@@ -94,8 +94,16 @@ class Tile:
             raise ValueError(
                 f"The supplied bounds are not aligned with the supplied grid. Consider calling 'grid.align_bounds' first."
             )
-        bottom_left = (bounds[0] + grid.dx / 2, bounds[1] + grid.dy / 2)
-        top_right = (bounds[2] + grid.dx / 2, bounds[3] - grid.dy / 2)
+        # Note: We modify the corners by a fraction of the cell size.
+        #       If we use the bounds when they are aligned, we query exactly on cell corners
+        #       which can give unreliable results due to machine precision.
+        #       Not all shifts are the same. For example, we shift the bottom left not
+        #       by half for both x and y, because it will end up on a diagonal border where
+        #       the same machine precision problem arises.
+        #       The following values seem to give a decent mix that works with all grid forms.
+        #       When modifying this logic, run test_from_bounds in test_tile.py to verify it works with all grid versions.
+        bottom_left = (bounds[0] + grid.dx / 1.5, bounds[1] + grid.dy / 2)
+        top_right = (bounds[2] + grid.dx / 1.5, bounds[3] - grid.dy / 2)
 
         # TODO: This still does not work nicely for rotated grids
         if grid.rotation != 0:
@@ -110,7 +118,7 @@ class Tile:
 
         # Take absolute values because rotated grids can cause flipped indices
         nx = abs(top_right_cell.x - bottom_left_cell.x)
-        ny = abs(top_right_cell.y - bottom_left_cell.y)
+        ny = abs(top_right_cell.y - bottom_left_cell.y) + 1
         return Tile(grid, bottom_left_cell, nx, ny)
 
     @property

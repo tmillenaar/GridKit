@@ -45,7 +45,43 @@ def test_init_errors():
         Tile(grid._grid, (0, 0), 1, 1)
 
 
-@pytest.mark.parametrize("grid", [TriGrid(size=1), RectGrid(size=1), HexGrid(size=1)])
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1, shape="flat"),
+        HexGrid(size=1, shape="pointy"),
+    ],
+)
+@pytest.mark.parametrize("offset", [(0, 0), (-2.3, 0.1), (3.4, -2.1)])
+def test_from_bounds(grid, offset):
+    bounds = (-2, -3, 6, 8.2)
+    grid.offset = offset
+
+    with pytest.raises(ValueError):
+        # Expect error when bounds are not yet aligned
+        Tile.from_bounds(grid, bounds)
+
+    bounds = grid.align_bounds(bounds, mode="nearest")
+    tile = Tile.from_bounds(grid, bounds)
+
+    numpy.testing.assert_allclose(tile.bounds, bounds)
+    expected_nx = (bounds[2] - bounds[0]) / grid.dx
+    numpy.testing.assert_allclose(tile.nx, expected_nx)
+    expected_ny = (bounds[3] - bounds[1]) / grid.dy
+    numpy.testing.assert_allclose(tile.ny, expected_ny)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1, shape="flat"),
+        HexGrid(size=1, shape="pointy"),
+    ],
+)
 @pytest.mark.parametrize("start_id", [(2, 3), [-3, 2]])
 @pytest.mark.parametrize("nx", [1, 7])
 @pytest.mark.parametrize("ny", [1, 4])
