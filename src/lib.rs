@@ -169,9 +169,10 @@ impl PyO3Tile {
                 let grid = match &new_tile.grid {
                     grid::Grid::TriGrid(grid) => PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(
                         grid.cellsize,
+                        &grid.cell_orientation.to_string(),
                         grid.offset.into(),
                         grid.rotation(),
-                    )),
+                    )?),
                     grid::Grid::RectGrid(grid) => PyO3Grid::PyO3RectGrid(PyO3RectGrid::new(
                         grid.dx(),
                         grid.dy(),
@@ -538,14 +539,27 @@ struct PyO3TriGrid {
 #[pymethods]
 impl PyO3TriGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let mut _grid = tri_grid::TriGrid::new(cellsize);
-        _grid.set_offset(offset.into());
-        _grid.set_rotation(rotation);
-        PyO3TriGrid {
-            cellsize,
-            rotation,
-            _grid,
+    fn new(
+        cellsize: f64,
+        cell_orientation: &str,
+        offset: (f64, f64),
+        rotation: f64,
+    ) -> PyResult<Self> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => {
+                let mut _grid = tri_grid::TriGrid::new(cellsize, cell_orientation);
+                _grid.set_offset(offset.into());
+                _grid.set_rotation(rotation);
+                Ok(PyO3TriGrid {
+                    cellsize,
+                    rotation,
+                    _grid,
+                })
+            }
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
         }
     }
 
