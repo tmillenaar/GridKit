@@ -14,8 +14,6 @@ pub fn normalize_offset(offset: [f64; 2], dx: f64, dy: f64) -> [f64; 2] {
     //       Here we want the modulus, see https://stackoverflow.com/q/31210357
     let offset_x = modulus(offset[0], dx);
     let offset_y = modulus(offset[1], dy);
-    println!("before modulus: {:?}, after modulus: {:?}, dx: {:?}", offset[0], offset_x, dx);
-    println!("before modulus: {:?}, after modulus: {:?}, dy: {:?}", offset[1], offset_y, dy);
     [offset_x, offset_y]
 }
 

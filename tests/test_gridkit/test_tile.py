@@ -54,34 +54,6 @@ def test_init_errors():
         HexGrid(size=1, shape="pointy"),
     ],
 )
-@pytest.mark.parametrize("offset", [(0, 0), (-2.3, 0.1), (3.4, -2.1)])
-def test_from_bounds(grid, offset):
-    bounds = (-2, -3, 6, 8.2)
-    grid.offset = offset
-
-    with pytest.raises(ValueError):
-        # Expect error when bounds are not yet aligned
-        Tile.from_bounds(grid, bounds)
-
-    bounds = grid.align_bounds(bounds, mode="nearest")
-    tile = Tile.from_bounds(grid, bounds)
-
-    numpy.testing.assert_allclose(tile.bounds, bounds)
-    expected_nx = (bounds[2] - bounds[0]) / grid.dx
-    numpy.testing.assert_allclose(tile.nx, expected_nx)
-    expected_ny = (bounds[3] - bounds[1]) / grid.dy
-    numpy.testing.assert_allclose(tile.ny, expected_ny)
-
-
-@pytest.mark.parametrize(
-    "grid",
-    [
-        TriGrid(size=1),
-        RectGrid(size=1),
-        HexGrid(size=1, shape="flat"),
-        HexGrid(size=1, shape="pointy"),
-    ],
-)
 @pytest.mark.parametrize("start_id", [(2, 3), [-3, 2]])
 @pytest.mark.parametrize("nx", [1, 7])
 @pytest.mark.parametrize("ny", [1, 4])
@@ -138,20 +110,3 @@ def test_indices(grid, start_id, nx, ny, rotation):
     #       start_id itself is already included (hence '>=')
     assert not numpy.any(indices.x >= start_id[0] + nx)
     assert not numpy.any(indices.y >= start_id[1] + ny)
-
-
-@pytest.mark.parametrize("grid", [TriGrid(size=1), RectGrid(size=1), HexGrid(size=1)])
-@pytest.mark.parametrize("start_id", [(2, 3), [-3, 2]])
-@pytest.mark.parametrize("nx", [1, 7])
-@pytest.mark.parametrize("ny", [1, 4])
-@pytest.mark.parametrize("rotation", [0, 10, 375])
-def test_bounds(grid, start_id, nx, ny, rotation):
-    grid.rotation = rotation
-    tile = Tile(grid, start_id, nx, ny)
-    bounds = tile.bounds
-    corners = tile.corners()
-
-    numpy.testing.assert_allclose(bounds[0], corners[:, 0].min())
-    numpy.testing.assert_allclose(bounds[1], corners[:, 1].min())
-    numpy.testing.assert_allclose(bounds[2], corners[:, 0].max())
-    numpy.testing.assert_allclose(bounds[3], corners[:, 1].max())

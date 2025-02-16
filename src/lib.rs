@@ -155,10 +155,6 @@ impl PyO3Tile {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._tile.bounds()
-    }
-
     fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {
         self._tile.intersects(&other._tile)
     }

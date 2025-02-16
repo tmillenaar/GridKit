@@ -539,6 +539,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
 
     def are_bounds_aligned(self, bounds, separate=False):
+        # Fixme: gives weird results for rotated grids
         is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(
             val, cellsize
         )
@@ -551,6 +552,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return per_axis if separate else numpy.all(per_axis)
 
     def align_bounds(self, bounds, mode="expand"):
+        # Fixme: gives weird results for rotated grids
         if self.are_bounds_aligned(bounds):
             return bounds
 

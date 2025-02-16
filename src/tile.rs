@@ -155,48 +155,11 @@ impl TileTraits for Tile {
         indices
     }
 
-    fn bounds(&self) -> (f64, f64, f64, f64) {
-        let corners: ArrayBase<OwnedRepr<f64>, Dim<[usize; 2]>> = self.corners();
-
-        // Note: something like the following might have been neat:
-        //        (
-        //            corners.slice(s![..,0]).min(),
-        //            corners.slice(s![..,1]).min(),
-        //            corners.slice(s![..,0]).max(),
-        //            corners.slice(s![..,1]).max(),
-        //        )
-        //       But that likely is less performant and it does not work with n-dimensional arrays.
-        //       See: https://stackoverflow.com/questions/62544170/how-can-i-get-or-create-the-equivalent-of-numpys-amax-function-with-rusts-ndar/62547757
-        let mut xmin = f64::MAX;
-        let mut xmax = f64::MIN;
-        let mut ymin = f64::MAX;
-        let mut ymax = f64::MIN;
-        for corner in corners.axis_iter(Axis(0)) {
-            let x = corner[Ix1(0)];
-            let y = corner[Ix1(1)];
-            if x < xmin {
-                xmin = x;
-            }
-            if x > xmax {
-                xmax = x;
-            }
-            if y < ymin {
-                ymin = y;
-            }
-            if y > ymax {
-                ymax = y;
-            }
-        }
-        (xmin, ymin, xmax, ymax)
-    }
-
     fn intersects(&self, other: &Tile) -> bool {
-        let self_bounds = self.bounds();
-        let other_bounds = other.bounds();
-        return !(self_bounds.0 >= other_bounds.2
-            || self_bounds.2 <= other_bounds.0
-            || self_bounds.1 >= other_bounds.3
-            || self_bounds.3 <= other_bounds.1);
+        return !(self.start_id.0 >= (other.start_id.0 + other.nx as i64)
+            || (self.start_id.0 + self.nx as i64) <= other.start_id.0
+            || self.start_id.1 >= (other.start_id.1 + other.ny as i64)
+            || (self.start_id.1 + other.ny as i64) <= other.start_id.1);
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {

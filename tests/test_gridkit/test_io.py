@@ -1,3 +1,5 @@
+import numpy
+
 from gridkit import raster_to_data_tile, read_raster, write_raster
 
 
@@ -23,8 +25,13 @@ def test_raster_to_data_tile():
     path = "tests/data/alps_landuse.tiff"
     grid_tile = raster_to_data_tile(path)
 
-    expected_bounds = (4116200.0, 2575600.0, 4218700.0, 2624900.0)
-    assert grid_tile.bounds == expected_bounds
+    expected_corners = [
+        [4116200.0, 2624900.0],
+        [4218700.0, 2624900.0],
+        [4218700.0, 2575600.0],
+        [4116200.0, 2575600.0],
+    ]
+    numpy.testing.assert_allclose(grid_tile.corners(), expected_corners)
     assert grid_tile.grid.dx == 100.0
     assert grid_tile.grid.dy == 100.0
     assert grid_tile.grid.crs.to_epsg() == 3035

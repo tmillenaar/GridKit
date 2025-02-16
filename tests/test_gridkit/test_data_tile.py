@@ -574,15 +574,15 @@ def test_interpolate(grid, interp_method):
 
     n = 100
     numpy.random.seed(0)
-    bounds = (
-        data_tile.bounds[0] - data_tile.grid.dx,
-        data_tile.bounds[1] - data_tile.grid.dy,
-        data_tile.bounds[2] + data_tile.grid.dx,
-        data_tile.bounds[3] + data_tile.grid.dy,
-    )
-    x = ((bounds[2] - bounds[0]) * numpy.random.rand(n)) + bounds[0]
+
+    corners = data_tile.corners()
+    left = corners.T[0].min()
+    bottom = corners.T[1].min()
+    right = corners.T[0].max()
+    top = corners.T[1].max()
+    x = ((right - left) * numpy.random.rand(n)) + left
     numpy.random.seed(1)
-    y = ((bounds[3] - bounds[1]) * numpy.random.rand(n)) + bounds[1]
+    y = ((top - bottom) * numpy.random.rand(n)) + bottom
     points = numpy.stack([x, y]).T
 
     result = data_tile.interpolate(points, method=interp_method)
