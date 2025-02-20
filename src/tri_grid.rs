@@ -96,9 +96,9 @@ impl GridTraits for TriGrid {
                 centroid_y = y as f64 * self.dy() + self.dy() + self.offset[1];
                 let horizontal_offset = self.radius() - 0.5 * self.dx();
                 if iseven(x) == iseven(y) {
-                    centroid_x = centroid_x + horizontal_offset;
-                } else {
                     centroid_x = centroid_x - horizontal_offset;
+                } else {
+                    centroid_x = centroid_x + horizontal_offset;
                 }
             }
         }
@@ -171,49 +171,67 @@ impl GridTraits for TriGrid {
             let mut y_threshold_left: f64;
             let mut y_threshold_right: f64;
 
-            let mut id_shift: i64;
-            match self.cell_orientation() {
-                Orientation::Flat => {
-                    let slope = dy / dx;
-                    // Descrtibes the equation that forms the left border of the triangle
-                    let left_eq = |x: f64| -> f64 { slope * x };
-                    // Descrtibes the equation that forms the right border of the triangle
-                    let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
-                    y_threshold_left = left_eq(rel_loc_x);
-                    y_threshold_right = right_eq(rel_loc_x);
-                    id_shift = if rel_loc_y > y_threshold_left {
-                        -1
-                    } else if rel_loc_y > y_threshold_right {
-                        1
-                    } else {
-                        0
-                    };
-                }
-                Orientation::Pointy => {
-                    let slope = dy / dx;
-                    // Descrtibes the equation that forms the left border of the triangle
-                    let left_eq = |x: f64| -> f64 { -slope * x };
-                    // Descrtibes the equation that forms the right border of the triangle
-                    let right_eq = |x: f64| -> f64 { slope * x - 2. * cell_height };
-                    y_threshold_left = left_eq(rel_loc_x);
-                    y_threshold_right = right_eq(rel_loc_x);
-                    // let slope = dx / dy;
-                    // // Descrtibes the equation that forms the left border of the triangle
-                    // let left_eq = |y: f64| -> f64 { slope * y };
-                    // // Descrtibes the equation that forms the right border of the triangle
-                    // let right_eq = |y: f64| -> f64 { -slope * y + 2. * cell_height };
-                    // y_threshold_left = left_eq(rel_loc_x);
-                    // y_threshold_right = right_eq(rel_loc_x);
-                    id_shift = if rel_loc_y < y_threshold_left {
-                        -1
-                    } else if rel_loc_y < y_threshold_right {
-                        1
-                    } else {
-                        0
-                    };
-                }
-            }
+            // nocheckin, clean up but make sure tests pass
+            // let mut id_shift: i64;
+            // match self.cell_orientation() {
+            //     Orientation::Flat => {
+            //         let slope = dy / dx;
+            //         // Descrtibes the equation that forms the left border of the triangle
+            //         let left_eq = |x: f64| -> f64 { slope * x };
+            //         // Descrtibes the equation that forms the right border of the triangle
+            //         let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
+            //         y_threshold_left = left_eq(rel_loc_x);
+            //         y_threshold_right = right_eq(rel_loc_x);
+            //         id_shift = if rel_loc_y > y_threshold_left {
+            //             -1
+            //         } else if rel_loc_y > y_threshold_right {
+            //             1
+            //         } else {
+            //             0
+            //         };
+            //     }
+            //     Orientation::Pointy => {
+            //         let slope = dy / dx;
+            //         // Descrtibes the equation that forms the left border of the triangle
+            //         let left_eq = |x: f64| -> f64 { slope * x };
+            //         // Descrtibes the equation that forms the right border of the triangle
+            //         let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
+            //         y_threshold_left = left_eq(rel_loc_x);
+            //         y_threshold_right = right_eq(rel_loc_x);
+            //         // let slope = dx / dy;
+            //         // // Descrtibes the equation that forms the left border of the triangle
+            //         // let left_eq = |y: f64| -> f64 { slope * y };
+            //         // // Descrtibes the equation that forms the right border of the triangle
+            //         // let right_eq = |y: f64| -> f64 { -slope * y + 2. * cell_height };
+            //         // y_threshold_left = left_eq(rel_loc_x);
+            //         // y_threshold_right = right_eq(rel_loc_x);
+            //         id_shift = if rel_loc_y > y_threshold_left {
+            //             -1
+            //         } else if rel_loc_y > y_threshold_right {
+            //             1
+            //         } else {
+            //             0
+            //         };
+            //     }
+            // }
+            //
 
+            let slope = dy / dx;
+            // Descrtibes the equation that forms the left border of the triangle
+            let left_eq = |x: f64| -> f64 { slope * x };
+            // Descrtibes the equation that forms the right border of the triangle
+            let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
+            y_threshold_left = left_eq(rel_loc_x);
+            y_threshold_right = right_eq(rel_loc_x);
+            let id_shift = if rel_loc_y > y_threshold_left {
+                -1
+            } else if rel_loc_y > y_threshold_right {
+                1
+            } else {
+                0
+            };
+
+            // nocheckin
             // let slope = dy / dx;
 
             // let left_eq = |x: f64| -> f64 {
@@ -276,16 +294,6 @@ impl GridTraits for TriGrid {
                 }
                 Orientation::Pointy => {
                     if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
-                        // Cell with flat base on right side, pointing left
-                        corners[Ix3(cell_id, 0, 0)] = centroid_x - self.radius(); // left-x
-                        corners[Ix3(cell_id, 0, 1)] = centroid_y; // left-y
-                        corners[Ix3(cell_id, 1, 0)] =
-                            centroid_x + (self.cell_width() - self.radius()); // top-right-x
-                        corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-right-y
-                        corners[Ix3(cell_id, 2, 0)] =
-                            centroid_x + (self.cell_width() - self.radius()); // bottom-right-x
-                        corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy(); // bottom-right-y
-                    } else {
                         // Cell with flat base on left side, pointing right
                         corners[Ix3(cell_id, 0, 0)] = centroid_x + self.radius(); // right-x
                         corners[Ix3(cell_id, 0, 1)] = centroid_y; // right-y
@@ -295,6 +303,16 @@ impl GridTraits for TriGrid {
                         corners[Ix3(cell_id, 2, 0)] =
                             centroid_x - (self.cell_width() - self.radius()); // bottom-left-x
                         corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy(); // bottom-left-y
+                    } else {
+                        // Cell with flat base on right side, pointing left
+                        corners[Ix3(cell_id, 0, 0)] = centroid_x - self.radius(); // left-x
+                        corners[Ix3(cell_id, 0, 1)] = centroid_y; // left-y
+                        corners[Ix3(cell_id, 1, 0)] =
+                            centroid_x + (self.cell_width() - self.radius()); // top-right-x
+                        corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-right-y
+                        corners[Ix3(cell_id, 2, 0)] =
+                            centroid_x + (self.cell_width() - self.radius()); // bottom-right-x
+                        corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy(); // bottom-right-y
                     }
                 }
             };
@@ -317,16 +335,35 @@ impl GridTraits for TriGrid {
         // TODO:
         // Condense this into a single loop
         let cell_ids = self.cell_at_point(points);
+        println!("points: {:?}", points);
+        println!("cell_ids near point: {:?}", cell_ids);
         let corners = self.cell_corners(&cell_ids.view());
 
-        if self.rotation() != 0. {
-            let mut points = points.to_owned();
+        // Rotate points only if nesecary
+        // We only want to clone/copy the data in the points variable
+        // if it needs rotating. This is hard for the Rust compiler
+        // because points cannot be either owned or a view depending on a condition.
+        // It needs to either always be owned or always be a view.
+        // Since we don't always want to own the data we make sure that
+        // the variable points is always a view.
+        // However, the rotated data does need to be stored in a different
+        // variable that lives at least as long as the view.
+        // To satisfy the compiler we declare points_ before the if-block and
+        // then return the view from the if-block which we use to shadow the original
+        // points variable.
+        let mut points_: Array2<f64>;
+        let points: ArrayView2<f64> = if self.rotation() != 0. {
+            // Create an owned copy of `points` and apply rotation.
+            points_ = points.to_owned();
             for cell_id in 0..points.shape()[0] {
-                let mut point = points.slice_mut(s![cell_id, ..]);
+                let mut point = points_.slice_mut(s![cell_id, ..]);
                 let point_rot = self._rotation_matrix_inv.dot(&point);
                 point.assign(&point_rot);
             }
-        }
+            points_.view()
+        } else {
+            points.view()
+        };
 
         // Define arguments to be used when determining the minimum distance
         let mut min_dist: f64 = 0.;
@@ -352,40 +389,101 @@ impl GridTraits for TriGrid {
             // The nearby cells will depend on which corner of the cell the point is located at, and
             // whether the cell is pointing up or down.
             let rel_nearby_cells: Array2<i64>;
-            if !self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]) {
-                // Triangle points upright
-                match nearest_corner_id {
-                    0 => {
-                        rel_nearby_cells =
-                            array![[-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1],];
-                    }
-                    1 => {
-                        rel_nearby_cells = array![[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0],];
-                    }
-                    2 => {
-                        rel_nearby_cells =
-                            array![[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0],];
-                    }
-                    _ => {
-                        panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+            println!(
+                "is_cell_upright: {}, ({}, {})",
+                self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]),
+                cell_ids[Ix2(cell_id, 0)],
+                cell_ids[Ix2(cell_id, 1)]
+            );
+            match self.cell_orientation() {
+                Orientation::Flat => {
+                    if !self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
+                    {
+                        // Triangle points upright
+                        match nearest_corner_id {
+                            0 => {
+                                rel_nearby_cells =
+                                    array![[-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1],];
+                            }
+                            1 => {
+                                rel_nearby_cells =
+                                    array![[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0],];
+                            }
+                            2 => {
+                                rel_nearby_cells =
+                                    array![[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0],];
+                            }
+                            _ => {
+                                panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                            }
+                        }
+                    } else {
+                        match nearest_corner_id {
+                            0 => {
+                                rel_nearby_cells =
+                                    array![[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0],];
+                            }
+                            1 => {
+                                rel_nearby_cells =
+                                    array![[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1],];
+                            }
+                            2 => {
+                                rel_nearby_cells =
+                                    array![[-2, 0], [-1, 0], [0, 0], [-2, -1], [-1, -1], [0, -1],];
+                            }
+                            _ => {
+                                panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                            }
+                        }
                     }
                 }
-            } else {
-                match nearest_corner_id {
-                    0 => {
-                        rel_nearby_cells =
-                            array![[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0],];
-                    }
-                    1 => {
-                        rel_nearby_cells =
-                            array![[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1],];
-                    }
-                    2 => {
-                        rel_nearby_cells =
-                            array![[-2, 0], [-1, 0], [0, 0], [-2, -1], [-1, -1], [0, -1],];
-                    }
-                    _ => {
-                        panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                Orientation::Pointy => {
+                    if !self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
+                    {
+                        // Triangle points left
+                        match nearest_corner_id {
+                            0 => {
+                                println!("Pointy left: 0");
+                                rel_nearby_cells =
+                                    array![[0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1],];
+                            }
+                            1 => {
+                                println!("Pointy left: 1");
+                                rel_nearby_cells =
+                                    array![[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2],];
+                            }
+                            2 => {
+                                println!("Pointy left: 2");
+                                rel_nearby_cells =
+                                    array![[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0],];
+                            }
+                            _ => {
+                                panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                            }
+                        }
+                    } else {
+                        match nearest_corner_id {
+                            // Note: these indices are just like those of the Pointy version, but swapped xy.
+                            0 => {
+                                println!("Pointy right: 0");
+                                rel_nearby_cells =
+                                    array![[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1],];
+                            }
+                            1 => {
+                                println!("Pointy right: 1");
+                                rel_nearby_cells =
+                                    array![[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]];
+                                // array![[1, 0], [2, 0], [2, -1], [1, -1], [0, -1], [0, 0],];
+                            }
+                            2 => {
+                                println!("Pointy right: 2");
+                                rel_nearby_cells =
+                                    array![[0, -2], [0, -1], [0, 0], [-1, -2], [-1, -1], [-1, 0],];
+                            }
+                            _ => {
+                                panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
+                            }
+                        }
                     }
                 }
             }
