@@ -335,8 +335,6 @@ impl GridTraits for TriGrid {
         // TODO:
         // Condense this into a single loop
         let cell_ids = self.cell_at_point(points);
-        println!("points: {:?}", points);
-        println!("cell_ids near point: {:?}", cell_ids);
         let corners = self.cell_corners(&cell_ids.view());
 
         // Rotate points only if nesecary
@@ -389,12 +387,6 @@ impl GridTraits for TriGrid {
             // The nearby cells will depend on which corner of the cell the point is located at, and
             // whether the cell is pointing up or down.
             let rel_nearby_cells: Array2<i64>;
-            println!(
-                "is_cell_upright: {}, ({}, {})",
-                self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]),
-                cell_ids[Ix2(cell_id, 0)],
-                cell_ids[Ix2(cell_id, 1)]
-            );
             match self.cell_orientation() {
                 Orientation::Flat => {
                     if !self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
@@ -443,17 +435,14 @@ impl GridTraits for TriGrid {
                         // Triangle points left
                         match nearest_corner_id {
                             0 => {
-                                println!("Pointy left: 0");
                                 rel_nearby_cells =
                                     array![[0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1],];
                             }
                             1 => {
-                                println!("Pointy left: 1");
                                 rel_nearby_cells =
                                     array![[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2],];
                             }
                             2 => {
-                                println!("Pointy left: 2");
                                 rel_nearby_cells =
                                     array![[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0],];
                             }
@@ -465,18 +454,15 @@ impl GridTraits for TriGrid {
                         match nearest_corner_id {
                             // Note: these indices are just like those of the Pointy version, but swapped xy.
                             0 => {
-                                println!("Pointy right: 0");
                                 rel_nearby_cells =
                                     array![[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1],];
                             }
                             1 => {
-                                println!("Pointy right: 1");
                                 rel_nearby_cells =
                                     array![[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]];
                                 // array![[1, 0], [2, 0], [2, -1], [1, -1], [0, -1], [0, 0],];
                             }
                             2 => {
-                                println!("Pointy right: 2");
                                 rel_nearby_cells =
                                     array![[0, -2], [0, -1], [0, 0], [-1, -2], [-1, -1], [-1, 0],];
                             }
@@ -599,7 +585,7 @@ impl TriGrid {
         add_cell_id: bool,
     ) -> Array3<i64> {
         let add_cell_id = add_cell_id as i64;
-        let mut total_nr_neighbours: usize = include_selected as usize;
+        let mut total_nr_neighbours = include_selected as usize;
         let mut nr_neighbours_factor: usize;
         let max_nr_cols: i64;
         let nr_rows: i64;
@@ -623,8 +609,6 @@ impl TriGrid {
             nr_cells_per_colum_upward[Ix1(row_id as usize)] = max_nr_cols - 2 * (row_id - depth);
         }
 
-        let mut counter: usize = 0;
-
         let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
         for i in 0..nr_rows {
             let i = i as usize;
@@ -637,21 +621,25 @@ impl TriGrid {
         for cell_id in 0..relative_neighbours.shape()[0] {
             counter = 0;
 
-            let downward_cell = iseven(index[Ix2(cell_id, 0)]) != iseven(index[Ix2(cell_id, 1)]);
+            let downward_cell =
+                !self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
             if downward_cell {
                 nr_cells_per_colum = &nr_cells_per_colum_downward;
             } else {
                 nr_cells_per_colum = &nr_cells_per_colum_upward;
             }
 
+            let id_x_axis = self.consistent_axis();
+            let id_y_axis = self.inconsistent_axis();
+
             for rel_row_id in (0..nr_rows).rev() {
                 let nr_cells_in_colum = nr_cells_per_colum[Ix1(rel_row_id as usize)];
                 for rel_col_id in 0..nr_cells_in_colum {
-                    relative_neighbours[Ix3(cell_id, counter, 0)] = rel_col_id
+                    relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = rel_col_id
                         - ((nr_cells_in_colum as f64 / 2.).floor() as i64)
-                        + (add_cell_id * index[Ix2(cell_id, 0)]);
-                    relative_neighbours[Ix3(cell_id, counter, 1)] =
-                        depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, 1)]);
+                        + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                    relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
+                        depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
                     counter = counter + 1;
                     // Skip selected center cell if include_selected is false
                     counter = counter
@@ -700,6 +688,9 @@ impl TriGrid {
                 nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
         }
 
+        let id_x_axis = self.consistent_axis();
+        let id_y_axis = self.inconsistent_axis();
+
         let mut counter: usize = 0;
         let mut y_offset: i64;
         let mut skip_cell: bool;
@@ -734,12 +725,12 @@ impl TriGrid {
                     y_offset = ((depth as f64 / 2.).floor() as i64);
                     if counter < relative_neighbours.shape()[1] {
                         if !skip_cell {
-                            relative_neighbours[Ix3(cell_id, counter, 0)] = flip_vertically
+                            relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = flip_vertically
                                 * (rel_col_id - (nr_cells_in_colum as f64 / 2.).floor() as i64)
-                                + (add_cell_id * index[Ix2(cell_id, 0)]);
-                            relative_neighbours[Ix3(cell_id, counter, 1)] = flip_vertically
+                                + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                            relative_neighbours[Ix3(cell_id, counter, id_y_axis)] = flip_vertically
                                 * (depth - rel_row_id - y_offset - !iseven(depth) as i64)
-                                + (add_cell_id * index[Ix2(cell_id, 1)]);
+                                + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
                             counter = counter + 1;
                         }
                     }
@@ -757,6 +748,8 @@ impl TriGrid {
     }
 
     fn _is_cell_upright(&self, id_x: i64, id_y: i64) -> bool {
+        // FIXME: Name makes no sense if grid is flat maybe is_cell_flipped?
+
         // if (id_x >= 0) == (id_y >= 0) {
         iseven(id_x) == iseven(id_y)
         // } else {

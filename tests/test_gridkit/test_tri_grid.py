@@ -483,29 +483,6 @@ def test_cells_near_point(grid, points, expected_nearby_ids, expand_axes):
         points = points[:, ::-1]
         expected_nearby_ids = expected_nearby_ids[:, ::-1]
 
-    # from gridkit.doc_utils import plot_polygons
-    # import matplotlib.pyplot as plt
-    # point = points[0]
-    # surrounding_cells = grid.neighbours(grid.cell_at_point(point), depth=2, connect_corners=True)
-    # plot_polygons(grid.to_shapely(surrounding_cells), fill=False)
-    # plt.scatter(*numpy.array(points).T)
-    # plt.show()
-    # # breakpoint()
-    # for point in points:
-    #     plot_polygons(grid.to_shapely(grid.cell_at_point(point)), colors="red", alpha=0.3)
-    #     nearby_ids = grid.cells_near_point(point)
-    #     plot_polygons(grid.to_shapely(nearby_ids), fill=True, colors="orange", alpha=0.2)
-    #     surrounding_cells = grid.neighbours(grid.cell_at_point(point), depth=2, connect_corners=True, include_selected=True)
-    #     plot_polygons(grid.to_shapely(surrounding_cells), fill=False)
-    #     for cell in surrounding_cells:
-    #         loc = grid.centroid(cell)
-    #         loc[0] -= 0.1
-    #         plt.text(*loc, f"({cell.x},{cell.y})")
-    #     plt.scatter(*grid.centroid(nearby_ids).T, marker="x")
-    #     plt.scatter(*numpy.array(point).T)
-    #     plt.show()
-    #     # break
-
     nearby_ids = grid.cells_near_point(points[0])
 
     # Test single point input
@@ -788,18 +765,6 @@ def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
         new_grid = grid.anchor(target_loc, cell_element=cell_element, in_place=False)
 
     if cell_element == "centroid":
-        # from gridkit.doc_utils import plot_polygons
-        # import matplotlib.pyplot as plt
-        # id = new_grid.cell_at_point(target_loc)
-        # print(f"id: {id.index}")
-        # ids = new_grid.neighbours(id, depth=3, connect_corners=False, include_selected=False)
-        # # plot_polygons(grid.to_shapely(id, as_multipolygon=True), alpha=0.3)
-        # plot_polygons(grid.to_shapely(ids, as_multipolygon=True), fill=True, colors="pink", linewidth=2, alpha=0.8)
-        # ids2 = new_grid.neighbours(id, depth=6, connect_corners=True, include_selected=True)
-        # plot_polygons(grid.to_shapely(ids2, as_multipolygon=True), fill=False, colors="black", linewidth=2, alpha=0.8)
-        # plt.scatter(*target_loc, marker="d", s=300)
-        # plt.show()
-        # # breakpoint()
         numpy.testing.assert_allclose(
             new_grid.centroid(new_grid.cell_at_point(target_loc)),
             target_loc,
