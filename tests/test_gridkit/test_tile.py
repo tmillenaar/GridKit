@@ -110,3 +110,82 @@ def test_indices(grid, start_id, nx, ny, rotation):
     #       start_id itself is already included (hence '>=')
     assert not numpy.any(indices.x >= start_id[0] + nx)
     assert not numpy.any(indices.y >= start_id[1] + ny)
+
+
+@pytest.mark.parametrize(
+    "index,expected_np_id,expected_value",
+    [  # note, numpy id is in y,x
+        [(0, 0), ([2, 1]), 7],
+        [
+            [(-1, 1), (1, -2)],  # index
+            [(1, 4), (0, 2)],  # expected_np_id in [(y0, y1), (x0,x1)]
+            [3, 14],  # expected_value
+        ],
+    ],
+)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1, shape="flat"),
+        HexGrid(size=1, shape="pointy"),
+    ],
+)
+def test_grid_id_to_tile_id(grid, index, expected_np_id, expected_value):
+    tile = Tile(grid, (-1, -2), 3, 5)
+    data = numpy.arange(tile.nx * tile.ny).reshape(tile.ny, tile.nx)
+    result = tile.grid_id_to_tile_id(index)
+    numpy.testing.assert_almost_equal(numpy.array(result).squeeze(), expected_np_id)
+    numpy.testing.assert_almost_equal(data[result], expected_value)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1, shape="flat"),
+        HexGrid(size=1, shape="pointy"),
+    ],
+)
+def test_grid_id_to_tile_id_nd(grid):
+    tile = Tile(grid, (-1, -2), 3, 5)
+    data = numpy.arange(tile.nx * tile.ny).reshape(tile.ny, tile.nx)
+    datatile = tile.to_data_tile(data)
+    index = [[[1, 2], [1, 2]]]
+    result = datatile.grid_id_to_tile_id(index)
+    numpy.testing.assert_allclose(data[result], datatile.value(index))
+
+
+@pytest.mark.parametrize(
+    "np_index,expected_grid_id",
+    [  # note, numpy id is in y,x
+        [(2, 1), (0, 0)],
+        [
+            [(1, 4, 2), (0, 2, 2)],  # np_index in [[y0, y1, y2], [x0, x1, x2]]
+            [
+                (-1, 1),
+                (1, -2),
+                (1, 0),
+            ],  # expected_grid_id in [(x0, y0), (x1,y1), (x2, y2)]
+        ],
+    ],
+)
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1, shape="flat"),
+        HexGrid(size=1, shape="pointy"),
+    ],
+)
+def test_tile_id_to_grid_id(grid, np_index, expected_grid_id):
+    tile = Tile(grid, (-1, -2), 3, 5)
+    data = numpy.arange(tile.nx * tile.ny).reshape(tile.ny, tile.nx)
+    datatile = tile.to_data_tile(data)
+    result = tile.tile_id_to_grid_id(np_index)
+
+    numpy.testing.assert_almost_equal(result, expected_grid_id)
+    numpy.testing.assert_almost_equal(data[tuple(np_index)], datatile.value(result))

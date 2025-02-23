@@ -1,6 +1,6 @@
 use std::f32::MAX;
 
-use crate::{grid::*, hex_grid::HexGrid};
+use crate::{grid::*, hex_grid::HexGrid, data_tile::DataTile};
 use numpy::{ndarray::*, IntoPyArray};
 
 #[derive(Clone)]
@@ -17,6 +17,15 @@ pub trait TileTraits {
 
     fn get_grid(&self) -> &Grid;
 
+    fn to_data_tile_from_value(&self, fill_value: f64, nodata_value: f64) -> DataTile {
+        let data = Array2::from_elem([self.get_tile().ny as usize, self.get_tile().nx as usize], fill_value);
+        DataTile {
+            tile: self.get_tile().clone(),
+            data,
+            nodata_value,
+        }
+    }
+
     fn corner_ids<'py>(&self) -> Array2<i64> {
         self.get_tile().corner_ids()
     }
@@ -27,10 +36,6 @@ pub trait TileTraits {
 
     fn indices<'py>(&self) -> Array3<i64> {
         self.get_tile().indices()
-    }
-
-    fn bounds<'py>(&self) -> (f64, f64, f64, f64) {
-        self.get_tile().bounds()
     }
 
     fn intersects(&self, other: &Tile) -> bool {
@@ -45,8 +50,28 @@ pub trait TileTraits {
         self.get_tile().combined_tile(other)
     }
 
+    fn grid_id_to_tile_id(&self, grid_ids: &ArrayView2<i64>, oob_value: i64) -> Array2<i64> {
+        let mut tile_ids = Array2::<i64>::zeros((grid_ids.shape()[0], 2));
+        for cell_id in 0..grid_ids.shape()[0] {
+            match self.grid_id_to_tile_id_xy(grid_ids[Ix2(cell_id, 0)], grid_ids[Ix2(cell_id, 1)]) {
+                Ok((x,y)) => {
+                    tile_ids[Ix2(cell_id, 0)] = x;
+                    tile_ids[Ix2(cell_id, 1)] = y;
+                }
+                Err(e) => {
+                    tile_ids[Ix2(cell_id, 0)] = oob_value;
+                    tile_ids[Ix2(cell_id, 1)] = oob_value;
+                }
+
+            }
+
+        }
+        tile_ids
+    }
+
     fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
         let tile = self.get_tile();
+        let grid = self.get_grid();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
         let tile_id_y = (tile.start_id.1 + tile.ny as i64 - 1) - id_y;
@@ -64,30 +89,48 @@ pub trait TileTraits {
             .to_string();
             return Err(error_message);
         }
-        return Ok((tile_id_x, tile_id_y));
+        // Note: return y,x for array indexing as per numpy convention
+        return Ok((tile_id_y, tile_id_x));
     }
 
-    fn tile_id_to_grid_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
+    fn tile_id_to_grid_id(&self, tile_ids: &ArrayView2<i64>, oob_value: i64) -> Array2<i64> {
+        let mut grid_ids = Array2::<i64>::zeros((tile_ids.shape()[0], 2));
+        for cell_id in 0..grid_ids.shape()[0] {
+            match self.tile_id_to_grid_id_xy(tile_ids[Ix2(cell_id, 0)], tile_ids[Ix2(cell_id, 1)]) {
+                Ok((x,y)) => {
+                    grid_ids[Ix2(cell_id, 0)] = x;
+                    grid_ids[Ix2(cell_id, 1)] = y;
+                }
+                Err(e) => {
+                    grid_ids[Ix2(cell_id, 0)] = oob_value;
+                    grid_ids[Ix2(cell_id, 1)] = oob_value;
+                }
+            }
+        }
+        grid_ids
+    }
+
+    fn tile_id_to_grid_id_xy(&self, id_col: i64, id_row: i64) -> Result<(i64, i64), String> {
         let tile = self.get_tile();
         // Check out of bounds
-        if id_x < 0
-            || id_y < 0
-            || id_x >= self.get_tile().nx as i64
-            || id_y >= self.get_tile().ny as i64
+        if id_row < 0
+            || id_col < 0
+            || id_row >= self.get_tile().nx as i64
+            || id_col >= self.get_tile().ny as i64
         {
             let error_message = format!(
-                "Grid ID ({}, {}) not in Tile ID with start_id: ({}, {}), nx: {}, ny: {}. Supplied array id: ({},{})",
-                id_x, id_y, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny, id_x, id_y
+                "Tile ID ({},{}) not in Tile with start_id: ({}, {}), nx: {}, ny: {}.",
+                id_col, id_row, tile.start_id.0, tile.start_id.1, tile.nx, tile.ny
             )
             .to_string();
             return Err(error_message);
         }
 
         // Do conversion
-        let grid_id_x = id_x + tile.start_id.0;
+        let grid_id_x = id_row + tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
         // Subtract 1 to account for base-0
-        let grid_id_y = (tile.ny as i64 - id_y) + tile.start_id.1 - 1;
+        let grid_id_y = (tile.ny as i64 - id_col) + tile.start_id.1 - 1;
         return Ok((grid_id_x, grid_id_y));
     }
 }

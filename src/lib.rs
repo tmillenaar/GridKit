@@ -143,6 +143,18 @@ impl PyO3Tile {
         }
     }
 
+    fn to_data_tile_from_value<'py>(
+        &self,
+        fill_value: f64,
+        nodata_value: f64,
+    ) -> PyO3DataTile {
+        let _data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value);
+        PyO3DataTile {
+            _data_tile: _data_tile,
+            _tile: self.clone(),
+        }
+    }
+
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
         self._tile.corner_ids().into_pyarray(py)
     }
@@ -192,6 +204,16 @@ impl PyO3Tile {
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
     }
+
+    fn tile_id_to_grid_id<'py>(&self, py: Python<'py>, tile_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+        let index = tile_ids.as_array();
+        self._tile.tile_id_to_grid_id(&index, oob_value).into_pyarray(py)
+    }
+
+    fn grid_id_to_tile_id<'py>(&self, py: Python<'py>, grid_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+        let index = grid_ids.as_array();
+        self._tile.grid_id_to_tile_id(&index, oob_value).into_pyarray(py)
+    }
 }
 
 #[pymethods]
@@ -230,10 +252,6 @@ impl PyO3DataTile {
 
     fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
         self._data_tile.indices().into_pyarray(py)
-    }
-
-    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._data_tile.bounds()
     }
 
     fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {

@@ -88,6 +88,14 @@ class Tile:
     def from_pyo3_tile(grid, pyo3_tile):
         return Tile(grid, pyo3_tile.start_id, pyo3_tile.nx, pyo3_tile.ny)
 
+    def to_data_tile(self, data, nodata_value=numpy.nan):
+        py03_data_tile = self._tile.to_data_tile(data.astype(float), nodata_value)
+        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+
+    def to_data_tile_from_value(self, fill_value, nodata_value=numpy.nan):
+        py03_data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value)
+        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+
     @property
     def start_id(self):
         """The starting cell of the Tile.
@@ -186,6 +194,50 @@ class Tile:
         if index is None:
             index = self.indices
         return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
+
+    def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
+        # nocheckin, add docsring with elaborate explenation of:
+        #     - input np_index in [[y0, y1, y2], [x0, x1, x2]]
+        #     - result grid_id in [(x0, y0), (x1,y1), (x2, y2)]
+        if tile_id is None:
+            ids_x = numpy.arange(self.nx)
+            ids_y = numpy.arange(self.ny)
+            tile_id = numpy.array(numpy.meshgrid(ids_x, ids_y)).reshape(-1, 2)
+        else:
+            tile_id = numpy.array(tile_id, dtype=int)
+        if not tile_id.shape[0] == 2:
+            raise ValueError(
+                f"""
+                Expected the first dimension of tile_id to have a length of two (for x,y). Got indices in shape: {tile_id.shape}.
+                This is different than the grid ids where we expect xy to be the last dimesnion.
+                This is in an effort to make indexing the data as a numpy array using data[tuple(numpy_ids)] the same
+                as querying values from datatile.value using grid ids botained through tile_id_to_grid_id(numpy_ids).
+                Note that not only does this function need the first demension to be of size two,
+                but numpy starts with the y-coordinate, so we expect: [[y0,y1,y2], [x0,x1,x2]].
+            """
+            )
+        if tile_id.ndim == 1:
+            tile_id = tile_id[numpy.newaxis]
+        else:
+            # Note: transpose to get the data from shape [[y0,y1,y2], [x0,x1,x2]]
+            #       into shape [[x0,y0], [x1,y1], [x2,y2]] which is what the rust package works with
+            # FIXME: I imagine that since the ndarray package uses the same index we might want to move
+            #        the transpose logic to the rust equavalent of this function.
+            tile_id = tile_id.T
+        oob_value = numpy.int64(oob_value)
+        return GridIndex(self._tile.tile_id_to_grid_id(tile_id, oob_value=oob_value))
+
+    @validate_index
+    def grid_id_to_tile_id(self, index=None, oob_value=numpy.iinfo(numpy.int64).max):
+        if index is None:
+            index = self.indices
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        oob_value = numpy.int64(oob_value)
+        # Note: return a tuple instead of numpy array becuase numpy indexing behaviour
+        #       is different when using arrays of integers compared to tuples.
+        return tuple(self._tile.grid_id_to_tile_id(index, oob_value=oob_value).T)
 
 
 class DataTile(Tile):
@@ -301,7 +353,10 @@ class DataTile(Tile):
             )
         oob_value = numpy.float64(oob_value)
         original_shape = index.shape
-        result = self._data_tile.value(index.ravel().index, oob_value)
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        result = self._data_tile.value(index, oob_value)
         return result.reshape(original_shape)
 
     def intersects(self, other):

@@ -93,9 +93,9 @@ impl DataTile {
     pub fn value(&self, i_x: i64, i_y: i64, nodata_value: f64) -> f64 {
         let id_result = self.grid_id_to_tile_id_xy(i_x, i_y);
         match id_result {
-            Ok((id_x, id_y)) => {
+            Ok((id_col, id_row)) => {
                 // Note: indexing into array is in order y,x
-                return self.data[Ix2(id_y as usize, id_x as usize)];
+                return self.data[Ix2(id_col as usize, id_row as usize)];
             }
             Err(e) => {
                 // If id is out of bounds, set value to nodata_value
@@ -105,11 +105,14 @@ impl DataTile {
     }
 
     pub fn values(&self, index: &ArrayView2<i64>, nodata_value: f64) -> Array1<f64> {
+        // let tile_index = self.grid_id_to_tile_id(index, i64::MAX);
         let mut values = Array1::<f64>::zeros(index.shape()[0]);
         for cell_id in 0..values.shape()[0] {
             values[Ix1(cell_id)] =
                 self.value(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)], nodata_value);
+            // println!("Indexing in {},{} gives value {}", tile_index[Ix2(cell_id, 0)], tile_index[Ix2(cell_id, 1)], values[Ix1(cell_id)])
         }
+        println!("{:?}", self.data);
         values
     }
 
