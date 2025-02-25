@@ -54,9 +54,9 @@ pub trait TileTraits {
         let mut tile_ids = Array2::<i64>::zeros((grid_ids.shape()[0], 2));
         for cell_id in 0..grid_ids.shape()[0] {
             match self.grid_id_to_tile_id_xy(grid_ids[Ix2(cell_id, 0)], grid_ids[Ix2(cell_id, 1)]) {
-                Ok((x,y)) => {
-                    tile_ids[Ix2(cell_id, 0)] = x;
-                    tile_ids[Ix2(cell_id, 1)] = y;
+                Ok((col,row)) => {
+                    tile_ids[Ix2(cell_id, 0)] = col;
+                    tile_ids[Ix2(cell_id, 1)] = row;
                 }
                 Err(e) => {
                     tile_ids[Ix2(cell_id, 0)] = oob_value;

@@ -64,7 +64,7 @@ impl DataTile {
         let mut new_data =
             Array2::from_elem((crop_tile.ny as usize, crop_tile.nx as usize), nodata_value);
 
-        let (start_slice_x, end_slice_y) = self
+        let (end_slice_col, start_slice_row) = self
             .grid_id_to_tile_id_xy(crop_tile.start_id.0, crop_tile.start_id.1)
             .unwrap();
         // Note: We first subtract one from nx and ny to get the id of the top left corner
@@ -75,10 +75,10 @@ impl DataTile {
             crop_tile.start_id.0 + crop_tile.nx as i64 - 1,
             crop_tile.start_id.1 + crop_tile.ny as i64 - 1,
         );
-        let (end_slice_x, start_slice_y) = self.grid_id_to_tile_id_xy(end_id.0, end_id.1).unwrap();
+        let (start_slice_col, end_slice_row) = self.grid_id_to_tile_id_xy(end_id.0, end_id.1).unwrap();
         let data_slice = &self.data.slice(s![
-            start_slice_y as usize..(end_slice_y + 1) as usize,
-            start_slice_x as usize..(end_slice_x + 1) as usize
+            start_slice_col as usize..(end_slice_col + 1) as usize,
+            start_slice_row as usize..(end_slice_row + 1) as usize
         ]);
         let mut new_data_slice =
             new_data.slice_mut(s![0..crop_tile.ny as usize, 0..crop_tile.nx as usize,]);
@@ -316,18 +316,18 @@ impl DataTile {
         //       For this cell we do not get out of bounds of the tile.
         //       Because this is then used as the upper end of a slice we add the 1 back because
         //       slice ends are exclusive.
-        let (start_slice_x, end_slice_y) = self
+        let (end_slice_col, start_slice_row) = self
             .grid_id_to_tile_id_xy(data_tile.tile.start_id.0, data_tile.tile.start_id.1)
             .unwrap();
-        let (end_slice_x, start_slice_y) = self
+        let (start_slice_col, end_slice_row) = self
             .grid_id_to_tile_id_xy(
                 data_tile.tile.start_id.0 + data_tile.tile.nx as i64 - 1,
                 data_tile.tile.start_id.1 + data_tile.tile.ny as i64 - 1,
             )
             .unwrap();
         let mut data_slice = self.data.slice_mut(s![
-            start_slice_y as usize..(end_slice_y + 1) as usize,
-            start_slice_x as usize..(end_slice_x + 1) as usize
+            start_slice_col as usize..(end_slice_col + 1) as usize,
+            start_slice_row as usize..(end_slice_row + 1) as usize
         ]);
         data_slice.assign(&data_tile.data);
         Ok(())
@@ -377,7 +377,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] == value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
@@ -403,7 +403,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] != value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
@@ -429,7 +429,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] > value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
@@ -455,7 +455,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] >= value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
@@ -481,7 +481,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] < value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
@@ -507,7 +507,7 @@ impl DataTile {
                 if self.data[Ix2(id_y as usize, id_x as usize)] <= value {
                     let (grid_id_x, grid_id_y) = self
                         .tile
-                        .tile_id_to_grid_id_xy(id_x as i64, id_y as i64)
+                        .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
                         .unwrap();
                     index_vec.push([grid_id_x, grid_id_y]);
                 }
