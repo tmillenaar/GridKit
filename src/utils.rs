@@ -5,7 +5,7 @@ pub fn iseven(val: i64) -> bool {
 }
 
 pub fn modulus(val: f64, modulus: f64) -> f64 {
-    ((val % modulus) + modulus ) % modulus
+    ((val % modulus) + modulus) % modulus
 }
 
 pub fn normalize_offset(offset: [f64; 2], dx: f64, dy: f64) -> [f64; 2] {
@@ -21,8 +21,5 @@ pub fn rotation_matrix_from_angle(angle_deg: f64) -> Array2<f64> {
     let angle_rad = angle_deg.to_radians();
     let cos_angle = angle_rad.cos();
     let sin_angle = angle_rad.sin();
-    array![
-        [cos_angle, -sin_angle],
-        [sin_angle, cos_angle]
-    ]
+    array![[cos_angle, -sin_angle], [sin_angle, cos_angle]]
 }

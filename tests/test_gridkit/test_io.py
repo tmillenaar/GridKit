@@ -1,4 +1,5 @@
 import numpy
+import pytest
 
 from gridkit import raster_to_data_tile, read_raster, write_raster
 
@@ -8,7 +9,7 @@ def test_read_raster():
     grid = read_raster(path)
 
     expected_bounds = (4116200.0, 2575600.0, 4218700.0, 2624900.0)
-    assert grid.bounds == expected_bounds
+    numpy.testing.assert_allclose(grid.bounds, expected_bounds)
     assert grid.dx == 100.0
     assert grid.dy == 100.0
     assert grid.crs.to_epsg() == 3035

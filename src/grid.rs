@@ -49,7 +49,7 @@ pub enum Orientation {
 impl ToString for Orientation {
     fn to_string(&self) -> String {
         match self {
-            Orientation::Flat => "falt".to_string(),
+            Orientation::Flat => "flat".to_string(),
             Orientation::Pointy => "pointy".to_string(),
         }
     }

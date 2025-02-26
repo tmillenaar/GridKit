@@ -134,7 +134,7 @@ def raster_to_data_tile(
         Path object, or one of the rasterio classes that provides the
         dataset-opening interface.
     bounds: Tuple(float, float, float, float)
-        The bounding box of the data to read. Can be used to read a smaller
+        The bounding box of the data to read in (min-x, min-y, max-x, max-y). Can be used to read a smaller
         section of the dataset. If the bounds are larger than the raster bounds,
         the full raster will be read.
     bounds_crs: CRS
@@ -151,6 +151,8 @@ def raster_to_data_tile(
     border_buffer: float
         Enlarge the supplied `bounds` with the specified border_radius.
         A negative border_radius can be supplied to decrease the bounds.
+        The unit of the border_radius is that of bounds_crs, or that of the
+        dataset CRS if bounds_crs is not supplied.
     band: int
         The index of the band to read. Default: 1.
         Note that raster bands start at 1, so if you
@@ -164,7 +166,19 @@ def raster_to_data_tile(
     with rasterio.open(path) as raster_file:
         crs = str(raster_file.crs)
 
+        if bounds is None and border_buffer < 0:
+            # Allow for shrinking of full dataset using border_buffer if no bounds are supplied
+            # If border_buffer is zero or larger then there is no point in cropping, just return the full dataset
+            b = raster_file.bounds if bounds is None else bounds
+            bounds = (b.left, b.bottom, b.right, b.top)
+
         if bounds is not None:
+
+            bounds = numpy.array(bounds)
+
+            if border_buffer:  # note rasterio slices from top to bottom
+                bounds[:2] -= border_buffer
+                bounds[2:] += border_buffer
 
             if bounds_crs is not None:
                 bounds_crs = CRS.from_user_input(bounds_crs)
@@ -172,12 +186,6 @@ def raster_to_data_tile(
                 bounds = transformer.transform_bounds(*bounds)
             top, left = raster_file.index(bounds[0], bounds[3])
             bottom, right = raster_file.index(bounds[2], bounds[1])
-
-            if border_buffer:  # note rasterio slices from top to bottom
-                left -= border_buffer
-                right += border_buffer
-                top -= border_buffer
-                bottom += border_buffer
 
             # Create a window from the indices
             window = rasterio.windows.Window.from_slices((top, bottom), (left, right))
