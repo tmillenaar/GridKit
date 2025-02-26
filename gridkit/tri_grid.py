@@ -510,13 +510,17 @@ class TriGrid(BaseGrid):
         if not in_place:
             return self
 
-    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+    def _update_inner_grid(
+        self, size=None, offset=None, rotation=None, orientation=None
+    ):
         if size is None:
             size = self.size
         if offset is None:
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
+        if orientation is None:
+            cell_orientation = self.orientation
         return PyO3TriGrid(
             cellsize=size,
             offset=offset,
