@@ -337,32 +337,6 @@ impl GridTraits for TriGrid {
         let cell_ids = self.cell_at_point(points);
         let corners = self.cell_corners(&cell_ids.view());
 
-        // Rotate points only if nesecary
-        // We only want to clone/copy the data in the points variable
-        // if it needs rotating. This is hard for the Rust compiler
-        // because points cannot be either owned or a view depending on a condition.
-        // It needs to either always be owned or always be a view.
-        // Since we don't always want to own the data we make sure that
-        // the variable points is always a view.
-        // However, the rotated data does need to be stored in a different
-        // variable that lives at least as long as the view.
-        // To satisfy the compiler we declare points_ before the if-block and
-        // then return the view from the if-block which we use to shadow the original
-        // points variable.
-        let mut points_: Array2<f64>;
-        let points: ArrayView2<f64> = if self.rotation() != 0. {
-            // Create an owned copy of `points` and apply rotation.
-            points_ = points.to_owned();
-            for cell_id in 0..points.shape()[0] {
-                let mut point = points_.slice_mut(s![cell_id, ..]);
-                let point_rot = self._rotation_matrix_inv.dot(&point);
-                point.assign(&point_rot);
-            }
-            points_.view()
-        } else {
-            points.view()
-        };
-
         // Define arguments to be used when determining the minimum distance
         let mut min_dist: f64 = 0.;
         let mut nearest_corner_id: usize = 0;
