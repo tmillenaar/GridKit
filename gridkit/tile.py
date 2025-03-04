@@ -33,7 +33,7 @@ class Tile:
 
     Init parameters
     ---------------
-    grid: :class:`BaseGrid`
+    grid: :class:`.BaseGrid`
         The :class:`.TriGrid`, :class:`.RectGrid` or :class:`.HexGrid` the tile is associated with
     start_id: Union[Tuple[int, int], GridIndex]
         The starting cell of the Tile.
@@ -157,8 +157,13 @@ class Tile:
         :class:`tuple`
             The extent of the data as defined expected by matplotlib in (left, right, bottom, top) or equivalently (min-x, max-x, min-y, max-y)
         """
-        b = self.bounds
-        return (b[0], b[2], b[1], b[3])
+        corners = self.corners()
+        return (
+            corners[:, 0].min(),
+            corners[:, 0].max(),
+            corners[:, 1].min(),
+            corners[:, 1].max(),
+        )
 
     def intersects(self, other):
         """Only checks bounds, not grid type, alignment etc."""
@@ -429,7 +434,7 @@ class DataTile(Tile):
 
     def resample(self, alignment_grid, method="nearest", **interp_kwargs):
         """Resample the grid onto another grid.
-            This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
+        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)
         and determine the value on these location based on the values of the original grid (``self``).
 
             The steps are as follows:
@@ -441,29 +446,30 @@ class DataTile(Tile):
              4. Interpolate the values using the supplied ``method`` at each of the centroids of the alignment grid cells selected in 2.
              5. Create a new bounded grid using the attributes of the alignment grid
 
-            Parameters
-            ----------
-            alignment_grid: :class:`.BaseGrid`
-                The grid with the desired attributes on which to resample.
+        Parameters
+        ----------
+        alignment_grid: :class:`.BaseGrid`
+            The grid with the desired attributes on which to resample.
 
-            method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
-                The interpolation method used to determine the value at the supplied `sample_points`.
-                Supported methods:
-                - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
-                - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
-                - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
-                Default: "nearest"
-            **interp_kwargs: `dict`
-                The keyword argument passed to the interpolation function corresponding to the specified `method`
-            Returns
-            -------
-            :class:`.BoundedGrid`
-                The interpolated values at the supplied points
+        method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
+            The interpolation method used to determine the value at the supplied `sample_points`.
+            Supported methods:
+            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+            - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+            Default: "nearest"
+        **interp_kwargs: `dict`
+            The keyword argument passed to the interpolation function corresponding to the specified `method`
+        Returns
+        -------
+        :class:`.BoundedGrid`
+            The interpolated values at the supplied points
 
-            See also
-            --------
-            :py:meth:`.BoundedGrid.interpolate`
-            :py:meth:`.BaseGrid.interp_from_points`
+        See also
+        --------
+        :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.BaseGrid.interp_from_points`
+
         """
         if isinstance(alignment_grid, Tile):
             alignment_grid = alignment_grid.grid

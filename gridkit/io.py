@@ -19,15 +19,15 @@ def read_raster(
 
     Parameters
     ----------
-    path: str
+    path: `str`
         The path to the file. This needs to be a file that is supported by rasterio.
-    bounds: Tuple(float, float, float, float)
+    bounds: `Tuple(float, float, float, float)`, None
         The bounds of the are of interest. Only the data within the supplied bounds is read from the input file.
-    bounds_crs: `pyproj.CRS`
+    bounds_crs: `pyproj.CRS`, None
         The Coordinte Reference System (CRS) of the supploed bounds.
         If the CRS of the bounds does not match that of the input files,
         the bounds are converted to that of the input file before reading.
-    border_buffer: int
+    border_buffer: `int`, 0
         A buffer to apply to the supplied `bounds` to read in a larger slice of the area.
 
     Returns
@@ -89,12 +89,12 @@ def write_raster(grid, path):
     grid: :class:`.BoundedRectGrid`
         The grid to write to a raster file.
         This can only be a BoundedRectGrid.
-    path: :class:`str`
+    path: `str`
         The locatin of the file to write to (eg ./my_raster.tiff).
 
     Returns
     -------
-    :class:`str`
+    `str`
         The path pointing to the written file
 
     See also
@@ -129,15 +129,15 @@ def raster_to_data_tile(
 
     Parameters
     ----------
-    path: str, file object, PathLike object, FilePath, or MemoryFile
+    path: `str`, `file object`, `PathLike object`, `FilePath`, or `MemoryFile`
         A filename or URL, a file object opened in binary ('rb') mode, a
         Path object, or one of the rasterio classes that provides the
         dataset-opening interface.
-    bounds: Tuple(float, float, float, float)
+    bounds: `Tuple(float, float, float, float)`, None
         The bounding box of the data to read in (min-x, min-y, max-x, max-y). Can be used to read a smaller
         section of the dataset. If the bounds are larger than the raster bounds,
         the full raster will be read.
-    bounds_crs: CRS
+    bounds_crs: `pyproj.CRS`, None
         The Coordinate Reference System (CRS) that matches the supplied `bounds` argument.
         The `bounds` are then converted to the CRS that matches the dataset before reading
         the tile. This allows for reading a section of the dataset defined in any CRS,
@@ -148,12 +148,12 @@ def raster_to_data_tile(
             The dataset will be read in the CRS corresponding to the data file,
             not the bounds_crs.
 
-    border_buffer: float
+    border_buffer: `float`, 0
         Enlarge the supplied `bounds` with the specified border_radius.
         A negative border_radius can be supplied to decrease the bounds.
         The unit of the border_radius is that of bounds_crs, or that of the
         dataset CRS if bounds_crs is not supplied.
-    band: int
+    band: `int`, 0
         The index of the band to read. Default: 1.
         Note that raster bands start at 1, so if you
         want to read the first band, supply band=1, not band=0.

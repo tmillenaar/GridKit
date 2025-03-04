@@ -17,35 +17,33 @@ from gridkit.tri_grid import TriGrid
 class HexGrid(BaseGrid):
     """Abstraction that represents an infinite grid with hexagonal cell shape.
 
-    The size of each cell can be specified through the `size` or `area` arguments.
+    The size of each cell can be specified through the `size`, `area` of `side_length` arguments.
 
     Initialization parameters
     -------------------------
-    size: float
+    size: `float`, None
         The spacing between two cell centroids in horizontal direction if ``shape`` is "pointy",
         or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area` or 'side_length'.
-    area: float
+    area: `float`, None
         The area of a cell. Cannot be supplied together with `size` or 'side_length'.
-    side_length: float
+    side_length: `float`, None
         The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or 'area'.
-    shape: `Literal["pointy", "flat"]`
+    shape: `Literal["pointy", "flat"]`, "pointy"
         The shape of the layout of the grid.
         If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
         If ``shape`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.
-    offset: `Tuple(float, float)` (optional)
+    offset: `Tuple(float, float)`, (0,0)
         The offset in dx and dy.
         Shifts the whole grid by the specified amount.
         The shift is always reduced to be maximum one cell size.
         If the supplied shift is larger,
         a shift will be performed such that the new center is a multiple of dx or dy away.
-        Default: (0,0)
-    rotation: float
+    rotation: `float`, 0
         The counter-clockwise rotation of the grid around the origin in degrees.
-    crs: `pyproj.CRS` (optional)
+    crs: `pyproj.CRS`, None
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
         such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
-        Default: None
 
     See also
     --------
@@ -251,21 +249,21 @@ class HexGrid(BaseGrid):
 
         Parameters
         ----------
-        depth: :class:`int` Default: 1
-            Determines the number of neighbours that are returned.
-            If `depth=1` the direct neighbours are returned.
-            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
-            `depth=3` returns yet another layer of neighbours, and so forth.
         index: `numpy.ndarray`
             The index of the cell of which the relative neighbours are desired.
             This is mostly relevant because in hexagonal grids the neighbouring indices differ
             when dealing with odd or even indices.
-        include_selected: :class:`bool` Default: False
+        depth: :class:`int`, 1
+            Determines the number of neighbours that are returned.
+            If `depth=1` the direct neighbours are returned.
+            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.
+            `depth=3` returns yet another layer of neighbours, and so forth.
+        include_selected: :class:`bool`, False
             Whether to include the specified cell in the return array.
             Even though the specified cell can never be a neighbour of itself,
             this can be useful when for example a weighted average of the neighbours is desired
             in which case the cell itself often should also be included.
-        connect_corners: :class:`bool` Default: False
+        connect_corners: :class:`bool`, False
             Whether to consider cells that touch corners but not sides as neighbours.
             This is not relevant in hexagonal grids. It does nothing here.
             See :py:meth:`.RectGrid.relative_neighbours`
@@ -538,7 +536,7 @@ class HexGrid(BaseGrid):
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
 
-        location: (float, float) (default: (0,0))
+        location: `Tuple[float, float]`, (0,0)
             The location at which to perform the conversion.
             When transforming to a new coordinate system, it matters at which location the transformation is performed.
             The chosen location will be used to determinde the cell size of the new grid.
@@ -548,7 +546,9 @@ class HexGrid(BaseGrid):
 
                 The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.
 
-        adjust_rotation: bool (default: False)
+            ..
+
+        adjust_rotation: `bool`, False
             If False, the grid in the new crs has the same rotation as the original grid.
             Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
             If True, set the new rotation to match the orientation of the grid at ``location`` after coordinate transformation.

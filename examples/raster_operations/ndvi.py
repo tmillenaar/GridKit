@@ -52,9 +52,8 @@ ndvi[~numpy.isfinite(ndvi)] = 0  # fill NaN values resulting from a division by 
 #
 
 # Plot the result
-mpl_extent = (band_4.bounds[0], band_4.bounds[2], band_4.bounds[1], band_4.bounds[3])
 fig, ax = plt.subplots(1)
-im_ndvi = ax.imshow(ndvi, cmap="RdYlGn", extent=mpl_extent, vmin=-1, vmax=1)
+im_ndvi = ax.imshow(ndvi, cmap="RdYlGn", extent=band_4.mpl_extent, vmin=-1, vmax=1)
 fig.colorbar(im_ndvi, ax=ax, fraction=0.022, pad=0.01)
 ax.set_xlabel("lon")
 ax.set_ylabel("lat")

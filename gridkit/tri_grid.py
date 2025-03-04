@@ -141,7 +141,7 @@ class TriGrid(BaseGrid):
     @property
     def side_length(self):
         """The length of the side of a cell.
-        For a TriGrid, the side length is the same as :meth:`.HexGrid.size`."""
+        For a TriGrid, the side length is the same as `HexGrid.size`"""
         return self.size
 
     def _side_length_to_size(self, side_length):
@@ -553,10 +553,10 @@ class TriGrid(BaseGrid):
             The new counter-clockwise rotation of the grid in degrees.
             Can be negative for clockwise rotation.
         orientation: Literal["flat", "pointy"]
-            The orientation of the cells.
-            "flat": The cells point up and down. They are positioned like you would expect a triangle to
-                    lie on the ground.
-            "pointy": The cells point left and right. They are positioned standing on a corner if you will.
+            The orientation of the cells. Options are:
+
+             - "flat": The cells point up and down. They are positioned like you would expect a triangle to lie on the ground.
+             - "pointy": The cells point left and right. They are positioned standing on a corner if you will.
         crs: Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
