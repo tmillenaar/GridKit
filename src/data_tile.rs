@@ -46,6 +46,16 @@ impl DataTile {
         }
     }
 
+    pub fn set_nodata_value(&mut self, nodata_value: f64){
+        for val in self.data.iter_mut() {
+            if *val == self.nodata_value {
+                *val = nodata_value;
+            }
+        }
+        self.nodata_value = nodata_value;
+    }
+
+
     pub fn _empty_combined_tile(&self, other: &DataTile, nodata_value: f64) -> DataTile {
         let tile = self.tile.combined_tile(&other.tile);
         let data = Array2::from_elem((tile.ny as usize, tile.nx as usize), nodata_value);

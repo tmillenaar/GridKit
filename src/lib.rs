@@ -235,6 +235,10 @@ impl PyO3DataTile {
         self._data_tile.nodata_value
     }
 
+    fn set_nodata_value(&mut self, nodata_value: f64){
+        self._data_tile.set_nodata_value(nodata_value);
+    }
+
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
         self._tile.clone()
     }

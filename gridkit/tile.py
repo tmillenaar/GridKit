@@ -261,7 +261,16 @@ class DataTile(Tile):
         self._data_tile = tile._tile.to_data_tile(data.astype("float64"), nodata_value)
         # _tile is used by the Tile parent class
         self._tile = self._data_tile.get_tile()
-        self.nodata_value = nodata_value
+
+    @property
+    def nodata_value(self):
+        return self._data_tile.nodata_value()
+
+    @nodata_value.setter
+    def nodata_value(self, value):
+        """Sets the nodata value of the DataTile.
+        This replaces all instances of the nodata value with the new value"""
+        self._data_tile.set_nodata_value(float(value))
 
     @staticmethod
     def from_PyO3DataTile(grid, pyo3_data_tile):
@@ -422,7 +431,7 @@ class DataTile(Tile):
         """
         if method == "nearest":
             new_ids = self.grid.cell_at_point(sample_points)
-            return self.value(new_ids)
+            return self.value(new_ids, oob_value=self.nodata_value)
         elif method == "bilinear" or method == "linear":
             return_shape = sample_points.shape[:-1]
             result = self._linear_interpolation(sample_points.reshape(-1, 2))
@@ -569,14 +578,13 @@ class DataTile(Tile):
 
         nodata_value = self.nodata_value if self.nodata_value is not None else numpy.nan
 
-        tile = Tile(
+        new_tile = Tile(
             alignment_grid,
             start_id=new_ids[-1, 0],
             nx=new_ids.shape[1],
             ny=new_ids.shape[0],
         )
-
-        return DataTile(tile, value)
+        return DataTile(new_tile, value, nodata_value=nodata_value)
 
     def to_crs(self, crs, resample_method="nearest"):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
