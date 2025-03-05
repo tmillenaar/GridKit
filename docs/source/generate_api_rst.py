@@ -1,5 +1,3 @@
-# Copyright 2021, SkyGeo Netherlands B.V.
-
 import datetime
 import os
 
@@ -28,7 +26,8 @@ def gen_module_rst(module, all_modules, output_dir):
     submodules = tuple(
         name
         for name in all_modules
-        if name.startswith(module + ".") and len(name.split(".")) == len(module.split(".")) + 1
+        if name.startswith(module + ".")
+        and len(name.split(".")) == len(module.split(".")) + 1
     )
 
     with open(os.path.join(output_dir, module + ".rst"), "w") as rst:
@@ -60,6 +59,3 @@ def gen_api_reference(module_dir, output_dir):
     modules = tuple(sorted(scan_dir(module_dir, ())))
     for module in modules:
         gen_module_rst(module, modules, output_dir)
-
-
-# vim: sts=4:sw=4:et

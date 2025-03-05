@@ -2,10 +2,11 @@ import numpy
 import pytest
 
 import gridkit
+from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 
 @pytest.mark.parametrize("shape", ["flat", "pointy", "rect"])
-def test_sum(
+def test_sum_bounded_grid(
     basic_bounded_pointy_grid, basic_bounded_flat_grid, basic_bounded_rect_grid, shape
 ):
     if shape == "pointy":

@@ -1,5 +1,6 @@
 use std::ops::Add;
 
+use grid::Orientation;
 use numpy::{
     IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3,
 };
@@ -142,6 +143,18 @@ impl PyO3Tile {
         }
     }
 
+    fn to_data_tile_from_value<'py>(
+        &self,
+        fill_value: f64,
+        nodata_value: f64,
+    ) -> PyO3DataTile {
+        let _data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value);
+        PyO3DataTile {
+            _data_tile: _data_tile,
+            _tile: self.clone(),
+        }
+    }
+
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
         self._tile.corner_ids().into_pyarray(py)
     }
@@ -154,10 +167,6 @@ impl PyO3Tile {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._tile.bounds()
-    }
-
     fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {
         self._tile.intersects(&other._tile)
     }
@@ -168,20 +177,22 @@ impl PyO3Tile {
                 let grid = match &new_tile.grid {
                     grid::Grid::TriGrid(grid) => PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(
                         grid.cellsize,
-                        grid.offset,
+                        &grid.cell_orientation.to_string(),
+                        grid.offset.into(),
                         grid.rotation(),
-                    )),
+                    )?),
                     grid::Grid::RectGrid(grid) => PyO3Grid::PyO3RectGrid(PyO3RectGrid::new(
                         grid.dx(),
                         grid.dy(),
-                        grid.offset,
+                        grid.offset.into(),
                         grid.rotation(),
                     )),
                     grid::Grid::HexGrid(grid) => PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(
                         grid.cellsize,
-                        grid.offset,
+                        &grid.cell_orientation.to_string(),
+                        grid.offset.into(),
                         grid.rotation(),
-                    )),
+                    )?),
                 };
                 Ok(PyO3Tile {
                     _grid: grid,
@@ -193,6 +204,16 @@ impl PyO3Tile {
             }
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
+    }
+
+    fn tile_id_to_grid_id<'py>(&self, py: Python<'py>, tile_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+        let index = tile_ids.as_array();
+        self._tile.tile_id_to_grid_id(&index, oob_value).into_pyarray(py)
+    }
+
+    fn grid_id_to_tile_id<'py>(&self, py: Python<'py>, grid_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+        let index = grid_ids.as_array();
+        self._tile.grid_id_to_tile_id(&index, oob_value).into_pyarray(py)
     }
 }
 
@@ -208,6 +229,10 @@ impl PyO3DataTile {
 
     fn ny(&self) -> u64 {
         self._data_tile.tile.ny
+    }
+
+    fn nodata_value(&self) -> f64 {
+        self._data_tile.nodata_value
     }
 
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
@@ -228,10 +253,6 @@ impl PyO3DataTile {
 
     fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
         self._data_tile.indices().into_pyarray(py)
-    }
-
-    fn bounds<'py>(&self, py: Python<'py>) -> (f64, f64, f64, f64) {
-        self._data_tile.bounds()
     }
 
     fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {
@@ -265,6 +286,27 @@ impl PyO3DataTile {
             }
             Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
         }
+    }
+
+    fn linear_interpolation<'py>(
+        &self,
+        py: Python<'py>,
+        sample_point: PyReadonlyArray2<'py, f64>,
+    ) -> &'py PyArray1<f64> {
+        self._data_tile
+            .linear_interpolation(&sample_point.as_array())
+            .into_pyarray(py)
+    }
+
+    fn inverse_distance_interpolation<'py>(
+        &self,
+        py: Python<'py>,
+        sample_point: PyReadonlyArray2<'py, f64>,
+        decay_constant: f64,
+    ) -> &'py PyArray1<f64> {
+        self._data_tile
+            .inverse_distance_interpolation(&sample_point.as_array(), decay_constant)
+            .into_pyarray(py)
     }
 
     fn _add_scalar<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
@@ -480,7 +522,7 @@ impl PyO3DataTile {
         nodata_value: f64,
     ) -> &'py PyArray1<f64> {
         self._data_tile
-            .value(&index.as_array(), nodata_value)
+            .values(&index.as_array(), nodata_value)
             .into_pyarray(py)
     }
 
@@ -511,17 +553,32 @@ struct PyO3TriGrid {
 #[pymethods]
 impl PyO3TriGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = tri_grid::TriGrid::new(cellsize, offset, rotation);
-        PyO3TriGrid {
-            cellsize,
-            rotation,
-            _grid,
+    fn new(
+        cellsize: f64,
+        cell_orientation: &str,
+        offset: (f64, f64),
+        rotation: f64,
+    ) -> PyResult<Self> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => {
+                let mut _grid = tri_grid::TriGrid::new(cellsize, cell_orientation);
+                _grid.set_offset(offset.into());
+                _grid.set_rotation(rotation);
+                Ok(PyO3TriGrid {
+                    cellsize,
+                    rotation,
+                    _grid,
+                })
+            }
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
         }
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn cell_height(&self) -> f64 {
@@ -545,11 +602,11 @@ impl PyO3TriGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -678,7 +735,9 @@ struct PyO3RectGrid {
 impl PyO3RectGrid {
     #[new]
     fn new(dx: f64, dy: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = rect_grid::RectGrid::new(dx, dy, offset, rotation);
+        let mut _grid = rect_grid::RectGrid::new(dx, dy);
+        _grid.set_offset(offset.into());
+        _grid.set_rotation(rotation);
         PyO3RectGrid {
             dx,
             dy,
@@ -704,15 +763,15 @@ impl PyO3RectGrid {
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -764,12 +823,41 @@ struct PyO3HexGrid {
 #[pymethods]
 impl PyO3HexGrid {
     #[new]
-    fn new(cellsize: f64, offset: (f64, f64), rotation: f64) -> Self {
-        let _grid = hex_grid::HexGrid::new(cellsize, offset, rotation);
-        PyO3HexGrid {
-            cellsize,
-            rotation,
-            _grid,
+    fn new(
+        cellsize: f64,
+        cell_orientation: &str,
+        offset: (f64, f64),
+        rotation: f64,
+    ) -> PyResult<Self> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => {
+                let mut _grid = hex_grid::HexGrid::new(cellsize, cell_orientation);
+                _grid.set_offset(offset.into());
+                _grid.set_rotation(rotation);
+                Ok(PyO3HexGrid {
+                    cellsize,
+                    rotation,
+                    _grid,
+                })
+            }
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
+        }
+    }
+
+    fn cell_orientation<'py>(&self, py: Python<'py>) -> &'py PyString {
+        PyString::new(py, &self._grid.cell_orientation.to_string())
+    }
+
+    fn set_cell_orientation(&mut self, cell_orientation: &str) -> PyResult<()> {
+        match Orientation::from_string(cell_orientation) {
+            Some(cell_orientation) => Ok(self._grid.set_cell_orientation(cell_orientation)),
+            None => Err(PyException::new_err(format!(
+                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
+                cell_orientation
+            ))),
         }
     }
 
@@ -782,7 +870,7 @@ impl PyO3HexGrid {
     }
 
     fn offset(&self) -> (f64, f64) {
-        self._grid.offset
+        self._grid.offset.into()
     }
 
     fn radius(&self) -> f64 {
@@ -798,11 +886,11 @@ impl PyO3HexGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().into_pyarray(py)
+        &self._grid.rotation_matrix().clone().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
     fn centroid<'py>(
@@ -814,13 +902,13 @@ impl PyO3HexGrid {
         self._grid.centroid(&index).into_pyarray(py)
     }
 
-    fn cell_at_location<'py>(
+    fn cell_at_point<'py>(
         &self,
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_location(&points).into_pyarray(py)
+        self._grid.cell_at_point(&points).into_pyarray(py)
     }
 
     fn cell_corners<'py>(

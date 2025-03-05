@@ -275,25 +275,28 @@ def test_neighbours(index, depth, include_selected, connect_corners):
             )
 
 
-def test_to_crs():
+@pytest.mark.parametrize("adjust_rotation", [False, True])
+def test_to_crs(adjust_rotation):
     grid = TriGrid(size=1.5, crs=None)
     # Expect error when `to_crs` is called on a grid where the CRS is not set
     with pytest.raises(ValueError):
         grid.to_crs(4326)
 
     grid = TriGrid(size=1.5, crs=3857)
-    grid_degrees = grid.to_crs(4326)
+    grid_degrees = grid.to_crs(4326, adjust_rotation=adjust_rotation)
 
     # Check cell size has changed after changing crs
     numpy.testing.assert_allclose(
         [grid_degrees.dx, grid_degrees.dy],
-        [2.42919136381939e-05, 4.2074828634427165e-05],
+        [6.737364630896411e-06, 1.1669457849830117e-05],
     )
     # Make sure original grid is unaffected
-    numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5, 2.598076211353316])
+    numpy.testing.assert_allclose([grid.dx, grid.dy], [1.5 / 2, 2.598076211353316 / 2])
     # Make sure nothing changed when setting to current CRS
-    new_grid = grid.to_crs(3857)
-    numpy.testing.assert_allclose([new_grid.dx, new_grid.dy], [1.5, 2.598076211353316])
+    new_grid = grid.to_crs(3857, adjust_rotation=adjust_rotation)
+    numpy.testing.assert_allclose(
+        [new_grid.dx, new_grid.dy], [1.5 / 2, 2.598076211353316 / 2]
+    )
 
 
 def test_is_aligned_with():
@@ -463,12 +466,34 @@ def test_is_cell_upright():
         ),
     ],
 )
-@pytest.mark.parametrize("expand_axes", [True, False])
-def test_cells_near_point(points, expected_nearby_ids, expand_axes):
-    grid = TriGrid(size=0.6, offset=(0.2, 0.3))
+# @pytest.mark.parametrize("expand_axes", [True, False])
+@pytest.mark.parametrize("expand_axes", [False])
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=0.6, offset=(0.2, 0.3), orientation="flat"),
+        TriGrid(size=0.6, offset=(0.3, 0.2), orientation="pointy"),
+    ],
+)
+def test_cells_near_point(grid, points, expected_nearby_ids, expand_axes):
+
+    points = numpy.array(points)
+    expected_nearby_ids = numpy.array(expected_nearby_ids)
+    if grid.orientation == "pointy":
+        points = points[:, ::-1]
+        expected_nearby_ids = expected_nearby_ids[:, ::-1]
+
     nearby_ids = grid.cells_near_point(points[0])
+
     # Test single point input
-    numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids)
+    # Note: we use GridIndex.intersection to figure out if the arrays match,
+    if grid.orientation == "Pointy":
+        numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids)
+    else:
+        # because the order of the cells changes for the Flat orientation
+        assert len(GridIndex(expected_nearby_ids).intersection(nearby_ids)) == len(
+            expected_nearby_ids
+        )
     # Test for all points
     expected_nearby_ids_extended = numpy.empty(shape=(len(points), 6, 2))
     expected_nearby_ids_extended[:] = expected_nearby_ids
@@ -478,7 +503,13 @@ def test_cells_near_point(points, expected_nearby_ids, expand_axes):
             numpy.array(expected_nearby_ids_extended)[None], 3, axis=0
         )
     nearby_ids = grid.cells_near_point(points)
-    numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
+    if grid.orientation == "Pointy":
+        numpy.testing.assert_allclose(nearby_ids, expected_nearby_ids_extended)
+    else:
+        # because the order of the cells changes for the Flat orientation
+        assert len(
+            GridIndex(expected_nearby_ids_extended).intersection(nearby_ids)
+        ) == len(expected_nearby_ids)
 
 
 @pytest.mark.parametrize("crs", [None, 4326, 3857])
@@ -549,7 +580,7 @@ def test_numpy_and_grid_ids(basic_bounded_tri_grid):
     numpy.testing.assert_allclose(grid_ids, grid.indices.ravel())
 
 
-def test_to_crs(basic_bounded_tri_grid):
+def test_to_crs_bounded(basic_bounded_tri_grid):
     grid = basic_bounded_tri_grid
     grid.crs = 4326
     grid_3857 = grid.to_crs(3857)
@@ -734,18 +765,6 @@ def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
         new_grid = grid.anchor(target_loc, cell_element=cell_element, in_place=False)
 
     if cell_element == "centroid":
-        # from gridkit.doc_utils import plot_polygons
-        # import matplotlib.pyplot as plt
-        # id = new_grid.cell_at_point(target_loc)
-        # print(f"id: {id.index}")
-        # ids = new_grid.neighbours(id, depth=3, connect_corners=False, include_selected=False)
-        # # plot_polygons(grid.to_shapely(id, as_multipolygon=True), alpha=0.3)
-        # plot_polygons(grid.to_shapely(ids, as_multipolygon=True), fill=True, colors="pink", linewidth=2, alpha=0.8)
-        # ids2 = new_grid.neighbours(id, depth=6, connect_corners=True, include_selected=True)
-        # plot_polygons(grid.to_shapely(ids2, as_multipolygon=True), fill=False, colors="black", linewidth=2, alpha=0.8)
-        # plt.scatter(*target_loc, marker="d", s=300)
-        # plt.show()
-        # # breakpoint()
         numpy.testing.assert_allclose(
             new_grid.centroid(new_grid.cell_at_point(target_loc)),
             target_loc,

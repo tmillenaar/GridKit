@@ -32,9 +32,9 @@ Let's start by viewing the distribution of temperature in a given space as being
 into many small regions where the temperature is the same.
 I will call such a region a control volume. Such a volume can conceptually be infinitesimally small,
 but for modelling purposes these control volumes will be given a finite size.
-The change of the temperature (:math:`\Delta T`) in a given control volume is determined by the temperature flux 
+The change of the temperature (:math:`\Delta T`) in a given control volume is determined by the temperature flux
 going in to the control volume (:math:`T_{flux}^{in}`) minus the temperature flux leaving the control volume (:math:`T_{flux}^{out}`)
-in a given time step :math:`\Delta t`. 
+in a given time step :math:`\Delta t`.
 
 This means that the temperature in the next time step (:math:`T^{t+\Delta t}`) is determined by the current temperature (:math:`T^t`)
 and the fluxes. As an equation this looks like:
@@ -144,8 +144,9 @@ To demonstrate what I mean, I will create a plot demonstrating the flow in three
 # sphinx_gallery_thumbnail_number = -1
 
 import matplotlib.pyplot as plt
+import numpy
 
-from gridkit import GridIndex, HexGrid
+from gridkit import HexGrid, Tile
 from gridkit.doc_utils import plot_polygons
 
 grid = HexGrid(size=1)
@@ -277,32 +278,29 @@ nr_cells_x = nr_cells_y = 30
 
 # Thermal properties
 D = 4.0  # Thermal diffusivity of steel, mm2.s-1
-Tcool, Thot = 0, 1000  # Temperatures in degrees
+T_cold, T_hot = 0, 1000  # Temperatures in degrees
 
 # plotting
 plot_interval = 0.1  # time in seconds
-tmax = 1.0  # time in seconds
+t_max = 1.0  # time in seconds
 
 # %%
 #
 # For the boundary conditions, we will have a hot rim surrounding the modelled area.
-# Let's define the outer bounds and the inner bounds, where the inner bounds will be cool,
-# and the cells between the inner bound and outer bound are hot.
+# Let's define an inner and an outer tile, where the inner tile will be cold,
+# and the cells outside the inner tile and inside the outer tile are hot.
 # The hot cells at the boundary will remain hot and will not be updated in the time loop.
 #
 
-outer_bounds = (0, 0, nr_cells_x * grid.dx, nr_cells_y * grid.dy)
-inner_bounds = (
-    grid.dx,
-    grid.dy,
-    (nr_cells_x - 1) * grid.dx,
-    (nr_cells_y - 1) * grid.dy,
-)
-inner_ids = grid.cells_in_bounds(inner_bounds).ravel()
+tile_outer = Tile(grid, (0, 0), nr_cells_x, nr_cells_y)
+tile_inner = Tile(grid, (1, 1), nr_cells_x - 2, nr_cells_y - 2)
 
-datagrid = grid.to_bounded(outer_bounds, fill_value=Thot)
-np_ids = datagrid.grid_id_to_numpy_id(inner_ids)
-datagrid.data[np_ids] = Tcool
+data = numpy.full(
+    (tile_outer.ny, tile_outer.nx), fill_value=T_hot, dtype=float
+)  # Be mindfull that 2D numpy arrays are indexed in order y,x
+np_ids_inner = tile_outer.grid_id_to_tile_id(tile_inner.indices)
+np_ids_outer = tile_outer.grid_id_to_tile_id(tile_outer.indices)
+data[np_ids_inner] = T_cold
 
 # %%
 #
@@ -314,16 +312,17 @@ hot_ids = (
     .ravel()
     .unique()
 )
-np_ids_hot = datagrid.grid_id_to_numpy_id(hot_ids)
-datagrid.data[np_ids_hot] = Thot
+np_ids_hot = tile_outer.grid_id_to_tile_id(hot_ids)
+data[np_ids_hot] = T_hot
+
 
 # %%
 #
 # Let's take a look at what these starting conditions look like
 
 plot_polygons(
-    datagrid.to_shapely(),
-    colors=datagrid.data.ravel(),
+    tile_outer.to_shapely(as_multipolygon=True),
+    colors=data.ravel().copy(),
     fill=True,
     cmap="magma",
     edgecolor="grey",
@@ -334,7 +333,7 @@ plt.show()
 
 # %%
 #
-# Here, all beige cells are the cells that start out hot and the black cells start out cool.
+# Here, all beige cells are the cells that start out hot and the black cells start out cold.
 #
 # The model
 # ---------
@@ -347,8 +346,8 @@ dt = cell_width**4 / (6 * D)
 #
 # We will only have to obtain the neighbour indices once and reuse these every time step.
 #
-neighbours = grid.neighbours(inner_ids)
-nbr_ids = neighbours.index
+neighbours = grid.neighbours(tile_inner.indices)
+nbr_ids_np = tile_outer.grid_id_to_tile_id(neighbours)
 
 # %%
 #
@@ -359,14 +358,15 @@ time = 0
 time_since_last_plot = plot_interval  # start with a plot of the initial state
 plot_data = []
 plot_titles = []
-while time < tmax:
+while time < t_max:
     if time_since_last_plot >= plot_interval:  # Save data every plot_interval
-        plot_data.append(datagrid.data.ravel().copy())
+        plot_data.append(data.ravel().copy())
         plot_titles.append("{:.1f} ms".format(time * 1000))
         time_since_last_plot = 0
     # Solve diffusion equation for this timestep
-    datagrid.data[np_ids] = datagrid.data[np_ids] + D * dt * (
-        (datagrid.value(nbr_ids).sum(axis=-1) - 6 * datagrid.value(inner_ids))
+    # breakpoint()
+    data[np_ids_inner] = data[np_ids_inner] + D * dt * (
+        (data[nbr_ids_np].reshape(-1, 6).sum(axis=-1) - 6 * data[np_ids_inner])
         / cell_width**2
     )
     time += dt
@@ -379,7 +379,7 @@ while time < tmax:
 #
 from matplotlib.animation import FuncAnimation
 
-all_geoms = datagrid.to_shapely()
+all_geoms = tile_outer.to_shapely()
 
 
 def update_frame(frame_id):
@@ -390,8 +390,8 @@ def update_frame(frame_id):
         fill=True,
         ax=ax,
         cmap="magma",
-        vmin=Tcool,
-        vmax=Thot,
+        vmin=T_cold,
+        vmax=T_hot,
     )
     ax.set_title(plot_titles[frame_id])
     ax.set_aspect("equal")

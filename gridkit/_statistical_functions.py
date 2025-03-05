@@ -1,6 +1,8 @@
 import numpy
 
 from gridkit.errors import AlignmentError
+from gridkit.index import GridIndex
+from gridkit.tile import Tile
 
 
 def _total_bounds(left_bounds, right_bounds):
