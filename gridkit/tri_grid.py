@@ -53,6 +53,7 @@ class TriGrid(BaseGrid):
         size=None,
         area=None,
         side_length=None,
+        orientation="flat",
         offset=(0, 0),
         rotation=0,
         **kwargs,
@@ -81,7 +82,13 @@ class TriGrid(BaseGrid):
         self._size = size
         self._radius = size / 3**0.5
         self._rotation = rotation
-        self._grid = PyO3TriGrid(cellsize=size, offset=tuple(offset), rotation=rotation)
+        self._orientation = orientation
+        self._grid = PyO3TriGrid(
+            cellsize=size,
+            offset=tuple(offset),
+            rotation=rotation,
+            cell_orientation=orientation,
+        )
 
         self.bounded_cls = BoundedTriGrid
         super(TriGrid, self).__init__(*args, **kwargs)
@@ -90,6 +97,26 @@ class TriGrid(BaseGrid):
     def definition(self):
         return dict(
             size=self.size, offset=self.offset, rotation=self.rotation, crs=self.crs
+        )
+
+    @property
+    def orientation(self) -> str:
+        """The shape of the grid as supplied when initiating the class.
+        This can be either "flat" or "pointy" referring to the top of the cells.
+        """
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, value):
+        """Set the shape of the grid to a new value. Possible values: 'pointy' or 'flat'"""
+        if not value in ("pointy", "flat"):
+            raise ValueError(
+                f"Shape cannot be set to '{value}', must be either 'pointy' or 'flat'"
+            )
+        rot = self.rotation
+        self._orientation = value
+        self.rotation = (
+            rot  # Re-run rotation settter to update rotaiton according to new shape
         )
 
     def _area_to_size(self, area):
@@ -114,7 +141,7 @@ class TriGrid(BaseGrid):
     @property
     def side_length(self):
         """The length of the side of a cell.
-        For a TriGrid, the side length is the same as :meth:`.HexGrid.size`."""
+        For a TriGrid, the side length is the same as `HexGrid.size`"""
         return self.size
 
     def _side_length_to_size(self, side_length):
@@ -309,7 +336,7 @@ class TriGrid(BaseGrid):
             crs=self.crs,
         )
 
-    def to_crs(self, crs):
+    def to_crs(self, crs, location=(0, 0), adjust_rotation=False):
         """Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
         This will update the cell size and the origin offset.
 
@@ -321,6 +348,22 @@ class TriGrid(BaseGrid):
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
             such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.
+
+
+        location: (float, float) (default: (0,0))
+            The location at which to perform the conversion.
+            When transforming to a new coordinate system, it matters at which location the transformation is performed.
+            The chosen location will be used to determinde the cell size of the new grid.
+            If you are unsure what location to use, pich the center of the area you are interested in.
+
+            .. Warning ::
+
+                The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.
+
+        adjust_rotation: bool (default: False)
+            If False, the grid in the new crs has the same rotation as the original grid.
+            Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
+            If True, set the new rotation to match the orientation of the grid at ``location`` after coordinate transformation.
 
         Returns
         -------
@@ -359,13 +402,47 @@ class TriGrid(BaseGrid):
 
         transformer = Transformer.from_crs(self.crs, crs, always_xy=True)
 
-        new_offset = transformer.transform(*self.offset)
-        point_start = transformer.transform(0, 0)
+        new_offset = transformer.transform(
+            location[0] + self.offset[0], location[1] + self.offset[1]
+        )
 
-        point_end = transformer.transform(self.size, 0)
+        point_start = numpy.array(transformer.transform(*location))
+        point_end = transformer.transform(location[0] + self.size, location[1])
+
+        if adjust_rotation:
+            cell_id = self.cell_at_point(location)
+            # move over two cells for the next cell is flipped and thus it's centroid not at the same y position
+            centroids = self.centroid([cell_id, (cell_id.x + 2, cell_id.y)])
+            trans_centroids = numpy.array(transformer.transform(*centroids.T)).T
+            vector = trans_centroids[1] - trans_centroids[0]
+            rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
+            trans_corners = numpy.array(
+                transformer.transform(
+                    *self.cell_corners(self.cell_at_point(location)).T
+                )
+            ).T
+            area = shapely.Polygon(trans_corners).area
+        else:
+            rotation = self.rotation
+            new_dx = numpy.linalg.norm(
+                point_start
+                - numpy.array(transformer.transform(location[0] + self.dx, location[1]))
+            )
+            new_dy = numpy.linalg.norm(
+                point_start
+                - numpy.array(transformer.transform(location[0], location[1] + self.dy))
+            )
+            area = new_dx * new_dy
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
-        return self.parent_grid_class(size=size, offset=new_offset, crs=crs)
+        # new_grid = self.parent_grid_class(area=area, offset=new_offset, crs=crs, rotation=rotation)
+        new_grid = self.parent_grid_class(
+            size=size, offset=new_offset, crs=crs, rotation=rotation
+        )
+
+        if adjust_rotation:
+            new_grid.anchor(trans_corners[0], cell_element="corner", in_place=True)
+        return new_grid
 
     def anchor(
         self,
@@ -433,17 +510,33 @@ class TriGrid(BaseGrid):
         if not in_place:
             return self
 
-    def _update_inner_grid(self, size=None, offset=None, rotation=None):
+    def _update_inner_grid(
+        self, size=None, offset=None, rotation=None, orientation=None
+    ):
         if size is None:
             size = self.size
         if offset is None:
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
-        return PyO3TriGrid(cellsize=size, offset=offset, rotation=rotation)
+        if orientation is None:
+            cell_orientation = self.orientation
+        return PyO3TriGrid(
+            cellsize=size,
+            offset=offset,
+            rotation=rotation,
+            cell_orientation=cell_orientation,
+        )
 
     def update(
-        self, size=None, area=None, offset=None, rotation=None, crs=None, **kwargs
+        self,
+        size=None,
+        area=None,
+        offset=None,
+        rotation=None,
+        orientation=None,
+        crs=None,
+        **kwargs,
     ):
         """Modify attributes of the existing grid and return a copy.
         The original grid remains un-mutated.
@@ -459,6 +552,11 @@ class TriGrid(BaseGrid):
         rotation: `float`
             The new counter-clockwise rotation of the grid in degrees.
             Can be negative for clockwise rotation.
+        orientation: Literal["flat", "pointy"]
+            The orientation of the cells. Options are:
+
+             - "flat": The cells point up and down. They are positioned like you would expect a triangle to lie on the ground.
+             - "pointy": The cells point left and right. They are positioned standing on a corner if you will.
         crs: Union[int, str, pyproj.CRS]
             The value can be anything accepted
             by :meth:`pyproj.CRS.from_user_input() <pyproj.crs.CRS.from_user_input>`,
@@ -475,10 +573,18 @@ class TriGrid(BaseGrid):
             offset = self.offset
         if rotation is None:
             rotation = self.rotation
+        if orientation is None:
+            orientation = self.orientation
         if crs is None:
             crs = self.crs
         return TriGrid(
-            size=size, area=area, offset=offset, rotation=rotation, crs=crs, **kwargs
+            size=size,
+            area=area,
+            offset=offset,
+            rotation=rotation,
+            orientation=orientation,
+            crs=crs,
+            **kwargs,
         )
 
 
@@ -505,7 +611,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
 
     """
 
-    def __init__(self, data, *args, bounds=None, **kwargs):
+    def __init__(self, data, *args, bounds=None, orientation="flat", **kwargs):
 
         data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
 
@@ -525,9 +631,19 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         dx = (bounds[2] - bounds[0]) / data.shape[1]
         dy = (bounds[3] - bounds[1]) / data.shape[0]
 
-        if not numpy.isclose(dy, (dx * 3**0.5)):
+        if orientation == "flat":
+            if not numpy.isclose(dy, (dx * 3**0.5)):
+                raise ValueError(
+                    "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
+                )
+        elif orientation == "pointy":
+            if not numpy.isclose(dx, (dy * 3**0.5)):
+                raise ValueError(
+                    "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
+                )
+        else:
             raise ValueError(
-                "The supplied data shape cannot be covered by triangles with sides of equal length with the given bounds."
+                f"Unrecognized orientation: {orientation}. Expecte 'flat' or 'pointy'"
             )
 
         offset_x = bounds[0] % dx
@@ -538,9 +654,16 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
             0 if numpy.isclose(offset_x, dx) else offset_x,
             0 if numpy.isclose(offset_y, dy) else offset_y,
         )
+        size = 2 * dx if orientation == "flat" else 2 * dy
 
         super(BoundedTriGrid, self).__init__(
-            data, *args, size=2 * dx, bounds=bounds, offset=offset, **kwargs
+            data,
+            *args,
+            size=size,
+            bounds=bounds,
+            offset=offset,
+            orientation=orientation,
+            **kwargs,
         )
 
         if not self.are_bounds_aligned(bounds):

@@ -846,8 +846,12 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
             crs=alignment_grid.crs,
             nodata_value=nodata_value,
         )
+
+        # FIXME: Align _shape and _orientation!
         if hasattr(alignment_grid, "_shape"):
             grid_kwargs["shape"] = alignment_grid._shape
+        if hasattr(alignment_grid, "_orientation"):
+            grid_kwargs["orientation"] = alignment_grid._orientation
 
         new_grid = alignment_grid.bounded_cls(**grid_kwargs)
 

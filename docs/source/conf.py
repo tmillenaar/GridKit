@@ -26,12 +26,7 @@ import generate_api_rst
 
 sys.path.insert(0, os.path.abspath("../../gridkit"))
 sys.path.insert(0, os.path.abspath("../source"))
-sys.path.insert(
-    0,
-    os.path.abspath(
-        "/home/timo/Documents/projects/venv_gridding_bare/lib/python3.10/site-packages/"
-    ),
-)
+
 import gridkit
 
 # The full version, including alpha/beta/rc tags

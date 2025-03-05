@@ -23,7 +23,7 @@ Note that in these cases, all datasets need to be resampled onto the same grid.
 Also, since all slices in this example are from the same dataset,
 the values in the overlapping sections will be identical, making for seamless fusing of the grids.
 If the values in the overlapping area differ a lot between the datasets,
-the seams won't be as smooth. 
+the seams won't be as smooth.
 
 That said, let's read in the data.
 The source of the DEM data used in this example is:

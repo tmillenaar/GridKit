@@ -9,7 +9,7 @@ Group points into grid cells in a tiled manner, using Dask.
 Introduction
 ------------
 
-In example :ref:`aggregate.py <example aggregate>` an approach is demonstrated where points 
+In example :ref:`aggregate.py <example aggregate>` an approach is demonstrated where points
 are grouped in cells and averaged per cell.
 This example does the same, but in a tiled manner.
 Dask is used for the groupby opertaion instead of Pandas.
@@ -20,7 +20,7 @@ which can provide a significant speedup.
 
 .. Note ::
 
-    Even though parallel processing using Dask can speed up the script, 
+    Even though parallel processing using Dask can speed up the script,
     for a small case like this the overhead is larger than the benefit obtained by parallelizing the operation.
 
 ..
@@ -32,14 +32,14 @@ This example mostly highlights the differences between the two approaches.
 
     Dask uses the terms 'chunks', 'blocks' and 'partitions'.
     While there are some nuances, in this example these terms will be used interchangeably.
-    I will try to stick with 'chunks' where I can since this is the general term, 
+    I will try to stick with 'chunks' where I can since this is the general term,
     though you will find references to 'map_blocks()' for Arrays and 'map_partitions()' for DataFrames.
 
 Generate input data
 -------------------
 
 Let's start by generating some points.
-The data will be a set of points scattered around a circle to create 
+The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
 I will first generate the points and the turn them into a Dask Array
 using ``dask.dataframe.from_array``.
@@ -85,9 +85,16 @@ print(df.npartitions)  # show the number of chunks
 from gridkit import GridIndex, HexGrid
 
 grid = HexGrid(size=1, shape="flat")
-df["cell_id"] = df.map_partitions(
-    lambda p: grid.cell_at_point(p[["pnt_x", "pnt_y"]]).index_1d
-)
+
+
+def index_1d_at_point(df):
+    """Find the cell for each point in the dataframe and return the 1D index.
+    This operation is meant to map to each DataFrame partition
+    """
+    return grid.cell_at_point(df[["pnt_x", "pnt_y"]]).index_1d
+
+
+df["cell_id"] = df.map_partitions(index_1d_at_point)
 df["nr_points"] = 1
 print(df)
 
@@ -111,9 +118,17 @@ occurrences = grouped.count()
 #     If you are wondering why we went through all that effort just to end up with a pandas DataFrame in the end,
 #     suffice it to say that the size of the data is significantly reduced after the groupby.
 #     Also, for the sake of the example I will plot the data with matplotlib.
-#
+
+
+def shapely_geom_from_index_1d(id_1d):
+    """Generate the Shapely geometry for each 1D index.
+    This operation is meant to map to each DataFrame partition
+    """
+    return grid.to_shapely(GridIndex.from_index_1d(id_1d))
+
+
 polygons = occurrences.index.map_partitions(
-    lambda id: grid.to_shapely(GridIndex.from_index_1d(id)), meta={"geoms": object}
+    shapely_geom_from_index_1d, meta={"geoms": object}
 )
 geoms, points_per_cell = dask.compute(polygons, occurrences.nr_points)
 

@@ -7,7 +7,7 @@ name = "gridkit"
 version = "0.1.0.dev"
 readme = "README.md"
 authors = [{ name = "Timo Millenaar", email = "tmillenaar@gmail.com" }]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 description = "Powerful abstractions of infinite grids for grid-vector interactions, tesselation, resampling and interactions between related grids."
 dependencies = ["numpy", "scipy", "shapely", "rasterio", "pyproj"]
 classifiers = [
@@ -24,7 +24,7 @@ doc = [
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
     "geopandas",
-    "dask",
+    "dask[dataframe]",
     "matplotlib",
 ]
 test = [
@@ -33,10 +33,10 @@ test = [
     "sphinx-gallery",
     "sphinxcontrib-plantuml",
     "geopandas",
-    "dask",
+    "dask[dataframe]",
     "matplotlib",
     "black",
-    "pytest<8.0",             # pin for error when running pytest: `pluggy._manager.PluginValidationError: Plugin 'black' for hook 'pytest_collect_file'`
+    "pytest",
     "pytest-cov",
     "pytest-pylint",
     "pytest-black",

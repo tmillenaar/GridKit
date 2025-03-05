@@ -195,32 +195,32 @@ def test_comparissons_with_scalars(nodata):
     # test equal
     result = grid == 1
     expected = numpy.array([1, 1])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
     # test not equal
     result = grid != 1
     expected = numpy.array([[0, 1], [0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
     # # test greater than
     result = grid > 1
     expected = numpy.array([[0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
     # # test smaller than
     result = grid < 1
     expected = numpy.array([0, 1])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
     # # test greater than or equal
     result = grid >= 1
     expected = numpy.array([[1, 1], [0, 0], [1, 0]])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
     # # test smaller than or equal
     result = grid <= 1
     expected = numpy.array([[0, 1], [1, 1]])
-    numpy.testing.assert_allclose(result.index, expected)
+    numpy.testing.assert_allclose(result, expected)
 
 
 def test_reduction_operators():
