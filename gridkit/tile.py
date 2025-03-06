@@ -90,11 +90,11 @@ class Tile:
 
     def to_data_tile(self, data, nodata_value=numpy.nan):
         py03_data_tile = self._tile.to_data_tile(data.astype(float), nodata_value)
-        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
-    def to_data_tile_from_value(self, fill_value, nodata_value=numpy.nan):
-        py03_data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value)
-        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+    def to_data_tile_with_value(self, fill_value, nodata_value=numpy.nan):
+        py03_data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value)
+        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
     @property
     def start_id(self):
@@ -273,7 +273,7 @@ class DataTile(Tile):
         self._data_tile.set_nodata_value(float(value))
 
     @staticmethod
-    def from_PyO3DataTile(grid, pyo3_data_tile):
+    def from_pyo3_data_tile(grid, pyo3_data_tile):
         tile = Tile(
             grid, pyo3_data_tile.start_id(), pyo3_data_tile.nx(), pyo3_data_tile.ny()
         )
@@ -603,7 +603,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __radd__(self, other):
@@ -616,7 +616,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __sub__(self, other):
@@ -815,3 +815,79 @@ class DataTile(Tile):
 
     def std(self):
         return self._data_tile.std()
+
+
+def combine_tiles(tiles):
+    pyo3_tiles = []
+    for tile in tiles:
+        if isinstance(tile, Tile):
+            pyo3_tiles.append(tile._tile)
+        elif isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._tile._tile)  # Man this nesting gets rediculous
+        else:
+            raise TypeError(
+                f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.combine_tiles(pyo3_tiles)
+    return Tile.from_pyo3_tile(tiles[0].grid, pyo3_tile)
+
+
+# nocheckin, think of naming
+def count(tiles):
+    pyo3_tiles = []
+    pyo3_data_tiles = []
+    for tile in tiles:
+        if isinstance(tile, Tile):
+            pyo3_tiles.append(tile._tile)
+        elif isinstance(tile, DataTile):
+            pyo3_data_tiles.append(tile._tile._tile)  # Man this nesting gets rediculous
+        else:
+            raise TypeError(
+                f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
+            )
+    if pyo3_tiles:
+        pyo3_data_tile = tile_utils.count_tiles(pyo3_tiles)
+        result_tiles_only = DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_data_tile)
+    if pyo3_data_tiles:
+        pyo3_data_tile = tile_utils.count_data_tiles(pyo3_tiles)
+        result_data_tiles_only = DataTile.from_pyo3_data_tile(
+            tiles[0].grid, pyo3_data_tile
+        )
+
+    if pyo3_tiles and pyo3_data_tiles:
+        return result_tiles_only + result_data_tiles_only
+    if pyo3_tiles:
+        return result_tiles_only
+    if pyo3_data_tiles:
+        return result_data_tiles_only
+
+    raise TypeError("No Tiles were found in the arguments")
+
+
+def sum(tiles):
+    pyo3_tiles = []
+    for tile in tiles:
+        if isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._data_tile)
+        else:
+            raise TypeError(
+                f"Expected all DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.sum_data_tile(pyo3_tiles)
+    return DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_tile)
+
+
+def mean(tiles):
+    # Simply calling `return sum(tiles) / count(tiles)` is a lot shorter, but I want to use the rust
+    # logic such that the rust and python logic are the same and don't have possible inconsistencies
+    # like inf instead of nan or vice versa. I want just one place for the logic.
+    pyo3_tiles = []
+    for tile in tiles:
+        if isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._data_tile)
+        else:
+            raise TypeError(
+                f"Expected all DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.average_data_tile(pyo3_tiles)
+    return DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_tile)

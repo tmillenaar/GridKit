@@ -1,8 +1,8 @@
 use crate::grid::*;
 use crate::tile::*;
 use core::f64;
-use std::any::Any;
 use numpy::ndarray::*;
+use std::any::Any;
 use std::f64::consts::E;
 use std::f64::NAN;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
@@ -46,7 +46,7 @@ impl DataTile {
         }
     }
 
-    pub fn set_nodata_value(&mut self, nodata_value: f64){
+    pub fn set_nodata_value(&mut self, nodata_value: f64) {
         for val in self.data.iter_mut() {
             if *val == self.nodata_value {
                 *val = nodata_value;
@@ -55,6 +55,12 @@ impl DataTile {
         self.nodata_value = nodata_value;
     }
 
+    pub fn is_nodata(&self, value: &f64) -> bool {
+        if f64::is_nan(self.nodata_value) {
+            return f64::is_nan(*value);
+        }
+        return *value == self.nodata_value;
+    }
 
     pub fn _empty_combined_tile(&self, other: &DataTile, nodata_value: f64) -> DataTile {
         let tile = self.tile.combined_tile(&other.tile);
@@ -85,7 +91,8 @@ impl DataTile {
             crop_tile.start_id.0 + crop_tile.nx as i64 - 1,
             crop_tile.start_id.1 + crop_tile.ny as i64 - 1,
         );
-        let (start_slice_col, end_slice_row) = self.grid_id_to_tile_id_xy(end_id.0, end_id.1).unwrap();
+        let (start_slice_col, end_slice_row) =
+            self.grid_id_to_tile_id_xy(end_id.0, end_id.1).unwrap();
         let data_slice = &self.data.slice(s![
             start_slice_col as usize..(end_slice_col + 1) as usize,
             start_slice_row as usize..(end_slice_row + 1) as usize
@@ -321,26 +328,35 @@ impl DataTile {
         result
     }
 
-    fn _assign_data_in_place(&mut self, data_tile: &DataTile) -> Result<(), String> {
+    pub fn _slice_tile_mut(
+        &mut self,
+        tile: &Tile,
+    ) -> ArrayBase<ViewRepr<&mut f64>, Dim<[usize; 2]>> {
+        // ArrayView2<&mut f64> is translated to &&mut so I specify the ArrayBase syntax as return type instead.
+
         // Note: We first subtract one from nx and ny to get the id of the top left corner.
         //       For this cell we do not get out of bounds of the tile.
         //       Because this is then used as the upper end of a slice we add the 1 back because
         //       slice ends are exclusive.
         let (end_slice_col, start_slice_row) = self
-            .grid_id_to_tile_id_xy(data_tile.tile.start_id.0, data_tile.tile.start_id.1)
+            .grid_id_to_tile_id_xy(tile.start_id.0, tile.start_id.1)
             .unwrap();
         let (start_slice_col, end_slice_row) = self
             .grid_id_to_tile_id_xy(
-                data_tile.tile.start_id.0 + data_tile.tile.nx as i64 - 1,
-                data_tile.tile.start_id.1 + data_tile.tile.ny as i64 - 1,
+                tile.start_id.0 + tile.nx as i64 - 1,
+                tile.start_id.1 + tile.ny as i64 - 1,
             )
             .unwrap();
         let mut data_slice = self.data.slice_mut(s![
             start_slice_col as usize..(end_slice_col + 1) as usize,
             start_slice_row as usize..(end_slice_row + 1) as usize
         ]);
+        data_slice
+    }
+
+    pub fn _assign_data_in_place(&mut self, data_tile: &DataTile) -> () {
+        let mut data_slice = self._slice_tile_mut(data_tile.get_tile());
         data_slice.assign(&data_tile.data);
-        Ok(())
     }
 
     pub fn powf(&self, exponent: f64) -> DataTile {
@@ -624,7 +640,7 @@ impl DataTile {
     pub fn std(&self) -> f64 {
         let mean = self.mean();
 
-        // // Compute the squared differences from the mean
+        // Compute the squared differences from the mean
         let filtered = self.data.iter().filter(|&&x| x != self.nodata_value);
         let variance_sum: f64 = filtered.clone().map(|&x| (x - mean).powi(2)).sum();
         let variance = variance_sum / filtered.count() as f64;
