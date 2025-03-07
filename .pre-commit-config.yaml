@@ -16,7 +16,7 @@ repos:
       - id: wordwarden
         name: Word Warden - Debug Statements
         entry: word_warden
-        args: ["breakpoint()", ".set_trace()"]
+        args: ["breakpoint()", ".set_trace()", "println("]
         stages: [pre-commit, pre-push]
 
   - repo: https://github.com/tmillenaar/wordwarden

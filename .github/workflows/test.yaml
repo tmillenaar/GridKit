@@ -1,4 +1,4 @@
-name: Pytest
+name: Test
 on:
   push:
     branches:
@@ -31,6 +31,14 @@ jobs:
 
       - name: Run isort check
         run: python3 -m isort gridkit tests --check
+
+      - name: Run wordwarden check
+        run: |
+          sudo apt update && sudo apt install -y build-essential curl
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          cargo install word_warden
+          word_warden $(ls gridkit/*.py tests/*.py src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
