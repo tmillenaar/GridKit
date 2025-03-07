@@ -521,29 +521,6 @@ class DataTile(Tile):
             )
             corners_transformed = numpy.array(transformer.transform(*coords)).T
 
-            # # Find the optimal new rotation
-            # bounding_rect = MultiPoint(corners_transformed).minimum_rotated_rectangle
-            # corners = numpy.array(bounding_rect.exterior.xy).T
-            # distances = numpy.linalg.norm(corners[1:] - corners[:-1], axis=1)
-            # longest_side_id = numpy.argmax(distances)
-            # longest_line = numpy.array([corners[longest_side_id], corners[longest_side_id+1]])
-            # horizontal_line = numpy.array([
-            #     longest_line[0],
-            #     [longest_line[1,0], longest_line[0,1]]
-            # ])
-            # # # angle_radians = numpy.arctan2(longest_line[1], horizontal_line[0])
-            # # vector = longest_line[0] - longest_line[1]
-            # # angle_radians = numpy.arctan2(vector[1], vector[0])
-            # # angle_degrees = numpy.degrees(angle_radians)
-            # #
-
-            # new_points = numpy.array(transformer.transform([bottom_left[0], bottom_right[0]], [bottom_left[1], bottom_right[1]])).T
-            # new_points = numpy.array(transformer.transform([bottom_left[0], top_left[0]], [bottom_left[1], top_left[1]])).T
-            # vector = new_points[1] - new_points[0]
-            # rotation = numpy.degrees(numpy.arctan2(vector[1], vector[0]))
-            # alignment_grid = alignment_grid.update(rotation=rotation)
-            # breakpoint()
-
             ids = alignment_grid.cell_at_point(corners_transformed).ravel()
         else:
             ids = alignment_grid.cell_at_point(self.corners()).ravel()

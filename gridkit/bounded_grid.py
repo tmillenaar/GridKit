@@ -742,8 +742,6 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         weights = numpy.exp(-((distances / decay_constant) ** 2))
         weights = weights / numpy.sum(weights, axis=0)
 
-        # breakpoint()
-
         # swap axes back to match dimensions to nearby_values
         weights = numpy.swapaxes(weights, 0, 1)  # shape is (points[N], cells[6])
 
