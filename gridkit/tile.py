@@ -836,7 +836,7 @@ def combine_tiles(tiles):
 
 
 # nocheckin, think of naming
-def count(tiles):
+def count_tiles(tiles):
     pyo3_tiles = []
     pyo3_data_tiles = []
     for tile in tiles:
@@ -867,7 +867,7 @@ def count(tiles):
     raise TypeError("No Tiles were found in the arguments")
 
 
-def sum(tiles):
+def sum_tiles(tiles):
     pyo3_tiles = []
     for tile in tiles:
         if isinstance(tile, DataTile):
@@ -880,7 +880,7 @@ def sum(tiles):
     return DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_tile)
 
 
-def mean(tiles):
+def mean_tiles(tiles):
     # Simply calling `return sum(tiles) / count(tiles)` is a lot shorter, but I want to use the rust
     # logic such that the rust and python logic are the same and don't have possible inconsistencies
     # like inf instead of nan or vice versa. I want just one place for the logic.

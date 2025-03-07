@@ -82,7 +82,7 @@ def test_count_data_tile(grid):
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
     tile3 = Tile(grid, (1, -4), 6, 10)
 
-    count = gridkit.tile.count([tile1, tile2, tile3])
+    count = gridkit.tile.count_tiles([tile1, tile2, tile3])
 
     assert len(count == 0) == 14
     assert len(count == 1) == 50
@@ -92,7 +92,7 @@ def test_count_data_tile(grid):
     # Check with nodata_value
     tile2[3, 3] = 999
     tile2.nodata_value = 999
-    count = gridkit.tile.count([tile1, tile2, tile3])
+    count = gridkit.tile.count_tiles([tile1, tile2, tile3])
     assert numpy.isclose(count[4, 6], 2)
 
 
@@ -113,7 +113,7 @@ def test_sum_data_tile(grid):
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
     tile3 = Tile(grid, (1, -4), 6, 10).to_data_tile_with_value(-1)
 
-    summation = gridkit.tile.sum([tile1, tile2, tile3])
+    summation = gridkit.tile.sum_tiles([tile1, tile2, tile3])
 
     assert len(summation == -3.1) == 6
     assert len(summation == -2.1) == 21
@@ -126,7 +126,7 @@ def test_sum_data_tile(grid):
     # Check with nodata_value
     tile2[3, 3] = 999
     tile2.nodata_value = 999
-    summation = gridkit.tile.sum([tile1, tile2, tile3])
+    summation = gridkit.tile.sum_tiles([tile1, tile2, tile3])
 
     # Since tile2 has it's 3,3 set to a nodata value, we expect the corresponding
     # summation value to not take that number into account. This works out to be
@@ -153,7 +153,7 @@ def test_mean_data_tile(grid):
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
     tile3 = Tile(grid, (1, -4), 6, 10).to_data_tile_with_value(-1)
 
-    mean = gridkit.tile.mean([tile1, tile2, tile3])
+    mean = gridkit.tile.mean_tiles([tile1, tile2, tile3])
 
     assert len(mean == -1.55) == 6
     assert len(mean == -2.1) == 21
@@ -168,7 +168,7 @@ def test_mean_data_tile(grid):
     tile2[3, 1] = 999
     tile2.nodata_value = 999
 
-    result = gridkit.tile.mean([tile1, tile2, tile3])
+    result = gridkit.tile.mean_tiles([tile1, tile2, tile3])
 
     # Since tile2 has it's 3,3 set to a nodata value, we expect the corresponding
     # summation and count values to not take that number into account. This works out to be
