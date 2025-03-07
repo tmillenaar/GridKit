@@ -272,6 +272,9 @@ class DataTile(Tile):
         This replaces all instances of the nodata value with the new value"""
         self._data_tile.set_nodata_value(float(value))
 
+    def is_nodata(self, value):
+        return self._data_tile.is_nodata(float(value))
+
     @staticmethod
     def from_pyo3_data_tile(grid, pyo3_data_tile):
         tile = Tile(

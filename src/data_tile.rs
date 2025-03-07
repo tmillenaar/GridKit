@@ -55,11 +55,11 @@ impl DataTile {
         self.nodata_value = nodata_value;
     }
 
-    pub fn is_nodata(&self, value: &f64) -> bool {
+    pub fn is_nodata(&self, value: f64) -> bool {
         if f64::is_nan(self.nodata_value) {
-            return f64::is_nan(*value);
+            return f64::is_nan(value);
         }
-        return *value == self.nodata_value;
+        return value == self.nodata_value;
     }
 
     pub fn _empty_combined_tile(&self, other: &DataTile, nodata_value: f64) -> DataTile {
@@ -400,7 +400,8 @@ impl DataTile {
 
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
-                if self.data[Ix2(id_y as usize, id_x as usize)] == value {
+                let tile_val = self.data[Ix2(id_y as usize, id_x as usize)];
+                if tile_val == value || (f64::is_nan(tile_val) && f64::is_nan(value)) {
                     let (grid_id_x, grid_id_y) = self
                         .tile
                         .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
@@ -426,7 +427,8 @@ impl DataTile {
 
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
-                if self.data[Ix2(id_y as usize, id_x as usize)] != value {
+                let tile_val = self.data[Ix2(id_y as usize, id_x as usize)];
+                if tile_val != value && !(f64::is_nan(tile_val) && f64::is_nan(value)) {
                     let (grid_id_x, grid_id_y) = self
                         .tile
                         .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)

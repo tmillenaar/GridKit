@@ -320,7 +320,7 @@ pub fn sum_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
         for (current_val, val_to_add) in data_slice.iter_mut().zip(tile.data.iter()) {
-            if tile.is_nodata(val_to_add) {
+            if tile.is_nodata(*val_to_add) {
                 // Don't add any cell in the tile that is falgged as nodata
                 continue;
             }

@@ -249,6 +249,10 @@ impl PyO3DataTile {
         self._data_tile.set_nodata_value(nodata_value);
     }
 
+    fn is_nodata(&self, value: f64) -> bool {
+        self._data_tile.is_nodata(value)
+    }
+
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
         self._tile.clone()
     }

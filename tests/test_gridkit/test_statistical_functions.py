@@ -118,7 +118,7 @@ def test_sum_data_tile(grid):
     assert len(summation == -3.1) == 6
     assert len(summation == -2.1) == 21
     assert len(summation == -1) == 24
-    assert len(summation == 0) == 14
+    assert len(summation == summation.nodata_value) == 14
     assert numpy.isclose(summation[:], 0.1).sum() == 8
     assert len(summation == 2.2) == 22
     assert len(summation == 3.2) == 5
