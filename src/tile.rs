@@ -292,7 +292,7 @@ pub fn combine_tiles<T: TileTraits>(tiles: &Vec<T>) -> Tile {
 }
 
 pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile {
-    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::MAX);
+    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
         data_slice.map_inplace(|val| *val += 1.0);
@@ -301,7 +301,7 @@ pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile {
 }
 
 pub fn count_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
-    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::MAX);
+    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
         for (count_val, tile_val) in data_slice.iter_mut().zip(tile.data.iter()) {

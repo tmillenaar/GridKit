@@ -80,7 +80,7 @@ def test_count_data_tile(grid):
 
     tile1 = Tile(grid, (-2, -3), 5, 7)
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
-    tile3 = Tile(grid, (1, -4), 6, 10)
+    tile3 = Tile(grid, (1, -4), 6, 10).to_data_tile_with_value(3.2)
 
     count = gridkit.tile.count_tiles([tile1, tile2, tile3])
 
@@ -89,11 +89,16 @@ def test_count_data_tile(grid):
     assert len(count == 2) == 28
     assert len(count == 3) == 8
 
-    # Check with nodata_value
+    # Check nodata_value, also for tiles with different nodata values
+    tile2[3, 0] = 999
     tile2[3, 3] = 999
     tile2.nodata_value = 999
+    tile3[4, 0] = 997
+    tile3.nodata_value = 997
     count = gridkit.tile.count_tiles([tile1, tile2, tile3])
-    assert numpy.isclose(count[4, 6], 2)
+
+    assert numpy.isclose(count[4, 6], 1)
+    assert numpy.isclose(count[4, 3], 1)
 
 
 @pytest.mark.parametrize(
@@ -106,14 +111,14 @@ def test_count_data_tile(grid):
         HexGrid(size=1, shape="flat"),
     ],
 )
-def test_sum_data_tile(grid):
+def test_sum_data_tiles(grid):
     grid.rotation = 12
 
     tile1 = Tile(grid, (-2, -3), 5, 7).to_data_tile_with_value(-2.1)
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
     tile3 = Tile(grid, (1, -4), 6, 10).to_data_tile_with_value(-1)
 
-    summation = gridkit.tile.sum_tiles([tile1, tile2, tile3])
+    summation = gridkit.tile.sum_data_tiles([tile1, tile2, tile3])
 
     assert len(summation == -3.1) == 6
     assert len(summation == -2.1) == 21
@@ -126,7 +131,7 @@ def test_sum_data_tile(grid):
     # Check with nodata_value
     tile2[3, 3] = 999
     tile2.nodata_value = 999
-    summation = gridkit.tile.sum_tiles([tile1, tile2, tile3])
+    summation = gridkit.tile.sum_data_tiles([tile1, tile2, tile3])
 
     # Since tile2 has it's 3,3 set to a nodata value, we expect the corresponding
     # summation value to not take that number into account. This works out to be
@@ -146,14 +151,14 @@ def test_sum_data_tile(grid):
         HexGrid(size=1, shape="flat"),
     ],
 )
-def test_mean_data_tile(grid):
+def test_average_data_tiles(grid):
     grid.rotation = 12
 
     tile1 = Tile(grid, (-2, -3), 5, 7).to_data_tile_with_value(-2.1)
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)
     tile3 = Tile(grid, (1, -4), 6, 10).to_data_tile_with_value(-1)
 
-    mean = gridkit.tile.mean_tiles([tile1, tile2, tile3])
+    mean = gridkit.tile.average_data_tiles([tile1, tile2, tile3])
 
     assert len(mean == -1.55) == 6
     assert len(mean == -2.1) == 21
@@ -168,7 +173,7 @@ def test_mean_data_tile(grid):
     tile2[3, 1] = 999
     tile2.nodata_value = 999
 
-    result = gridkit.tile.mean_tiles([tile1, tile2, tile3])
+    result = gridkit.tile.average_data_tiles([tile1, tile2, tile3])
 
     # Since tile2 has it's 3,3 set to a nodata value, we expect the corresponding
     # summation and count values to not take that number into account. This works out to be

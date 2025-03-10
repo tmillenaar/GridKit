@@ -1,5 +1,5 @@
 import warnings
-from typing import Literal, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import numpy
 from pyproj import Transformer
@@ -315,7 +315,7 @@ class DataTile(Tile):
         self._data_tile = tile.to_data_tile(new_data, self.nodata_value)
 
     def update(
-        self, grid=None, data=None, start_id=None, nx=None, ny=None, nodata_value=None
+        self, data=None, grid=None, start_id=None, nx=None, ny=None, nodata_value=None
     ):
         # TODO: Make clear that update copies the data
         if grid is None:
@@ -799,28 +799,47 @@ class DataTile(Tile):
             )
 
     def max(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.max()
 
     def min(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.min()
 
     def mean(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.mean()
 
     def sum(self):
+        """Get the sum of all values in the data tile, disregarding the nodata_value."""
         return self._data_tile.sum()
 
     def median(self):
+        """Get the median value of the data tile, disregarding the nodata_value."""
         return self._data_tile.median()
 
     def percentile(self, percentile):
+        """Get the percentile of the data tile at the specified value, disregarding the nodata_value."""
         return self._data_tile.percentile(percentile)
 
     def std(self):
+        """Get the standard deviation of the data in the tile, disregarding the nodata_value."""
         return self._data_tile.std()
 
 
 def combine_tiles(tiles):
+    """Create a tile that covers all supplied tiles.
+
+    Parameters
+    ----------
+    tiles: List[Tile]
+        A list of tiles around which the combined tile will be created.
+
+    Returns
+    -------
+    :class:`.Tile`
+        A Tile that covers the supplied Tiles
+    """
     pyo3_tiles = []
     for tile in tiles:
         if isinstance(tile, Tile):
@@ -835,15 +854,33 @@ def combine_tiles(tiles):
     return Tile.from_pyo3_tile(tiles[0].grid, pyo3_tile)
 
 
-# nocheckin, think of naming
 def count_tiles(tiles):
+    """Count how many times a cell occurs in a tile for the list of tiles provided.
+    Regions where many tiles overlap will have a high count, regions where few tiles
+    overlap will have low count.
+
+    Parameters
+    ----------
+    tiles: `List[Tile]` or `List[DataTile]`
+        The tiles from which the overlap count will be determined.
+        For each Tile that is supplied in the list, all cells in the tile contribute to the count.
+        For each DataTile that is supplied in the list, the cells with a value equal to the
+        nodata_value of the DataTile are ignored for the count.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile where each value indicates by how many tiles this cell was covered.
+
+    """
     pyo3_tiles = []
     pyo3_data_tiles = []
     for tile in tiles:
-        if isinstance(tile, Tile):
+        # Note: check DataTile before Tile, because DataTile is a subclass of Tile
+        if isinstance(tile, DataTile):
+            pyo3_data_tiles.append(tile._data_tile)  # Man this nesting gets rediculous
+        elif isinstance(tile, Tile):
             pyo3_tiles.append(tile._tile)
-        elif isinstance(tile, DataTile):
-            pyo3_data_tiles.append(tile._tile._tile)  # Man this nesting gets rediculous
         else:
             raise TypeError(
                 f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
@@ -852,13 +889,19 @@ def count_tiles(tiles):
         pyo3_data_tile = tile_utils.count_tiles(pyo3_tiles)
         result_tiles_only = DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_data_tile)
     if pyo3_data_tiles:
-        pyo3_data_tile = tile_utils.count_data_tiles(pyo3_tiles)
+        pyo3_data_tile = tile_utils.count_data_tiles(pyo3_data_tiles)
         result_data_tiles_only = DataTile.from_pyo3_data_tile(
             tiles[0].grid, pyo3_data_tile
         )
 
     if pyo3_tiles and pyo3_data_tiles:
-        return result_tiles_only + result_data_tiles_only
+        result = result_tiles_only + result_data_tiles_only
+        # Note: After summation, nodata values are added in the corners where no tiles are present
+        #       if the DataTiles do not have the exact same coverage as the supplied Tiles.
+        #       Since we want a count to say 0 where no tile is present, we replace the nans
+        #       introduced by the summation with zeros.
+        result[~numpy.isfinite(result)] = 0
+        return result
     if pyo3_tiles:
         return result_tiles_only
     if pyo3_data_tiles:
@@ -867,9 +910,23 @@ def count_tiles(tiles):
     raise TypeError("No Tiles were found in the arguments")
 
 
-def sum_tiles(tiles):
+def sum_data_tiles(data_tiles: List):
+    """Add the DataTiles in the data_tiles list. Nodata_values will be ignored.
+    Each cell will then contain the sum of the value that cell accross the supplied DataTiles.
+
+    Parameters
+    ----------
+    data_tiles: `List[Tile]` or `List[DataTile]`
+        A list of DataTiles to add together.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile with the values of the provided data_tiles added together
+
+    """
     pyo3_tiles = []
-    for tile in tiles:
+    for tile in data_tiles:
         if isinstance(tile, DataTile):
             pyo3_tiles.append(tile._data_tile)
         else:
@@ -877,15 +934,29 @@ def sum_tiles(tiles):
                 f"Expected all DataTile objects but also got a: {type(tile)}"
             )
     pyo3_tile = tile_utils.sum_data_tile(pyo3_tiles)
-    return DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_tile)
+    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)
 
 
-def mean_tiles(tiles):
+def average_data_tiles(data_tiles: List):
+    """Average the DataTiles in the data_tiles list. Nodata_values will be ignored.
+    Each cell will then contain the mean or average value of that cell accross the supplied DataTiles.
+
+    Parameters
+    ----------
+    data_tiles: `List[Tile]` or `List[DataTile]`
+        A list of DataTiles to average.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile with the averaged values of the provided data_tiles
+
+    """
     # Simply calling `return sum(tiles) / count(tiles)` is a lot shorter, but I want to use the rust
     # logic such that the rust and python logic are the same and don't have possible inconsistencies
     # like inf instead of nan or vice versa. I want just one place for the logic.
     pyo3_tiles = []
-    for tile in tiles:
+    for tile in data_tiles:
         if isinstance(tile, DataTile):
             pyo3_tiles.append(tile._data_tile)
         else:
@@ -893,4 +964,4 @@ def mean_tiles(tiles):
                 f"Expected all DataTile objects but also got a: {type(tile)}"
             )
     pyo3_tile = tile_utils.average_data_tile(pyo3_tiles)
-    return DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_tile)
+    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)

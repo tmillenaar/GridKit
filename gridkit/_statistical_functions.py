@@ -1,8 +1,9 @@
 import numpy
 
+from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError
 from gridkit.index import GridIndex
-from gridkit.tile import Tile
+from gridkit.tile import Tile, average_data_tiles, count_tiles, sum_data_tiles
 
 
 def _total_bounds(left_bounds, right_bounds):
@@ -44,7 +45,7 @@ def _empty_combined_grid(grids, value=numpy.nan):
     return reference.update(combined_data, bounds=combined_bounds, crs=reference.crs)
 
 
-def count(grids):
+def count_bounded_grids(grids):
     empty_grid = _empty_combined_grid(grids, value=0)
     combined_grid = empty_grid.copy()
     for grid in grids:
@@ -57,7 +58,18 @@ def count(grids):
     return combined_grid
 
 
-def sum(grids):
+def count(grids_or_tiles):
+    """See :func:`gridkit.tile.count_tiles`"""
+    if all([isinstance(obj, BoundedGrid) for obj in grids_or_tiles]):
+        return count_bounded_grids(grids_or_tiles)
+    if all([isinstance(obj, Tile) for obj in grids_or_tiles]):
+        return count_tiles(grids_or_tiles)
+    raise TypeError(
+        "Either not all types are the same or the tiles are not of type gridkit.BoundedGrid or gridkit.Tile"
+    )
+
+
+def sum_bounded_grids(grids):
     empty_grid = _empty_combined_grid(grids, value=numpy.nan)
     combined_grid = empty_grid.copy()
     for (
@@ -72,5 +84,27 @@ def sum(grids):
     return combined_grid
 
 
-def mean(grids):
+def sum(grids_or_tiles):
+    """See :func:`gridkit.tile.sum_data_tiles`"""
+    if all([isinstance(obj, BoundedGrid) for obj in grids_or_tiles]):
+        return sum_bounded_grids(grids_or_tiles)
+    if all([isinstance(obj, Tile) for obj in grids_or_tiles]):
+        return sum_data_tiles(grids_or_tiles)
+    raise TypeError(
+        "Either not all types are the same or the tiles are not of type gridkit.BoundedGrid or gridkit.Tile"
+    )
+
+
+def mean_bounded_grids(grids):
     return sum(grids) / count(grids)
+
+
+def mean(grids_or_tiles):
+    """See :func:`gridkit.tile.average_data_tiles`"""
+    if all([isinstance(obj, BoundedGrid) for obj in grids_or_tiles]):
+        return mean_bounded_grids(grids_or_tiles)
+    if all([isinstance(obj, Tile) for obj in grids_or_tiles]):
+        return average_data_tiles(grids_or_tiles)
+    raise TypeError(
+        "Either not all types are the same or the tiles are not of type gridkit.BoundedGrid or gridkit.Tile"
+    )
