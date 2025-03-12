@@ -10,10 +10,10 @@ Merge rasters with different spatial extent
 Introduction
 ------------
 
-Since each BoundedGrid in GridKit has information on the bounds,
+Since each Tile in GridKit has information on it's spatial positioning,
 multiple grids can be combined in a way where their spatial extend is taken into account.
 Basic mathematical operations were shown in the example :ref:`ndvi.py <example ndvi>`,
-but in that example the bands were fully overlapping.
+but in that example the different bands were perfectly overlapping in space.
 In this example we are combining grids that are partially overlapping.
 To combine the grids we will be taking the mean value for the cells that are shared between the grids.
 
@@ -23,7 +23,7 @@ Note that in these cases, all datasets need to be resampled onto the same grid.
 Also, since all slices in this example are from the same dataset,
 the values in the overlapping sections will be identical, making for seamless fusing of the grids.
 If the values in the overlapping area differ a lot between the datasets,
-the seams won't be as smooth.
+the seams won't be as smooth. We will simulate what that might look like further down in this example.
 
 That said, let's read in the data.
 The source of the DEM data used in this example is:
@@ -32,13 +32,13 @@ https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-
 
 # sphinx_gallery_thumbnail_number = -3
 
-from gridkit import read_raster
+from gridkit import raster_to_data_tile
 
 path_dem = "../../tests/data/alps_dem.tiff"
 
-dem1 = read_raster(path_dem, bounds=(29040, 167500, 29100, 167620))
-dem2 = read_raster(path_dem, bounds=(29070, 167470, 29150, 167580))
-dem3 = read_raster(path_dem, bounds=(29080, 167520, 29160, 167600))
+dem1 = raster_to_data_tile(path_dem, bounds=(29040, 167500, 29100, 167620))
+dem2 = raster_to_data_tile(path_dem, bounds=(29070, 167470, 29150, 167580))
+dem3 = raster_to_data_tile(path_dem, bounds=(29080, 167520, 29160, 167600))
 
 # %%
 #
@@ -79,7 +79,7 @@ plt.show()
 #
 # Now we have an idea on what the spatial distribution of the data looks like,
 # let's take the mean of the datasets to combine them into one.
-# For each cell, this will take the mean value of all grids that cover it.
+# For each cell, this will take the mean value of all tiles that cover it.
 #
 
 dem_mean = gridkit.mean(dem_slices)
@@ -110,8 +110,8 @@ plt.show()
 # consider cleaning the data before merging or smoothing the data after merging.
 #
 # For smoothing the data afterwards, we can use scipy's gaussian_filter.
-# Note that scipy treats our grid object as a numpy array,
-# so we need to update the existing grid with the array returned from the scipy function.
+# Note that scipy treats our DataTile object as a numpy array,
+# so we need to update the existing DataTile with the array returned from the scipy function.
 # A larger convolution window (sigma) will result in more aggressive filtering.
 # This will result in smoother seams between slices,
 # but also remove high-frequency signal from your data.
@@ -144,7 +144,7 @@ plt.show()
 # Nodata values
 # -------------
 #
-# For each grid, the nodata value of that grid is also taken into account.
-# This means that values outside of the original extent of each respective data grid are not considered in the calculation.
-# If the data grids have different nodata_values, this still works, for each grid's nodata_value is considered separately.
-# In that scenario the resulting product will have the nodata_value of the first grid.
+# For each data tile, the nodata value of that data tile is also taken into account.
+# This means that values outside of the original extent of each respective data tile are not considered in the calculation.
+# If the data grids have different nodata_values, this still works, because each tile's nodata_value is considered separately.
+# In that scenario the averaged data tile will have the nodata_value set to that of the first grid.

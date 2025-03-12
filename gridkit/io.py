@@ -118,6 +118,7 @@ def write_raster(grid, path):
     return path
 
 
+# TODO: Add a write data_tile to raster function
 def raster_to_data_tile(
     path,
     bounds=None,

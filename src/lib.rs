@@ -143,12 +143,8 @@ impl PyO3Tile {
         }
     }
 
-    fn to_data_tile_from_value<'py>(
-        &self,
-        fill_value: f64,
-        nodata_value: f64,
-    ) -> PyO3DataTile {
-        let _data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value);
+    fn to_data_tile_with_value<'py>(&self, fill_value: f64, nodata_value: f64) -> PyO3DataTile {
+        let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTile {
             _data_tile: _data_tile,
             _tile: self.clone(),
@@ -206,14 +202,28 @@ impl PyO3Tile {
         }
     }
 
-    fn tile_id_to_grid_id<'py>(&self, py: Python<'py>, tile_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+    fn tile_id_to_grid_id<'py>(
+        &self,
+        py: Python<'py>,
+        tile_ids: PyReadonlyArray2<'py, i64>,
+        oob_value: i64,
+    ) -> &'py PyArray2<i64> {
         let index = tile_ids.as_array();
-        self._tile.tile_id_to_grid_id(&index, oob_value).into_pyarray(py)
+        self._tile
+            .tile_id_to_grid_id(&index, oob_value)
+            .into_pyarray(py)
     }
 
-    fn grid_id_to_tile_id<'py>(&self, py: Python<'py>, grid_ids: PyReadonlyArray2<'py, i64>, oob_value: i64) -> &'py PyArray2<i64> {
+    fn grid_id_to_tile_id<'py>(
+        &self,
+        py: Python<'py>,
+        grid_ids: PyReadonlyArray2<'py, i64>,
+        oob_value: i64,
+    ) -> &'py PyArray2<i64> {
         let index = grid_ids.as_array();
-        self._tile.grid_id_to_tile_id(&index, oob_value).into_pyarray(py)
+        self._tile
+            .grid_id_to_tile_id(&index, oob_value)
+            .into_pyarray(py)
     }
 }
 
@@ -235,8 +245,12 @@ impl PyO3DataTile {
         self._data_tile.nodata_value
     }
 
-    fn set_nodata_value(&mut self, nodata_value: f64){
+    fn set_nodata_value(&mut self, nodata_value: f64) {
         self._data_tile.set_nodata_value(nodata_value);
+    }
+
+    fn is_nodata(&self, value: f64) -> bool {
+        self._data_tile.is_nodata(value)
     }
 
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
@@ -966,6 +980,107 @@ fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
+#[pyfunction]
+fn combine_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3Tile> {
+    let tiles_vec: Vec<tile::Tile> = tiles
+        .iter()
+        .map(|item| {
+            let py_o3_tile: PyO3Tile = item.extract().unwrap(); // Extract PyO3Tile
+            py_o3_tile._tile.clone() // Get the Tile reference and clone it
+        })
+        .collect();
+    let _tile = tile::combine_tiles(&tiles_vec);
+    let _grid = tiles[0].extract::<PyO3Tile>().unwrap()._grid;
+    let tile = PyO3Tile {
+        _grid: _grid,
+        start_id: _tile.start_id,
+        nx: _tile.nx,
+        ny: _tile.ny,
+        _tile,
+    };
+    Ok(tile)
+}
+
+#[pyfunction]
+fn count_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTile> {
+    let tiles_vec: Vec<tile::Tile> = tiles
+        .iter()
+        .map(|item| {
+            let py_o3_tile: PyO3Tile = item.extract().unwrap();
+            py_o3_tile._tile.clone()
+        })
+        .collect();
+    let _data_tile = tile::count_tiles(&tiles_vec);
+    let _tile = tiles[0].extract::<PyO3Tile>().unwrap();
+    let tile = PyO3DataTile { _data_tile, _tile };
+    Ok(tile)
+}
+
+#[pyfunction]
+fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
+    // Like count_tiles but does not count cells with a nodata_value
+    let tiles_vec: Vec<DataTile> = data_tiles
+        .iter()
+        .map(|item| {
+            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+            py_o3_tile._data_tile
+        })
+        .collect();
+    let _data_tile = tile::count_data_tiles(&tiles_vec);
+    let _tile = data_tiles[0]
+        .extract::<PyO3DataTile>()
+        .unwrap()
+        .get_tile(py);
+    let tile = PyO3DataTile { _data_tile, _tile };
+    Ok(tile)
+}
+
+#[pyfunction]
+fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
+    let tiles_vec: Vec<DataTile> = data_tiles
+        .iter()
+        .map(|item| {
+            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+            py_o3_tile._data_tile
+        })
+        .collect();
+    let _data_tile = tile::sum_data_tiles(&tiles_vec);
+    let _tile = data_tiles[0]
+        .extract::<PyO3DataTile>()
+        .unwrap()
+        .get_tile(py);
+    let tile = PyO3DataTile { _data_tile, _tile };
+    Ok(tile)
+}
+
+#[pyfunction]
+fn average_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
+    let tiles_vec: Vec<DataTile> = data_tiles
+        .iter()
+        .map(|item| {
+            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+            py_o3_tile._data_tile
+        })
+        .collect();
+    let _data_tile = tile::average_data_tiles(&tiles_vec);
+    let _tile = data_tiles[0]
+        .extract::<PyO3DataTile>()
+        .unwrap()
+        .get_tile(py);
+    let tile = PyO3DataTile { _data_tile, _tile };
+    Ok(tile)
+}
+
+#[pymodule]
+fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
+    module.add_function(wrap_pyfunction!(combine_tiles, module)?)?;
+    module.add_function(wrap_pyfunction!(count_tiles, module)?)?;
+    module.add_function(wrap_pyfunction!(count_data_tiles, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile, module)?)?;
+    module.add_function(wrap_pyfunction!(average_data_tile, module)?)?;
+    Ok(())
+}
+
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyO3TriGrid>()?;
@@ -975,5 +1090,6 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyO3DataTile>()?;
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
+    module.add_wrapped(wrap_pymodule!(tile_utils))?;
     Ok(())
 }

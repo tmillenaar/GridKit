@@ -1,5 +1,5 @@
 import warnings
-from typing import Literal, Tuple, Union
+from typing import List, Literal, Tuple, Union
 
 import numpy
 from pyproj import Transformer
@@ -90,11 +90,11 @@ class Tile:
 
     def to_data_tile(self, data, nodata_value=numpy.nan):
         py03_data_tile = self._tile.to_data_tile(data.astype(float), nodata_value)
-        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
-    def to_data_tile_from_value(self, fill_value, nodata_value=numpy.nan):
-        py03_data_tile = self._tile.to_data_tile_from_value(fill_value, nodata_value)
-        return DataTile.from_PyO3DataTile(self.grid.update(), py03_data_tile)
+    def to_data_tile_with_value(self, fill_value, nodata_value=numpy.nan):
+        py03_data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value)
+        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
     @property
     def start_id(self):
@@ -201,13 +201,97 @@ class Tile:
         return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
 
     def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
-        # nocheckin, add docsring with elaborate explenation of:
-        #     - input np_index in [[y0, y1, y2], [x0, x1, x2]]
-        #     - result grid_id in [(x0, y0), (x1,y1), (x2, y2)]
+        """Convert the index referring to a cell from the tile reference frame to that of the grid.
+        The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+        The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+        The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+        but depending on where in the world the tile is placed it can have any starting value.
+
+        Parameters
+        ----------
+        tile_id: Tuple
+            The tile index in the format: ((y0, y1, y2), (x0, x1, x2)).
+            If None, return a GridIndex that includes all cells in the tile.
+        oob_value: int
+            The value to assign to indices not in the tile. Default: maximum numpy.in64 value.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The index referring to the same cell but in grid coordinates instead of tile coordinates
+
+        Examples
+        --------
+
+        Let's first start by creating a data_tile that we can sample using either grid ids or tile ids.
+
+        .. code-block:: python
+
+            >>> import numpy
+            >>> from gridkit import RectGrid, Tile
+            >>> grid = RectGrid(size=5)
+            >>> nx = ny = 4
+            >>> tile = Tile(grid, start_id=(2,3), nx=nx, ny=ny)
+            >>> data = numpy.arange(ny*nx).reshape(ny,nx) # Note that numpy indexes in the form (y,x)
+            >>> data_tile = tile.to_data_tile(data=data)
+            >>> print(data_tile.to_numpy())
+            [[ 0.  1.  2.  3.]
+             [ 4.  5.  6.  7.]
+             [ 8.  9. 10. 11.]
+             [12. 13. 14. 15.]]
+            >>> tile_ids = ((1,2,3), (2,1,0))
+            >>> grid_ids = data_tile.tile_id_to_grid_id(tile_ids)
+            >>> print(grid_ids.index)
+            [[4 5]
+             [3 4]
+             [2 3]]
+
+        ..
+
+        Note the differnce in value due to the tile's start_id of (2,3), as well as the difference in array shape.
+
+        The method `tile_id_to_grid_id` exists on both Tile and DataTile objects.
+        The tile and data_tile here are at the same location on the grid,
+        the difference is just that the data_tile has data.
+        Doing the id conversion should yield the same result in both cases.
+
+        The value obtained from data_tile.value using the grid_id should be the same as obtaining
+        the value from data_tile.to_numpy() using the tile_ids.
+        You can shorthand this by just indexing directly on the data_tile.
+
+        .. code-block:: python
+
+            >>> assert grid_ids == tile.tile_id_to_grid_id(tile_ids)
+            >>> print(data_tile[tile_ids])
+            [ 6.  9. 12.]
+            >>> print(data_tile.value(grid_ids))
+            [ 6.  9. 12.]
+
+        ..
+
+        We should of course be able to get the tile_ids back using :meth:`Tile.grid_id_to_tile_id`:
+
+        .. code-block:: python
+
+            >>> reverted_tile_ids = tile.grid_id_to_tile_id(grid_ids)
+            >>> print(reverted_tile_ids)
+            (array([1, 2, 3]), array([2, 1, 0]))
+            >>> numpy.testing.assert_allclose(tile_ids, reverted_tile_ids)
+
+        ..
+
+        # We get a tuple of numpy arrays back instead of a tuple of tuples,
+        # but numerically they are the same as the tuple we started with.
+        # :meth:`Tile.grid_id_to_tile_id` always returns a tuple of arrays but
+        # :meth:`Tile.tile_id_to_grid_id` accepts a tuple of lists, tuple of tuples or tuple of arrays.
+
+        See also
+        --------
+        :meth:`Tile.grid_id_to_tile_id`
+
+        """
         if tile_id is None:
-            ids_x = numpy.arange(self.nx)
-            ids_y = numpy.arange(self.ny)
-            tile_id = numpy.array(numpy.meshgrid(ids_x, ids_y)).reshape(-1, 2)
+            return self.indices
         else:
             tile_id = numpy.array(tile_id, dtype=int)
         if not tile_id.shape[0] == 2:
@@ -226,14 +310,40 @@ class Tile:
         else:
             # Note: transpose to get the data from shape [[y0,y1,y2], [x0,x1,x2]]
             #       into shape [[x0,y0], [x1,y1], [x2,y2]] which is what the rust package works with
-            # FIXME: I imagine that since the ndarray package uses the same index we might want to move
-            #        the transpose logic to the rust equavalent of this function.
             tile_id = tile_id.T
         oob_value = numpy.int64(oob_value)
         return GridIndex(self._tile.tile_id_to_grid_id(tile_id, oob_value=oob_value))
 
     @validate_index
     def grid_id_to_tile_id(self, index=None, oob_value=numpy.iinfo(numpy.int64).max):
+        """Convert the index referring to a cell from the grid reference frame to that of the tile.
+        The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+        The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+        The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+        but depending on where in the world the tile is placed it can have any starting value.
+
+        Parameters
+        ----------
+        index: :class:`.GridIndex`
+            The grid index in the form [(x0, y0), (x1,y1), (x2, y2)].
+            If None, return the tile indices for each cell. Note that they are in raveled form.
+        oob_value: int
+            The value to assign to indices not in the tile. Default: maximum numpy.in64 value.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The index referring to the same cell but in tile coordinates instead of tile coordinates
+
+        Examples
+        --------
+        For an elaborate example showing going from tile_id to grid_id and back, see :meth:`Tile.tile_id_to_grid_id`
+
+        See also
+        --------
+        :meth:`Tile.tile_id_to_grid_id`
+
+        """
         if index is None:
             index = self.indices
         index = (
@@ -272,8 +382,11 @@ class DataTile(Tile):
         This replaces all instances of the nodata value with the new value"""
         self._data_tile.set_nodata_value(float(value))
 
+    def is_nodata(self, value):
+        return self._data_tile.is_nodata(float(value))
+
     @staticmethod
-    def from_PyO3DataTile(grid, pyo3_data_tile):
+    def from_pyo3_data_tile(grid, pyo3_data_tile):
         tile = Tile(
             grid, pyo3_data_tile.start_id(), pyo3_data_tile.nx(), pyo3_data_tile.ny()
         )
@@ -312,7 +425,7 @@ class DataTile(Tile):
         self._data_tile = tile.to_data_tile(new_data, self.nodata_value)
 
     def update(
-        self, grid=None, data=None, start_id=None, nx=None, ny=None, nodata_value=None
+        self, data=None, grid=None, start_id=None, nx=None, ny=None, nodata_value=None
     ):
         # TODO: Make clear that update copies the data
         if grid is None:
@@ -603,7 +716,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __radd__(self, other):
@@ -616,7 +729,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_PyO3DataTile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __sub__(self, other):
@@ -796,22 +909,169 @@ class DataTile(Tile):
             )
 
     def max(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.max()
 
     def min(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.min()
 
     def mean(self):
+        """Get the maximum value in the data tile, disregarding the nodata_value."""
         return self._data_tile.mean()
 
     def sum(self):
+        """Get the sum of all values in the data tile, disregarding the nodata_value."""
         return self._data_tile.sum()
 
     def median(self):
+        """Get the median value of the data tile, disregarding the nodata_value."""
         return self._data_tile.median()
 
     def percentile(self, percentile):
+        """Get the percentile of the data tile at the specified value, disregarding the nodata_value."""
         return self._data_tile.percentile(percentile)
 
     def std(self):
+        """Get the standard deviation of the data in the tile, disregarding the nodata_value."""
         return self._data_tile.std()
+
+
+def combine_tiles(tiles):
+    """Create a tile that covers all supplied tiles.
+
+    Parameters
+    ----------
+    tiles: List[Tile]
+        A list of tiles around which the combined tile will be created.
+
+    Returns
+    -------
+    :class:`.Tile`
+        A Tile that covers the supplied Tiles
+    """
+    pyo3_tiles = []
+    for tile in tiles:
+        if isinstance(tile, Tile):
+            pyo3_tiles.append(tile._tile)
+        elif isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._tile._tile)  # Man this nesting gets rediculous
+        else:
+            raise TypeError(
+                f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.combine_tiles(pyo3_tiles)
+    return Tile.from_pyo3_tile(tiles[0].grid, pyo3_tile)
+
+
+def count_tiles(tiles):
+    """Count how many times a cell occurs in a tile for the list of tiles provided.
+    Regions where many tiles overlap will have a high count, regions where few tiles
+    overlap will have low count.
+
+    Parameters
+    ----------
+    tiles: `List[Tile]` or `List[DataTile]`
+        The tiles from which the overlap count will be determined.
+        For each Tile that is supplied in the list, all cells in the tile contribute to the count.
+        For each DataTile that is supplied in the list, the cells with a value equal to the
+        nodata_value of the DataTile are ignored for the count.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile where each value indicates by how many tiles this cell was covered.
+
+    """
+    pyo3_tiles = []
+    pyo3_data_tiles = []
+    for tile in tiles:
+        # Note: check DataTile before Tile, because DataTile is a subclass of Tile
+        if isinstance(tile, DataTile):
+            pyo3_data_tiles.append(tile._data_tile)  # Man this nesting gets rediculous
+        elif isinstance(tile, Tile):
+            pyo3_tiles.append(tile._tile)
+        else:
+            raise TypeError(
+                f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
+            )
+    if pyo3_tiles:
+        pyo3_data_tile = tile_utils.count_tiles(pyo3_tiles)
+        result_tiles_only = DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_data_tile)
+    if pyo3_data_tiles:
+        pyo3_data_tile = tile_utils.count_data_tiles(pyo3_data_tiles)
+        result_data_tiles_only = DataTile.from_pyo3_data_tile(
+            tiles[0].grid, pyo3_data_tile
+        )
+
+    if pyo3_tiles and pyo3_data_tiles:
+        result = result_tiles_only + result_data_tiles_only
+        # Note: After summation, nodata values are added in the corners where no tiles are present
+        #       if the DataTiles do not have the exact same coverage as the supplied Tiles.
+        #       Since we want a count to say 0 where no tile is present, we replace the nans
+        #       introduced by the summation with zeros.
+        result[~numpy.isfinite(result)] = 0
+        return result
+    if pyo3_tiles:
+        return result_tiles_only
+    if pyo3_data_tiles:
+        return result_data_tiles_only
+
+    raise TypeError("No Tiles were found in the arguments")
+
+
+def sum_data_tiles(data_tiles: List):
+    """Add the DataTiles in the data_tiles list. Nodata_values will be ignored.
+    Each cell will then contain the sum of the value that cell accross the supplied DataTiles.
+
+    Parameters
+    ----------
+    data_tiles: `List[Tile]` or `List[DataTile]`
+        A list of DataTiles to add together.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile with the values of the provided data_tiles added together
+
+    """
+    pyo3_tiles = []
+    for tile in data_tiles:
+        if isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._data_tile)
+        else:
+            raise TypeError(
+                f"Expected all DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.sum_data_tile(pyo3_tiles)
+    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)
+
+
+def average_data_tiles(data_tiles: List):
+    """Average the DataTiles in the data_tiles list. Nodata_values will be ignored.
+    Each cell will then contain the mean or average value of that cell accross the supplied DataTiles.
+
+    Parameters
+    ----------
+    data_tiles: `List[Tile]` or `List[DataTile]`
+        A list of DataTiles to average.
+
+    Returns
+    -------
+    :class:`.DataTile`
+        A data tile with the averaged values of the provided data_tiles
+
+    """
+    # Simply calling `return sum(tiles) / count(tiles)` is a lot shorter, but I want to use the rust
+    # logic such that the rust and python logic are the same and don't have possible inconsistencies
+    # like inf instead of nan or vice versa. I want just one place for the logic.
+    pyo3_tiles = []
+    for tile in data_tiles:
+        if isinstance(tile, DataTile):
+            pyo3_tiles.append(tile._data_tile)
+        else:
+            raise TypeError(
+                f"Expected all DataTile objects but also got a: {type(tile)}"
+            )
+    pyo3_tile = tile_utils.average_data_tile(pyo3_tiles)
+    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)

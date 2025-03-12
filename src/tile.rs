@@ -1,6 +1,6 @@
-use std::f32::MAX;
+use std::{f32::MAX, f64, i64};
 
-use crate::{grid::*, hex_grid::HexGrid, data_tile::DataTile};
+use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
 use numpy::{ndarray::*, IntoPyArray};
 
 #[derive(Clone)]
@@ -17,8 +17,11 @@ pub trait TileTraits {
 
     fn get_grid(&self) -> &Grid;
 
-    fn to_data_tile_from_value(&self, fill_value: f64, nodata_value: f64) -> DataTile {
-        let data = Array2::from_elem([self.get_tile().ny as usize, self.get_tile().nx as usize], fill_value);
+    fn to_data_tile_with_value(&self, fill_value: f64, nodata_value: f64) -> DataTile {
+        let data = Array2::from_elem(
+            [self.get_tile().ny as usize, self.get_tile().nx as usize],
+            fill_value,
+        );
         DataTile {
             tile: self.get_tile().clone(),
             data,
@@ -54,7 +57,7 @@ pub trait TileTraits {
         let mut tile_ids = Array2::<i64>::zeros((grid_ids.shape()[0], 2));
         for cell_id in 0..grid_ids.shape()[0] {
             match self.grid_id_to_tile_id_xy(grid_ids[Ix2(cell_id, 0)], grid_ids[Ix2(cell_id, 1)]) {
-                Ok((col,row)) => {
+                Ok((col, row)) => {
                     tile_ids[Ix2(cell_id, 0)] = col;
                     tile_ids[Ix2(cell_id, 1)] = row;
                 }
@@ -62,9 +65,7 @@ pub trait TileTraits {
                     tile_ids[Ix2(cell_id, 0)] = oob_value;
                     tile_ids[Ix2(cell_id, 1)] = oob_value;
                 }
-
             }
-
         }
         tile_ids
     }
@@ -97,7 +98,7 @@ pub trait TileTraits {
         let mut grid_ids = Array2::<i64>::zeros((tile_ids.shape()[0], 2));
         for cell_id in 0..grid_ids.shape()[0] {
             match self.tile_id_to_grid_id_xy(tile_ids[Ix2(cell_id, 0)], tile_ids[Ix2(cell_id, 1)]) {
-                Ok((x,y)) => {
+                Ok((x, y)) => {
                     grid_ids[Ix2(cell_id, 0)] = x;
                     grid_ids[Ix2(cell_id, 1)] = y;
                 }
@@ -254,4 +255,91 @@ impl TileTraits for Tile {
             ny: ny as u64,
         }
     }
+}
+
+pub fn combine_tiles<T: TileTraits>(tiles: &Vec<T>) -> Tile {
+    let mut min_x: i64 = i64::MAX;
+    let mut min_y: i64 = i64::MAX;
+    let mut max_x: i64 = i64::MIN;
+    let mut max_y: i64 = i64::MIN;
+    let _ = for tile in tiles {
+        let t = tile.get_tile();
+        // Min x
+        if t.start_id.0 < min_x {
+            min_x = t.start_id.0;
+        };
+        // Min y
+        if t.start_id.1 < min_y {
+            min_y = t.start_id.1;
+        };
+        // Max x
+        let tile_max_x = t.start_id.0 + t.nx as i64;
+        if tile_max_x > max_x {
+            max_x = tile_max_x;
+        };
+        // Max y
+        let tile_max_y = t.start_id.1 + t.ny as i64;
+        if tile_max_y > max_y {
+            max_y = tile_max_y;
+        };
+    };
+    return Tile {
+        grid: tiles[0].get_grid().clone(),
+        start_id: (min_x, min_y),
+        nx: (max_x - min_x) as u64,
+        ny: (max_y - min_y) as u64,
+    };
+}
+
+pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile {
+    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
+    for tile in tiles {
+        let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
+        data_slice.map_inplace(|val| *val += 1.0);
+    }
+    combined_tile
+}
+
+pub fn count_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
+    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
+    for tile in tiles {
+        let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
+        for (count_val, tile_val) in data_slice.iter_mut().zip(tile.data.iter()) {
+            if *tile_val != tile.nodata_value {
+                *count_val += 1.0;
+            }
+        }
+    }
+    combined_tile
+}
+
+pub fn sum_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
+    // Note: if we make combine_tiles start with something other than NAN, like
+    // if we want to support other data_types, we need to modify the is_nan check below.
+    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(f64::NAN, f64::NAN);
+    for tile in tiles {
+        let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
+        for (current_val, val_to_add) in data_slice.iter_mut().zip(tile.data.iter()) {
+            if tile.is_nodata(*val_to_add) {
+                // Don't add any cell in the tile that is falgged as nodata
+                continue;
+            }
+            // It would have been nice to use combined_tile.is_nodata here,
+            // but since combined_tile._slice_tile_mut mutably borrows self,
+            // we cannot call other methods on combined_tile as long as the data_slice
+            // is being held on to. Since at the start of the function we set combine_tiles
+            // to start with nans, we can just check for that. If we ever allow for a different
+            // non-nan nodata value for combined_tile we need to change this check to be more robust.
+            if f64::is_nan(*current_val) {
+                *current_val = *val_to_add; // Overwriting default, only on first modification
+            } else {
+                *current_val += val_to_add; // If already has a value, start summing
+            }
+        }
+    }
+    combined_tile
+}
+
+pub fn average_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
+    sum_data_tiles(tiles) / count_data_tiles(tiles)
 }
