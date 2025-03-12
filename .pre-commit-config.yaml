@@ -11,19 +11,21 @@ repos:
       - id: isort
 
   - repo: https://github.com/tmillenaar/wordwarden
-    rev: v0.1.3
+    rev: v0.1.4
     hooks:
       - id: wordwarden
         name: Word Warden - Debug Statements
         entry: word_warden
         args: ["breakpoint()", ".set_trace()", "println("]
         stages: [pre-commit, pre-push]
+        types_or: [python, pyi, rust, rst]
 
   - repo: https://github.com/tmillenaar/wordwarden
-    rev: v0.1.3
+    rev: v0.1.4
     hooks:
       - id: wordwarden
         name: Word Warden - WIP comments
         entry: word_warden
         args: ["WIP", "FIXME", "nocheckin"]
         stages: [pre-push]
+        types_or: [python, pyi, rust, rst]
