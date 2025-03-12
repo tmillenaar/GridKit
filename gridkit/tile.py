@@ -201,13 +201,97 @@ class Tile:
         return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
 
     def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
-        # nocheckin, add docsring with elaborate explenation of:
-        #     - input np_index in [[y0, y1, y2], [x0, x1, x2]]
-        #     - result grid_id in [(x0, y0), (x1,y1), (x2, y2)]
+        """Convert the index referring to a cell from the tile reference frame to that of the grid.
+        The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+        The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+        The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+        but depending on where in the world the tile is placed it can have any starting value.
+
+        Parameters
+        ----------
+        tile_id: Tuple
+            The tile index in the format: ((y0, y1, y2), (x0, x1, x2)).
+            If None, return a GridIndex that includes all cells in the tile.
+        oob_value: int
+            The value to assign to indices not in the tile. Default: maximum numpy.in64 value.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The index referring to the same cell but in grid coordinates instead of tile coordinates
+
+        Examples
+        --------
+
+        Let's first start by creating a data_tile that we can sample using either grid ids or tile ids.
+
+        .. code-block:: python
+
+            >>> import numpy
+            >>> from gridkit import RectGrid, Tile
+            >>> grid = RectGrid(size=5)
+            >>> nx = ny = 4
+            >>> tile = Tile(grid, start_id=(2,3), nx=nx, ny=ny)
+            >>> data = numpy.arange(ny*nx).reshape(ny,nx) # Note that numpy indexes in the form (y,x)
+            >>> data_tile = tile.to_data_tile(data=data)
+            >>> print(data_tile.to_numpy())
+            [[ 0.  1.  2.  3.]
+             [ 4.  5.  6.  7.]
+             [ 8.  9. 10. 11.]
+             [12. 13. 14. 15.]]
+            >>> tile_ids = ((1,2,3), (2,1,0))
+            >>> grid_ids = data_tile.tile_id_to_grid_id(tile_ids)
+            >>> print(grid_ids.index)
+            [[4 5]
+             [3 4]
+             [2 3]]
+
+        ..
+
+        Note the differnce in value due to the tile's start_id of (2,3), as well as the difference in array shape.
+
+        The method `tile_id_to_grid_id` exists on both Tile and DataTile objects.
+        The tile and data_tile here are at the same location on the grid,
+        the difference is just that the data_tile has data.
+        Doing the id conversion should yield the same result in both cases.
+
+        The value obtained from data_tile.value using the grid_id should be the same as obtaining
+        the value from data_tile.to_numpy() using the tile_ids.
+        You can shorthand this by just indexing directly on the data_tile.
+
+        .. code-block:: python
+
+            >>> assert grid_ids == tile.tile_id_to_grid_id(tile_ids)
+            >>> print(data_tile[tile_ids])
+            [ 6.  9. 12.]
+            >>> print(data_tile.value(grid_ids))
+            [ 6.  9. 12.]
+
+        ..
+
+        We should of course be able to get the tile_ids back using :meth:`Tile.grid_id_to_tile_id`:
+
+        .. code-block:: python
+
+            >>> reverted_tile_ids = tile.grid_id_to_tile_id(grid_ids)
+            >>> print(reverted_tile_ids)
+            (array([1, 2, 3]), array([2, 1, 0]))
+            >>> numpy.testing.assert_allclose(tile_ids, reverted_tile_ids)
+
+        ..
+
+        # We get a tuple of numpy arrays back instead of a tuple of tuples,
+        # but numerically they are the same as the tuple we started with.
+        # :meth:`Tile.grid_id_to_tile_id` always returns a tuple of arrays but
+        # :meth:`Tile.tile_id_to_grid_id` accepts a tuple of lists, tuple of tuples or tuple of arrays.
+
+        See also
+        --------
+        :meth:`Tile.grid_id_to_tile_id`
+
+        """
         if tile_id is None:
-            ids_x = numpy.arange(self.nx)
-            ids_y = numpy.arange(self.ny)
-            tile_id = numpy.array(numpy.meshgrid(ids_x, ids_y)).reshape(-1, 2)
+            return self.indices
         else:
             tile_id = numpy.array(tile_id, dtype=int)
         if not tile_id.shape[0] == 2:
@@ -226,14 +310,40 @@ class Tile:
         else:
             # Note: transpose to get the data from shape [[y0,y1,y2], [x0,x1,x2]]
             #       into shape [[x0,y0], [x1,y1], [x2,y2]] which is what the rust package works with
-            # FIXME: I imagine that since the ndarray package uses the same index we might want to move
-            #        the transpose logic to the rust equavalent of this function.
             tile_id = tile_id.T
         oob_value = numpy.int64(oob_value)
         return GridIndex(self._tile.tile_id_to_grid_id(tile_id, oob_value=oob_value))
 
     @validate_index
     def grid_id_to_tile_id(self, index=None, oob_value=numpy.iinfo(numpy.int64).max):
+        """Convert the index referring to a cell from the grid reference frame to that of the tile.
+        The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+        The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+        The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+        but depending on where in the world the tile is placed it can have any starting value.
+
+        Parameters
+        ----------
+        index: :class:`.GridIndex`
+            The grid index in the form [(x0, y0), (x1,y1), (x2, y2)].
+            If None, return the tile indices for each cell. Note that they are in raveled form.
+        oob_value: int
+            The value to assign to indices not in the tile. Default: maximum numpy.in64 value.
+
+        Returns
+        -------
+        :class:`.GridIndex`
+            The index referring to the same cell but in tile coordinates instead of tile coordinates
+
+        Examples
+        --------
+        For an elaborate example showing going from tile_id to grid_id and back, see :meth:`Tile.tile_id_to_grid_id`
+
+        See also
+        --------
+        :meth:`Tile.tile_id_to_grid_id`
+
+        """
         if index is None:
             index = self.indices
         index = (
