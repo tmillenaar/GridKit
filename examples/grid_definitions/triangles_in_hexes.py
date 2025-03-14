@@ -22,7 +22,7 @@ that they perfectly line up. A hexagon can be neatly divided into six triangles.
 
 ..
 
-For the two grids to align, two things will need to match:
+For the two grids to visually align, two things will need to match:
  - the length of the edge connecting two vertices needs to be the same
  - they need an origin point that lines them up properly
 
@@ -38,7 +38,7 @@ which we will need to do in order for the grids to overlap.
 If this is not obvious, I encourage you to do this exercise with a 'pointy' hexagonal grid.
 It will be obvious from the plot.
 
-Let's first plot some cells of these two grids and compare them. 
+Let's first plot some cells of these two grids and compare them.
 From there we can figure out how to shift the grids in order to align them.
 
 """
@@ -47,22 +47,26 @@ From there we can figure out how to shift the grids in order to align them.
 
 import matplotlib.pyplot as plt
 
-from gridkit import HexGrid, TriGrid
+from gridkit import HexGrid, Tile, TriGrid
 from gridkit.doc_utils import plot_polygons
 
 tri_grid = TriGrid(size=1)
 hex_grid = HexGrid(size=3 / 3**0.5, shape="flat")
 
-bounds = [-6.8, -5, 6.75, 5]
+tri_tile = Tile(tri_grid, (-14, -7), 27, 13)
+hex_tile = Tile(hex_grid, (-5, -4), 9, 7)
+
+# Note: The grid is copied when creating a tile such that the grid that is related to the tile
+# does not unexpectedly change when the original grid object changes.
+# In this example we do actually want to change the grid that is related to the tile
+# so let's redefine the grids to point to the copies that are related to the respective tiles.
+tri_grid = tri_tile.grid
+hex_grid = hex_tile.grid
 
 ax = plt.subplot()
-tri_bounds = tri_grid.align_bounds(bounds, mode="nearest")
-tri_ids = tri_grid.cells_in_bounds(tri_bounds)
-tri_geoms = tri_grid.to_shapely(tri_ids)
+tri_geoms = tri_tile.to_shapely()
 plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2, ax=ax)
-hex_bounds = hex_grid.align_bounds(bounds, mode="nearest")
-hex_ids = hex_grid.cells_in_bounds(hex_bounds)
-hex_geoms = hex_grid.to_shapely(hex_ids)
+hex_geoms = hex_tile.to_shapely()
 plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":", ax=ax)
 # Create lattice with spacing of dx and dy to highlight cell bounds
 ax.set_xticks([i * hex_grid.dx for i in range(-5, 5)])
@@ -83,19 +87,18 @@ assert numpy.isclose(tri_grid.side_length, hex_grid.side_length)
 
 # %%
 #
-# The grids are not aligned however. We can use the `anchor` method on both grids
+# The grids are not aligned however. We can use the :meth:`.BaseGrid.anchor` method on both grids
 # to force them to have a corner at the same location, but let's supply a manual offset
 # for educational purposes. Say we want to position the hexagon around zero.
 # From visually inspecting the plot I can tell we'd have to
 # shift the hexagon to the right by half a dx.
 # The triangles already cross at the origin so that will do for our usecase.
 #
-# .. Warning ::
+# .. Note ::
 #
-#    When dealing with a 'flat' hex grid, the x and y of `offset` need to
-#    be set in reverse order: (y,x). This is a known conceptual inconsistency
-#    but will not be fixed since 'flat' HexGrids will be removed in a future version
-#    in favor of `rotation`. See: :ref:`release notes: v0.11.0 <release notes v0_11_0>`
+#    Before version 1.0.0 , when dealing with a 'flat' hex grid, the x and y of `offset` need to
+#    be set in reverse order: (y,x). This is a conceptual inconsistency
+#    that has since been fixed.
 #
 # ..
 #
@@ -105,12 +108,12 @@ assert numpy.isclose(tri_grid.side_length, hex_grid.side_length)
 #
 # ..
 
-hex_grid.offset = (0, hex_grid.dx / 2)
+hex_grid.offset = (hex_grid.dx / 2, 0)
 
 ax = plt.subplot()
-tri_geoms = tri_grid.to_shapely(tri_ids)
+tri_geoms = tri_tile.to_shapely()
 plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
-hex_geoms = hex_grid.to_shapely(hex_ids)
+hex_geoms = hex_tile.to_shapely()
 plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
 # Create lattice with spacing of dx and dy to highlight cell bounds
 ax.set_xticks([i * hex_grid.dx + hex_grid.dx / 2 for i in range(-5, 5)])
@@ -139,7 +142,7 @@ plt.show()
 # grid to be reflected in the colors
 #
 
-tri_centroids = tri_grid.centroid(tri_ids)
+tri_centroids = tri_grid.centroid(tri_tile.indices)
 hex_ids = hex_grid.cell_at_point(tri_centroids).ravel()
 value_map = {tuple(cell): i for (i, cell) in enumerate(hex_ids.unique().index)}
 color_values = [value_map[tuple(cell)] for cell in hex_ids.index]
