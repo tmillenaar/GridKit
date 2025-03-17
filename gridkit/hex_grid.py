@@ -996,9 +996,9 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
                 new_bounds[2] + buffer_cells * self.dx,
                 new_bounds[3] + buffer_cells * self.dy,
             )
-        # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
-        cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
-        # cropped_data = self._data[slice_x, slice_y]
+        cropped_data = self._data[
+            slice_y, slice_x
+        ]  # Note: array slicing is in order [y,x]
         return self.update(cropped_data, bounds=new_bounds)
 
     def _data_slice_from_bounds(self, bounds):

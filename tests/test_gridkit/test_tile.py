@@ -189,3 +189,18 @@ def test_tile_id_to_grid_id(grid, np_index, expected_grid_id):
 
     numpy.testing.assert_almost_equal(result, expected_grid_id)
     numpy.testing.assert_almost_equal(data[tuple(np_index)], datatile.value(result))
+
+
+def test_tile_id_conversion_back_and_forth():
+    grid = RectGrid(size=1)
+    tile = Tile(grid, (-1, -1), 3, 3)
+    data = numpy.arange(tile.nx * tile.ny).reshape(tile.nx, tile.ny)
+    data_tile = tile.to_data_tile(data=data)
+
+    ids = tile.indices
+    np_ids = tile.grid_id_to_tile_id(ids)
+    ids_reverted = tile.tile_id_to_grid_id(np_ids)
+
+    numpy.testing.assert_allclose(ids.ravel(), ids_reverted)
+    numpy.testing.assert_allclose(data_tile.value(tile.indices), data)
+    numpy.testing.assert_allclose(data_tile.value(data_tile.indices), data)

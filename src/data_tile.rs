@@ -127,9 +127,7 @@ impl DataTile {
         for cell_id in 0..values.shape()[0] {
             values[Ix1(cell_id)] =
                 self.value(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)], nodata_value);
-            // println!("Indexing in {},{} gives value {}", tile_index[Ix2(cell_id, 0)], tile_index[Ix2(cell_id, 1)], values[Ix1(cell_id)])
         }
-        println!("{:?}", self.data);
         values
     }
 

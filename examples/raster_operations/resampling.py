@@ -18,14 +18,15 @@ The read function returns a BoundedRectGrid object that will serve as the initia
 Several grids with different cell shapes are then defined on which the DEM data can be resampled.
 """
 
-# sphinx_gallery_thumbnail_number = -1
+# sphinx_gallery_thumbnail_number = -2
 
-from gridkit import HexGrid, RectGrid, read_raster
+from gridkit import HexGrid, RectGrid, raster_to_data_tile
 
-dem = read_raster(
+dem = raster_to_data_tile(
     "../../tests/data/alps_dem.tiff", bounds=(28300, 167300, 28700, 167700)
 )
-print("Original resolution in (dx, dy):", dem.cellsize)
+print(f"Original resolution in (dx, dy): ({dem.grid.dx}, {dem.grid.dy})")
+
 
 # %%
 #
@@ -48,8 +49,8 @@ print("Original resolution in (dx, dy):", dem.cellsize)
 # Let's define a rectangular grid with a cell size of 10x10 degrees.
 # I am calling it rectdem for later on I will define hexagonal ones as well.
 # To make sure it worked we can print out the cellsize after resampling
-rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.crs), method="bilinear")
-print("Downsampled resolution in (dx, dy):", rectdem.cellsize)
+rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.grid.crs), method="nearest")
+print(f"Downsampled resolution in (dx, dy): ({rectdem.grid.dx}, {rectdem.grid.dy})")
 
 # %%
 #
@@ -70,12 +71,14 @@ plt.show()
 # for a fair visual comparison.
 #
 hexdem_flat = dem.resample(
-    HexGrid(area=rectdem.area, shape="flat", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.grid.area, shape="flat", crs=dem.grid.crs), method="nearest"
 )
 hexdem_pointy = dem.resample(
-    HexGrid(area=rectdem.area, shape="pointy", crs=dem.crs), method="bilinear"
+    HexGrid(area=rectdem.grid.area, shape="pointy", crs=dem.grid.crs), method="nearest"
 )
 
+
+from shapely import Polygon
 
 # %%
 #
@@ -85,37 +88,80 @@ hexdem_pointy = dem.resample(
 #
 from gridkit.doc_utils import plot_polygons
 
+
 # define two new figures
-fig_flat, ax_flat = plt.subplots()
-fig_pointy, ax_pointy = plt.subplots()
+def plot_flat_and_pointy(flat_tile, pointy_tile):
+    fig_flat, ax_flat = plt.subplots()
+    fig_pointy, ax_pointy = plt.subplots()
 
-plot_polygons(
-    hexdem_flat.to_shapely(),
-    colors=hexdem_flat.data.ravel(),
-    cmap="terrain",
-    ax=ax_flat,
-)
-plot_polygons(
-    hexdem_pointy.to_shapely(),
-    colors=hexdem_pointy.data.ravel(),
-    cmap="terrain",
-    ax=ax_pointy,
-)
+    plot_polygons(  # Plot 1, show data
+        flat_tile.to_shapely(),
+        colors=hexdem_flat.to_numpy().ravel(),
+        cmap="terrain",
+        add_colorbar=True,
+        ax=ax_flat,
+    )
+    plot_polygons(  # Plot 1, show tile bounds
+        Polygon(flat_tile.corners()),
+        colors="red",
+        filled=False,
+        ax=ax_flat,
+    )
 
-# Format the plot
-for hexdem, ax in zip((hexdem_flat, hexdem_pointy), (ax_flat, ax_pointy)):
-    ax.set_xlim(hexdem.bounds[0], hexdem.bounds[2])
-    ax.set_ylim(hexdem.bounds[1], hexdem.bounds[3])
-    ax.set_aspect("equal")
-plt.show()
+    plot_polygons(  # Plot 2, show data
+        pointy_tile.to_shapely(),
+        colors=hexdem_pointy.to_numpy().ravel(),
+        cmap="terrain",
+        add_colorbar=True,
+        ax=ax_pointy,
+    )
+    plot_polygons(  # Plot 2, show tile bounds
+        Polygon(pointy_tile.corners()),
+        colors="red",
+        filled=False,
+        ax=ax_pointy,
+    )
+    ax_flat.set_aspect("equal")
+    ax_pointy.set_aspect("equal")
+    plt.show()
+
+
+plot_flat_and_pointy(hexdem_flat, hexdem_pointy)
 
 # %%
 #
-# This example can of course also be used to upsample your data.
+# When observing these plots it is obvious that one of them has something weird going on at the edge of the tile.
+# Triangluar and hexagonal grids both have one of the axes that is irregular. Sometimes it works out such that
+# an irregular row or column has some cells inside the tile and some outside. In such a case we can have nodata values
+# at the edges. The original dem file has the nodata value set to 0. The nodata value is inherited when resampling.
+# We see these 0 values here at the edges. Matplotlib recognizes NaN values as nodata but just shows 0 values,
+# as it should. Of course this not only affects the sides of the plot but also changes the range of the colormap.
+# For visualization we can set the nodata_value of our dems to NaN, which will replace all
+# occurences of a nodata value in our tile with the new nodata value.
 #
 # .. Note ::
 #
-#    The three images in this example look different, but they are all equally 'correct'.
+#     The edges can also contain nodata_values if the interpolation method looks at neighboring cells,
+#     such as with bilinear resampling. If one of the neighbours of a cell is outside of the tile,
+#     the interpolation result will also be a nodata_value, even if the cell itself is inside of the tile.
+#
+# ..
+#
+
+# numpy.nan also works but since that is not imported in this example, I use python's buildin nan float
+hexdem_flat.nodata_value = float("nan")
+hexdem_pointy.nodata_value = float("nan")
+
+plot_flat_and_pointy(hexdem_flat, hexdem_pointy)
+
+# %%
+#
+# This concludes the example. Naturally, this example can also be used to upsample your data.
+#
+# .. Note ::
+#
+#    The three resampled images in this example look different, but they are all equally 'correct'.
 #    The visual difference results from the difference in positioning of the cells.
 #    Generally hexagon grids better represent rounded features,
 #    whereas rectangular grids are generally easier to work with and are more widespread.
+#

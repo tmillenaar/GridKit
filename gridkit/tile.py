@@ -89,6 +89,18 @@ class Tile:
         return Tile(grid, pyo3_tile.start_id, pyo3_tile.nx, pyo3_tile.ny)
 
     def to_data_tile(self, data, nodata_value=numpy.nan):
+        if not data.ndim == 2:
+            raise TypeError(
+                f"Setting data is only allowed for 2D data. Got data with {data.ndim} dimensions."
+            )
+        if data.shape[0] != self.ny:
+            raise ValueError(
+                f"The provided data has {data.shape()[0]} elements in the first axis but the tile has {tile.ny} y-elements. Beware that a numpy array's axis order is in y,x."
+            )
+        if data.shape[1] != self.nx:
+            raise ValueError(
+                f"The provided data has {data.shape()[1]} elements in the second axis but the tile has {tile.nx} x-elements. Beware that a numpy array's axis order is in y,x."
+            )
         py03_data_tile = self._tile.to_data_tile(data.astype(float), nodata_value)
         return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
@@ -126,14 +138,13 @@ class Tile:
         return GridIndex(self._tile.corner_ids())
 
     def corners(self):
-        """The coordinates at the corners of the Tile
+        """The coordinates at the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
+        (assuming the assicaited grid is not rotated)
 
         Returns
         -------
         `numpy.ndarray`
-            A two-dimensional array that contais the x and y coordinates of
-            the corners in order: top-left, top-right, bottom-right, bottom-left
-            (assuming the assicaited grid is not rotated)
+            A two-dimensional array that contais the x and y coordinates of the corners
         """
         return self._tile.corners()
 
@@ -551,7 +562,11 @@ class DataTile(Tile):
             return result.reshape(return_shape)
         elif method == "inverse_distance":
             decay_constant = interp_kwargs.pop("decay_constant", 1)
-            return self._inverse_distance_interpolation(sample_points, decay_constant)
+            return_shape = sample_points.shape[:-1]
+            result = self._inverse_distance_interpolation(
+                sample_points.reshape(-1, 2), decay_constant
+            )
+            return result.reshape(return_shape)
         raise ValueError(f"Resampling method '{method}' is not supported.")
 
     def resample(self, alignment_grid, method="nearest", **interp_kwargs):
@@ -594,6 +609,7 @@ class DataTile(Tile):
 
         """
         if isinstance(alignment_grid, Tile):
+            # nocheckin: When taking in a Tile we should not figure out the new extent and create a new tile but just use the Tile that was given
             alignment_grid = alignment_grid.grid
         if self.grid.crs is None or alignment_grid.crs is None:
             warnings.warn(
@@ -636,9 +652,34 @@ class DataTile(Tile):
 
             ids = alignment_grid.cell_at_point(corners_transformed).ravel()
         else:
-            ids = alignment_grid.cell_at_point(self.corners()).ravel()
+            corners = self.corners()
+            ids = alignment_grid.cell_at_point(corners).ravel()
         min_x, min_y = numpy.min(ids, axis=0)
         max_x, max_y = numpy.max(ids, axis=0)
+
+        # nocheckin, what to do with rotated grids? Also use corners?
+        #            I think we have to rotate the corners back to get the tile.
+
+        # Prevent outer rows or columns with all nodata_value.
+        # The centroid of the corner ids in the alignment_grid are checked against
+        # the bounds of the original tile to see if the centroid of these new corner ids
+        # is within the original tile. If the centroid is not within the original tile
+        # the values will always be nodata_value so we don't want to include these.
+        reference_corners = corners_transformed if different_crs else corners
+        total_bounds = (  # in min_x, min_y, max_x, max_y
+            *numpy.min(reference_corners, axis=0),
+            *numpy.max(reference_corners, axis=0),
+        )
+        left_new, bottom_new = alignment_grid.centroid([min_x, min_y])
+        right_new, top_new = alignment_grid.centroid([max_x, max_y])
+        if left_new <= total_bounds[0]:
+            min_x += int(numpy.ceil((total_bounds[0] - left_new) / alignment_grid.dx))
+        if bottom_new <= total_bounds[1]:
+            min_y += int(numpy.ceil((total_bounds[1] - bottom_new) / alignment_grid.dy))
+        if right_new >= total_bounds[2]:
+            max_x -= int(numpy.ceil((right_new - total_bounds[2]) / alignment_grid.dx))
+        if top_new >= total_bounds[3]:
+            max_y -= int(numpy.ceil((top_new - total_bounds[3]) / alignment_grid.dy))
 
         tile = Tile(
             alignment_grid, (min_x, min_y), max_x - min_x + 1, max_y - min_y + 1
