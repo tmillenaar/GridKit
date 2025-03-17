@@ -34,8 +34,9 @@ from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
 
 # create a grids
-fine_grid = HexGrid(size=1).anchor([0, 0])
-coarse_grid = HexGrid(size=3 * fine_grid.size).anchor([0, 0])
+target_loc = [0, 0]
+fine_grid = HexGrid(size=1).anchor(target_loc)
+coarse_grid = HexGrid(size=3 * fine_grid.size).anchor(target_loc)
 
 # %%
 #
@@ -47,21 +48,21 @@ coarse_grid = HexGrid(size=3 * fine_grid.size).anchor([0, 0])
 # let's center our are of interest around zero as well.
 
 # define an area of interest, slightly larger than what we want to plot
-bounds = (-7, -7, 7, 7)
+target_cell_fine = fine_grid.cell_at_point(target_loc)
+fine_cell_ids = fine_grid.neighbours(target_cell_fine, depth=3 * 10 / fine_grid.size)
+shapes_fine = fine_grid.to_shapely(fine_cell_ids, as_multipolygon=True)
 
-fine_bounds = fine_grid.align_bounds(bounds)
-fine_cell_ids = fine_grid.cells_in_bounds(fine_bounds)
-fine_shapes = fine_grid.to_shapely(fine_cell_ids)
-
-coarse_bounds = coarse_grid.align_bounds(bounds)
-coarse_cell_ids = coarse_grid.cells_in_bounds(coarse_bounds)
-coarse_shapes = coarse_grid.to_shapely(coarse_cell_ids)
+target_cell_coarse = coarse_grid.cell_at_point(target_loc)
+cell_ids_coarse = coarse_grid.neighbours(
+    target_cell_coarse, depth=3 * 10 / coarse_grid.size, include_selected=True
+)
+shapes_coarse = coarse_grid.to_shapely(cell_ids_coarse, as_multipolygon=True)
 
 # %%
 #
 # Let's plot our grids in the same image so we can compare them.
-plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
-plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
+plot_polygons(shapes_fine, fill=False, linewidth=1, colors="purple")
+plot_polygons(shapes_coarse, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -78,13 +79,13 @@ plt.show()
 # vertices of the orange cells.
 # Let's start by coloring in the center cells.
 
-coarse_centroids = coarse_grid.centroid(coarse_cell_ids)
+coarse_centroids = coarse_grid.centroid(cell_ids_coarse)
 center_cells = fine_grid.cell_at_point(coarse_centroids)
 center_shapes = fine_grid.to_shapely(center_cells)
 
-plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
+plot_polygons(shapes_fine, fill=False, linewidth=1, colors="purple")
 plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
-plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
+plot_polygons(shapes_coarse, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -102,8 +103,8 @@ center_neighbour_shapes = fine_grid.to_shapely(center_neighbour_cells)
 
 plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
 plot_polygons(center_neighbour_shapes, fill=True, colors="sandybrown", alpha=0.6)
-plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
-plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
+plot_polygons(shapes_fine, fill=False, linewidth=1, colors="purple")
+plot_polygons(shapes_coarse, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)
@@ -114,7 +115,7 @@ plt.show()
 # Lastly, let's find coordinates of the vertices of the orange cells.
 # We then find what purple cells are a these coordinates and color them as well.
 
-vertices = coarse_grid.cell_corners(coarse_cell_ids).reshape((-1, 2))
+vertices = coarse_grid.cell_corners(cell_ids_coarse).reshape((-1, 2))
 vertices_cells = fine_grid.cell_at_point(vertices)
 vertices_cells = vertices_cells.unique()  # drop duplicate ids
 vertices_shapes = fine_grid.to_shapely(vertices_cells)
@@ -122,8 +123,8 @@ vertices_shapes = fine_grid.to_shapely(vertices_cells)
 plot_polygons(center_shapes, fill=True, colors="limegreen", alpha=0.6)
 plot_polygons(center_neighbour_shapes, fill=True, colors="sandybrown", alpha=0.6)
 plot_polygons(vertices_shapes, fill=True, colors="darkcyan", alpha=0.6)
-plot_polygons(fine_shapes, fill=False, linewidth=1, colors="purple")
-plot_polygons(coarse_shapes, fill=False, linewidth=2, colors="orange")
+plot_polygons(shapes_fine, fill=False, linewidth=1, colors="purple")
+plot_polygons(shapes_coarse, fill=False, linewidth=2, colors="orange")
 
 plt.xlim(-4.5, 4.5)
 plt.ylim(-4.5, 4.5)

@@ -330,7 +330,7 @@ class HexGrid(BaseGrid):
         :py:meth:`.RectGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
-
+        depth = int(depth)
         if depth < 1:
             raise ValueError("'depth' cannot be lower than 1")
 

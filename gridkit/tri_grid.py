@@ -305,7 +305,7 @@ class TriGrid(BaseGrid):
         )
         result = self._grid.relative_neighbours(
             index,
-            depth=depth,
+            depth=int(depth),
             connect_corners=connect_corners,
             include_selected=include_selected,
         )
