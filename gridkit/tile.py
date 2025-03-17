@@ -587,6 +587,18 @@ class DataTile(Tile):
         ----------
         alignment_grid: :class:`.BaseGrid`
             The grid with the desired attributes on which to resample.
+            For the new data tile with the interpolated values, a tile extent will be chosen that closely matches
+            the tile with the original data.
+            If a :class:`.Tile` is provided, this step is skipped and the data is interpolated onto the cells of the
+            tile as provided.
+
+            .. Tip ::
+
+                If the two grids don't align very well, you can play with the offset of the alignment grid to try to
+                make it match the orignal grid a bit better. You could for example ``anchor`` a cell corner of the
+                alignment grid to the corner of the tile like so: ``my_data_tile.resample(my_grid.anchor(my_data_tile.corners()[0], cell_element="corner"))``
+
+            ..
 
         method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional
             The interpolation method used to determine the value at the supplied `sample_points`.
@@ -608,9 +620,11 @@ class DataTile(Tile):
         :py:meth:`.BaseGrid.interp_from_points`
 
         """
-        if isinstance(alignment_grid, Tile):
-            # nocheckin: When taking in a Tile we should not figure out the new extent and create a new tile but just use the Tile that was given
+        tile_is_given = isinstance(alignment_grid, Tile)
+        if tile_is_given:
+            tile = alignment_grid
             alignment_grid = alignment_grid.grid
+
         if self.grid.crs is None or alignment_grid.crs is None:
             warnings.warn(
                 "`crs` not set for one or both grids. Assuming both grids have an identical CRS."
@@ -619,71 +633,84 @@ class DataTile(Tile):
         else:
             different_crs = not self.grid.crs.is_exact_same(alignment_grid.crs)
 
-        # make sure the bounds align with the grid
-        if different_crs:
-            # Create array that contains points around the bounds of the tile.
-            # Then transform these points to the new CRS.
-            # From the transformed coordinates we can determine the shape of the new bounds
-            nr_cells_y = numpy.max((self.ny - 2), 0)
+        if not tile_is_given:
+            # make sure the bounds align with the grid
+            if different_crs:
+                # Create array that contains points around the bounds of the tile.
+                # Then transform these points to the new CRS.
+                # From the transformed coordinates we can determine the shape of the new bounds
+                nr_cells_y = numpy.max((self.ny - 2), 0)
 
-            top_left, top_right, bottom_right, bottom_left = self.corners()
-            top_x = numpy.linspace(top_left[0], top_right[0], 2 * self.nx)
-            top_y = numpy.linspace(top_left[1], top_right[1], 2 * self.nx)
-            top_xy = numpy.stack([top_x, top_y])
+                top_left, top_right, bottom_right, bottom_left = self.corners()
+                top_x = numpy.linspace(top_left[0], top_right[0], 2 * self.nx)
+                top_y = numpy.linspace(top_left[1], top_right[1], 2 * self.nx)
+                top_xy = numpy.stack([top_x, top_y])
 
-            right_x = numpy.linspace(top_right[0], bottom_right[0], 2 * nr_cells_y)
-            right_y = numpy.linspace(top_right[1], bottom_right[1], 2 * nr_cells_y)
-            right_xy = numpy.stack([right_x, right_y])
+                right_x = numpy.linspace(top_right[0], bottom_right[0], 2 * nr_cells_y)
+                right_y = numpy.linspace(top_right[1], bottom_right[1], 2 * nr_cells_y)
+                right_xy = numpy.stack([right_x, right_y])
 
-            bottom_x = numpy.linspace(bottom_right[0], bottom_left[0], 2 * self.nx)
-            bootom_y = numpy.linspace(bottom_right[1], bottom_left[1], 2 * self.nx)
-            bottom_xy = numpy.stack([bottom_x, bootom_y])
+                bottom_x = numpy.linspace(bottom_right[0], bottom_left[0], 2 * self.nx)
+                bootom_y = numpy.linspace(bottom_right[1], bottom_left[1], 2 * self.nx)
+                bottom_xy = numpy.stack([bottom_x, bootom_y])
 
-            left_x = numpy.linspace(bottom_left[0], top_left[0], 2 * nr_cells_y)
-            left_y = numpy.linspace(bottom_left[1], top_left[1], 2 * nr_cells_y)
-            left_xy = numpy.stack([left_x, left_y])
+                left_x = numpy.linspace(bottom_left[0], top_left[0], 2 * nr_cells_y)
+                left_y = numpy.linspace(bottom_left[1], top_left[1], 2 * nr_cells_y)
+                left_xy = numpy.stack([left_x, left_y])
 
-            coords = numpy.hstack([top_xy, right_xy, bottom_xy, left_xy])
+                coords = numpy.hstack([top_xy, right_xy, bottom_xy, left_xy])
 
-            transformer = Transformer.from_crs(
-                self.grid.crs, alignment_grid.crs, always_xy=True
+                transformer = Transformer.from_crs(
+                    self.grid.crs, alignment_grid.crs, always_xy=True
+                )
+                corners_transformed = numpy.array(transformer.transform(*coords)).T
+
+                ids = alignment_grid.cell_at_point(corners_transformed).ravel()
+            else:
+                corners = self.corners()
+                ids = alignment_grid.cell_at_point(corners).ravel()
+            min_x, min_y = numpy.min(ids, axis=0)
+            max_x, max_y = numpy.max(ids, axis=0)
+
+            # nocheckin, what to do with rotated grids? Also use corners?
+            #            I think we have to rotate the corners back to get the tile.
+
+            # Prevent outer rows or columns with all nodata_value.
+            # The centroid of the corner ids in the alignment_grid are checked against
+            # the bounds of the original tile to see if the centroid of these new corner ids
+            # is within the original tile. If the centroid is not within the original tile
+            # the values will always be nodata_value so we don't want to include these.
+            reference_corners = corners_transformed if different_crs else corners
+            total_bounds = (  # in min_x, min_y, max_x, max_y
+                *numpy.min(reference_corners, axis=0),
+                *numpy.max(reference_corners, axis=0),
             )
-            corners_transformed = numpy.array(transformer.transform(*coords)).T
+            left_new, bottom_new = alignment_grid.centroid([min_x, min_y])
+            right_new, top_new = alignment_grid.centroid([max_x, max_y])
+            if left_new <= total_bounds[0]:
+                min_x += int(
+                    numpy.ceil((total_bounds[0] - left_new) / alignment_grid.dx)
+                )
+            if bottom_new <= total_bounds[1]:
+                min_y += int(
+                    numpy.ceil((total_bounds[1] - bottom_new) / alignment_grid.dy)
+                )
+            if right_new >= total_bounds[2]:
+                max_x -= int(
+                    numpy.ceil((right_new - total_bounds[2]) / alignment_grid.dx)
+                )
+            if top_new >= total_bounds[3]:
+                max_y -= int(
+                    numpy.ceil((top_new - total_bounds[3]) / alignment_grid.dy)
+                )
 
-            ids = alignment_grid.cell_at_point(corners_transformed).ravel()
-        else:
-            corners = self.corners()
-            ids = alignment_grid.cell_at_point(corners).ravel()
-        min_x, min_y = numpy.min(ids, axis=0)
-        max_x, max_y = numpy.max(ids, axis=0)
+            tile = Tile(
+                alignment_grid, (min_x, min_y), max_x - min_x + 1, max_y - min_y + 1
+            )
+        else:  # Tile is already given
+            pass  # We already have a tile
 
-        # nocheckin, what to do with rotated grids? Also use corners?
-        #            I think we have to rotate the corners back to get the tile.
-
-        # Prevent outer rows or columns with all nodata_value.
-        # The centroid of the corner ids in the alignment_grid are checked against
-        # the bounds of the original tile to see if the centroid of these new corner ids
-        # is within the original tile. If the centroid is not within the original tile
-        # the values will always be nodata_value so we don't want to include these.
-        reference_corners = corners_transformed if different_crs else corners
-        total_bounds = (  # in min_x, min_y, max_x, max_y
-            *numpy.min(reference_corners, axis=0),
-            *numpy.max(reference_corners, axis=0),
-        )
-        left_new, bottom_new = alignment_grid.centroid([min_x, min_y])
-        right_new, top_new = alignment_grid.centroid([max_x, max_y])
-        if left_new <= total_bounds[0]:
-            min_x += int(numpy.ceil((total_bounds[0] - left_new) / alignment_grid.dx))
-        if bottom_new <= total_bounds[1]:
-            min_y += int(numpy.ceil((total_bounds[1] - bottom_new) / alignment_grid.dy))
-        if right_new >= total_bounds[2]:
-            max_x -= int(numpy.ceil((right_new - total_bounds[2]) / alignment_grid.dx))
-        if top_new >= total_bounds[3]:
-            max_y -= int(numpy.ceil((top_new - total_bounds[3]) / alignment_grid.dy))
-
-        tile = Tile(
-            alignment_grid, (min_x, min_y), max_x - min_x + 1, max_y - min_y + 1
-        )
+            # nocheckin, test if tile resample works as expected
 
         new_ids = tile.indices
         shape = new_ids.shape
