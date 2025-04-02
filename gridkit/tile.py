@@ -672,9 +672,6 @@ class DataTile(Tile):
             min_x, min_y = numpy.min(ids, axis=0)
             max_x, max_y = numpy.max(ids, axis=0)
 
-            # nocheckin, what to do with rotated grids? Also use corners?
-            #            I think we have to rotate the corners back to get the tile.
-
             # Prevent outer rows or columns with all nodata_value.
             # The centroid of the corner ids in the alignment_grid are checked against
             # the bounds of the original tile to see if the centroid of these new corner ids
@@ -708,9 +705,7 @@ class DataTile(Tile):
                 alignment_grid, (min_x, min_y), max_x - min_x + 1, max_y - min_y + 1
             )
         else:  # Tile is already given
-            pass  # We already have a tile
-
-            # nocheckin, test if tile resample works as expected
+            pass  # Pass because we already have a tile to interpolate on
 
         new_ids = tile.indices
         shape = new_ids.shape
