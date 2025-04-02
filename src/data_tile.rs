@@ -554,7 +554,7 @@ impl DataTile {
     pub fn max(&self) -> f64 {
         let mut max_val = f64::NEG_INFINITY;
         for val in self.data.iter() {
-            if *val != self.nodata_value && *val > max_val {
+            if !self.is_nodata(*val) && *val > max_val {
                 max_val = *val;
             }
         }
@@ -567,7 +567,7 @@ impl DataTile {
     pub fn min(&self) -> f64 {
         let mut min_val = f64::INFINITY;
         for val in self.data.iter() {
-            if *val != self.nodata_value && *val < min_val {
+            if !self.is_nodata(*val) && *val < min_val {
                 min_val = *val;
             }
         }
@@ -580,7 +580,7 @@ impl DataTile {
     pub fn sum(&self) -> f64 {
         let mut summed = 0.;
         for val in self.data.iter() {
-            if *val != self.nodata_value {
+            if !self.is_nodata(*val) {
                 summed += *val;
             }
         }
@@ -591,7 +591,7 @@ impl DataTile {
         let mut summed = 0.;
         let mut nr_values_with_data = 0;
         for val in self.data.iter() {
-            if *val != self.nodata_value {
+            if !self.is_nodata(*val) {
                 summed += *val;
                 nr_values_with_data += 1;
             }
@@ -615,7 +615,7 @@ impl DataTile {
         }
 
         let mut sorted: Vec<f64> = self.data.iter().cloned().collect();
-        sorted.retain(|&x| x != self.nodata_value);
+        sorted.retain(|&x| !self.is_nodata(x));
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let n = sorted.len();
         if n == 0 {
@@ -641,7 +641,7 @@ impl DataTile {
         let mean = self.mean();
 
         // Compute the squared differences from the mean
-        let filtered = self.data.iter().filter(|&&x| x != self.nodata_value);
+        let filtered = self.data.iter().filter(|&&x| !self.is_nodata(x));
         let variance_sum: f64 = filtered.clone().map(|&x| (x - mean).powi(2)).sum();
         let variance = variance_sum / filtered.count() as f64;
 
@@ -655,7 +655,7 @@ impl Add<DataTile> for f64 {
     fn add(self, data_tile: DataTile) -> DataTile {
         let mut data = data_tile.data.to_owned();
         for val in data.iter_mut() {
-            if *val == data_tile.nodata_value {
+            if data_tile.is_nodata(*val) {
                 *val = data_tile.nodata_value;
             } else {
                 *val = self + *val;
@@ -675,7 +675,7 @@ impl Add<f64> for DataTile {
     fn add(self, scalar: f64) -> DataTile {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if *val == self.nodata_value {
+            if self.is_nodata(*val) {
                 *val = self.nodata_value;
             } else {
                 *val = *val + scalar
@@ -715,7 +715,7 @@ impl Add<DataTile> for DataTile {
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val + other_val;
@@ -760,7 +760,7 @@ impl Sub<f64> for DataTile {
     fn sub(self, scalar: f64) -> DataTile {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if *val == self.nodata_value {
+            if self.is_nodata(*val) {
                 *val = self.nodata_value;
             } else {
                 *val = *val - scalar
@@ -800,7 +800,7 @@ impl Sub<DataTile> for DataTile {
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val - other_val;
@@ -825,7 +825,7 @@ impl Mul<DataTile> for f64 {
     fn mul(self, data_tile: DataTile) -> DataTile {
         let mut data = data_tile.data.to_owned();
         for val in data.iter_mut() {
-            if *val == data_tile.nodata_value {
+            if data_tile.is_nodata(*val) {
                 *val = data_tile.nodata_value;
             } else {
                 *val = self * *val;
@@ -845,7 +845,7 @@ impl Mul<f64> for DataTile {
     fn mul(self, scalar: f64) -> DataTile {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if *val == self.nodata_value {
+            if self.is_nodata(*val) {
                 *val = self.nodata_value;
             } else {
                 *val = *val * scalar
@@ -885,7 +885,7 @@ impl Mul<DataTile> for DataTile {
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val * other_val;
@@ -910,7 +910,7 @@ impl Div<DataTile> for f64 {
     fn div(self, data_tile: DataTile) -> DataTile {
         let mut data = data_tile.data.to_owned();
         for val in data.iter_mut() {
-            if *val == data_tile.nodata_value {
+            if data_tile.is_nodata(*val) {
                 *val = data_tile.nodata_value;
             } else {
                 *val = self / *val;
@@ -930,7 +930,7 @@ impl Div<f64> for DataTile {
     fn div(self, scalar: f64) -> DataTile {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if *val == self.nodata_value {
+            if self.is_nodata(*val) {
                 *val = self.nodata_value;
             } else {
                 *val = *val / scalar
@@ -969,7 +969,7 @@ impl Div<DataTile> for DataTile {
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self_val == self.nodata_value || other_val == other.nodata_value {
+                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val / other_val;
