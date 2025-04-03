@@ -123,11 +123,15 @@ plt.show()
 # This is it! To visualize it nicely we can add a border around it and clip the polygons
 # such that they do not cross the outer border.
 #
-
+# .. Note :: In Shapely<2.1.0 we could do `MultiPolygon([c.intersection(outer_poly) for c in all_circles])`,
+#            but since Shapely 2.1.0 `intersection` can return a point. We cannot create a MultiPolygon
+#            from a list that includes points, hence we have to filter those out manually.
 outer_poly = Point(center).buffer(3 * grid.r)
 
 all_circles = [*circles.geoms, *circles1.geoms, *circles2.geoms]
-all_circles = MultiPolygon([c.intersection(outer_poly) for c in all_circles])
+
+intersected_circles = [c.intersection(outer_poly) for c in all_circles]
+all_circles = MultiPolygon([c for c in intersected_circles if not isinstance(c, Point)])
 
 plot_polygons(all_circles, fill=False, colors="black")
 plot_polygons(outer_poly.buffer(0.0), fill=False, colors="black")
