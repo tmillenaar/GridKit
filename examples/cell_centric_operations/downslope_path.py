@@ -37,9 +37,9 @@ First let's import the dependencies and read in the DEM.
 import matplotlib.pyplot as plt
 import numpy
 
-from gridkit import read_raster
+from gridkit.io import raster_to_data_tile
 
-dem = read_raster(
+dem = raster_to_data_tile(
     "../../tests/data/alps_dem.tiff", bounds=(29200, 167700, 29800, 168100)
 )
 
@@ -58,7 +58,7 @@ neighbour_values = []
 def downslope_path(cell_id):
     visited_cells.append(cell_id)
     # add new neigbours and their values to their respective lists
-    neighbours = dem.neighbours(cell_id, connect_corners=True)
+    neighbours = dem.grid.neighbours(cell_id, connect_corners=True)
     for cell, value in zip(neighbours, dem.value(neighbours)):
         cell = tuple(cell.index)
         if not cell in visited_cells and not cell in all_neighbours:
@@ -80,7 +80,7 @@ def downslope_path(cell_id):
 
 # %%
 # Determine the starting cell and call the function
-start_cell_id = dem.cell_at_point((29330, 167848))
+start_cell_id = dem.grid.cell_at_point((29330, 167848))
 downslope_path(tuple(start_cell_id.index))
 
 
@@ -99,7 +99,7 @@ plt.ylabel("latitude")
 plt.title("Downslope path from a chosen starting point", fontsize=10)
 
 path_label = "Downslope path"
-for poly in dem.to_shapely(visited_cells):
+for poly in dem.to_shapely(visited_cells).geoms:
     x, y = poly.exterior.xy
     plt.fill(x, y, alpha=1.0, color="red", label=path_label)
     path_label = None  # Only show the label in the legend once
