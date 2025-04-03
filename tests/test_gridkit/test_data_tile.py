@@ -633,3 +633,47 @@ def test_interpolate(grid, interp_method):
             assert numpy.isfinite(val)
         else:
             assert numpy.isnan(val)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1, rotation=13, crs=4326),
+        RectGrid(size=1, rotation=13, crs=4326),
+        HexGrid(size=1, rotation=13, crs=4326),
+    ],
+)
+@pytest.mark.parametrize("interp_method", ["nearest", "linear", "inverse_distance"])
+def test_resample(grid, interp_method):
+    tile = Tile(grid, (-2, -2), 5, 5)
+    data = numpy.arange(tile.nx * tile.ny).reshape((tile.nx, tile.ny))
+    data_tile = tile.to_data_tile(data)
+
+    new_grid = grid.update(rotation=-5, offset=(-0.2, 0.3))
+    new_tile = Tile(new_grid, tile.start_id, tile.nx, tile.ny)
+
+    result = data_tile.resample(new_tile, method=interp_method)
+
+    # For each nodata value make sure there is at least one neighbour that is outside of the original tile
+    for id, value in zip(result.indices, result.to_numpy().ravel()):
+        if result.is_nodata(value):
+            original_cells_near_nodata_cell = tile.grid.cells_near_point(
+                result.grid.centroid(id)
+            )
+            # check that at least one cell is outside the original tile to warrent the nodata value
+            cells_otuside_orignal_tile = original_cells_near_nodata_cell.difference(
+                tile.indices
+            )
+            assert len(cells_otuside_orignal_tile) > 0
+            # or equivalently
+            assert cells_otuside_orignal_tile  # Fails when empty. Ain't that both fun and hard to read? :)
+
+    # The new data should still be roughly in inascending order
+    # Not exactly, but close enough
+    data_values = [v for v in result.to_numpy().ravel() if not result.is_nodata(v)]
+    assert data_values[0] < data_values[-1]
+
+    # All interpolation methods used here smooth to some exent and never get values larger than in the original
+    assert result.min() >= data_tile.min()
+    assert result.max() <= data_tile.max()
+    assert result.mean() > data_tile.min() and result.mean() < data_tile.max()

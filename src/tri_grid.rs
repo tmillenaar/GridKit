@@ -170,52 +170,6 @@ impl GridTraits for TriGrid {
 
             let mut y_threshold_left: f64;
             let mut y_threshold_right: f64;
-
-            // nocheckin, clean up but make sure tests pass
-            // let mut id_shift: i64;
-            // match self.cell_orientation() {
-            //     Orientation::Flat => {
-            //         let slope = dy / dx;
-            //         // Descrtibes the equation that forms the left border of the triangle
-            //         let left_eq = |x: f64| -> f64 { slope * x };
-            //         // Descrtibes the equation that forms the right border of the triangle
-            //         let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
-            //         y_threshold_left = left_eq(rel_loc_x);
-            //         y_threshold_right = right_eq(rel_loc_x);
-            //         id_shift = if rel_loc_y > y_threshold_left {
-            //             -1
-            //         } else if rel_loc_y > y_threshold_right {
-            //             1
-            //         } else {
-            //             0
-            //         };
-            //     }
-            //     Orientation::Pointy => {
-            //         let slope = dy / dx;
-            //         // Descrtibes the equation that forms the left border of the triangle
-            //         let left_eq = |x: f64| -> f64 { slope * x };
-            //         // Descrtibes the equation that forms the right border of the triangle
-            //         let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
-            //         y_threshold_left = left_eq(rel_loc_x);
-            //         y_threshold_right = right_eq(rel_loc_x);
-            //         // let slope = dx / dy;
-            //         // // Descrtibes the equation that forms the left border of the triangle
-            //         // let left_eq = |y: f64| -> f64 { slope * y };
-            //         // // Descrtibes the equation that forms the right border of the triangle
-            //         // let right_eq = |y: f64| -> f64 { -slope * y + 2. * cell_height };
-            //         // y_threshold_left = left_eq(rel_loc_x);
-            //         // y_threshold_right = right_eq(rel_loc_x);
-            //         id_shift = if rel_loc_y > y_threshold_left {
-            //             -1
-            //         } else if rel_loc_y > y_threshold_right {
-            //             1
-            //         } else {
-            //             0
-            //         };
-            //     }
-            // }
-            //
-
             let slope = dy / dx;
             // Descrtibes the equation that forms the left border of the triangle
             let left_eq = |x: f64| -> f64 { slope * x };
@@ -231,32 +185,6 @@ impl GridTraits for TriGrid {
                 0
             };
 
-            // nocheckin
-            // let slope = dy / dx;
-
-            // let left_eq = |x: f64| -> f64 {
-            //     // Descrtibes the equation that forms the left border of the triangle
-            //     slope * x
-            // };
-            // let right_eq = |x: f64| -> f64 {
-            //     // Descrtibes the equation that forms the right border of the triangle
-            //     -slope * x + 2. * self.cell_height()
-            // };
-
-            // let y_threshold_left = left_eq(rel_loc_x);
-            // let y_threshold_right = right_eq(rel_loc_x);
-
-            // let id_shift: i64 = if rel_loc_y > y_threshold_left {
-            //     -1
-            // } else if rel_loc_y > y_threshold_right {
-            //     1
-            // } else {
-            //     0
-            // };
-
-            // let id_shift = 0;
-
-            // index[Ix2(cell_id, id_x_axis)] = id_shift;
             index[Ix2(cell_id, id_x_axis)] = index[Ix2(cell_id, id_x_axis)] + id_shift;
         }
         index
