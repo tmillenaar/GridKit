@@ -47,6 +47,7 @@ def plot_polygons(
     filled: bool = None,
     ax=None,
     add_colorbar=False,
+    set_zoom_to_bounds=True,
     **kwargs,
 ):
     """Plot polygons on a map and color them based on the supplied ``values``.
@@ -162,7 +163,8 @@ def plot_polygons(
     if add_colorbar:
         plt.colorbar(im)
 
-    ax.set_xlim(bounds[0], bounds[2])
-    ax.set_ylim(bounds[1], bounds[3])
+    if set_zoom_to_bounds:
+        ax.set_xlim(bounds[0], bounds[2])
+        ax.set_ylim(bounds[1], bounds[3])
 
     return im
