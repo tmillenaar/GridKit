@@ -127,9 +127,7 @@ def shapely_geom_from_index_1d(id_1d):
     return grid.to_shapely(GridIndex.from_index_1d(id_1d))
 
 
-polygons = occurrences.index.map_partitions(
-    shapely_geom_from_index_1d, meta={"geoms": object}
-)
+polygons = occurrences.index.map_partitions(shapely_geom_from_index_1d)
 geoms, points_per_cell = dask.compute(polygons, occurrences.nr_points)
 
 # %%
