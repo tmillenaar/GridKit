@@ -36,7 +36,7 @@ pub enum PyO3Grid {
 #[pyclass]
 #[derive(Clone)]
 struct PyO3DataTile {
-    _data_tile: data_tile::DataTile,
+    _data_tile: data_tile::DataTile<f64>,
     _tile: PyO3Tile,
 }
 
@@ -336,7 +336,7 @@ impl PyO3DataTile {
     }
 
     fn _add_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value + self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) + self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -360,7 +360,7 @@ impl PyO3DataTile {
     }
 
     fn _subtract_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value - self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) - self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -384,7 +384,7 @@ impl PyO3DataTile {
     }
 
     fn _multiply_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value * self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) * self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -408,7 +408,7 @@ impl PyO3DataTile {
     }
 
     fn _divide_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value / self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) / self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -1019,7 +1019,7 @@ fn count_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTile> {
 #[pyfunction]
 fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
     // Like count_tiles but does not count cells with a nodata_value
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
@@ -1037,7 +1037,7 @@ fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3D
 
 #[pyfunction]
 fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
@@ -1055,7 +1055,7 @@ fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3Data
 
 #[pyfunction]
 fn average_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
