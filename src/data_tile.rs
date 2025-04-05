@@ -100,6 +100,41 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         value == self.nodata_value
     }
 
+    pub fn is_nodata_array(&self, value: &ArrayViewD<T>) -> ArrayD<bool> {
+        let mut result = Array::default(value.shape());
+        for (idx, val) in value.indexed_iter() {
+            result[idx] = self.is_nodata(*val);
+        }
+        result
+    }
+
+    pub fn nodata_cells(&self) -> Array2<i64> {
+        let nodata_mask = self.is_nodata_array(&self.data.view().into_dyn());
+        // Note: nodata_mask.sum() returns a bool, which is not what we are after
+        //       when summing a boolean array. So I'll do the sum myself.
+        let mut nr_nodata: usize = 0;
+        for val in nodata_mask.iter() {
+            if *val {
+                nr_nodata += 1;
+            }
+        }
+
+        // Now for each true in nodata_mask, get the index
+        let mut result = Array2::<i64>::zeros((nr_nodata, 2));
+        let ids = self.indices();
+        let mut result_id = 0;
+        for id_y in 0..ids.shape()[0] {
+            for id_x in 0..ids.shape()[1] {
+                if nodata_mask[Ix2(id_y, id_x)] {
+                    result[Ix2(result_id, 0)] = ids[Ix3(id_y, id_x, 0)];
+                    result[Ix2(result_id, 1)] = ids[Ix3(id_y, id_x, 1)];
+                    result_id += 1;
+                }
+            }
+        }
+        result
+    }
+
     pub fn _empty_combined_tile(&self, other: &DataTile<T>, nodata_value: T) -> DataTile<T> {
         let tile = self.tile.combined_tile(&other.tile);
         let data = Array2::from_elem((tile.ny as usize, tile.nx as usize), nodata_value);

@@ -2,7 +2,7 @@ use std::ops::Add;
 
 use grid::Orientation;
 use numpy::{
-    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3,
+    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3, PyArrayDyn, PyReadonlyArrayDyn
 };
 use pyo3::exceptions::*;
 use pyo3::prelude::*;
@@ -251,6 +251,14 @@ impl PyO3DataTile {
 
     fn is_nodata(&self, value: f64) -> bool {
         self._data_tile.is_nodata(value)
+    }
+
+    fn is_nodata_array<'py>(&self, values: PyReadonlyArrayDyn<'py, f64>, py: Python<'py>) -> &'py PyArrayDyn<bool> {
+        self._data_tile.is_nodata_array(&values.as_array()).into_pyarray(py)
+    }
+
+    fn nodata_cells<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._data_tile.nodata_cells().into_pyarray(py)
     }
 
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {

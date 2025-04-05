@@ -393,8 +393,15 @@ class DataTile(Tile):
         This replaces all instances of the nodata value with the new value"""
         self._data_tile.set_nodata_value(float(value))
 
-    def is_nodata(self, value):
-        return self._data_tile.is_nodata(float(value))
+    def is_nodata(self, values):
+        values = numpy.array(values, dtype=float)
+        if values.ndim == 0:
+            return self._data_tile.is_nodata(values)
+        return self._data_tile.is_nodata_array(values)
+
+    @property
+    def nodata_cells(self):
+        return GridIndex(self._data_tile.nodata_cells())
 
     @staticmethod
     def from_pyo3_data_tile(grid, pyo3_data_tile):
