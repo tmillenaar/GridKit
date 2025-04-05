@@ -271,8 +271,8 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                                 [mean_centroid[Ix1(0)], mean_centroid[Ix1(1)]],
                             ];
                             let near_pnt_vals = array![
-                                near_vals[Ix1(near_pnt_1)].to_f64().unwrap_or(f64::NAN),
-                                near_vals[Ix1(near_pnt_2)].to_f64().unwrap_or(f64::NAN),
+                                near_vals[Ix1(near_pnt_1)],
+                                near_vals[Ix1(near_pnt_2)],
                                 mean_val,
                             ];
 
@@ -318,11 +318,18 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                         || self.is_nodata(br_val[Ix1(i)]);
                     if is_nodata {
                         values[Ix1(i)] = to_f64(self.nodata_value);
-                    } else {
-                        let top_val: f64 = to_f64(tl_val[Ix1(i)]) + to_f64(tr_val[Ix1(i)])
-                            - to_f64(tl_val[Ix1(i)]) * &x_diff[Ix1(i)];
-                        let bot_val: f64 = to_f64(bl_val[Ix1(i)]) + to_f64(br_val[Ix1(i)])
-                            - to_f64(bl_val[Ix1(i)]) * &x_diff[Ix1(i)];
+                    }
+                    else {
+                        // Should look like so:
+                        // let top_val = &tl_val + (&tr_val - &tl_val) * &x_diff;
+                        // let bot_val = &bl_val + (&br_val - &bl_val) * &x_diff;
+                        // values = &bot_val + (&top_val - &bot_val) * &y_diff;
+                        let top_val: f64 = to_f64(tl_val[Ix1(i)]) + (
+                            to_f64(tr_val[Ix1(i)]) - to_f64(tl_val[Ix1(i)])
+                        ) * &x_diff[Ix1(i)];
+                        let bot_val: f64 = to_f64(bl_val[Ix1(i)]) + (
+                            to_f64(br_val[Ix1(i)]) - to_f64(bl_val[Ix1(i)])
+                        ) * &x_diff[Ix1(i)];
                         values[Ix1(i)] = &bot_val + (&top_val - &bot_val) * &y_diff[Ix1(i)];
                     }
                 }
@@ -443,11 +450,12 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         let nodata_value = to_f64(self.nodata_value);
         for id_x in 0..self.tile.ny {
             for id_y in 0..self.tile.nx {
-                let val = data[Ix2(id_y as usize, id_x as usize)];
-                if is_nodata_value_f64(val, nodata_value) {
+                let val = self.data[Ix2(id_y as usize, id_x as usize)];
+                println!("{:?}", to_f64(val));
+                if self.is_nodata(val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
-                    data[Ix2(id_y as usize, id_x as usize)] = val;
+                    data[Ix2(id_y as usize, id_x as usize)] = to_f64(val).powf(exponent);
                 }
             }
         }
@@ -463,11 +471,11 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         let nodata_value = to_f64(self.nodata_value);
         for id_x in 0..self.tile.ny {
             for id_y in 0..self.tile.nx {
-                let val = data[Ix2(id_y as usize, id_x as usize)];
-                if is_nodata_value_f64(val, nodata_value) {
+                let val = self.data[Ix2(id_y as usize, id_x as usize)];
+                if self.is_nodata(val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
-                    data[Ix2(id_y as usize, id_x as usize)] = base.powf(val);
+                    data[Ix2(id_y as usize, id_x as usize)] = base.powf(to_f64(val));
                 }
             }
         }
@@ -483,11 +491,11 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         let nodata_value = to_f64(self.nodata_value);
         for id_x in 0..self.tile.ny {
             for id_y in 0..self.tile.nx {
-                let val = data[Ix2(id_y as usize, id_x as usize)];
-                if is_nodata_value_f64(val, nodata_value) {
+                let val = self.data[Ix2(id_y as usize, id_x as usize)];
+                if self.is_nodata(val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
-                    data[Ix2(id_y as usize, id_x as usize)] = val.powi(exponent);
+                    data[Ix2(id_y as usize, id_x as usize)] = to_f64(val).powi(exponent);
                 }
             }
         }
