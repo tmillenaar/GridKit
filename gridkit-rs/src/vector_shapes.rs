@@ -1,8 +1,10 @@
-use geo_types::{Coord, Geometry, LineString, MultiPolygon, Point, Polygon};
 use ndarray::*;
 use wkb::geom_to_wkb;
+use geo_types::{MultiPolygon, Polygon, LineString, Point, Coord, Geometry};
 
-pub fn coords_to_multipolygon_wkb(coords: &ArrayView3<f64>) -> Vec<u8> {
+pub fn coords_to_multipolygon_wkb(
+    coords: &ArrayView3<f64>,
+) -> Vec<u8> {
     let polygons: Vec<Polygon<f64>> = (0..coords.shape()[0])
         .map(|poly_index| {
             let points: Vec<Coord<f64>> = (0..coords.shape()[1])

@@ -12,6 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Enter Python dir
+        run: cd gridkit-py
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
