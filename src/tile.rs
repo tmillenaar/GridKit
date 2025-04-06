@@ -1,3 +1,4 @@
+use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive};
 use std::{f32::MAX, f64, i64};
 
 use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
@@ -17,7 +18,13 @@ pub trait TileTraits {
 
     fn get_grid(&self) -> &Grid;
 
-    fn to_data_tile_with_value(&self, fill_value: f64, nodata_value: f64) -> DataTile {
+    fn to_data_tile_with_value<
+        T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd,
+    >(
+        &self,
+        fill_value: T,
+        nodata_value: T,
+    ) -> DataTile<T> {
         let data = Array2::from_elem(
             [self.get_tile().ny as usize, self.get_tile().nx as usize],
             fill_value,
@@ -291,7 +298,7 @@ pub fn combine_tiles<T: TileTraits>(tiles: &Vec<T>) -> Tile {
     };
 }
 
-pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile {
+pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile<f64> {
     let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
@@ -300,23 +307,31 @@ pub fn count_tiles<T: TileTraits>(tiles: &Vec<T>) -> DataTile {
     combined_tile
 }
 
-pub fn count_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
+pub fn count_data_tiles<
+    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd,
+>(
+    tiles: &Vec<DataTile<T>>,
+) -> DataTile<f64> {
     let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(0., f64::NAN);
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
         for (count_val, tile_val) in data_slice.iter_mut().zip(tile.data.iter()) {
             if *tile_val != tile.nodata_value {
-                *count_val += 1.0;
+                *count_val += 1.;
             }
         }
     }
     combined_tile
 }
 
-pub fn sum_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
-    // Note: if we make combine_tiles start with something other than NAN, like
-    // if we want to support other data_types, we need to modify the is_nan check below.
-    let mut combined_tile = combine_tiles(tiles).to_data_tile_with_value(f64::NAN, f64::NAN);
+pub fn sum_data_tiles<
+    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd,
+>(
+    tiles: &Vec<DataTile<T>>,
+) -> DataTile<T> {
+    let nodata_value = tiles[0].nodata_value;
+    let mut combined_tile =
+        combine_tiles(tiles).to_data_tile_with_value(nodata_value, nodata_value);
     for tile in tiles {
         let mut data_slice = combined_tile._slice_tile_mut(&tile.get_tile());
         for (current_val, val_to_add) in data_slice.iter_mut().zip(tile.data.iter()) {
@@ -327,19 +342,30 @@ pub fn sum_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
             // It would have been nice to use combined_tile.is_nodata here,
             // but since combined_tile._slice_tile_mut mutably borrows self,
             // we cannot call other methods on combined_tile as long as the data_slice
-            // is being held on to. Since at the start of the function we set combine_tiles
-            // to start with nans, we can just check for that. If we ever allow for a different
-            // non-nan nodata value for combined_tile we need to change this check to be more robust.
-            if f64::is_nan(*current_val) {
+            // is being held on to. Since we base the nodata_value on the first tile,
+            if tiles[0].is_nodata(*current_val) {
                 *current_val = *val_to_add; // Overwriting default, only on first modification
             } else {
-                *current_val += val_to_add; // If already has a value, start summing
+                *current_val = *current_val + *val_to_add; // If already has a value, start summing
             }
         }
     }
     combined_tile
 }
 
-pub fn average_data_tiles(tiles: &Vec<DataTile>) -> DataTile {
-    sum_data_tiles(tiles) / count_data_tiles(tiles)
+pub fn average_data_tiles<
+    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd,
+>(
+    tiles: &Vec<DataTile<T>>,
+) -> DataTile<f64> {
+    let summed = sum_data_tiles(tiles);
+    let counted = count_data_tiles(tiles);
+    let summed_data = summed.data.mapv(|x| x.to_f64().unwrap_or(f64::NAN));
+    let counted_data = counted.data.mapv(|x| x.to_f64().unwrap_or(f64::NAN));
+    let result = summed_data / counted_data;
+    DataTile {
+        tile: summed.tile.clone(),
+        data: result,
+        nodata_value: f64::NAN,
+    }
 }

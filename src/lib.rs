@@ -2,7 +2,7 @@ use std::ops::Add;
 
 use grid::Orientation;
 use numpy::{
-    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3,
+    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3, PyArrayDyn, PyReadonlyArrayDyn
 };
 use pyo3::exceptions::*;
 use pyo3::prelude::*;
@@ -36,7 +36,7 @@ pub enum PyO3Grid {
 #[pyclass]
 #[derive(Clone)]
 struct PyO3DataTile {
-    _data_tile: data_tile::DataTile,
+    _data_tile: data_tile::DataTile<f64>,
     _tile: PyO3Tile,
 }
 
@@ -253,6 +253,14 @@ impl PyO3DataTile {
         self._data_tile.is_nodata(value)
     }
 
+    fn is_nodata_array<'py>(&self, values: PyReadonlyArrayDyn<'py, f64>, py: Python<'py>) -> &'py PyArrayDyn<bool> {
+        self._data_tile.is_nodata_array(&values.as_array()).into_pyarray(py)
+    }
+
+    fn nodata_cells<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+        self._data_tile.nodata_cells().into_pyarray(py)
+    }
+
     fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
         self._tile.clone()
     }
@@ -336,7 +344,7 @@ impl PyO3DataTile {
     }
 
     fn _add_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value + self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) + self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -360,7 +368,7 @@ impl PyO3DataTile {
     }
 
     fn _subtract_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value - self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) - self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -384,7 +392,7 @@ impl PyO3DataTile {
     }
 
     fn _multiply_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value * self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) * self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -408,7 +416,7 @@ impl PyO3DataTile {
     }
 
     fn _divide_scalar_reverse<'py>(&self, py: Python<'py>, value: f64) -> PyO3DataTile {
-        let _data_tile = value / self._data_tile.clone();
+        let _data_tile = data_tile::Scalar(value) / self._data_tile.clone();
         PyO3DataTile {
             _data_tile,
             _tile: self._tile.clone(),
@@ -1019,7 +1027,7 @@ fn count_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTile> {
 #[pyfunction]
 fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
     // Like count_tiles but does not count cells with a nodata_value
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
@@ -1037,7 +1045,7 @@ fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3D
 
 #[pyfunction]
 fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
@@ -1055,7 +1063,7 @@ fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3Data
 
 #[pyfunction]
 fn average_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile> = data_tiles
+    let tiles_vec: Vec<DataTile<f64>> = data_tiles
         .iter()
         .map(|item| {
             let py_o3_tile: PyO3DataTile = item.extract().unwrap();

@@ -123,10 +123,12 @@ def test_sum_data_tiles(grid):
     assert len(summation == -3.1) == 6
     assert len(summation == -2.1) == 21
     assert len(summation == -1) == 24
-    assert len(summation == summation.nodata_value) == 14
     assert numpy.isclose(summation[:], 0.1).sum() == 8
     assert len(summation == 2.2) == 22
     assert len(summation == 3.2) == 5
+    # Test nodata in two different ways, make sure they agree
+    assert summation.is_nodata(summation).sum() == 14
+    assert len(summation.nodata_cells) == 14
 
     # Check with nodata_value
     tile2[3, 3] = 999

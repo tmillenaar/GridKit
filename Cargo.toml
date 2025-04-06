@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 enum_delegate = "0.2.0"
 geo-types = "0.7.12"
+num-traits = "0.2.19"
 numpy = "0.21.0"
 pyo3 = "0.21.2"
 wkb = "0.7.1"
