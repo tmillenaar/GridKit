@@ -16,10 +16,9 @@ and finally the polygon description of these cells will be obtained.
    >>> points = [[2, 7], [-6, 2]]
    >>> cell_ids = grid.cell_at_point(points)
    >>> geoms = grid.to_shapely(cell_ids)
-   >>> geoms
-   array([<POLYGON ((2.5 5.052, 2.5 7.939, 0 9.382, -2.5 7.939, -2.5 5.052, 0 3.608, 2...>,
-         <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>],
-         dtype=object)
+   >>> print(geoms)
+   [<POLYGON ((2.5 5.052, 2.5 7.939, 1.768e-16 9.382, -2.5 7.939, -2.5 5.052, -5...>
+    <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>]
 
 ..
 
@@ -103,7 +102,7 @@ Gridkit is not nesecarily build to work with multiband rasters.
 If this is the kind of data you are most likely to use, you may consider one of the packages mentined in the previous section.
 
 GridKit's cell-based approach can be beneficial if you want to:
- 
+
  * relate rasters of different spatial extends
  * relate vector data to grid cells
  * exercise fine grained control over particular cells and their properties, such as obtaining a cell's corner locations or finding it's neighbouring cells
@@ -117,7 +116,7 @@ We chan choose how we subdivide this surface by choosing the type shape and size
 Once we have chose these parameters, we can say something about each cell, like it's position relative to the origin or relative other cells.
 Since this plane has no defined end, the cells can keep on tiling to infinity. Hence the term '*infinite grid*'.
 
-A grid that is defined by it's cell shape, size and the grid's origin does not need to store a lot of data in memory. 
+A grid that is defined by it's cell shape, size and the grid's origin does not need to store a lot of data in memory.
 All other information regarding grid cells of interest (such as their area, center location, corner locations or neighbours) can be calculated on demand.
 
 Bounded vs infinite grids, an example
@@ -126,7 +125,7 @@ Bounded vs infinite grids, an example
 Out of practicality, most data that can be thought of as a grid is bounded in the real world.
 A computer screen can be thought of as a rectangular grid of say 1920x1080 pixels.
 This is clearly a bounded grid, where pixel (2000, 500) has little meaning, for it is out of the bounds of the screen and hence does not reflect a real-world pixel.
-However, when two screens are placed next to each other and attached to the same device, 
+However, when two screens are placed next to each other and attached to the same device,
 the screens can be combined and their shared pixel space can thought of as one of 3840x1080 pixels.
 In this scenario pixel (2000, 500) refers to a pixel on the second screen.
 Conceptually, these two screens then sare the same grid.
@@ -161,4 +160,3 @@ In fact, in GridKit there is no distinction between these two grids, they are co
 To refer back to the screen example, the two screens that are attached to the same device conceptually occupy the same pixel-space.
 Hence they live on the same grid, with the same origin.
 In this conceptualization, the second screen's first pixel would start at index (1921,0).
-
