@@ -1,5 +1,6 @@
 import numpy
 import pytest
+
 from gridkit import BoundedTriGrid, RectGrid, TriGrid
 from gridkit.index import GridIndex
 

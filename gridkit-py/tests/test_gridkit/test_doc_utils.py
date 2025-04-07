@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import numpy
 import pytest
 import shapely
-from gridkit import doc_utils
 from matplotlib.collections import PatchCollection
+
+from gridkit import doc_utils
 
 
 def test_generate_2d_scatter_doughnut():

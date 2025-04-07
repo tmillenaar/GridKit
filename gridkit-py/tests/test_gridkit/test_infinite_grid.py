@@ -4,6 +4,7 @@ import numpy
 import pytest
 import shapely
 from geopandas import GeoSeries
+
 from gridkit import HexGrid, RectGrid, TriGrid
 
 

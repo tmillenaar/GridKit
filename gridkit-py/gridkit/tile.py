@@ -2,6 +2,9 @@ import warnings
 from typing import List, Literal, Tuple, Union
 
 import numpy
+from pyproj import Transformer
+from shapely.geometry import MultiPoint
+
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError
 from gridkit.gridkit_rs import *
@@ -9,8 +12,6 @@ from gridkit.hex_grid import HexGrid
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 from gridkit.tri_grid import TriGrid
-from pyproj import Transformer
-from shapely.geometry import MultiPoint
 
 
 class Tile:

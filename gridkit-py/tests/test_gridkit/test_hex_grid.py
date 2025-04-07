@@ -1,6 +1,7 @@
 import numpy
 import pytest
 import shapely
+
 from gridkit import GridIndex, RectGrid
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 

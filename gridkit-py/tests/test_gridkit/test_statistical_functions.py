@@ -1,7 +1,8 @@
-import gridkit
-import gridkit.tile
 import numpy
 import pytest
+
+import gridkit
+import gridkit.tile
 from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 

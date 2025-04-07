@@ -3,9 +3,10 @@ from typing import Tuple
 
 import numpy
 import rasterio
+from pyproj import CRS, Transformer
+
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 from gridkit.tile import DataTile, Tile
-from pyproj import CRS, Transformer
 
 
 def read_raster(

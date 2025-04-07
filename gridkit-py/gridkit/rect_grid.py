@@ -3,12 +3,13 @@ from typing import Literal, Tuple, Union
 
 import numpy
 import scipy
+from pyproj import CRS, Transformer
+
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.gridkit_rs import PyO3RectGrid
 from gridkit.index import GridIndex, validate_index
-from pyproj import CRS, Transformer
 
 
 class RectGrid(BaseGrid):

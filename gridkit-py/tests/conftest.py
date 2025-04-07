@@ -1,5 +1,6 @@
 import numpy
 import pytest
+
 from gridkit import hex_grid, rect_grid, tri_grid
 from gridkit.io import read_geotiff
 

@@ -2,6 +2,7 @@ import numpy
 import pytest
 import shapely
 import shapely.geometry
+
 from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 

@@ -5,13 +5,14 @@ import warnings
 from multiprocessing.sharedctypes import Value
 from typing import Literal, Tuple
 
-import gridkit
 import numpy
 import scipy
+from pyproj import Transformer
+
+import gridkit
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.index import GridIndex, validate_index
-from pyproj import Transformer
 
 
 class _BoundedGridMeta(type):
