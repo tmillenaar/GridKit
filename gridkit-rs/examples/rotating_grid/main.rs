@@ -1,5 +1,5 @@
 use bresenham::Bresenham;
-use gridkit::TriGrid;
+use gridkit::*;
 use ndarray::*;
 
 fn draw_hexagon(canvas: &mut Vec<Vec<char>>, points: &Array3<f64>) {
@@ -29,7 +29,7 @@ fn print_canvas(canvas: &[Vec<char>]) {
     }
 }
 fn main() {
-    let grid = gridkit::TriGrid::new(5., (0., 0.), 0.);
+    let grid = gridkit::TriGrid::new(10., Orientation::Flat);
 
     let point: Array2<f64> = Array2::from_shape_vec((1, 2), vec![42., 25.]).unwrap();
     let center_cell = grid.cell_at_point(&point.view()); // Fixme do a cell_at_point_xy
