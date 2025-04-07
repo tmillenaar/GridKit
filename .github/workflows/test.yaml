@@ -19,18 +19,23 @@ jobs:
 
       - name: Install dependencies
         run: pip install -e ./[test]
+        working-directory: ./gridkit-py
 
       - name: Run pytest
         run: python -m pytest tests --cov --verbose
+        working-directory: ./gridkit-py
 
       - name: Run doctest
-        run: python -m pytest gridkit/ --doctest-modules
+        run: python -m pytest gridkit/ docs/source/*.rst --doctest-modules
+        working-directory: ./gridkit-py
 
       - name: Run black check
         run: python3 -m black gridkit tests --check
+        working-directory: ./gridkit-py
 
       - name: Run isort check
         run: python3 -m isort gridkit tests --check
+        working-directory: ./gridkit-py
 
       - name: Run wordwarden check
         run: |
@@ -38,7 +43,7 @@ jobs:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           cargo install word_warden
-          word_warden $(ls gridkit/*.py tests/*.py src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
+          word_warden $(ls ./gridkit-py/gridkit/*.py ./gridkit-py/tests/*.py ./gridkit-py/src/*.rs ./gridkit-rs/src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

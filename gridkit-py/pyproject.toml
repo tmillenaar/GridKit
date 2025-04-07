@@ -1,0 +1,51 @@
+[build-system]
+requires = ["maturin>=1.0"]
+build-backend = "maturin"
+
+[project]
+name = "gridkit"
+version = "0.1.0.dev"
+readme = "../README.md"
+authors = [{ name = "Timo Millenaar", email = "tmillenaar@gmail.com" }]
+requires-python = ">=3.10"
+description = "Powerful abstractions of infinite grids for grid-vector interactions, tesselation, resampling and interactions between related grids."
+dependencies = ["numpy", "scipy", "shapely", "rasterio", "pyproj"]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "License :: OSI Approved :: MIT License",
+]
+
+[project.optional-dependencies]
+doc = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-gallery",
+    "sphinxcontrib-plantuml",
+    "geopandas",
+    "dask[dataframe]",
+    "matplotlib",
+]
+test = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinx-gallery",
+    "sphinxcontrib-plantuml",
+    "geopandas",
+    "dask[dataframe]",
+    "matplotlib",
+    "black",
+    "pytest",
+    "pytest-cov",
+    "pytest-pylint",
+    "pytest-black",
+    "pylint",
+    "pre-commit",
+    "maturin",
+]
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+python-source = "./"
+module-name = "gridkit.gridkit_rs"
