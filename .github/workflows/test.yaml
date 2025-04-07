@@ -12,28 +12,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Enter Python dir
-        run: cd gridkit-py
-
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: pip install -e ./[test]
+        run: pip install -e ./gridkit-py/[test]
 
       - name: Run pytest
-        run: python -m pytest tests --cov --verbose
+        run: python -m pytest ./gridkit-py/tests --cov --verbose
 
       - name: Run doctest
-        run: python -m pytest gridkit/ --doctest-modules
+        # Note: we run d
+        run: python -m pytest ./gridkit-py/gridkit/ ./gridkit-py/docs/source/*.rst --doctest-modules
 
       - name: Run black check
-        run: python3 -m black gridkit tests --check
+        run: python3 -m black ./gridkit-py/gridkit ./gridkit-py/tests --check
 
       - name: Run isort check
-        run: python3 -m isort gridkit tests --check
+        run: python3 -m isort ./gridkit-py/gridkit ./gridkit-py/tests --check
 
       - name: Run wordwarden check
         run: |
@@ -41,7 +39,7 @@ jobs:
           curl https://sh.rustup.rs -sSf | sh -s -- -y
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           cargo install word_warden
-          word_warden $(ls gridkit/*.py tests/*.py src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
+          word_warden $(ls ./gridkit-py/gridkit/*.py ./gridkit-py/tests/*.py ./gridkit-py/src/*.rs ./gridkit-rs/src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
