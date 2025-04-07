@@ -18,20 +18,24 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: pip install -e ./gridkit-py/[test]
+        run: pip install -e ./[test]
+        working-directory: ./gridkit-py
 
       - name: Run pytest
-        run: python -m pytest ./gridkit-py/tests --cov --verbose
+        run: python -m pytest tests --cov --verbose
+        working-directory: ./gridkit-py
 
       - name: Run doctest
-        # Note: we run d
-        run: python -m pytest ./gridkit-py/gridkit/ ./gridkit-py/docs/source/*.rst --doctest-modules
+        run: python -m pytest gridkit/ docs/source/*.rst --doctest-modules
+        working-directory: ./gridkit-py
 
       - name: Run black check
-        run: python3 -m black ./gridkit-py/gridkit ./gridkit-py/tests --check
+        run: python3 -m black gridkit tests --check
+        working-directory: ./gridkit-py
 
       - name: Run isort check
-        run: python3 -m isort ./gridkit-py/gridkit ./gridkit-py/tests --check
+        run: python3 -m isort gridkit tests --check
+        working-directory: ./gridkit-py
 
       - name: Run wordwarden check
         run: |
