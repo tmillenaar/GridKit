@@ -1,8 +1,10 @@
 use std::ops::Add;
 
 use grid::Orientation;
+use gridkit::CellElement;
 use numpy::{
-    IntoPyArray, PyArray1, PyArray2, PyArray3, PyReadonlyArray1, PyReadonlyArray2, PyReadonlyArray3, PyArrayDyn, PyReadonlyArrayDyn
+    IntoPyArray, PyArray1, PyArray2, PyArray3, PyArrayDyn, PyReadonlyArray1, PyReadonlyArray2,
+    PyReadonlyArray3, PyReadonlyArrayDyn,
 };
 use pyo3::exceptions::*;
 use pyo3::prelude::*;
@@ -253,8 +255,14 @@ impl PyO3DataTile {
         self._data_tile.is_nodata(value)
     }
 
-    fn is_nodata_array<'py>(&self, values: PyReadonlyArrayDyn<'py, f64>, py: Python<'py>) -> &'py PyArrayDyn<bool> {
-        self._data_tile.is_nodata_array(&values.as_array()).into_pyarray(py)
+    fn is_nodata_array<'py>(
+        &self,
+        values: PyReadonlyArrayDyn<'py, f64>,
+        py: Python<'py>,
+    ) -> &'py PyArrayDyn<bool> {
+        self._data_tile
+            .is_nodata_array(&values.as_array())
+            .into_pyarray(py)
     }
 
     fn nodata_cells<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
@@ -635,6 +643,32 @@ impl PyO3TriGrid {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
+    fn anchor<'py>(
+        &self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) -> PyO3TriGrid {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element =
+            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+        let mut new_grid = self.clone();
+        new_grid._grid.anchor_inplace(&target_loc, cell_element);
+        new_grid
+    }
+
+    fn anchor_inplace<'py>(
+        &mut self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element =
+            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+        self._grid.anchor_inplace(&target_loc, cell_element);
+    }
+
     fn centroid<'py>(
         &self,
         py: Python<'py>,
@@ -653,13 +687,13 @@ impl PyO3TriGrid {
         self._grid.cell_corners(&index).into_pyarray(py)
     }
 
-    fn cell_at_point<'py>(
+    fn cell_at_points<'py>(
         &self,
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_point(&points).into_pyarray(py)
+        self._grid.cell_at_points(&points).into_pyarray(py)
     }
 
     fn cells_in_bounds<'py>(
@@ -800,6 +834,32 @@ impl PyO3RectGrid {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
+    fn anchor<'py>(
+        &self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) -> PyO3RectGrid {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element =
+            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+        let mut new_grid = self.clone();
+        new_grid._grid.anchor_inplace(&target_loc, cell_element);
+        new_grid
+    }
+
+    fn anchor_inplace<'py>(
+        &mut self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element =
+            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+        self._grid.anchor_inplace(&target_loc, cell_element);
+    }
+
     fn centroid<'py>(
         &self,
         py: Python<'py>,
@@ -809,13 +869,13 @@ impl PyO3RectGrid {
         self._grid.centroid(&index).into_pyarray(py)
     }
 
-    fn cell_at_point<'py>(
+    fn cell_at_points<'py>(
         &self,
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_point(&points).into_pyarray(py)
+        self._grid.cell_at_points(&points).into_pyarray(py)
     }
 
     fn cell_corners<'py>(
@@ -919,6 +979,31 @@ impl PyO3HexGrid {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
+    fn anchor<'py>(
+        &self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) -> PyO3HexGrid {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element {}", &cell_element));
+        let mut new_grid = self.clone();
+        new_grid._grid.anchor_inplace(&target_loc, cell_element);
+        new_grid
+    }
+
+    fn anchor_inplace<'py>(
+        &mut self,
+        py: Python<'py>,
+        target_loc: (f64, f64),
+        cell_element: String,
+    ) {
+        let target_loc: [f64; 2] = target_loc.into();
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element {}", &cell_element));
+        self._grid.anchor_inplace(&target_loc, cell_element);
+    }
     fn centroid<'py>(
         &self,
         py: Python<'py>,
@@ -928,13 +1013,13 @@ impl PyO3HexGrid {
         self._grid.centroid(&index).into_pyarray(py)
     }
 
-    fn cell_at_point<'py>(
+    fn cell_at_points<'py>(
         &self,
         py: Python<'py>,
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_point(&points).into_pyarray(py)
+        self._grid.cell_at_points(&points).into_pyarray(py)
     }
 
     fn cell_corners<'py>(

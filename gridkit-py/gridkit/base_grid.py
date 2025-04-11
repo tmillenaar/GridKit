@@ -484,38 +484,15 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :meth:`.BoundedHexGrid.anchor`
 
         """
-
-        # Force rotation to zer before determining new offset
-        orig_rot = self.rotation
-        if orig_rot:
-            orig_target_loc = target_loc
-            target_loc = self.rotation_matrix_inv.dot(target_loc)
-            self.rotation = 0
-
-        current_cell = self.cell_at_point(target_loc)
-
-        # Determine the offset
-        if cell_element == "centroid":
-            diff = target_loc - self.centroid(current_cell)
-        elif cell_element == "corner":
-            corners = self.cell_corners(current_cell)
-            diffs = target_loc - corners
-            distances = numpy.linalg.norm(diffs, axis=1)
-            diff = diffs[numpy.argmin(distances)]
-        else:
-            raise ValueError(
-                f"Unsupported cell_element supplied to anchor. Got: {cell_element}. Available: ('centroid')"
-            )
-
-        # Rotate original grid back
-        if orig_rot:
-            self.rotation = orig_rot
-
-        # Apply the offset
-        new_offset = self.offset + diff
+        target_loc = tuple(target_loc)
+        if not len(target_loc) == 2:
+            raise ValueError(f"Expected target_loc to be of type (x,y) but it has {len(target_loc)} elements instead of 2.")
         if not in_place:
-            return self.update(offset=new_offset)
-        self.offset = new_offset
+            self = self.update()
+        self._grid.anchor_inplace(target_loc, cell_element)
+        if not in_place:
+            return self
+
 
     @abc.abstractproperty
     def parent_grid_class(self):

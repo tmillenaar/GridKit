@@ -507,7 +507,7 @@ class HexGrid(BaseGrid):
         original_shape = point.shape
         point = point[None] if point.ndim == 1 else point
         point = point.reshape(-1, 2)
-        cell_at_point = self._grid.cell_at_point(points=point)
+        cell_at_point = self._grid.cell_at_points(points=point)
         return GridIndex(cell_at_point.squeeze().reshape(original_shape))
 
     @validate_index
@@ -756,7 +756,7 @@ class HexGrid(BaseGrid):
 
         # Turn Hex Grid into TriGrid, adjust definition appropriately
         definition = self.definition
-        definition.pop("shape")  # shape does not exist for TriGrids
+        definition.pop("shape")  # shape does not exist for TriGrids, FIXME: it does now though
         extra_rot = 30 if self.shape == "pointy" else 0
         definition["rotation"] += extra_rot
         definition["size"] = self.r / factor

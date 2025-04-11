@@ -754,9 +754,9 @@ def test_area(size):
 @pytest.mark.parametrize("starting_offset", [[0, 0], [0.1, 0], [0, 0.1], [0.1, 0.2]])
 @pytest.mark.parametrize("rot", [0, 15, -69, 420])
 @pytest.mark.parametrize("cell_element", ["centroid", "corner"])
-def test_anchor(target_loc, in_place, starting_offset, rot, cell_element):
-    grid = TriGrid(size=0.3, offset=starting_offset, rotation=rot)
-    # grid = TriGrid(size=1)
+@pytest.mark.parametrize("orientation", ["pointy", "flat"])
+def test_anchor(target_loc, in_place, starting_offset, rot, cell_element, orientation):
+    grid = TriGrid(size=0.3, offset=starting_offset, rotation=rot, orientation=orientation)
 
     if in_place:
         grid.anchor(target_loc, cell_element=cell_element, in_place=True)

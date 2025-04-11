@@ -537,7 +537,7 @@ class RectGrid(BaseGrid):
         point = numpy.array(point, dtype=float)
         original_shape = point.shape
         point = point.reshape(-1, 2)
-        cell_ids = self._grid.cell_at_point(point)
+        cell_ids = self._grid.cell_at_points(point)
         return GridIndex(cell_ids.reshape(original_shape))
 
     @validate_index

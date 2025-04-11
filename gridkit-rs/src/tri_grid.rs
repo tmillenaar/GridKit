@@ -16,6 +16,10 @@ pub struct TriGrid {
 }
 
 impl GridTraits for TriGrid {
+    fn get_grid(&self) -> crate::Grid {
+        crate::Grid::TriGrid(self.to_owned())
+    }
+
     fn dx(&self) -> f64 {
         match self.cell_orientation() {
             Orientation::Flat => self.cellsize / 2.,
@@ -125,7 +129,7 @@ impl GridTraits for TriGrid {
         centroids
     }
 
-    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+    fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
 
         let dx = self.stepsize_consistent_axis();
@@ -262,7 +266,7 @@ impl GridTraits for TriGrid {
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 6, 2));
         // TODO:
         // Condense this into a single loop
-        let cell_ids = self.cell_at_point(points);
+        let cell_ids = self.cell_at_points(points);
         let corners = self.cell_corners(&cell_ids.view());
 
         // Define arguments to be used when determining the minimum distance
@@ -407,28 +411,28 @@ impl TriGrid {
         self.cell_orientation = cell_orientation;
     }
 
-    fn consistent_axis(&self) -> usize {
+    pub fn consistent_axis(&self) -> usize {
         match self.cell_orientation {
             Orientation::Pointy => 1,
             Orientation::Flat => 0,
         }
     }
 
-    fn inconsistent_axis(&self) -> usize {
+    pub fn inconsistent_axis(&self) -> usize {
         match self.cell_orientation {
             Orientation::Pointy => 0,
             Orientation::Flat => 1,
         }
     }
 
-    fn stepsize_consistent_axis(&self) -> f64 {
+    pub fn stepsize_consistent_axis(&self) -> f64 {
         match self.cell_orientation {
             Orientation::Pointy => self.dy(),
             Orientation::Flat => self.dx(),
         }
     }
 
-    fn stepsize_inconsistent_axis(&self) -> f64 {
+    pub fn stepsize_inconsistent_axis(&self) -> f64 {
         match self.cell_orientation {
             Orientation::Pointy => self.dx(),
             Orientation::Flat => self.dy(),
@@ -437,15 +441,15 @@ impl TriGrid {
 
     pub fn cells_in_bounds(&self, bounds: &(f64, f64, f64, f64)) -> (Array2<i64>, (usize, usize)) {
         // Get ids of the cells at diagonally opposing corners of the bounds
-        // TODO: allow calling of cell_at_point with single point (tuple or 1d array)
+        // TODO: allow calling of cell_at_points with single point (tuple or 1d array)
         let left_bottom: Array2<f64> =
             array![[bounds.0 + self.dx() / 4., bounds.1 + self.dy() / 4.]];
         let right_top: Array2<f64> =
             array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
 
         // translate the coordinates of the corner cells into indices
-        let left_bottom_id = self.cell_at_point(&left_bottom.view());
-        let right_top_id = self.cell_at_point(&right_top.view());
+        let left_bottom_id = self.cell_at_points(&left_bottom.view());
+        let right_top_id = self.cell_at_points(&right_top.view());
 
         // use the cells at the corners to determine
         // the ids in x an y direction as separate 1d arrays

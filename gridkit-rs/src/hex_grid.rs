@@ -14,6 +14,10 @@ pub struct HexGrid {
 }
 
 impl GridTraits for HexGrid {
+    fn get_grid(&self) -> crate::Grid {
+        crate::Grid::HexGrid(self.to_owned())
+    }
+
     fn dx(&self) -> f64 {
         match self.cell_orientation {
             Orientation::Pointy => self.cellsize,
@@ -35,8 +39,16 @@ impl GridTraits for HexGrid {
         self.offset
     }
 
-    fn set_offset(&mut self, offset: [f64; 2]) {
-        self.offset = normalize_offset(offset, self.cell_width(), self.cell_height())
+    fn set_offset(&mut self, mut offset: [f64; 2]) {
+        if modulus(
+            (offset[self.inconsistent_axis()] / self.stepsize_inconsistent_axis()).floor(),
+            2.,
+        ) != 0.
+        {
+            // Row is odd
+            offset[self.consistent_axis()] -= self.stepsize_consistent_axis() / 2.
+        }
+        self.offset = normalize_offset(offset, self.dx(), self.dy());
     }
 
     fn rotation(&self) -> f64 {
@@ -112,7 +124,7 @@ impl GridTraits for HexGrid {
         centroids
     }
 
-    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+    fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         // For the sake of simplicity here I will define it all in terms of a pointy grid.
         // dx, dy etc will be used but they will refer to the consistent/inconsistent axes
         // so it also works for flat grids. While in the context of flat grids the meanings
@@ -223,11 +235,11 @@ impl GridTraits for HexGrid {
         // the point and pure up, as measured from the centroid of the cell.
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
 
-        // Since points are rotated in cell_at_point, perform this call before
+        // Since points are rotated in cell_at_points, perform this call before
         // rotating the points in this function.
-        // Ideally we have a version cell_at_point that does not rotate, same
+        // Ideally we have a version cell_at_points that does not rotate, same
         // as we do with centroid_xy_no_rot.
-        let cell_ids = self.cell_at_point(&points);
+        let cell_ids = self.cell_at_points(&points);
 
         // Rotate points only if nesecary
         // We only want to clone/copy the data in the points variable
@@ -388,28 +400,28 @@ impl HexGrid {
         self.cell_orientation = cell_orientation;
     }
 
-    fn consistent_axis(&self) -> usize {
+    pub fn consistent_axis(&self) -> usize {
         match self.cell_orientation {
             Orientation::Pointy => 0,
             Orientation::Flat => 1,
         }
     }
 
-    fn inconsistent_axis(&self) -> usize {
+    pub fn inconsistent_axis(&self) -> usize {
         match self.cell_orientation {
             Orientation::Pointy => 1,
             Orientation::Flat => 0,
         }
     }
 
-    fn stepsize_consistent_axis(&self) -> f64 {
+    pub fn stepsize_consistent_axis(&self) -> f64 {
         match self.cell_orientation {
             Orientation::Pointy => self.dx(),
             Orientation::Flat => self.dy(),
         }
     }
 
-    fn stepsize_inconsistent_axis(&self) -> f64 {
+    pub fn stepsize_inconsistent_axis(&self) -> f64 {
         match self.cell_orientation {
             Orientation::Pointy => self.dy(),
             Orientation::Flat => self.dx(),

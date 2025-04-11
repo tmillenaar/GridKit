@@ -14,6 +14,10 @@ pub struct RectGrid {
 }
 
 impl GridTraits for RectGrid {
+    fn get_grid(&self) -> crate::Grid {
+        crate::Grid::RectGrid(self.to_owned())
+    }
+
     fn dx(&self) -> f64 {
         self._dx
     }
@@ -85,7 +89,7 @@ impl GridTraits for RectGrid {
         self._dx
     }
 
-    fn cell_at_point(&self, points: &ArrayView2<f64>) -> Array2<i64> {
+    fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64> {
         let shape = points.shape();
         let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
         for cell_id in 0..points.shape()[0] {
@@ -129,7 +133,7 @@ impl GridTraits for RectGrid {
 
     fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
         let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
-        let index = self.cell_at_point(points);
+        let index = self.cell_at_points(points);
 
         // FIXME: Find a way to not clone points in the case of no rotation
         //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
