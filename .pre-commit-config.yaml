@@ -6,7 +6,7 @@ repos:
         language_version: python3
 
   - repo: https://github.com/timothycrosley/isort
-    rev: 5.11.5 # Replace by any tag/version: https://github.com/PyCQA/isort/tags
+    rev: 6.0.1 # Replace by any tag/version: https://github.com/PyCQA/isort/tags
     hooks:
       - id: isort
 

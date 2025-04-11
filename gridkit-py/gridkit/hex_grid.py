@@ -2,9 +2,6 @@ import warnings
 from typing import Literal, Tuple
 
 import numpy
-from pyproj import CRS, Transformer
-from shapely.geometry import Polygon
-
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
@@ -12,6 +9,8 @@ from gridkit.gridkit_rs import PyO3HexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 from gridkit.tri_grid import TriGrid
+from pyproj import CRS, Transformer
+from shapely.geometry import Polygon
 
 
 class HexGrid(BaseGrid):
@@ -756,7 +755,9 @@ class HexGrid(BaseGrid):
 
         # Turn Hex Grid into TriGrid, adjust definition appropriately
         definition = self.definition
-        definition.pop("shape")  # shape does not exist for TriGrids, FIXME: it does now though
+        definition.pop(
+            "shape"
+        )  # shape does not exist for TriGrids, FIXME: it does now though
         extra_rot = 30 if self.shape == "pointy" else 0
         definition["rotation"] += extra_rot
         definition["size"] = self.r / factor

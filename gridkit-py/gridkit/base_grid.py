@@ -7,10 +7,9 @@ from typing import Literal, Tuple
 import numpy
 import scipy
 import shapely
-from pyproj import CRS, Transformer
-
 from gridkit.gridkit_rs import shapes
 from gridkit.index import GridIndex, validate_index
+from pyproj import CRS, Transformer
 
 
 class BaseGrid(metaclass=abc.ABCMeta):
@@ -486,13 +485,14 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
         target_loc = tuple(target_loc)
         if not len(target_loc) == 2:
-            raise ValueError(f"Expected target_loc to be of type (x,y) but it has {len(target_loc)} elements instead of 2.")
+            raise ValueError(
+                f"Expected target_loc to be of type (x,y) but it has {len(target_loc)} elements instead of 2."
+            )
         if not in_place:
             self = self.update()
         self._grid.anchor_inplace(target_loc, cell_element)
         if not in_place:
             return self
-
 
     @abc.abstractproperty
     def parent_grid_class(self):

@@ -1,8 +1,8 @@
 import numpy
 import pytest
+from gridkit.index import GridIndex
 
 from gridkit import BoundedTriGrid, RectGrid, TriGrid
-from gridkit.index import GridIndex
 
 
 @pytest.mark.parametrize(
@@ -756,7 +756,9 @@ def test_area(size):
 @pytest.mark.parametrize("cell_element", ["centroid", "corner"])
 @pytest.mark.parametrize("orientation", ["pointy", "flat"])
 def test_anchor(target_loc, in_place, starting_offset, rot, cell_element, orientation):
-    grid = TriGrid(size=0.3, offset=starting_offset, rotation=rot, orientation=orientation)
+    grid = TriGrid(
+        size=0.3, offset=starting_offset, rotation=rot, orientation=orientation
+    )
 
     if in_place:
         grid.anchor(target_loc, cell_element=cell_element, in_place=True)
