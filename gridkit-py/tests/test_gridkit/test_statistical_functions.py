@@ -1,8 +1,8 @@
+import gridkit.tile
 import numpy
 import pytest
 
 import gridkit
-import gridkit.tile
 from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 
@@ -84,7 +84,8 @@ def test_count_data_tile(grid):
 
     count = gridkit.tile.count_tiles([tile1, tile2, tile3])
 
-    assert len(count == 0) == 14
+    assert len(count == count.nodata_value) == 14
+    assert len(count.nodata_cells) == 14
     assert len(count == 1) == 50
     assert len(count == 2) == 28
     assert len(count == 3) == 8

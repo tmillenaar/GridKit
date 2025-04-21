@@ -2,13 +2,12 @@ from typing import Literal, Tuple
 
 import numpy
 import shapely
-from pyproj import CRS, Transformer
-
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
 from gridkit.gridkit_rs import PyO3TriGrid
 from gridkit.index import GridIndex, validate_index
+from pyproj import CRS, Transformer
 
 
 class TriGrid(BaseGrid):

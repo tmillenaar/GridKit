@@ -1,4 +1,5 @@
 use std::ops::Add;
+// use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive};
 
 use grid::Orientation;
 use gridkit::CellElement;
@@ -59,7 +60,7 @@ macro_rules! impl_pydata_tile {
         }
 
         fn is_nodata(&self, value: $type) -> bool {
-            self._data_tile.is_nodata(value)
+            self._data_tile.is_nodata(&value)
         }
 
         fn is_nodata_array<'py>(
@@ -76,7 +77,7 @@ macro_rules! impl_pydata_tile {
             self._data_tile.nodata_cells().into_pyarray(py)
         }
 
-        fn get_tile<'py>(&self, py: Python<'py>) -> PyO3Tile {
+        fn get_tile<'py>(&self, _py: Python<'py>) -> PyO3Tile {
             self._tile.clone()
         }
 
@@ -96,11 +97,11 @@ macro_rules! impl_pydata_tile {
             self._data_tile.indices().into_pyarray(py)
         }
 
-        fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {
+        fn intersects<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> bool {
             self._data_tile.intersects(&other._tile)
         }
 
-        fn overlap<'py>(&self, py: Python<'py>, other: &$name) -> PyResult<PyO3Tile> {
+        fn overlap<'py>(&self, _py: Python<'py>, other: &$name) -> PyResult<PyO3Tile> {
             match self._data_tile.overlap(&other._data_tile.get_tile()) {
                 Ok(new_tile) => {
                     let tile = match &self._tile._grid {
@@ -150,7 +151,7 @@ macro_rules! impl_pydata_tile {
                 .into_pyarray(py)
         }
 
-        fn _add_scalar<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _add_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile = self._data_tile.clone() + value;
             $name {
                 _data_tile,
@@ -158,7 +159,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _add_scalar_reverse<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _add_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile: data_tile::DataTile<$type> = data_tile::Scalar::<$type>(value) + self._data_tile.clone();
             $name {
                 _data_tile,
@@ -166,15 +167,15 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _add_tile<'py>(&self, py: Python<'py>, other: $name) -> Self {
-            let _data_tile = self._data_tile.clone() + other._data_tile;
+        fn _add_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
+            let _data_tile = &self._data_tile + &other._data_tile;
             $name {
                 _data_tile,
                 _tile: self._tile.clone(),
             }
         }
 
-        fn _subtract_scalar<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _subtract_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile = self._data_tile.clone() - value;
             $name {
                 _data_tile,
@@ -182,7 +183,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _subtract_scalar_reverse<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _subtract_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile = data_tile::Scalar(value) - self._data_tile.clone();
             $name {
                 _data_tile,
@@ -190,7 +191,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _subtract_tile<'py>(&self, py: Python<'py>, other: $name) -> Self {
+        fn _subtract_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
             let _data_tile = self._data_tile.clone() - other._data_tile;
             $name {
                 _data_tile,
@@ -198,7 +199,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _multiply_scalar<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _multiply_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile = self._data_tile.clone() * value;
             $name {
                 _data_tile,
@@ -206,7 +207,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _multiply_scalar_reverse<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _multiply_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
             let _data_tile = data_tile::Scalar(value) * self._data_tile.clone();
             $name {
                 _data_tile,
@@ -214,7 +215,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _multiply_tile<'py>(&self, py: Python<'py>, other: $name) -> Self {
+        fn _multiply_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
             let _data_tile = self._data_tile.clone() * other._data_tile;
             $name {
                 _data_tile,
@@ -222,31 +223,31 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _divide_scalar<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _divide_scalar<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
             let _data_tile = self._data_tile.clone() / value;
-            $name {
+            $f64type {
                 _data_tile,
                 _tile: self._tile.clone(),
             }
         }
 
-        fn _divide_scalar_reverse<'py>(&self, py: Python<'py>, value: $type) -> Self {
+        fn _divide_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
             let _data_tile = data_tile::Scalar(value) / self._data_tile.clone();
-            $name {
+            $f64type {
                 _data_tile,
                 _tile: self._tile.clone(),
             }
         }
 
-        fn _divide_tile<'py>(&self, py: Python<'py>, other: $name) -> Self {
+        fn _divide_tile<'py>(&self, _py: Python<'py>, other: $name) -> $f64type {
             let _data_tile = self._data_tile.clone() / other._data_tile;
-            $name {
+            $f64type {
                 _data_tile,
                 _tile: self._tile.clone(),
             }
         }
 
-        fn _powf<'py>(&self, py: Python<'py>, value: f64) -> $f64type {
+        fn _powf<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
             let _data_tile = self._data_tile.powf(value);
             $f64type {
                 _data_tile,
@@ -254,7 +255,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _powf_reverse<'py>(&self, py: Python<'py>, value: f64) -> $f64type {
+        fn _powf_reverse<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
             // FIXME: Only for float??
             let _data_tile = self._data_tile.powf_reverse(value);
             $f64type {
@@ -263,7 +264,7 @@ macro_rules! impl_pydata_tile {
             }
         }
 
-        fn _powi<'py>(&self, py: Python<'py>, value: i32) -> $f64type {
+        fn _powi<'py>(&self, _py: Python<'py>, value: i32) -> $f64type {
             let _data_tile = self._data_tile.powi(value);
             $f64type {
                 _data_tile,
@@ -295,38 +296,38 @@ macro_rules! impl_pydata_tile {
             self._data_tile.lower_equals_value(value).into_pyarray(py)
         }
 
-        fn max<'py>(&self, py: Python<'py>) -> $type {
+        fn max<'py>(&self, _py: Python<'py>) -> $type {
             self._data_tile.max()
         }
 
-        fn min<'py>(&self, py: Python<'py>) -> $type {
+        fn min<'py>(&self, _py: Python<'py>) -> $type {
             self._data_tile.min()
         }
 
-        fn sum<'py>(&self, py: Python<'py>) -> $type {
+        fn sum<'py>(&self, _py: Python<'py>) -> $type {
             self._data_tile.sum()
         }
 
-        fn mean<'py>(&self, py: Python<'py>) -> f64 {
+        fn mean<'py>(&self, _py: Python<'py>) -> f64 {
             self._data_tile.mean()
         }
 
-        fn median<'py>(&self, py: Python<'py>) -> f64 {
+        fn median<'py>(&self, _py: Python<'py>) -> f64 {
             self._data_tile.median()
         }
 
-        fn percentile<'py>(&self, py: Python<'py>, percentile: f64) -> PyResult<f64> {
+        fn percentile<'py>(&self, _py: Python<'py>, percentile: f64) -> PyResult<f64> {
             match self._data_tile.percentile(percentile) {
                 Ok(value) => Ok(value),
                 Err(e) => Err(PyValueError::new_err(e)),
             }
         }
 
-        fn std<'py>(&self, py: Python<'py>) -> f64 {
+        fn std<'py>(&self, _py: Python<'py>) -> f64 {
             self._data_tile.std()
         }
 
-        fn _empty_combined_data_tile<'py>(&self, py: Python<'py>, other: $name) -> Self {
+        fn _empty_combined_data_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
             // Fixme: other should maybe be tile and not datatile?
             let _data_tile = self
                 ._data_tile
@@ -371,7 +372,7 @@ macro_rules! impl_pydata_tile {
 
         fn crop<'py>(
             &self,
-            py: Python<'py>,
+            _py: Python<'py>,
             crop_tile: PyO3Tile,
             nodata_value: $type,
         ) -> PyResult<$name> {
@@ -397,6 +398,97 @@ impl_pydata_tile!(PyO3DataTileU64, u64, PyO3DataTileF64);
 impl_pydata_tile!(PyO3DataTileU32, u32, PyO3DataTileF64);
 impl_pydata_tile!(PyO3DataTileU16, u16, PyO3DataTileF64);
 impl_pydata_tile!(PyO3DataTileU8, u8, PyO3DataTileF64);
+
+#[derive(Clone)]
+pub enum PyO3DataTile {
+    F64(PyO3DataTileF64),
+    F32(PyO3DataTileF32),
+    I64(PyO3DataTileI64),
+    I32(PyO3DataTileI32),
+    I16(PyO3DataTileI16),
+    I8(PyO3DataTileI8),
+    U64(PyO3DataTileU64),
+    U32(PyO3DataTileU32),
+    U16(PyO3DataTileU16),
+    U8(PyO3DataTileU8),
+    // Bool(PyO3DataTileBool),
+    // Complex(PyO3DataTileComplex),
+}
+
+impl<'py> FromPyObject<'py> for PyO3DataTile {
+    fn extract(obj: &'py PyAny) -> PyResult<Self> {
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileF64>>() {
+            return Ok(Self::F64(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileI64>>() {
+            return Ok(Self::I64(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileU64>>() {
+            return Ok(Self::U64(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileI32>>() {
+            return Ok(Self::I32(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileU32>>() {
+            return Ok(Self::U32(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileI16>>() {
+            return Ok(Self::I16(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileU16>>() {
+            return Ok(Self::U16(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileI8>>() {
+            return Ok(Self::I8(v.clone()));
+        }
+        if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileU8>>() {
+            return Ok(Self::U8(v.clone()));
+        }
+        // if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileBool>>() {
+        //     return Ok(Self::Bool(v.clone()));
+        // }
+        // if let Ok(v) = obj.extract::<PyRef<'py, PyO3DataTileComplex>>() {
+        //     return Ok(Self::Complex(v.clone()));
+        // }
+
+        Err(pyo3::exceptions::PyTypeError::new_err(
+            "Unsupported PyO3DataTile type",
+        ))
+    }
+}
+
+
+impl PyO3DataTile {
+    pub fn get_tile(&self) -> &PyO3Tile {
+        match self {
+            PyO3DataTile::F64(grid) => &grid._tile,
+            PyO3DataTile::F32(grid) => &grid._tile,
+            PyO3DataTile::I64(grid) => &grid._tile,
+            PyO3DataTile::I32(grid) => &grid._tile,
+            PyO3DataTile::I16(grid) => &grid._tile,
+            PyO3DataTile::I8(grid) => &grid._tile,
+            PyO3DataTile::U64(grid) => &grid._tile,
+            PyO3DataTile::U32(grid) => &grid._tile,
+            PyO3DataTile::U16(grid) => &grid._tile,
+            PyO3DataTile::U8(grid) => &grid._tile,
+        }
+    }
+
+    // pub fn get_data_tile(&self) -> &DataTile<T> {
+    //     match self {
+    //         PyO3DataTile::F64(grid) => &grid._data_tile,
+    //         PyO3DataTile::F32(grid) => &grid._data_tile,
+    //         PyO3DataTile::I64(grid) => &grid._data_tile,
+    //         PyO3DataTile::I32(grid) => &grid._data_tile,
+    //         PyO3DataTile::I16(grid) => &grid._data_tile,
+    //         PyO3DataTile::I8(grid) => &grid._data_tile,
+    //         PyO3DataTile::U64(grid) => &grid._data_tile,
+    //         PyO3DataTile::U32(grid) => &grid._data_tile,
+    //         PyO3DataTile::U16(grid) => &grid._data_tile,
+    //         PyO3DataTile::U8(grid) => &grid._data_tile,
+    //     }
+    // }
+}
 
 #[derive(Clone)]
 // #[enum_delegate::implement(GridTraits)]
@@ -659,11 +751,11 @@ impl PyO3Tile {
         self._tile.indices().into_pyarray(py)
     }
 
-    fn intersects<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> bool {
+    fn intersects<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> bool {
         self._tile.intersects(&other._tile)
     }
 
-    fn overlap<'py>(&self, py: Python<'py>, other: &PyO3Tile) -> PyResult<PyO3Tile> {
+    fn overlap<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> PyResult<PyO3Tile> {
         match self._tile.overlap(&other._tile) {
             Ok(new_tile) => {
                 let grid = match &new_tile.grid {
@@ -793,7 +885,7 @@ impl PyO3TriGrid {
 
     fn anchor<'py>(
         &self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) -> PyO3TriGrid {
@@ -807,7 +899,7 @@ impl PyO3TriGrid {
 
     fn anchor_inplace<'py>(
         &mut self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) {
@@ -984,7 +1076,7 @@ impl PyO3RectGrid {
 
     fn anchor<'py>(
         &self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) -> PyO3RectGrid {
@@ -998,7 +1090,7 @@ impl PyO3RectGrid {
 
     fn anchor_inplace<'py>(
         &mut self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) {
@@ -1129,7 +1221,7 @@ impl PyO3HexGrid {
 
     fn anchor<'py>(
         &self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) -> PyO3HexGrid {
@@ -1143,7 +1235,7 @@ impl PyO3HexGrid {
 
     fn anchor_inplace<'py>(
         &mut self,
-        py: Python<'py>,
+        _py: Python<'py>,
         target_loc: (f64, f64),
         cell_element: String,
     ) {
@@ -1222,7 +1314,7 @@ fn shapes(_py: Python, module: &PyModule) -> PyResult<()> {
 }
 
 #[pyfunction]
-fn combine_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3Tile> {
+fn combine_tiles<'py>(_py: Python<'py>, tiles: &PyList) -> PyResult<PyO3Tile> {
     let tiles_vec: Vec<tile::Tile> = tiles
         .iter()
         .map(|item| {
@@ -1243,7 +1335,7 @@ fn combine_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3Tile> {
 }
 
 #[pyfunction]
-fn count_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTile> {
+fn count_tiles<'py>(_py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTileU64> {
     let tiles_vec: Vec<tile::Tile> = tiles
         .iter()
         .map(|item| {
@@ -1253,72 +1345,179 @@ fn count_tiles<'py>(py: Python<'py>, tiles: &PyList) -> PyResult<PyO3DataTile> {
         .collect();
     let _data_tile = tile::count_tiles(&tiles_vec);
     let _tile = tiles[0].extract::<PyO3Tile>().unwrap();
-    let tile = PyO3DataTile { _data_tile, _tile };
+    let tile = PyO3DataTileU64 { _data_tile, _tile };
     Ok(tile)
 }
 
 #[pyfunction]
-fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    // Like count_tiles but does not count cells with a nodata_value
-    let tiles_vec: Vec<DataTile<f64>> = data_tiles
+fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTileU64> {
+    // TODO: add check if tiles are aligned. Currently done in python but would be robust to add check here too.
+    let tiles_as_coverage: Vec<_> = data_tiles
         .iter()
         .map(|item| {
-            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-            py_o3_tile._data_tile
+            let pyo3_tile: PyO3DataTile = item.extract().unwrap();
+            match pyo3_tile {
+                PyO3DataTile::F64(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::F32(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::I64(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::I32(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::I16(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::I8(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::U64(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::U32(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::U16(data_tile) => data_tile._data_tile.data_cells_uint(),
+                PyO3DataTile::U8(data_tile) => data_tile._data_tile.data_cells_uint(),
+            }
         })
         .collect();
-    let _data_tile = tile::count_data_tiles(&tiles_vec);
-    let _tile = data_tiles[0]
-        .extract::<PyO3DataTile>()
-        .unwrap()
-        .get_tile(py);
-    let tile = PyO3DataTile { _data_tile, _tile };
-    Ok(tile)
+
+    let pyo3_tile: PyO3DataTile = data_tiles[0].extract().unwrap();
+    let pyo3_grid = match pyo3_tile {
+        PyO3DataTile::F64(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::F32(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::I64(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::I32(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::I16(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::I8(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::U64(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::U32(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::U16(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+        PyO3DataTile::U8(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
+    };
+
+    let mut combined_tile: DataTile<u64> = tiles_as_coverage[0].to_owned();
+    for i in 1..tiles_as_coverage.len() {
+        combined_tile = &combined_tile + &tiles_as_coverage[i];
+    }
+    let _tile = PyO3Tile{
+        _grid: pyo3_grid.clone(),
+        start_id: combined_tile.get_tile().start_id,
+        nx: combined_tile.get_tile().nx,
+        ny: combined_tile.get_tile().ny,
+        _tile: combined_tile.get_tile().to_owned(),
+    };
+    Ok(PyO3DataTileU64{
+        _data_tile: combined_tile,
+        _tile
+    })
+    // combined_tile
+    // // Determine extent of combined tile
+    // let mut min_x_id = i64::MAX;
+    // let mut min_y_id = i64::MAX;
+    // let mut max_x_id = i64::MIN;
+    // let mut max_y_id = i64::MIN;
+    // for data_tile in tiles_vec {
+    //     let tile = data_tile.get_tile();
+    //     let (min_x_id_tile, min_y_id_tile) = tile.start_id;
+    //     let max_x_id_tile = min_x_id_tile + tile.nx;
+    //     let max_y_id_tile = min_y_id_tile + tile.ny;
+    //     if min_x_id_tile < min_x_id {
+    //         min_x_id = min_x_id_tile
+    //     }
+    //     if min_y_id_tile < min_y_id {
+    //         min_y_id = min_y_id_tile
+    //     }
+    //     if max_x_id_tile > max_x_id {
+    //         max_x_id = max_x_id_tile
+    //     }
+    //     if max_y_id_tile > max_y_id {
+    //         max_y_id = max_y_id_tile
+    //     }
+    // }
+    // let mut combined_tile =
+
 }
 
-#[pyfunction]
-fn sum_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile<f64>> = data_tiles
-        .iter()
-        .map(|item| {
-            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-            py_o3_tile._data_tile
-        })
-        .collect();
-    let _data_tile = tile::sum_data_tiles(&tiles_vec);
-    let _tile = data_tiles[0]
-        .extract::<PyO3DataTile>()
-        .unwrap()
-        .get_tile(py);
-    let tile = PyO3DataTile { _data_tile, _tile };
-    Ok(tile)
-}
+// #[pyfunction]
+// fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTileU64> {
+//
+//     TODO: Create a coverage method that returns a PyO3DataTileU64. That way we would be able to add the coverages.
+//           The problem we are facing now is that we have different types that we cannot unify in a vec of a single type.
+//           Type <T> does not exist in PyO3 after all. I think we need to do the looping over tiles in python, or here
+//           do a item.extract::<PyO3DataTileF64> for each data type, call coverage and append coverage to vec.
+//           Maybe enum delegate can help here.
+//
+//     // Like count_tiles but does not count cells with a nodata_value
+//     let tiles_vec: Vec<DataTile<T>> = data_tiles
+//         .iter()
+//         .map(|item| {
+//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+//             match py_o3_tile {
+//                 PyO3DataTile::F64(grid) => &grid._data_tile,
+//                 PyO3DataTile::F32(grid) => &grid._data_tile,
+//                 PyO3DataTile::I64(grid) => &grid._data_tile,
+//                 PyO3DataTile::I32(grid) => &grid._data_tile,
+//                 PyO3DataTile::I16(grid) => &grid._data_tile,
+//                 PyO3DataTile::I8(grid) => &grid._data_tile,
+//                 PyO3DataTile::U64(grid) => &grid._data_tile,
+//                 PyO3DataTile::U32(grid) => &grid._data_tile,
+//                 PyO3DataTile::U16(grid) => &grid._data_tile,
+//                 PyO3DataTile::U8(grid) => &grid._data_tile,
+//             }
+//         })
+//         .collect();
+//     let _data_tile = tile::count_data_tiles(&tiles_vec);
+//     let _tile = data_tiles[0]
+//         .extract::<PyO3DataTileU64>()
+//         .unwrap()
+//         .get_tile(py);
+//     let tile = PyO3DataTileU64 { _data_tile, _tile };
+//     Ok(tile)
+// }
 
-#[pyfunction]
-fn average_data_tile<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTile> {
-    let tiles_vec: Vec<DataTile<f64>> = data_tiles
-        .iter()
-        .map(|item| {
-            let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-            py_o3_tile._data_tile
-        })
-        .collect();
-    let _data_tile = tile::average_data_tiles(&tiles_vec);
-    let _tile = data_tiles[0]
-        .extract::<PyO3DataTile>()
-        .unwrap()
-        .get_tile(py);
-    let tile = PyO3DataTile { _data_tile, _tile };
-    Ok(tile)
-}
+// #[pyfunction]
+// fn sum_data_tile<'py>(_py: Python<'py>, data_tiles: &PyList) -> PyResult<PyObject> {
+//     // Note: I am returning PyObject because PyO3DataTile is an enum.
+//     //       I could return a more specific version like PyO3DataTileF64,
+//     //       but that would require a version of this function for each type.
+//     //       Using PyObject is easier but we lose static typing in Python.
+//     let tiles_vec: Vec<DataTile<f64>> = data_tiles
+//         .iter()
+//         .map(|item| {
+//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+//             py_o3_tile.get_data_tile()
+//         })
+//         .collect();
+//     let _data_tile = tile::sum_data_tiles(&tiles_vec);
+//     let _tile = data_tiles[0]
+//         .extract::<PyO3DataTile>()
+//         .unwrap()
+//         .get_tile()
+//         ._tile;
+//     let tile = PyO3DataTile { _data_tile, _tile };
+//     Ok(tile)
+// }
+
+// #[pyfunction]
+// fn average_data_tile<'py>(_py: Python<'py>, data_tiles: &PyList) -> PyResult<PyObject> {
+//     // Note: I am returning PyObject because PyO3DataTile is an enum.
+//     //       I could return a more specific version like PyO3DataTileF64,
+//     //       but that would require a version of this function for each type.
+//     //       Using PyObject is easier but we lose static typing in Python.
+//     let tiles_vec: Vec<DataTile<f64>> = data_tiles
+//         .iter()
+//         .map(|item| {
+//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
+//             py_o3_tile.get_data_tile()
+//         })
+//         .collect();
+//     let _data_tile = tile::average_data_tiles(&tiles_vec);
+//     let _tile = data_tiles[0]
+//         .extract::<PyO3DataTile>()
+//         .unwrap()
+//         .get_tile()
+//         ._tile;
+//     let tile = PyO3DataTile { _data_tile, _tile };
+//     Ok(tile)
+// }
 
 #[pymodule]
 fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(combine_tiles, module)?)?;
     module.add_function(wrap_pyfunction!(count_tiles, module)?)?;
     module.add_function(wrap_pyfunction!(count_data_tiles, module)?)?;
-    module.add_function(wrap_pyfunction!(sum_data_tile, module)?)?;
-    module.add_function(wrap_pyfunction!(average_data_tile, module)?)?;
+    // module.add_function(wrap_pyfunction!(sum_data_tile, module)?)?;
+    // module.add_function(wrap_pyfunction!(average_data_tile, module)?)?;
     Ok(())
 }
 

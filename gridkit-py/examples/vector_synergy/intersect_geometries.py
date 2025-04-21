@@ -35,6 +35,7 @@ With that approach it might be worthwhile to call a `numpy.unique` on axis 0 aft
 import geopandas
 import matplotlib.pyplot as plt
 import pandas
+
 from gridkit import read_raster
 
 rivers = geopandas.read_file("../../tests/data/streams.gpkg")

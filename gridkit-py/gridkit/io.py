@@ -3,10 +3,9 @@ from typing import Tuple
 
 import numpy
 import rasterio
-from pyproj import CRS, Transformer
-
 from gridkit.rect_grid import BoundedRectGrid, RectGrid
 from gridkit.tile import DataTile, Tile
+from pyproj import CRS, Transformer
 
 
 def read_raster(
@@ -221,5 +220,12 @@ def raster_to_data_tile(
     grid = RectGrid(dx=dx, dy=dy, offset=offset, crs=crs)
     start_id = grid.cell_at_point(bounds[:2])
     tile = Tile(grid, start_id, nx=data.shape[1], ny=data.shape[0])
-    data_tile = DataTile(tile, data, nodata_value=raster_file.nodata)
+    try:
+        data_tile = DataTile(tile, data, nodata_value=nodata)
+    except TypeError:
+        warnings.warn(
+            f"The data type '{nodata}' cannot be safely converted into '{data.dtype}' for file {path}. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file."
+        )
+        nodata = numpy.array(nodata, dtype=data.dtype)
+        data_tile = DataTile(tile, data, nodata_value=nodata)
     return data_tile

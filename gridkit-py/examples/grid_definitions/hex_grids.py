@@ -19,8 +19,9 @@ Let's create a grid and obtain the polygons in some area of interest.
 
 # sphinx_gallery_thumbnail_number = -1
 
-from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
+
+from gridkit import HexGrid
 
 # create a grid
 main_grid = HexGrid(size=10, shape="pointy")

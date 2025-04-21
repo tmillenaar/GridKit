@@ -24,6 +24,7 @@ To demonstrate this, let's create a grid in WGS84 (epsg code 4326) and transform
 # sphinx_gallery_thumbnail_number = -2
 
 import numpy
+
 from gridkit import DataTile, RectGrid, Tile
 
 # Create a new grid

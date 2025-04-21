@@ -20,9 +20,10 @@ The rotation can be set when creating a new grid.
 # sphinx_gallery_thumbnail_number = -1
 
 import numpy
-from gridkit import TriGrid
 from gridkit.doc_utils import plot_polygons
 from matplotlib import pyplot as plt
+
+from gridkit import TriGrid
 
 grid = TriGrid(size=1, rotation=20)
 

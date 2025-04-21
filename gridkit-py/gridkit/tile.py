@@ -2,9 +2,6 @@ import warnings
 from typing import List, Literal, Tuple, Union
 
 import numpy
-from pyproj import Transformer
-from shapely.geometry import MultiPoint
-
 from gridkit.base_grid import BaseGrid
 from gridkit.errors import AlignmentError
 from gridkit.gridkit_rs import *
@@ -12,6 +9,14 @@ from gridkit.hex_grid import HexGrid
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 from gridkit.tri_grid import TriGrid
+from pyproj import Transformer
+from shapely.geometry import MultiPoint
+
+
+def get_value_dtype(value):
+    if isinstance(value, numpy.generic):
+        return value.dtype
+    return numpy.array(value).dtype
 
 
 class Tile:
@@ -88,7 +93,7 @@ class Tile:
     def from_pyo3_tile(grid, pyo3_tile):
         return Tile(grid, pyo3_tile.start_id, pyo3_tile.nx, pyo3_tile.ny)
 
-    def to_data_tile(self, data, nodata_value=numpy.nan):
+    def to_data_tile(self, data, nodata_value=None):
         if not data.ndim == 2:
             raise TypeError(
                 f"Setting data is only allowed for 2D data. Got data with {data.ndim} dimensions."
@@ -101,11 +106,49 @@ class Tile:
             raise ValueError(
                 f"The provided data has {data.shape()[1]} elements in the second axis but the tile has {tile.nx} x-elements. Beware that a numpy array's axis order is in y,x."
             )
-        py03_data_tile = self._tile.to_data_tile(data.astype(float), nodata_value)
-        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
+        if nodata_value is None:
+            if numpy.issubdtype(data.dtype, float):
+                nodata_value = numpy.nan
+            else:
+                nodata_value = numpy.iinfo(data.dtype).max
 
-    def to_data_tile_with_value(self, fill_value, nodata_value=numpy.nan):
-        py03_data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value)
+        return DataTile(self, data, nodata_value)
+
+    def to_data_tile_with_value(self, fill_value, nodata_value=None):
+        dtype = get_value_dtype(fill_value)
+        if nodata_value is None:
+            if numpy.issubdtype(dtype, float):
+                nodata_value = numpy.nan
+            else:
+                nodata_value = numpy.iinfo(dtype).max
+
+        # Map numpy dtypes to method suffixes
+        dtype_method_map = {
+            numpy.dtype("float64"): "f64",
+            numpy.dtype("float32"): "f32",
+            numpy.dtype("int64"): "i64",
+            numpy.dtype("int32"): "i32",
+            numpy.dtype("int16"): "i16",
+            numpy.dtype("int8"): "i8",
+            numpy.dtype("uint64"): "u64",
+            numpy.dtype("uint32"): "u32",
+            numpy.dtype("uint16"): "u16",
+            numpy.dtype("uint8"): "u8",
+            # numpy.dtype('bool'):   'bool',  # optional support
+            # FIXME: add complex version
+        }
+
+        method_suffix = dtype_method_map.get(dtype)
+        if method_suffix is None:
+            raise TypeError(f"Unsupported dtype: {dtype}")
+
+        method_name = f"to_data_tile_with_value_{method_suffix}"
+        method = getattr(self._tile, method_name, None)
+
+        if method is None:
+            raise AttributeError(f"Method {method_name} not found on tile")
+
+        py03_data_tile = method(fill_value, nodata_value)
         return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
 
     @property
@@ -368,20 +411,74 @@ class Tile:
 
 class DataTile(Tile):
 
-    def __init__(self, tile: Tile, data: numpy.ndarray, nodata_value=numpy.nan):
+    def __init__(self, tile: Tile, data: numpy.ndarray, nodata_value=None):
         if data.ndim != 2:
             raise ValueError(f"Expected a 2D array, got {data.ndim} dimensions")
         if tile.ny != data.shape[0] or tile.nx != data.shape[1]:
             raise ValueError(
                 f"The shape of the data {data.shape} does not match the shape of the tile: {(tile.ny, tile.nx)}"
             )
-
-        self.grid = tile.grid
         if nodata_value is None:
-            nodata_value = numpy.nan
-        self._data_tile = tile._tile.to_data_tile(data.astype("float64"), nodata_value)
+            if numpy.issubdtype(data.dtype, float):
+                nodata_value = numpy.nan
+            else:
+                nodata_value = numpy.iinfo(data.dtype.type).max
+        else:
+            if not get_value_dtype(nodata_value) == data.dtype:
+                try:
+                    nodata_value = numpy.array(nodata_value).astype(
+                        data.dtype, casting="safe"
+                    )
+                except TypeError as e:
+                    raise TypeError(
+                        f"Data type of the supplied array in argument 'data' (dtype: '{data.dtype}') did not match the supplied nodata value '{nodata_value}' of type '{type(nodata_value)}'"
+                    ) from e
+        self.grid = tile.grid
+
+        # Map numpy dtypes to method suffixes
+        dtype_method_map = {
+            numpy.dtype("float64"): "f64",
+            numpy.dtype("float32"): "f32",
+            numpy.dtype("int64"): "i64",
+            numpy.dtype("int32"): "i32",
+            numpy.dtype("int16"): "i16",
+            numpy.dtype("int8"): "i8",
+            numpy.dtype("uint64"): "u64",
+            numpy.dtype("uint32"): "u32",
+            numpy.dtype("uint16"): "u16",
+            numpy.dtype("uint8"): "u8",
+            # numpy.dtype('bool'):   'bool',  # optional support
+            # FIXME: add complex version
+        }
+        method_suffix = dtype_method_map.get(data.dtype)
+        if method_suffix is None:
+            raise TypeError(f"Unsupported dtype: {data.dtype}")
+        method_name = f"to_data_tile_{method_suffix}"
+        method = getattr(tile._tile, method_name, None)
+        if method is None:
+            raise AttributeError(f"Method {method_name} not found on tile")
+        self._data_tile = method(data, nodata_value)
+
         # _tile is used by the Tile parent class
         self._tile = self._data_tile.get_tile()
+
+    @property
+    def dtype(self):
+        dtype_method_map = {
+            "PyO3DataTileF64": "float64",
+            "PyO3DataTileF32": "float32",
+            "PyO3DataTileI64": "int64",
+            "PyO3DataTileI32": "int32",
+            "PyO3DataTileI16": "int16",
+            "PyO3DataTileI8": "int8",
+            "PyO3DataTileU64": "uint64",
+            "PyO3DataTileU32": "uint32",
+            "PyO3DataTileU16": "uint16",
+            "PyO3DataTileU8": "uint8",
+            # numpy.dtype('bool'):   'bool',  # optional support
+            # FIXME: add complex version
+        }
+        return dtype_method_map[self._data_tile.__class__.__name__]
 
     @property
     def nodata_value(self):
@@ -394,7 +491,7 @@ class DataTile(Tile):
         self._data_tile.set_nodata_value(float(value))
 
     def is_nodata(self, values):
-        values = numpy.array(values, dtype=float)
+        values = numpy.array(values)
         if values.ndim == 0:
             return self._data_tile.is_nodata(values)
         return self._data_tile.is_nodata_array(values)
@@ -440,7 +537,8 @@ class DataTile(Tile):
             )
         else:
             raise TypeError(f"Unrecognized grid type: {self.grid}")
-        self._data_tile = tile.to_data_tile(new_data, self.nodata_value)
+        new_data_tile = self.to_data_tile(new_data, self.nodata_value)
+        self._data_tile = new_data_tile._data_tile
 
     def update(
         self, data=None, grid=None, start_id=None, nx=None, ny=None, nodata_value=None
@@ -493,10 +591,14 @@ class DataTile(Tile):
     @validate_index
     def value(self, index=None, oob_value=None):
         if oob_value is None:
-            oob_value = (
-                self.nodata_value if not self.nodata_value is None else numpy.nan
-            )
-        oob_value = numpy.float64(oob_value)
+            if self.nodata_value is not None:
+                oob_value = self.nodata_value
+            else:
+                if numpy.issubdtype(dtype, float):
+                    oob_value = numpy.nan
+                else:
+                    oob_value = numpy.iinfo(dtype).max
+
         original_shape = index.shape
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
@@ -781,7 +883,9 @@ class DataTile(Tile):
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+
+                dtype = get_value_dtype(other)
+                # nocheckin, check other dtype with data dtype and convert in
                 _data_tile = self._data_tile._add_scalar(other)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
@@ -794,7 +898,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._add_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
@@ -807,7 +911,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._subtract_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._subtract_scalar(other)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
@@ -820,7 +924,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._subtract_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._subtract_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
@@ -833,7 +937,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._multiply_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._multiply_scalar(other)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
@@ -846,7 +950,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._multiply_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._multiply_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
@@ -859,7 +963,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._divide_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._divide_scalar(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
@@ -872,7 +976,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._divide_tile(other._data_tile)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._divide_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
@@ -889,7 +993,7 @@ class DataTile(Tile):
             _data_tile = self._data_tile._powi(other)
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._powf(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
@@ -904,7 +1008,7 @@ class DataTile(Tile):
             )
         else:
             try:
-                other = float(other)
+                other = numpy.array(other, dtype=self.dtype)
                 _data_tile = self._data_tile._powf_reverse(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
@@ -916,7 +1020,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile == other)
         except ValueError:
             raise TypeError(
@@ -927,7 +1031,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile != other)
         except ValueError:
             raise TypeError(
@@ -938,7 +1042,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile >= other)
         except ValueError:
             raise TypeError(
@@ -949,7 +1053,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile > other)
         except ValueError:
             raise TypeError(
@@ -960,7 +1064,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile <= other)
         except ValueError:
             raise TypeError(
@@ -971,7 +1075,7 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = float(other)
+            other = numpy.array(other, dtype=self.dtype)
             return GridIndex(self._data_tile < other)
         except ValueError:
             raise TypeError(

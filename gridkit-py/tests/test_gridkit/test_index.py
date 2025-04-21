@@ -2,7 +2,6 @@ import operator
 
 import numpy
 import pytest
-
 from gridkit.index import GridIndex, concat, validate_index
 
 

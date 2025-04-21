@@ -1,8 +1,8 @@
 import numpy
 import pytest
+from gridkit.io import read_geotiff
 
 from gridkit import hex_grid, rect_grid, tri_grid
-from gridkit.io import read_geotiff
 
 
 @pytest.fixture(scope="function")

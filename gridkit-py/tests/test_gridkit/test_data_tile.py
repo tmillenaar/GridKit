@@ -138,7 +138,7 @@ def test_intersects(grid, tile_init, expected):
     ),
 )
 def test_add_partial_overlap(grid, start_id, expected_data):
-    data = numpy.arange(9).reshape((3, 3))
+    data = numpy.arange(9, dtype=float).reshape((3, 3))
     tile1 = Tile(grid, (0, 0), 3, 3)
     tile2 = Tile(grid, start_id, 3, 3)
     data_tile1 = DataTile(tile1, data)
@@ -221,10 +221,10 @@ def test_basic_operations_with_scalars(grid):
     numpy.testing.assert_allclose(result, expected)
 
     result = 2 / data_tile_nodata
-    expected = numpy.array([[numpy.inf, 2], [2, 2 / 3]])
+    expected = numpy.array([[numpy.inf, 2], [numpy.nan, 2 / 3]])
     numpy.testing.assert_allclose(result, expected)
     result = data_tile_nodata / 2
-    expected = numpy.array([[0, 1 / 2], [2, 3 / 2]])
+    expected = numpy.array([[0, 1 / 2], [numpy.nan, 3 / 2]])
     numpy.testing.assert_allclose(result, expected)
 
     # test power
@@ -445,23 +445,26 @@ def test_basic_operations_with_other_grids(grid):
     numpy.testing.assert_allclose(result, expected)
 
     # test division
+    # Note: division is a special case becuase it returns a type f64, always.
+    #       Dividing integers should namely return a float too, not an integer.
+    #       This means also that the nodata value is hardcoded to be NaN.
     result = data_tile1 / data_tile2
     expected = numpy.array(
         [
-            [4, 0, 1, 2],
-            [0, 3, 4, 5],
-            [3, 4, 7 / 5, 8],
-            [6, 7, 8, 4],
+            [numpy.nan, 0, 1, 2],
+            [0, 3, numpy.nan, 5],
+            [3, numpy.nan, 7 / 5, 8],
+            [6, 7, 8, numpy.nan],
         ]
     )
     numpy.testing.assert_allclose(result, expected)
     result = data_tile2 / data_tile1
     expected = numpy.array(
         [
-            [4, 0, 1, 2],
-            [0, 1 / 3, 4, 5],
-            [3, 4, 5 / 7, 8],
-            [6, 7, 8, 4],
+            [numpy.nan, 0, 1, 2],
+            [0, 1 / 3, numpy.nan, 5],
+            [3, numpy.nan, 5 / 7, 8],
+            [6, 7, 8, numpy.nan],
         ]
     )
     numpy.testing.assert_allclose(result, expected)
@@ -569,7 +572,7 @@ def test_overlap(grid):
 def test_interpolate(grid, interp_method):
     tile = Tile(grid, (-1, -1), 5, 5)
 
-    data = numpy.arange(tile.nx * tile.ny).reshape((tile.ny, tile.nx))
+    data = numpy.arange(tile.nx * tile.ny, dtype=float).reshape((tile.ny, tile.nx))
     data_tile = DataTile(tile, data, nodata_value=-10)
 
     n = 100

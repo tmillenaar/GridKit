@@ -1,9 +1,9 @@
 import numpy
 import pytest
 import shapely
+from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 from gridkit import GridIndex, HexGrid
-from gridkit.rect_grid import BoundedRectGrid, RectGrid
 
 
 def test_cell_size_init():

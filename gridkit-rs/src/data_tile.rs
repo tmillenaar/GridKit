@@ -1,7 +1,7 @@
 use crate::grid::*;
 use crate::tile::*;
 use core::f64;
-use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive};
+use num_traits::{Bounded, FromPrimitive, Num, AsPrimitive, ToPrimitive, NumCast};
 use ndarray::*;
 use std::any::Any;
 use std::f64::consts::E;
@@ -16,7 +16,7 @@ pub struct DataTile<T> {
 }
 
 fn to_f64<
-    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd,
+    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast,
 >(
     val: T,
 ) -> f64 {
@@ -31,7 +31,7 @@ fn is_nodata_value_f64(val: f64, nodata_value: f64) -> bool {
     val == nodata_value
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     TileTraits for DataTile<T>
 {
     fn get_tile(&self) -> &Tile {
@@ -43,7 +43,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     DataTile<T>
 {
     pub fn new(
@@ -67,6 +67,36 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         }
     }
 
+    // nocheckin
+    // pub fn astype(&self) -> DataTile<T> {
+    //     // FIXME: I don't think this actually works
+    //     // nocheckin
+    //     let data = self.data.mapv(|val| NumCast::from(val).expect("Conversion failed"));
+    //     DataTile {
+    //         tile: self.get_tile().to_owned(),
+    //         data,
+    //         nodata_value: NumCast::from(self.nodata_value).expect("Conversion failed")
+    //     }
+    // }
+    //
+
+    pub fn into_dtype<U>(self) -> DataTile<U>
+        where
+            T: AsPrimitive<U>,
+            U: 'static + Clone,
+            T: 'static, // Needed to use AsPrimitive safely
+            T: Copy,
+            U: Copy,
+        {
+            let data = self.data.map(|x| (*x).as_());
+            let nodata_value = self.nodata_value.as_();
+            DataTile {
+                tile: self.tile,
+                data,
+                nodata_value,
+            }
+        }
+
     pub fn set_nodata_value(&mut self, nodata_value: T) {
         for val in self.data.iter_mut() {
             if *val == self.nodata_value {
@@ -76,7 +106,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         self.nodata_value = nodata_value;
     }
 
-    pub fn is_nodata(&self, value: T) -> bool {
+    pub fn is_nodata(&self, &value: &T) -> bool {
         // The following if-block is a dirty way of checking for nans which
         // are a float only concept. T.is_nan() does not exist and Rust does
         // not allow fow matching of T. Ideally we would have been able to do
@@ -103,12 +133,14 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     pub fn is_nodata_array(&self, value: &ArrayViewD<T>) -> ArrayD<bool> {
         let mut result = Array::default(value.shape());
         for (idx, val) in value.indexed_iter() {
-            result[idx] = self.is_nodata(*val);
+            result[idx] = self.is_nodata(&val);
         }
         result
     }
 
     pub fn nodata_cells(&self) -> Array2<i64> {
+        // Returns ids of cells with nodata value
+
         let nodata_mask = self.is_nodata_array(&self.data.view().into_dyn());
         // Note: nodata_mask.sum() returns a bool, which is not what we are after
         //       when summing a boolean array. So I'll do the sum myself.
@@ -133,6 +165,36 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
             }
         }
         result
+    }
+
+    pub fn data_cells(&self) -> DataTile<bool> {
+        // Returns a DataTile with boolean values where each true indicates the cell has valid data
+        let mut result = Array2::<bool>::default((self.tile.ny as usize, self.tile.nx as usize));
+        for (idx, val) in self.data.indexed_iter() {
+            result[idx] = !self.is_nodata(&val);
+        }
+        DataTile{
+            tile: self.get_tile().to_owned(),
+            data: result,
+            nodata_value: false // Maybe make nodata_value optional??
+        }
+    }
+
+    pub fn data_cells_uint(&self) -> DataTile<u64> {
+        // Returns a DataTile with u64 values where each 1 indicates the cell has valid data
+        let mut result = Array2::<u64>::default((self.tile.ny as usize, self.tile.nx as usize));
+        for (idx, val) in self.data.indexed_iter() {
+            if self.is_nodata(&val) {
+                result[idx] = 0;
+            } else {
+                result[idx] = 1;
+            }
+        }
+        DataTile{
+            tile: self.get_tile().to_owned(),
+            data: result,
+            nodata_value: u64::MAX
+        }
     }
 
     pub fn _empty_combined_tile(&self, other: &DataTile<T>, nodata_value: T) -> DataTile<T> {
@@ -234,7 +296,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                     .for_each(|new_val, point, val_locs, near_vals| {
                         let mut nodata_present: bool = false;
                         for val in near_vals {
-                            if self.is_nodata(*val) {
+                            if self.is_nodata(&val) {
                                 *new_val = nodata_value;
                                 nodata_present = true;
                                 break;
@@ -312,10 +374,10 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                 let y_diff = &abs_diff.slice(s![.., 1]) / grid.dy();
 
                 for i in 0..sample_points.shape()[0] {
-                    let is_nodata = self.is_nodata(tl_val[Ix1(i)])
-                        || self.is_nodata(tr_val[Ix1(i)])
-                        || self.is_nodata(bl_val[Ix1(i)])
-                        || self.is_nodata(br_val[Ix1(i)]);
+                    let is_nodata = self.is_nodata(&tl_val[Ix1(i)])
+                        || self.is_nodata(&tr_val[Ix1(i)])
+                        || self.is_nodata(&bl_val[Ix1(i)])
+                        || self.is_nodata(&br_val[Ix1(i)]);
                     if is_nodata {
                         values[Ix1(i)] = to_f64(self.nodata_value);
                     }
@@ -452,7 +514,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
             for id_y in 0..self.tile.nx {
                 let val = self.data[Ix2(id_y as usize, id_x as usize)];
                 println!("{:?}", to_f64(val));
-                if self.is_nodata(val) {
+                if self.is_nodata(&val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
                     data[Ix2(id_y as usize, id_x as usize)] = to_f64(val).powf(exponent);
@@ -472,7 +534,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         for id_x in 0..self.tile.ny {
             for id_y in 0..self.tile.nx {
                 let val = self.data[Ix2(id_y as usize, id_x as usize)];
-                if self.is_nodata(val) {
+                if self.is_nodata(&val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
                     data[Ix2(id_y as usize, id_x as usize)] = base.powf(to_f64(val));
@@ -492,7 +554,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         for id_x in 0..self.tile.ny {
             for id_y in 0..self.tile.nx {
                 let val = self.data[Ix2(id_y as usize, id_x as usize)];
-                if self.is_nodata(val) {
+                if self.is_nodata(&val) {
                     data[Ix2(id_y as usize, id_x as usize)] = nodata_value;
                 } else {
                     data[Ix2(id_y as usize, id_x as usize)] = to_f64(val).powi(exponent);
@@ -539,7 +601,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         for id_y in 0..self.tile.ny {
             for id_x in 0..self.tile.nx {
                 let tile_val = self.data[Ix2(id_y as usize, id_x as usize)];
-                if tile_val != value && !self.is_nodata(tile_val) {
+                if tile_val != value && !self.is_nodata(&tile_val) {
                     let (grid_id_x, grid_id_y) = self
                         .tile
                         .tile_id_to_grid_id_xy(id_y as i64, id_x as i64)
@@ -667,7 +729,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     pub fn max(&self) -> T {
         let mut max_val = T::min_value();
         for val in self.data.iter() {
-            if !self.is_nodata(*val) && *val > max_val {
+            if !self.is_nodata(&val) && *val > max_val {
                 max_val = *val;
             }
         }
@@ -680,7 +742,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     pub fn min(&self) -> T {
         let mut min_val = T::max_value();
         for val in self.data.iter() {
-            if !self.is_nodata(*val) && *val < min_val {
+            if !self.is_nodata(&val) && *val < min_val {
                 min_val = *val;
             }
         }
@@ -693,7 +755,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     pub fn sum(&self) -> T {
         let mut summed = T::zero();
         for val in self.data.iter() {
-            if !self.is_nodata(*val) {
+            if !self.is_nodata(&val) {
                 summed = summed + *val;
             }
         }
@@ -704,7 +766,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         let mut summed = T::zero();
         let mut nr_values_with_data = 0;
         for val in self.data.iter() {
-            if !self.is_nodata(*val) {
+            if !self.is_nodata(&val) {
                 summed = summed + *val;
                 nr_values_with_data += 1;
             }
@@ -728,7 +790,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         }
 
         let mut sorted: Vec<T> = self.data.iter().cloned().collect();
-        sorted.retain(|&x| !self.is_nodata(x));
+        sorted.retain(|&x| !self.is_nodata(&x));
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
         let n = sorted.len();
         if n == 0 {
@@ -754,7 +816,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         let mean = self.mean();
 
         // Compute the squared differences from the mean
-        let filtered = self.data.iter().filter(|&&x| !self.is_nodata(x));
+        let filtered = self.data.iter().filter(|&&x| !self.is_nodata(&x));
         let variance_sum: f64 = filtered
             .clone()
             .map(|&x| (x.to_f64().unwrap_or(f64::NAN) - mean).powi(2))
@@ -779,6 +841,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Add<Output = T>,
 {
     type Output = DataTile<T>;
@@ -786,7 +849,7 @@ where
     fn add(self, scalar: T) -> DataTile<T> {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if !self.is_nodata(*val) {
+            if !self.is_nodata(&val) {
                 *val = *val + scalar;
             }
         }
@@ -808,6 +871,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Add<Output = T>,
 {
     type Output = DataTile<T>;
@@ -829,17 +893,17 @@ where
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
-    Add<DataTile<T>> for DataTile<T>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
+    Add<&DataTile<T>> for &DataTile<T>
 {
     type Output = DataTile<T>;
 
-    fn add(self, other: DataTile<T>) -> DataTile<T> {
+    fn add(self, other: &DataTile<T>) -> DataTile<T> {
         // Create full span DataTile
-        let mut out_data_tile = self._empty_combined_tile(&other, self.nodata_value);
+        let mut out_data_tile = self._empty_combined_tile(other, self.nodata_value);
 
         let _ = out_data_tile._assign_data_in_place(&self);
-        let _ = out_data_tile._assign_data_in_place(&other);
+        let _ = out_data_tile._assign_data_in_place(other);
 
         // Insert added overlap between self and other
         if self.intersects(&other.tile) {
@@ -857,7 +921,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
+                    if self.is_nodata(&self_val) || other.is_nodata(&other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val + other_val;
@@ -886,6 +950,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Sub<Output = T>,
 {
     type Output = DataTile<T>;
@@ -893,7 +958,7 @@ where
     fn sub(self, scalar: T) -> DataTile<T> {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if !self.is_nodata(*val) {
+            if !self.is_nodata(&val) {
                 *val = *val - scalar;
             }
         }
@@ -915,6 +980,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Sub<Output = T>,
 {
     type Output = DataTile<T>;
@@ -936,7 +1002,7 @@ where
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     Sub<DataTile<T>> for DataTile<T>
 {
     type Output = DataTile<T>;
@@ -964,7 +1030,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
+                    if self.is_nodata(&self_val) || other.is_nodata(&other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val - other_val;
@@ -993,6 +1059,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Mul<Output = T>,
 {
     type Output = DataTile<T>;
@@ -1024,6 +1091,7 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Add<Output = T>,
 {
     type Output = DataTile<T>;
@@ -1031,7 +1099,7 @@ where
     fn mul(self, scalar: T) -> DataTile<T> {
         let mut data = self.data.to_owned();
         for val in data.iter_mut() {
-            if self.is_nodata(*val) {
+            if self.is_nodata(&val) {
                 *val = self.nodata_value;
             } else {
                 *val = *val * scalar
@@ -1045,7 +1113,7 @@ where
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     Mul<DataTile<T>> for DataTile<T>
 {
     type Output = DataTile<T>;
@@ -1073,7 +1141,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
+                    if self.is_nodata(&self_val) || other.is_nodata(&other_val) {
                         *result_val = self.nodata_value;
                     } else {
                         *result_val = self_val * other_val;
@@ -1102,23 +1170,25 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Div<Output = T>,
 {
-    type Output = DataTile<T>;
+    type Output = DataTile<f64>;
 
-    fn div(self, data_tile: DataTile<T>) -> DataTile<T> {
-        let mut data = data_tile.data.to_owned();
-        for val in data.iter_mut() {
-            if *val == data_tile.nodata_value {
-                *val = data_tile.nodata_value;
+    fn div(self, data_tile: DataTile<T>) -> DataTile<f64> {
+        let mut data = Array2::<f64>::default((data_tile.data.shape()[0], data_tile.data.shape()[1]));
+
+        for (new_val, orig_val) in data.iter_mut().zip(data_tile.data.iter()) {
+            if data_tile.is_nodata(orig_val) {
+                *new_val = f64::NAN;
             } else {
-                *val = self.0 / *val;
+                *new_val = to_f64(self.0) / to_f64(*orig_val);
             }
         }
-        DataTile {
+        DataTile::<f64> {
             tile: data_tile.tile,
             data,
-            nodata_value: data_tile.nodata_value,
+            nodata_value: f64::NAN,
         }
     }
 }
@@ -1133,44 +1203,71 @@ where
         + ToPrimitive
         + FromPrimitive
         + PartialOrd
+        + NumCast
         + Div<Output = T>,
 {
-    type Output = DataTile<T>;
+    type Output = DataTile<f64>;
 
-    fn div(self, scalar: T) -> DataTile<T> {
-        let mut data = self.data.to_owned();
-        for val in data.iter_mut() {
-            if self.is_nodata(*val) {
-                *val = self.nodata_value;
+    fn div(self, scalar: T) -> DataTile<f64> {
+        let mut data = Array2::<f64>::default((self.data.shape()[0], self.data.shape()[1]));
+        for (new_val, orig_val) in data.iter_mut().zip(&self.data) {
+            if self.is_nodata(orig_val) {
+                *new_val = f64::NAN;
             } else {
-                *val = *val / scalar
+                println!("Dividing {} / {}", to_f64(*orig_val), to_f64(scalar));
+                *new_val = to_f64(*orig_val) / to_f64(scalar)
             }
         }
         DataTile {
             tile: self.tile,
             data: data,
-            nodata_value: self.nodata_value,
+            nodata_value: f64::NAN,
         }
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + AsPrimitive<f64> + PartialOrd + NumCast>
     Div<DataTile<T>> for DataTile<T>
 {
-    type Output = DataTile<T>;
+    type Output = DataTile<f64>;
 
-    fn div(self, other: DataTile<T>) -> DataTile<T> {
+    fn div(self, other: DataTile<T>) -> DataTile<f64> {
         // Create full span DataTile
-        let mut out_data_tile = self._empty_combined_tile(&other, self.nodata_value);
+        let tile = self.tile.combined_tile(&other.tile);
+        let nodata_value = f64::NAN;
+        let data = Array2::<f64>::from_elem((tile.ny as usize, tile.nx as usize), nodata_value);
+        let mut out_data_tile = DataTile {
+            tile,
+            data,
+            nodata_value,
+        };
+        // let mut data_slice = out_data_tile._slice_tile_mut(self.get_tile());
+        // data_slice.assign(&self.data.astype());
+
+        // nocheckin
+        // TODO:
+        //    - Check if the normal method of _assign_data_in_place handles nodata values at all
+        //    - Maybe we need an assign function for all math ops
+        //    - (dt1 * dt2) gives wrong nx and ny
+        //    - set_nodata_value in python does not replace nodata values
+        //    - make math obs take in & and not clone in lib.rs
+        //
+        //
+
+        // let mut data_slice = out_data_tile._slice_tile_mut(other.get_tile());
+        // data_slice.assign(&other.data.into());
+        let mut other: DataTile<f64> = other.into_dtype::<f64>();
+        other.set_nodata_value(f64::NAN);
+        let self_f64: DataTile<f64> = self.clone().into_dtype::<f64>();
         let _ = out_data_tile._assign_data_in_place(&other);
-        let _ = out_data_tile._assign_data_in_place(&self);
+        let _ = out_data_tile._assign_data_in_place(&self_f64);
 
         // Insert added overlap between self and other
         if self.intersects(&other.tile) {
             // Note that it should unwrap the crop() calls here. Since we already checked if the tiles overlap,
             // crop() should not return an error. If it does, something more fundamental is wrong.
             let overlap_self = self.crop(&other.tile, self.nodata_value).unwrap();
-            let overlap_other = other.crop(&self.tile, self.nodata_value).unwrap();
+            let overlap_other = other.crop(&self.tile, other.nodata_value).unwrap();
 
             // Calculate overlapping values taking nodata values into account
             // The nodata value will be taken from self and not other.
@@ -1181,10 +1278,10 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
                 .and(&overlap_self.data)
                 .and(&overlap_other.data)
                 .for_each(|result_val, &self_val, &other_val| {
-                    if self.is_nodata(self_val) || other.is_nodata(other_val) {
-                        *result_val = self.nodata_value;
+                    if self.is_nodata(&self_val) || other.is_nodata(&other_val) {
+                        *result_val = f64::NAN;
                     } else {
-                        *result_val = self_val / other_val;
+                        *result_val = to_f64(self_val) / to_f64(other_val);
                     }
                 });
 
@@ -1192,7 +1289,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
             let overlap_data_tile = DataTile {
                 tile: overlap_tile,
                 data: overlap_data,
-                nodata_value: self.nodata_value,
+                nodata_value: f64::NAN,
             };
             let _ = out_data_tile._assign_data_in_place(&overlap_data_tile);
         }
@@ -1200,7 +1297,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     Index<(usize, usize)> for DataTile<T>
 {
     type Output = T;
@@ -1210,7 +1307,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     }
 }
 
-impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd>
+impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     IndexMut<(usize, usize)> for DataTile<T>
 {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {

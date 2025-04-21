@@ -29,8 +29,9 @@ where one grid's cells are exactly three times larger than the other grid's cell
 # sphinx_gallery_thumbnail_number = -1
 
 import matplotlib.pyplot as plt
-from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
+
+from gridkit import HexGrid
 
 # create a grids
 target_loc = [0, 0]

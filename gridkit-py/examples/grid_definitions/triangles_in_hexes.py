@@ -46,8 +46,9 @@ From there we can figure out how to shift the grids in order to align them.
 # sphinx_gallery_thumbnail_number = -1
 
 import matplotlib.pyplot as plt
-from gridkit import HexGrid, Tile, TriGrid
 from gridkit.doc_utils import plot_polygons
+
+from gridkit import HexGrid, Tile, TriGrid
 
 tri_grid = TriGrid(size=1)
 hex_grid = HexGrid(size=3 / 3**0.5, shape="flat")

@@ -26,9 +26,10 @@ two degrees more than the previous frame.
 
 import matplotlib.pyplot as plt
 import numpy
-from gridkit import HexGrid
 from gridkit.doc_utils import plot_polygons
 from matplotlib.animation import FuncAnimation
+
+from gridkit import HexGrid
 
 # Initialize
 grid = HexGrid(size=1, rotation=0).anchor([0, 0])
