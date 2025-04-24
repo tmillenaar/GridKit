@@ -480,6 +480,31 @@ class DataTile(Tile):
         }
         return dtype_method_map[self._data_tile.__class__.__name__]
 
+    def astype(self, dtype, nodata_value=None):
+        if self.dtype == numpy.dtype(dtype):
+            # Note: Do not make unnesecary copy here, but conversion does return copy.
+            #       Too inconsistent? Or worth skipping the copy?
+            return self
+
+        new_data = self.to_numpy().astype(dtype)
+        if nodata_value is None:
+            # Note, maybe obsolete if nodata_value ever is allowed to be None?
+            try:
+                new_nodata_value = numpy.array(self.nodata_value, dtype=dtype)
+            except ValueError:
+                if numpy.issubdtype(dtype, numpy.floating):
+                    new_nodata_value = numpy.nan
+                elif numpy.issubdtype(dtype, numpy.integer):
+                    new_nodata_value = numpy.iinfo(dtype).max
+                else:
+                    raise ValueError(
+                        f"Unable to convert nodata_value of {self.nodata_value} to dtype {dtype}"
+                    )
+        result = self.update(data=new_data, nodata_value=new_nodata_value)
+        # Note: since self and result have the same tile coverage it is safe to index result with ids from self
+        result[self.nodata_cells] = new_nodata_value
+        return result
+
     @property
     def nodata_value(self):
         return self._data_tile.nodata_value()
@@ -488,7 +513,12 @@ class DataTile(Tile):
     def nodata_value(self, value):
         """Sets the nodata value of the DataTile.
         This replaces all instances of the nodata value with the new value"""
-        self._data_tile.set_nodata_value(float(value))
+        try:
+            return self._data_tile.set_nodata_value(value)
+        except TypeError:
+            dtype = get_value_dtype(value)
+            value = numpy.array(value, dtype=dtype)
+            return self._data_tile.set_nodata_value(value)
 
     def is_nodata(self, values):
         values = numpy.array(values)
@@ -517,10 +547,15 @@ class DataTile(Tile):
         return self.to_numpy() if dtype is None else self.to_numpy().astype(dtype)
 
     def __getitem__(self, item):
+        if isinstance(item, GridIndex):
+            item = self.grid_id_to_tile_id(item)
         return self.to_numpy()[item]
 
     def __setitem__(self, item, value):
         # Don't use update() but replace _data_tile in-place
+        if isinstance(item, GridIndex):
+            item = self.grid_id_to_tile_id(item)
+
         new_data = self.to_numpy()
         new_data[item] = value
         if isinstance(self.grid, TriGrid):
@@ -1209,16 +1244,46 @@ def sum_data_tiles(data_tiles: List):
         A data tile with the values of the provided data_tiles added together
 
     """
+    if len(data_tiles) == 0:
+        raise ValueError("No data tiles were supplied")
+
+    grid = data_tiles[0].grid
+    if not all([t.grid.is_aligned_with(grid) for t in data_tiles]):
+        raise AlignmentError(
+            "Not all data tiles are on the same grid. Consider resampling them all to the same grid."
+        )
+
+    result_dtype = numpy.result_type(*data_tiles)
     pyo3_tiles = []
     for tile in data_tiles:
         if isinstance(tile, DataTile):
-            pyo3_tiles.append(tile._data_tile)
+            pyo3_tiles.append(tile.astype(result_dtype)._data_tile)
         else:
             raise TypeError(
                 f"Expected all DataTile objects but also got a: {type(tile)}"
             )
-    pyo3_tile = tile_utils.sum_data_tile(pyo3_tiles)
-    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)
+
+    dtype_method_map = {
+        numpy.dtype("float64"): tile_utils.sum_data_tile_f64,
+        numpy.dtype("float32"): tile_utils.sum_data_tile_f32,
+        numpy.dtype("int64"): tile_utils.sum_data_tile_i64,
+        numpy.dtype("int32"): tile_utils.sum_data_tile_i32,
+        numpy.dtype("int16"): tile_utils.sum_data_tile_i16,
+        numpy.dtype("int8"): tile_utils.sum_data_tile_i8,
+        numpy.dtype("uint64"): tile_utils.sum_data_tile_u64,
+        numpy.dtype("uint32"): tile_utils.sum_data_tile_u32,
+        numpy.dtype("uint16"): tile_utils.sum_data_tile_u16,
+        numpy.dtype("uint8"): tile_utils.sum_data_tile_u8,
+        # numpy.dtype('bool'):   'bool',  # optional support
+        # FIXME: add complex version
+    }
+
+    method = dtype_method_map.get(result_dtype)
+    if method is None:
+        raise TypeError(f"Unsupported dtype: {result_dtype}")
+
+    pyo3_data_tile = method(pyo3_tiles)
+    return DataTile.from_pyo3_data_tile(grid, pyo3_data_tile)
 
 
 def average_data_tiles(data_tiles: List):
@@ -1239,13 +1304,6 @@ def average_data_tiles(data_tiles: List):
     # Simply calling `return sum(tiles) / count(tiles)` is a lot shorter, but I want to use the rust
     # logic such that the rust and python logic are the same and don't have possible inconsistencies
     # like inf instead of nan or vice versa. I want just one place for the logic.
-    pyo3_tiles = []
-    for tile in data_tiles:
-        if isinstance(tile, DataTile):
-            pyo3_tiles.append(tile._data_tile)
-        else:
-            raise TypeError(
-                f"Expected all DataTile objects but also got a: {type(tile)}"
-            )
-    pyo3_tile = tile_utils.average_data_tile(pyo3_tiles)
-    return DataTile.from_pyo3_data_tile(data_tiles[0].grid, pyo3_tile)
+    summed = sum_data_tiles(data_tiles)
+    counted = count_tiles(data_tiles).astype(summed)
+    return summed / counted

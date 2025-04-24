@@ -31,6 +31,32 @@ fn is_nodata_value_f64(val: f64, nodata_value: f64) -> bool {
     val == nodata_value
 }
 
+fn is_nodata_value<
+    T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast
+>(val: T, nodata_value: T) -> bool {
+    // The following if-block is a dirty way of checking for nans which
+    // are a float only concept. T.is_nan() does not exist and Rust does
+    // not allow fow matching of T. Ideally we would have been able to do
+    // something like match T {f64 => {handle_nan..}}.
+    // Since that is not possible. I also tried something like
+    // `impl IsNoData<T> for DataTile<T>` and
+    // `impl IsNoData<f64> for DataTile<f64>`
+    // But again that is not supported because I get an error saying:
+    // conflicting implementation for f64. That leads us to the following hack.
+    // This might be solved by `specialization` suggested here:
+    // https://github.com/rust-lang/rfcs/pull/1210
+    // But at the time of writing this is not avaialable in Rust stable (only nightly).
+    if let Some(nodata_float) = nodata_value.to_f64() {
+        if let Some(val_float) = val.to_f64() {
+            if nodata_float.is_nan() {
+                return val_float.is_nan();
+            }
+        }
+    }
+    // Normal check for when self.nodata_value is not a nan
+    val == nodata_value
+}
+
 impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast>
     TileTraits for DataTile<T>
 {
@@ -98,8 +124,9 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
         }
 
     pub fn set_nodata_value(&mut self, nodata_value: T) {
+        let old_nodata_value = self.nodata_value;
         for val in self.data.iter_mut() {
-            if *val == self.nodata_value {
+            if is_nodata_value(*val, old_nodata_value) {
                 *val = nodata_value;
             }
         }
@@ -107,27 +134,7 @@ impl<T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive +
     }
 
     pub fn is_nodata(&self, &value: &T) -> bool {
-        // The following if-block is a dirty way of checking for nans which
-        // are a float only concept. T.is_nan() does not exist and Rust does
-        // not allow fow matching of T. Ideally we would have been able to do
-        // something like match T {f64 => {handle_nan..}}.
-        // Since that is not possible. I also tried something like
-        // `impl IsNoData<T> for DataTile<T>` and
-        // `impl IsNoData<f64> for DataTile<f64>`
-        // But again that is not supported because I get an error saying:
-        // conflicting implementation for f64. That leads us to the following hack.
-        // This might be solved by `specialization` suggested here:
-        // https://github.com/rust-lang/rfcs/pull/1210
-        // But at the time of writing this is not avaialable in Rust stable (only nightly).
-        if let Some(nodata_float) = self.nodata_value.to_f64() {
-            if let Some(val_float) = value.to_f64() {
-                if nodata_float.is_nan() {
-                    return val_float.is_nan();
-                }
-            }
-        }
-        // Normal check for when self.nodata_value is not a nan
-        value == self.nodata_value
+        is_nodata_value(value, self.nodata_value)
     }
 
     pub fn is_nodata_array(&self, value: &ArrayViewD<T>) -> ArrayD<bool> {

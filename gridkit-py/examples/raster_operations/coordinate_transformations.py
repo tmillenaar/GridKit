@@ -28,7 +28,8 @@ import numpy
 from gridkit import DataTile, RectGrid, Tile
 
 # Create a new grid
-data = numpy.arange(25 * 25).reshape(25, 25)
+# Use float as data type because NaNs nicely show up as transparent in matplotlib
+data = numpy.arange(25 * 25, dtype=float).reshape(25, 25)
 grid = RectGrid(size=2, crs=4326)
 tile = Tile(grid, (-20, -15), data.shape[1], data.shape[0])
 data_tile_wgs84 = DataTile(

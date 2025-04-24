@@ -473,21 +473,6 @@ impl PyO3DataTile {
             PyO3DataTile::U8(grid) => &grid._tile,
         }
     }
-
-    // pub fn get_data_tile(&self) -> &DataTile<T> {
-    //     match self {
-    //         PyO3DataTile::F64(grid) => &grid._data_tile,
-    //         PyO3DataTile::F32(grid) => &grid._data_tile,
-    //         PyO3DataTile::I64(grid) => &grid._data_tile,
-    //         PyO3DataTile::I32(grid) => &grid._data_tile,
-    //         PyO3DataTile::I16(grid) => &grid._data_tile,
-    //         PyO3DataTile::I8(grid) => &grid._data_tile,
-    //         PyO3DataTile::U64(grid) => &grid._data_tile,
-    //         PyO3DataTile::U32(grid) => &grid._data_tile,
-    //         PyO3DataTile::U16(grid) => &grid._data_tile,
-    //         PyO3DataTile::U8(grid) => &grid._data_tile,
-    //     }
-    // }
 }
 
 #[derive(Clone)]
@@ -1385,10 +1370,8 @@ fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3D
         PyO3DataTile::U8(pyo3_tile) => pyo3_tile._tile._grid.to_owned(),
     };
 
-    let mut combined_tile: DataTile<u64> = tiles_as_coverage[0].to_owned();
-    for i in 1..tiles_as_coverage.len() {
-        combined_tile = &combined_tile + &tiles_as_coverage[i];
-    }
+    let combined_tile = tile::sum_data_tiles(&tiles_as_coverage);
+
     let _tile = PyO3Tile{
         _grid: pyo3_grid.clone(),
         start_id: combined_tile.get_tile().start_id,
@@ -1400,124 +1383,62 @@ fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3D
         _data_tile: combined_tile,
         _tile
     })
-    // combined_tile
-    // // Determine extent of combined tile
-    // let mut min_x_id = i64::MAX;
-    // let mut min_y_id = i64::MAX;
-    // let mut max_x_id = i64::MIN;
-    // let mut max_y_id = i64::MIN;
-    // for data_tile in tiles_vec {
-    //     let tile = data_tile.get_tile();
-    //     let (min_x_id_tile, min_y_id_tile) = tile.start_id;
-    //     let max_x_id_tile = min_x_id_tile + tile.nx;
-    //     let max_y_id_tile = min_y_id_tile + tile.ny;
-    //     if min_x_id_tile < min_x_id {
-    //         min_x_id = min_x_id_tile
-    //     }
-    //     if min_y_id_tile < min_y_id {
-    //         min_y_id = min_y_id_tile
-    //     }
-    //     if max_x_id_tile > max_x_id {
-    //         max_x_id = max_x_id_tile
-    //     }
-    //     if max_y_id_tile > max_y_id {
-    //         max_y_id = max_y_id_tile
-    //     }
-    // }
-    // let mut combined_tile =
-
 }
 
-// #[pyfunction]
-// fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3DataTileU64> {
-//
-//     TODO: Create a coverage method that returns a PyO3DataTileU64. That way we would be able to add the coverages.
-//           The problem we are facing now is that we have different types that we cannot unify in a vec of a single type.
-//           Type <T> does not exist in PyO3 after all. I think we need to do the looping over tiles in python, or here
-//           do a item.extract::<PyO3DataTileF64> for each data type, call coverage and append coverage to vec.
-//           Maybe enum delegate can help here.
-//
-//     // Like count_tiles but does not count cells with a nodata_value
-//     let tiles_vec: Vec<DataTile<T>> = data_tiles
-//         .iter()
-//         .map(|item| {
-//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-//             match py_o3_tile {
-//                 PyO3DataTile::F64(grid) => &grid._data_tile,
-//                 PyO3DataTile::F32(grid) => &grid._data_tile,
-//                 PyO3DataTile::I64(grid) => &grid._data_tile,
-//                 PyO3DataTile::I32(grid) => &grid._data_tile,
-//                 PyO3DataTile::I16(grid) => &grid._data_tile,
-//                 PyO3DataTile::I8(grid) => &grid._data_tile,
-//                 PyO3DataTile::U64(grid) => &grid._data_tile,
-//                 PyO3DataTile::U32(grid) => &grid._data_tile,
-//                 PyO3DataTile::U16(grid) => &grid._data_tile,
-//                 PyO3DataTile::U8(grid) => &grid._data_tile,
-//             }
-//         })
-//         .collect();
-//     let _data_tile = tile::count_data_tiles(&tiles_vec);
-//     let _tile = data_tiles[0]
-//         .extract::<PyO3DataTileU64>()
-//         .unwrap()
-//         .get_tile(py);
-//     let tile = PyO3DataTileU64 { _data_tile, _tile };
-//     Ok(tile)
-// }
+macro_rules! impl_sum_data_tile {
+    ($func_name:ident, $PyO3DataTile:ident, $type:ty) => {
+        #[pyfunction]
+        fn $func_name<'py>(_py: Python<'py>, data_tiles: &PyList) -> PyResult<$PyO3DataTile> {
+            // Note: I am returning PyObject because PyO3DataTile is an enum.
+            //       I could return a more specific version like PyO3DataTileF64,
+            //       but that would require a version of this function for each type.
+            //       Using PyObject is easier but we lose static typing in Python.
+            let tiles_vec: Vec<DataTile<$type>> = data_tiles
+                .iter()
+                .map(|item| {
+                    let py_o3_tile: $PyO3DataTile = item.extract().unwrap();
+                    py_o3_tile._data_tile
+                })
+                .collect();
+            let _data_tile = tile::sum_data_tiles(&tiles_vec);
+            let _tile = data_tiles[0]
+                .extract::<$PyO3DataTile>()
+                .unwrap()
+                // .get_tile()
+                ._tile;
+            let tile = $PyO3DataTile { _data_tile, _tile };
+            Ok(tile)
+        }
+    }
+}
 
-// #[pyfunction]
-// fn sum_data_tile<'py>(_py: Python<'py>, data_tiles: &PyList) -> PyResult<PyObject> {
-//     // Note: I am returning PyObject because PyO3DataTile is an enum.
-//     //       I could return a more specific version like PyO3DataTileF64,
-//     //       but that would require a version of this function for each type.
-//     //       Using PyObject is easier but we lose static typing in Python.
-//     let tiles_vec: Vec<DataTile<f64>> = data_tiles
-//         .iter()
-//         .map(|item| {
-//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-//             py_o3_tile.get_data_tile()
-//         })
-//         .collect();
-//     let _data_tile = tile::sum_data_tiles(&tiles_vec);
-//     let _tile = data_tiles[0]
-//         .extract::<PyO3DataTile>()
-//         .unwrap()
-//         .get_tile()
-//         ._tile;
-//     let tile = PyO3DataTile { _data_tile, _tile };
-//     Ok(tile)
-// }
+impl_sum_data_tile!(sum_data_tile_f64, PyO3DataTileF64, f64);
+impl_sum_data_tile!(sum_data_tile_f32, PyO3DataTileF32, f32);
+impl_sum_data_tile!(sum_data_tile_i64, PyO3DataTileI64, i64);
+impl_sum_data_tile!(sum_data_tile_i32, PyO3DataTileI32, i32);
+impl_sum_data_tile!(sum_data_tile_i16, PyO3DataTileI16, i16);
+impl_sum_data_tile!(sum_data_tile_i8, PyO3DataTileI8, i8);
+impl_sum_data_tile!(sum_data_tile_u64, PyO3DataTileU64, u64);
+impl_sum_data_tile!(sum_data_tile_u32, PyO3DataTileU32, u32);
+impl_sum_data_tile!(sum_data_tile_u16, PyO3DataTileU16, u16);
+impl_sum_data_tile!(sum_data_tile_u8, PyO3DataTileU8, u8);
 
-// #[pyfunction]
-// fn average_data_tile<'py>(_py: Python<'py>, data_tiles: &PyList) -> PyResult<PyObject> {
-//     // Note: I am returning PyObject because PyO3DataTile is an enum.
-//     //       I could return a more specific version like PyO3DataTileF64,
-//     //       but that would require a version of this function for each type.
-//     //       Using PyObject is easier but we lose static typing in Python.
-//     let tiles_vec: Vec<DataTile<f64>> = data_tiles
-//         .iter()
-//         .map(|item| {
-//             let py_o3_tile: PyO3DataTile = item.extract().unwrap();
-//             py_o3_tile.get_data_tile()
-//         })
-//         .collect();
-//     let _data_tile = tile::average_data_tiles(&tiles_vec);
-//     let _tile = data_tiles[0]
-//         .extract::<PyO3DataTile>()
-//         .unwrap()
-//         .get_tile()
-//         ._tile;
-//     let tile = PyO3DataTile { _data_tile, _tile };
-//     Ok(tile)
-// }
 
 #[pymodule]
 fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(combine_tiles, module)?)?;
     module.add_function(wrap_pyfunction!(count_tiles, module)?)?;
     module.add_function(wrap_pyfunction!(count_data_tiles, module)?)?;
-    // module.add_function(wrap_pyfunction!(sum_data_tile, module)?)?;
-    // module.add_function(wrap_pyfunction!(average_data_tile, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_f64, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_f32, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_i64, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_i32, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_i16, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_i8, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_u64, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_u32, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_u16, module)?)?;
+    module.add_function(wrap_pyfunction!(sum_data_tile_u8, module)?)?;
     Ok(())
 }
 
