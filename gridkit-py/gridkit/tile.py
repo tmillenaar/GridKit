@@ -289,10 +289,10 @@ class Tile:
             >>> data = numpy.arange(ny*nx).reshape(ny,nx) # Note that numpy indexes in the form (y,x)
             >>> data_tile = tile.to_data_tile(data=data)
             >>> print(data_tile.to_numpy())
-            [[ 0.  1.  2.  3.]
-             [ 4.  5.  6.  7.]
-             [ 8.  9. 10. 11.]
-             [12. 13. 14. 15.]]
+            [[ 0  1  2  3]
+             [ 4  5  6  7]
+             [ 8  9 10 11]
+             [12 13 14 15]]
             >>> tile_ids = ((1,2,3), (2,1,0))
             >>> grid_ids = data_tile.tile_id_to_grid_id(tile_ids)
             >>> print(grid_ids.index)
@@ -317,9 +317,9 @@ class Tile:
 
             >>> assert grid_ids == tile.tile_id_to_grid_id(tile_ids)
             >>> print(data_tile[tile_ids])
-            [ 6.  9. 12.]
+            [ 6  9 12]
             >>> print(data_tile.value(grid_ids))
-            [ 6.  9. 12.]
+            [ 6  9 12]
 
         ..
 
