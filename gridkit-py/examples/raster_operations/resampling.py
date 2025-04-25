@@ -78,6 +78,8 @@ hexdem_pointy = dem.resample(
 )
 
 
+from shapely import Polygon
+
 # %%
 #
 # Now let's create two new figures and populate these with the colored shapes of the two downsampled hexagon grids.
@@ -85,7 +87,6 @@ hexdem_pointy = dem.resample(
 # function, which is less performant but works on generalized shapes.
 #
 from gridkit.doc_utils import plot_polygons
-from shapely import Polygon
 
 
 # define two new figures

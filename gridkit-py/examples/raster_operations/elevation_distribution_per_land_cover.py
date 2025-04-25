@@ -39,6 +39,7 @@ We can make use of this to read out a crop of the same area form different files
 
 import matplotlib.pyplot as plt
 import numpy
+
 from gridkit.io import raster_to_data_tile
 
 # Define the bounding box of interest and the corresponding CRS

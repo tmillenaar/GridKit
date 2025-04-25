@@ -7,9 +7,10 @@ from typing import Literal, Tuple
 import numpy
 import scipy
 import shapely
+from pyproj import CRS, Transformer
+
 from gridkit.gridkit_rs import shapes
 from gridkit.index import GridIndex, validate_index
-from pyproj import CRS, Transformer
 
 
 class BaseGrid(metaclass=abc.ABCMeta):

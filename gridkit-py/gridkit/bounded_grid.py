@@ -7,12 +7,12 @@ from typing import Literal, Tuple
 
 import numpy
 import scipy
-from gridkit.base_grid import BaseGrid
-from gridkit.errors import AlignmentError, IntersectionError
-from gridkit.index import GridIndex, validate_index
 from pyproj import Transformer
 
 import gridkit
+from gridkit.base_grid import BaseGrid
+from gridkit.errors import AlignmentError, IntersectionError
+from gridkit.index import GridIndex, validate_index
 
 
 class _BoundedGridMeta(type):

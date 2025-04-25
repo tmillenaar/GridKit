@@ -52,8 +52,9 @@ centroids = get_centroids(grid)
 # ..
 #
 import matplotlib.pyplot as plt
-from gridkit.doc_utils import plot_polygons
 from shapely.geometry import MultiPolygon, Point
+
+from gridkit.doc_utils import plot_polygons
 
 
 def plot_circles(geoms, color):

@@ -1,4 +1,5 @@
 import numpy
+
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError
 from gridkit.index import GridIndex

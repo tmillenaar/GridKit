@@ -36,6 +36,7 @@ First let's import the dependencies and read in the DEM.
 
 import matplotlib.pyplot as plt
 import numpy
+
 from gridkit.io import raster_to_data_tile
 
 dem = raster_to_data_tile(

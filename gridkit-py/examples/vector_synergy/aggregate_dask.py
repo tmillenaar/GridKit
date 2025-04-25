@@ -55,6 +55,7 @@ I will print ``npartitions`` to show the number of chunks the array is divided i
 import dask
 import dask.array
 import dask.dataframe
+
 from gridkit.doc_utils import generate_2d_scatter_doughnut, plot_polygons
 
 points = generate_2d_scatter_doughnut(num_points=2000, radius=4)

@@ -50,13 +50,14 @@ from gridkit import HexGrid
 empty_grid = HexGrid(size=6, shape="pointy")
 data_grid = empty_grid.interp_from_points(points, values)
 
+from matplotlib.patches import Rectangle
+
 # %%
 #
 # Currently the interpolation methods "nearest", "linear" and "cubic" are supported,
 # based on scpiy's ``NearestNDInterpolator``, ``LinearNDInterpolator`` and ``CloughTocher2DInterpolator``, respectively.
 # Here we try each method and plot them next to each other to compare.
 from gridkit.doc_utils import plot_polygons
-from matplotlib.patches import Rectangle
 
 fig, axes = plt.subplots(1, 3, sharey=True, figsize=(12, 5))
 

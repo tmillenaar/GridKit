@@ -19,11 +19,11 @@ Let's plot the cells contained in a tile and show the tile outline.
 
 # sphinx_gallery_thumbnail_number = -2
 
-from gridkit.doc_utils import plot_polygons
 from matplotlib import pyplot as plt
 from shapely.geometry import Polygon
 
 from gridkit import HexGrid, Tile
+from gridkit.doc_utils import plot_polygons
 
 grid = HexGrid(size=1, offset=(0.3, 0.5), rotation=18)
 

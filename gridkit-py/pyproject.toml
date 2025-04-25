@@ -49,3 +49,6 @@ test = [
 features = ["pyo3/extension-module"]
 python-source = "./"
 module-name = "gridkit.gridkit_rs"
+
+[tool.isort]
+known_first_party = ["gridkit-py"]

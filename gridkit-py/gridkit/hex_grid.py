@@ -2,6 +2,9 @@ import warnings
 from typing import Literal, Tuple
 
 import numpy
+from pyproj import CRS, Transformer
+from shapely.geometry import Polygon
+
 from gridkit.base_grid import BaseGrid
 from gridkit.bounded_grid import BoundedGrid
 from gridkit.errors import AlignmentError, IntersectionError
@@ -9,8 +12,6 @@ from gridkit.gridkit_rs import PyO3HexGrid, interp
 from gridkit.index import GridIndex, validate_index
 from gridkit.rect_grid import RectGrid
 from gridkit.tri_grid import TriGrid
-from pyproj import CRS, Transformer
-from shapely.geometry import Polygon
 
 
 class HexGrid(BaseGrid):

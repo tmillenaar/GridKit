@@ -11,7 +11,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/tmillenaar/wordwarden
-    rev: v0.1.4
+    rev: v0.1.5
     hooks:
       - id: wordwarden
         name: Word Warden - Debug Statements
@@ -21,7 +21,7 @@ repos:
         types_or: [python, pyi, rust, rst]
 
   - repo: https://github.com/tmillenaar/wordwarden
-    rev: v0.1.4
+    rev: v0.1.5
     hooks:
       - id: wordwarden
         name: Word Warden - WIP comments

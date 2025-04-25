@@ -20,6 +20,7 @@ This means none of the bands have to be resampled before we combine them.
 
 import matplotlib.pyplot as plt
 import numpy
+
 from gridkit.io import raster_to_data_tile
 
 # Read in the bands required to determine the NDVI

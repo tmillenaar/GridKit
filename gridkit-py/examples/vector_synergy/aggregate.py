@@ -44,6 +44,7 @@ I'll plot the input here to show what it looks like.
 # sphinx_gallery_thumbnail_number = -1
 
 import matplotlib.pyplot as plt
+
 from gridkit.doc_utils import generate_2d_scatter_doughnut, plot_polygons
 
 points = generate_2d_scatter_doughnut(num_points=2000, radius=4)

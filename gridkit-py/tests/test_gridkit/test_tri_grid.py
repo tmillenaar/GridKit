@@ -1,8 +1,8 @@
 import numpy
 import pytest
-from gridkit.index import GridIndex
 
 from gridkit import BoundedTriGrid, RectGrid, TriGrid
+from gridkit.index import GridIndex
 
 
 @pytest.mark.parametrize(

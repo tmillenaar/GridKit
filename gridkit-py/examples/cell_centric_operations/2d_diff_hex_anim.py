@@ -145,9 +145,9 @@ To demonstrate what I mean, I will create a plot demonstrating the flow in three
 
 import matplotlib.pyplot as plt
 import numpy
-from gridkit.doc_utils import plot_polygons
 
 from gridkit import HexGrid, Tile
+from gridkit.doc_utils import plot_polygons
 
 grid = HexGrid(size=1)
 ids = grid.neighbours([0, 0])
