@@ -33,7 +33,6 @@ pub trait GridTraits {
             CellElement::Centroid => {
                 // Get (dx, dy) to centroid of cell at target_loc
                 let diff = &target_loc - &self.centroid(&current_cell.view());
-                println!("diff: {:?}", diff);
                 diff.slice(s![0, ..]).to_owned()
             }
             CellElement::Corner => {

@@ -28,7 +28,6 @@ use crate::data_tile::DataTile;
 use crate::grid::GridTraits;
 use crate::tile::TileTraits;
 
-
 macro_rules! impl_pydata_tile {
     ($name:ident, $type:ty, $f64type:ident) => {
         #[pyclass]
@@ -37,355 +36,356 @@ macro_rules! impl_pydata_tile {
             _data_tile: data_tile::DataTile<$type>,
             _tile: PyO3Tile,
         }
-    #[pymethods]
-    impl $name {
-        fn start_id(&self) -> (i64, i64) {
-            self._data_tile.tile.start_id
-        }
+        #[pymethods]
+        impl $name {
+            fn start_id(&self) -> (i64, i64) {
+                self._data_tile.tile.start_id
+            }
 
-        fn nx(&self) -> u64 {
-            self._data_tile.tile.nx
-        }
+            fn nx(&self) -> u64 {
+                self._data_tile.tile.nx
+            }
 
-        fn ny(&self) -> u64 {
-            self._data_tile.tile.ny
-        }
+            fn ny(&self) -> u64 {
+                self._data_tile.tile.ny
+            }
 
-        fn nodata_value(&self) -> $type {
-            self._data_tile.nodata_value
-        }
+            fn nodata_value(&self) -> $type {
+                self._data_tile.nodata_value
+            }
 
-        fn set_nodata_value(&mut self, nodata_value: $type) {
-            self._data_tile.set_nodata_value(nodata_value);
-        }
+            fn set_nodata_value(&mut self, nodata_value: $type) {
+                self._data_tile.set_nodata_value(nodata_value);
+            }
 
-        fn is_nodata(&self, value: $type) -> bool {
-            self._data_tile.is_nodata(&value)
-        }
+            fn is_nodata(&self, value: $type) -> bool {
+                self._data_tile.is_nodata(&value)
+            }
 
-        fn is_nodata_array<'py>(
-            &self,
-            values: PyReadonlyArrayDyn<'py, $type>,
-            py: Python<'py>,
-        ) -> &'py PyArrayDyn<bool> {
-            self._data_tile
-                .is_nodata_array(&values.as_array())
-                .into_pyarray(py)
-        }
+            fn is_nodata_array<'py>(
+                &self,
+                values: PyReadonlyArrayDyn<'py, $type>,
+                py: Python<'py>,
+            ) -> &'py PyArrayDyn<bool> {
+                self._data_tile
+                    .is_nodata_array(&values.as_array())
+                    .into_pyarray(py)
+            }
 
-        fn nodata_cells<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
-            self._data_tile.nodata_cells().into_pyarray(py)
-        }
+            fn nodata_cells<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+                self._data_tile.nodata_cells().into_pyarray(py)
+            }
 
-        fn get_tile<'py>(&self, _py: Python<'py>) -> PyO3Tile {
-            self._tile.clone()
-        }
+            fn get_tile<'py>(&self, _py: Python<'py>) -> PyO3Tile {
+                self._tile.clone()
+            }
 
-        fn to_numpy<'py>(&self, py: Python<'py>) -> &'py PyArray2<$type> {
-            self._data_tile.data.clone().into_pyarray(py)
-        }
+            fn to_numpy<'py>(&self, py: Python<'py>) -> &'py PyArray2<$type> {
+                self._data_tile.data.clone().into_pyarray(py)
+            }
 
-        fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
-            self._data_tile.corner_ids().into_pyarray(py)
-        }
+            fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
+                self._data_tile.corner_ids().into_pyarray(py)
+            }
 
-        fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-            self._data_tile.corners().into_pyarray(py)
-        }
+            fn corners<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
+                self._data_tile.corners().into_pyarray(py)
+            }
 
-        fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
-            self._data_tile.indices().into_pyarray(py)
-        }
+            fn indices<'py>(&self, py: Python<'py>) -> &'py PyArray3<i64> {
+                self._data_tile.indices().into_pyarray(py)
+            }
 
-        fn intersects<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> bool {
-            self._data_tile.intersects(&other._tile)
-        }
+            fn intersects<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> bool {
+                self._data_tile.intersects(&other._tile)
+            }
 
-        fn overlap<'py>(&self, _py: Python<'py>, other: &$name) -> PyResult<PyO3Tile> {
-            match self._data_tile.overlap(&other._data_tile.get_tile()) {
-                Ok(new_tile) => {
-                    let tile = match &self._tile._grid {
-                        PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
-                            grid.clone(),
-                            new_tile.start_id,
-                            new_tile.nx,
-                            new_tile.ny,
-                        ),
-                        PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
-                            grid.clone(),
-                            new_tile.start_id,
-                            new_tile.nx,
-                            new_tile.ny,
-                        ),
-                        PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
-                            grid.clone(),
-                            new_tile.start_id,
-                            new_tile.nx,
-                            new_tile.ny,
-                        ),
-                    };
-                    Ok(tile)
+            fn overlap<'py>(&self, _py: Python<'py>, other: &$name) -> PyResult<PyO3Tile> {
+                match self._data_tile.overlap(&other._data_tile.get_tile()) {
+                    Ok(new_tile) => {
+                        let tile = match &self._tile._grid {
+                            PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
+                                grid.clone(),
+                                new_tile.start_id,
+                                new_tile.nx,
+                                new_tile.ny,
+                            ),
+                            PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
+                                grid.clone(),
+                                new_tile.start_id,
+                                new_tile.nx,
+                                new_tile.ny,
+                            ),
+                            PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
+                                grid.clone(),
+                                new_tile.start_id,
+                                new_tile.nx,
+                                new_tile.ny,
+                            ),
+                        };
+                        Ok(tile)
+                    }
+                    Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
                 }
-                Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
             }
-        }
 
-        fn linear_interpolation<'py>(
-            &self,
-            py: Python<'py>,
-            sample_point: PyReadonlyArray2<'py, f64>,
-        ) -> &'py PyArray1<f64> {
-            self._data_tile
-                .linear_interpolation(&sample_point.as_array())
-                .into_pyarray(py)
-        }
-
-        fn inverse_distance_interpolation<'py>(
-            &self,
-            py: Python<'py>,
-            sample_point: PyReadonlyArray2<'py, f64>,
-            decay_constant: f64,
-        ) -> &'py PyArray1<f64> {
-            self._data_tile
-                .inverse_distance_interpolation(&sample_point.as_array(), decay_constant)
-                .into_pyarray(py)
-        }
-
-        fn _add_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile = self._data_tile.clone() + value;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
+            fn linear_interpolation<'py>(
+                &self,
+                py: Python<'py>,
+                sample_point: PyReadonlyArray2<'py, f64>,
+            ) -> &'py PyArray1<f64> {
+                self._data_tile
+                    .linear_interpolation(&sample_point.as_array())
+                    .into_pyarray(py)
             }
-        }
 
-        fn _add_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile: data_tile::DataTile<$type> = data_tile::Scalar::<$type>(value) + self._data_tile.clone();
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
+            fn inverse_distance_interpolation<'py>(
+                &self,
+                py: Python<'py>,
+                sample_point: PyReadonlyArray2<'py, f64>,
+                decay_constant: f64,
+            ) -> &'py PyArray1<f64> {
+                self._data_tile
+                    .inverse_distance_interpolation(&sample_point.as_array(), decay_constant)
+                    .into_pyarray(py)
             }
-        }
 
-        fn _add_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
-            let _data_tile = &self._data_tile + &other._data_tile;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _subtract_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile = self._data_tile.clone() - value;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _subtract_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile = data_tile::Scalar(value) - self._data_tile.clone();
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _subtract_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
-            let _data_tile = self._data_tile.clone() - other._data_tile;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _multiply_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile = self._data_tile.clone() * value;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _multiply_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
-            let _data_tile = data_tile::Scalar(value) * self._data_tile.clone();
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _multiply_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
-            let _data_tile = self._data_tile.clone() * other._data_tile;
-            $name {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _divide_scalar<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
-            let _data_tile = self._data_tile.clone() / value;
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _divide_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
-            let _data_tile = data_tile::Scalar(value) / self._data_tile.clone();
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _divide_tile<'py>(&self, _py: Python<'py>, other: $name) -> $f64type {
-            let _data_tile = self._data_tile.clone() / other._data_tile;
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _powf<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
-            let _data_tile = self._data_tile.powf(value);
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _powf_reverse<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
-            // FIXME: Only for float??
-            let _data_tile = self._data_tile.powf_reverse(value);
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn _powi<'py>(&self, _py: Python<'py>, value: i32) -> $f64type {
-            let _data_tile = self._data_tile.powi(value);
-            $f64type {
-                _data_tile,
-                _tile: self._tile.clone(),
-            }
-        }
-
-        fn __eq__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.equals_value(value).into_pyarray(py)
-        }
-
-        fn __ne__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.not_equals_value(value).into_pyarray(py)
-        }
-
-        fn __gt__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.greater_than_value(value).into_pyarray(py)
-        }
-
-        fn __ge__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.greater_equals_value(value).into_pyarray(py)
-        }
-
-        fn __lt__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.lower_than_value(value).into_pyarray(py)
-        }
-
-        fn __le__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
-            self._data_tile.lower_equals_value(value).into_pyarray(py)
-        }
-
-        fn max<'py>(&self, _py: Python<'py>) -> $type {
-            self._data_tile.max()
-        }
-
-        fn min<'py>(&self, _py: Python<'py>) -> $type {
-            self._data_tile.min()
-        }
-
-        fn sum<'py>(&self, _py: Python<'py>) -> $type {
-            self._data_tile.sum()
-        }
-
-        fn mean<'py>(&self, _py: Python<'py>) -> f64 {
-            self._data_tile.mean()
-        }
-
-        fn median<'py>(&self, _py: Python<'py>) -> f64 {
-            self._data_tile.median()
-        }
-
-        fn percentile<'py>(&self, _py: Python<'py>, percentile: f64) -> PyResult<f64> {
-            match self._data_tile.percentile(percentile) {
-                Ok(value) => Ok(value),
-                Err(e) => Err(PyValueError::new_err(e)),
-            }
-        }
-
-        fn std<'py>(&self, _py: Python<'py>) -> f64 {
-            self._data_tile.std()
-        }
-
-        fn _empty_combined_data_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
-            // Fixme: other should maybe be tile and not datatile?
-            let _data_tile = self
-                ._data_tile
-                ._empty_combined_tile(&other._data_tile, self._data_tile.nodata_value);
-            let tile = match &self._tile._grid {
-                PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
-                    grid.clone(),
-                    _data_tile.tile.start_id,
-                    _data_tile.tile.nx,
-                    _data_tile.tile.ny,
-                ),
-                PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
-                    grid.clone(),
-                    _data_tile.tile.start_id,
-                    _data_tile.tile.nx,
-                    _data_tile.tile.ny,
-                ),
-                PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
-                    grid.clone(),
-                    _data_tile.tile.start_id,
-                    _data_tile.tile.nx,
-                    _data_tile.tile.ny,
-                ),
-            };
-
-            $name {
-                _data_tile: _data_tile,
-                _tile: tile,
-            }
-        }
-
-        fn value<'py>(
-            &self,
-            py: Python<'py>,
-            index: PyReadonlyArray2<'py, i64>,
-            nodata_value: $type,
-        ) -> &'py PyArray1<$type> {
-            self._data_tile
-                .values(&index.as_array(), nodata_value)
-                .into_pyarray(py)
-        }
-
-        fn crop<'py>(
-            &self,
-            _py: Python<'py>,
-            crop_tile: PyO3Tile,
-            nodata_value: $type,
-        ) -> PyResult<$name> {
-            match self._data_tile.crop(&crop_tile._tile, nodata_value) {
-                Ok(new_tile) => Ok($name {
-                    _data_tile: new_tile,
+            fn _add_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile = &self._data_tile + value;
+                $name {
+                    _data_tile,
                     _tile: self._tile.clone(),
-                }),
-                Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
+                }
+            }
+
+            fn _add_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile: data_tile::DataTile<$type> =
+                    data_tile::Scalar::<$type>(value) + &self._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _add_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
+                let _data_tile = &self._data_tile + &other._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _subtract_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile = &self._data_tile - value;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _subtract_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile = data_tile::Scalar(value) - &self._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _subtract_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
+                let _data_tile = &self._data_tile - &other._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _multiply_scalar<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile = &self._data_tile * value;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _multiply_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> Self {
+                let _data_tile = data_tile::Scalar(value) * &self._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _multiply_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
+                let _data_tile = &self._data_tile * &other._data_tile;
+                $name {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _divide_scalar<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
+                let _data_tile = &self._data_tile / value;
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _divide_scalar_reverse<'py>(&self, _py: Python<'py>, value: $type) -> $f64type {
+                let _data_tile = data_tile::Scalar(value) / &self._data_tile;
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _divide_tile<'py>(&self, _py: Python<'py>, other: $name) -> $f64type {
+                let _data_tile = &self._data_tile / &other._data_tile;
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _powf<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
+                let _data_tile = self._data_tile.powf(value);
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _powf_reverse<'py>(&self, _py: Python<'py>, value: f64) -> $f64type {
+                // FIXME: Only for float??
+                let _data_tile = self._data_tile.powf_reverse(value);
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn _powi<'py>(&self, _py: Python<'py>, value: i32) -> $f64type {
+                let _data_tile = self._data_tile.powi(value);
+                $f64type {
+                    _data_tile,
+                    _tile: self._tile.clone(),
+                }
+            }
+
+            fn __eq__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.equals_value(value).into_pyarray(py)
+            }
+
+            fn __ne__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.not_equals_value(value).into_pyarray(py)
+            }
+
+            fn __gt__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.greater_than_value(value).into_pyarray(py)
+            }
+
+            fn __ge__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.greater_equals_value(value).into_pyarray(py)
+            }
+
+            fn __lt__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.lower_than_value(value).into_pyarray(py)
+            }
+
+            fn __le__<'py>(&self, py: Python<'py>, value: $type) -> &'py PyArray2<i64> {
+                self._data_tile.lower_equals_value(value).into_pyarray(py)
+            }
+
+            fn max<'py>(&self, _py: Python<'py>) -> $type {
+                self._data_tile.max()
+            }
+
+            fn min<'py>(&self, _py: Python<'py>) -> $type {
+                self._data_tile.min()
+            }
+
+            fn sum<'py>(&self, _py: Python<'py>) -> $type {
+                self._data_tile.sum()
+            }
+
+            fn mean<'py>(&self, _py: Python<'py>) -> f64 {
+                self._data_tile.mean()
+            }
+
+            fn median<'py>(&self, _py: Python<'py>) -> f64 {
+                self._data_tile.median()
+            }
+
+            fn percentile<'py>(&self, _py: Python<'py>, percentile: f64) -> PyResult<f64> {
+                match self._data_tile.percentile(percentile) {
+                    Ok(value) => Ok(value),
+                    Err(e) => Err(PyValueError::new_err(e)),
+                }
+            }
+
+            fn std<'py>(&self, _py: Python<'py>) -> f64 {
+                self._data_tile.std()
+            }
+
+            fn _empty_combined_data_tile<'py>(&self, _py: Python<'py>, other: $name) -> Self {
+                // Fixme: other should maybe be tile and not datatile?
+                let _data_tile = self
+                    ._data_tile
+                    ._empty_combined_tile(&other._data_tile, self._data_tile.nodata_value);
+                let tile = match &self._tile._grid {
+                    PyO3Grid::PyO3TriGrid(grid) => PyO3Tile::from_tri_grid(
+                        grid.clone(),
+                        _data_tile.tile.start_id,
+                        _data_tile.tile.nx,
+                        _data_tile.tile.ny,
+                    ),
+                    PyO3Grid::PyO3RectGrid(grid) => PyO3Tile::from_rect_grid(
+                        grid.clone(),
+                        _data_tile.tile.start_id,
+                        _data_tile.tile.nx,
+                        _data_tile.tile.ny,
+                    ),
+                    PyO3Grid::PyO3HexGrid(grid) => PyO3Tile::from_hex_grid(
+                        grid.clone(),
+                        _data_tile.tile.start_id,
+                        _data_tile.tile.nx,
+                        _data_tile.tile.ny,
+                    ),
+                };
+
+                $name {
+                    _data_tile: _data_tile,
+                    _tile: tile,
+                }
+            }
+
+            fn value<'py>(
+                &self,
+                py: Python<'py>,
+                index: PyReadonlyArray2<'py, i64>,
+                nodata_value: $type,
+            ) -> &'py PyArray1<$type> {
+                self._data_tile
+                    .values(&index.as_array(), nodata_value)
+                    .into_pyarray(py)
+            }
+
+            fn crop<'py>(
+                &self,
+                _py: Python<'py>,
+                crop_tile: PyO3Tile,
+                nodata_value: $type,
+            ) -> PyResult<$name> {
+                match self._data_tile.crop(&crop_tile._tile, nodata_value) {
+                    Ok(new_tile) => Ok($name {
+                        _data_tile: new_tile,
+                        _tile: self._tile.clone(),
+                    }),
+                    Err(e) => Err(PyException::new_err(e)), // TODO: return custom exception for nicer try-catch on python end
+                }
             }
         }
-    }
-    }
+    };
 }
 
 impl_pydata_tile!(PyO3DataTileF64, f64, PyO3DataTileF64);
@@ -457,7 +457,6 @@ impl<'py> FromPyObject<'py> for PyO3DataTile {
     }
 }
 
-
 impl PyO3DataTile {
     pub fn get_tile(&self) -> &PyO3Tile {
         match self {
@@ -526,7 +525,7 @@ macro_rules! impl_to_data_tile {
                 _tile: self.clone(),
             }
         }
-    }
+    };
 }
 
 impl PyO3Tile {
@@ -604,47 +603,91 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_f64<'py>(&self, data: PyReadonlyArray2<'py, f64>, nodata_value: f64) -> PyO3DataTileF64 {
+    pub fn to_data_tile_f64<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, f64>,
+        nodata_value: f64,
+    ) -> PyO3DataTileF64 {
         self._to_data_tile_f64(data, nodata_value)
     }
 
-    pub fn to_data_tile_f32<'py>(&self, data: PyReadonlyArray2<'py, f32>, nodata_value: f32) -> PyO3DataTileF32 {
+    pub fn to_data_tile_f32<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, f32>,
+        nodata_value: f32,
+    ) -> PyO3DataTileF32 {
         self._to_data_tile_f32(data, nodata_value)
     }
 
-    pub fn to_data_tile_i64<'py>(&self, data: PyReadonlyArray2<'py, i64>, nodata_value: i64) -> PyO3DataTileI64 {
+    pub fn to_data_tile_i64<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, i64>,
+        nodata_value: i64,
+    ) -> PyO3DataTileI64 {
         self._to_data_tile_i64(data, nodata_value)
     }
 
-    pub fn to_data_tile_i32<'py>(&self, data: PyReadonlyArray2<'py, i32>, nodata_value: i32) -> PyO3DataTileI32 {
+    pub fn to_data_tile_i32<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, i32>,
+        nodata_value: i32,
+    ) -> PyO3DataTileI32 {
         self._to_data_tile_i32(data, nodata_value)
     }
 
-    pub fn to_data_tile_u64<'py>(&self, data: PyReadonlyArray2<'py, u64>, nodata_value: u64) -> PyO3DataTileU64 {
+    pub fn to_data_tile_u64<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, u64>,
+        nodata_value: u64,
+    ) -> PyO3DataTileU64 {
         self._to_data_tile_u64(data, nodata_value)
     }
 
-    pub fn to_data_tile_u32<'py>(&self, data: PyReadonlyArray2<'py, u32>, nodata_value: u32) -> PyO3DataTileU32 {
+    pub fn to_data_tile_u32<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, u32>,
+        nodata_value: u32,
+    ) -> PyO3DataTileU32 {
         self._to_data_tile_u32(data, nodata_value)
     }
 
-    pub fn to_data_tile_i16<'py>(&self, data: PyReadonlyArray2<'py, i16>, nodata_value: i16) -> PyO3DataTileI16 {
+    pub fn to_data_tile_i16<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, i16>,
+        nodata_value: i16,
+    ) -> PyO3DataTileI16 {
         self._to_data_tile_i16(data, nodata_value)
     }
 
-    pub fn to_data_tile_u16<'py>(&self, data: PyReadonlyArray2<'py, u16>, nodata_value: u16) -> PyO3DataTileU16 {
+    pub fn to_data_tile_u16<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, u16>,
+        nodata_value: u16,
+    ) -> PyO3DataTileU16 {
         self._to_data_tile_u16(data, nodata_value)
     }
 
-    pub fn to_data_tile_i8<'py>(&self, data: PyReadonlyArray2<'py, i8>, nodata_value: i8) -> PyO3DataTileI8 {
+    pub fn to_data_tile_i8<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, i8>,
+        nodata_value: i8,
+    ) -> PyO3DataTileI8 {
         self._to_data_tile_i8(data, nodata_value)
     }
 
-    pub fn to_data_tile_u8<'py>(&self, data: PyReadonlyArray2<'py, u8>, nodata_value: u8) -> PyO3DataTileU8 {
+    pub fn to_data_tile_u8<'py>(
+        &self,
+        data: PyReadonlyArray2<'py, u8>,
+        nodata_value: u8,
+    ) -> PyO3DataTileU8 {
         self._to_data_tile_u8(data, nodata_value)
     }
 
-    pub fn to_data_tile_with_value_f64<'py>(&self, fill_value: f64, nodata_value: f64) -> PyO3DataTileF64 {
+    pub fn to_data_tile_with_value_f64<'py>(
+        &self,
+        fill_value: f64,
+        nodata_value: f64,
+    ) -> PyO3DataTileF64 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileF64 {
             _data_tile,
@@ -652,7 +695,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_f32<'py>(&self, fill_value: f32, nodata_value: f32) -> PyO3DataTileF32 {
+    pub fn to_data_tile_with_value_f32<'py>(
+        &self,
+        fill_value: f32,
+        nodata_value: f32,
+    ) -> PyO3DataTileF32 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileF32 {
             _data_tile,
@@ -660,7 +707,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_i64<'py>(&self, fill_value: i64, nodata_value: i64) -> PyO3DataTileI64 {
+    pub fn to_data_tile_with_value_i64<'py>(
+        &self,
+        fill_value: i64,
+        nodata_value: i64,
+    ) -> PyO3DataTileI64 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileI64 {
             _data_tile,
@@ -668,7 +719,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_i32<'py>(&self, fill_value: i32, nodata_value: i32) -> PyO3DataTileI32 {
+    pub fn to_data_tile_with_value_i32<'py>(
+        &self,
+        fill_value: i32,
+        nodata_value: i32,
+    ) -> PyO3DataTileI32 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileI32 {
             _data_tile,
@@ -676,7 +731,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_u64<'py>(&self, fill_value: u64, nodata_value: u64) -> PyO3DataTileU64 {
+    pub fn to_data_tile_with_value_u64<'py>(
+        &self,
+        fill_value: u64,
+        nodata_value: u64,
+    ) -> PyO3DataTileU64 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileU64 {
             _data_tile,
@@ -684,7 +743,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_u32<'py>(&self, fill_value: u32, nodata_value: u32) -> PyO3DataTileU32 {
+    pub fn to_data_tile_with_value_u32<'py>(
+        &self,
+        fill_value: u32,
+        nodata_value: u32,
+    ) -> PyO3DataTileU32 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileU32 {
             _data_tile,
@@ -692,7 +755,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_i16<'py>(&self, fill_value: i16, nodata_value: i16) -> PyO3DataTileI16 {
+    pub fn to_data_tile_with_value_i16<'py>(
+        &self,
+        fill_value: i16,
+        nodata_value: i16,
+    ) -> PyO3DataTileI16 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileI16 {
             _data_tile,
@@ -700,7 +767,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_u16<'py>(&self, fill_value: u16, nodata_value: u16) -> PyO3DataTileU16 {
+    pub fn to_data_tile_with_value_u16<'py>(
+        &self,
+        fill_value: u16,
+        nodata_value: u16,
+    ) -> PyO3DataTileU16 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileU16 {
             _data_tile,
@@ -708,7 +779,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_i8<'py>(&self, fill_value: i8, nodata_value: i8) -> PyO3DataTileI8 {
+    pub fn to_data_tile_with_value_i8<'py>(
+        &self,
+        fill_value: i8,
+        nodata_value: i8,
+    ) -> PyO3DataTileI8 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileI8 {
             _data_tile,
@@ -716,7 +791,11 @@ impl PyO3Tile {
         }
     }
 
-    pub fn to_data_tile_with_value_u8<'py>(&self, fill_value: u8, nodata_value: u8) -> PyO3DataTileU8 {
+    pub fn to_data_tile_with_value_u8<'py>(
+        &self,
+        fill_value: u8,
+        nodata_value: u8,
+    ) -> PyO3DataTileU8 {
         let _data_tile = self._tile.to_data_tile_with_value(fill_value, nodata_value);
         PyO3DataTileU8 {
             _data_tile,
@@ -799,7 +878,6 @@ impl PyO3Tile {
             .into_pyarray(py)
     }
 }
-
 
 #[derive(Clone)]
 #[pyclass]
@@ -1372,16 +1450,16 @@ fn count_data_tiles<'py>(py: Python<'py>, data_tiles: &PyList) -> PyResult<PyO3D
 
     let combined_tile = tile::sum_data_tiles(&tiles_as_coverage);
 
-    let _tile = PyO3Tile{
+    let _tile = PyO3Tile {
         _grid: pyo3_grid.clone(),
         start_id: combined_tile.get_tile().start_id,
         nx: combined_tile.get_tile().nx,
         ny: combined_tile.get_tile().ny,
         _tile: combined_tile.get_tile().to_owned(),
     };
-    Ok(PyO3DataTileU64{
+    Ok(PyO3DataTileU64 {
         _data_tile: combined_tile,
-        _tile
+        _tile,
     })
 }
 
@@ -1409,7 +1487,7 @@ macro_rules! impl_sum_data_tile {
             let tile = $PyO3DataTile { _data_tile, _tile };
             Ok(tile)
         }
-    }
+    };
 }
 
 impl_sum_data_tile!(sum_data_tile_f64, PyO3DataTileF64, f64);
@@ -1422,7 +1500,6 @@ impl_sum_data_tile!(sum_data_tile_u64, PyO3DataTileU64, u64);
 impl_sum_data_tile!(sum_data_tile_u32, PyO3DataTileU32, u32);
 impl_sum_data_tile!(sum_data_tile_u16, PyO3DataTileU16, u16);
 impl_sum_data_tile!(sum_data_tile_u8, PyO3DataTileU8, u8);
-
 
 #[pymodule]
 fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {

@@ -507,7 +507,7 @@ class DataTile(Tile):
 
     @property
     def nodata_value(self):
-        return self._data_tile.nodata_value()
+        return numpy.array(self._data_tile.nodata_value(), dtype=self.dtype)
 
     @nodata_value.setter
     def nodata_value(self, value):
@@ -535,8 +535,11 @@ class DataTile(Tile):
         tile = Tile(
             grid, pyo3_data_tile.start_id(), pyo3_data_tile.nx(), pyo3_data_tile.ny()
         )
+        data = pyo3_data_tile.to_numpy()
         data_tile = DataTile(
-            tile, pyo3_data_tile.to_numpy(), nodata_value=pyo3_data_tile.nodata_value()
+            tile,
+            data,
+            nodata_value=numpy.array(pyo3_data_tile.nodata_value(), dtype=data.dtype),
         )
         return data_tile
 
@@ -599,7 +602,6 @@ class DataTile(Tile):
             raise ValueError(
                 f"The shape of the supplied data ({data.shape}) does not match the shape of the tile where ny is {ny} and nx is {nx}"
             )
-
         return DataTile(Tile(grid, start_id, nx, ny), data, nodata_value=nodata_value)
 
     def get_tile(self):
@@ -950,8 +952,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._subtract_scalar(other)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __rsub__(self, other):
@@ -963,8 +964,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._subtract_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __mul__(self, other):
@@ -976,8 +976,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._multiply_scalar(other)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __rmul__(self, other):
@@ -989,8 +988,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._multiply_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __truediv__(self, other):
@@ -1002,8 +1000,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._divide_scalar(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __rtruediv__(self, other):
@@ -1015,8 +1012,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._divide_scalar_reverse(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __pow__(self, other):
@@ -1032,8 +1028,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._powf(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __rpow__(self, other):
@@ -1047,8 +1042,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._powf_reverse(other)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = self.update()
-        combined._data_tile = _data_tile
+        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
         return combined
 
     def __eq__(self, other):

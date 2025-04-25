@@ -49,7 +49,7 @@ print(f"Original resolution in (dx, dy): ({dem.grid.dx}, {dem.grid.dy})")
 # Let's define a rectangular grid with a cell size of 10x10 degrees.
 # I am calling it rectdem for later on I will define hexagonal ones as well.
 # To make sure it worked we can print out the cellsize after resampling
-rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.grid.crs), method="nearest")
+rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.grid.crs), method="linear")
 print(f"Downsampled resolution in (dx, dy): ({rectdem.grid.dx}, {rectdem.grid.dy})")
 
 # %%
@@ -71,10 +71,10 @@ plt.show()
 # for a fair visual comparison.
 #
 hexdem_flat = dem.resample(
-    HexGrid(area=rectdem.grid.area, shape="flat", crs=dem.grid.crs), method="nearest"
+    HexGrid(area=rectdem.grid.area, shape="flat", crs=dem.grid.crs), method="linear"
 )
 hexdem_pointy = dem.resample(
-    HexGrid(area=rectdem.grid.area, shape="pointy", crs=dem.grid.crs), method="nearest"
+    HexGrid(area=rectdem.grid.area, shape="pointy", crs=dem.grid.crs), method="linear"
 )
 
 

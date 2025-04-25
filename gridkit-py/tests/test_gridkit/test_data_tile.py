@@ -380,6 +380,8 @@ def test_basic_operations_with_other_grids(grid):
 
     # test addition
     result = data_tile1 + data_tile2
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [4, 0, 1, 2],
@@ -390,6 +392,8 @@ def test_basic_operations_with_other_grids(grid):
     )
     numpy.testing.assert_allclose(result, expected)
     result = data_tile2 + data_tile1
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [4, 0, 1, 2],
@@ -412,6 +416,8 @@ def test_basic_operations_with_other_grids(grid):
     )
     numpy.testing.assert_allclose(result, expected)
     result = data_tile2 - data_tile1
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [4, 0, 1, 2],
@@ -424,6 +430,8 @@ def test_basic_operations_with_other_grids(grid):
 
     # test multiplication
     result = data_tile1 * data_tile2
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [4, 0, 1, 2],
@@ -449,6 +457,8 @@ def test_basic_operations_with_other_grids(grid):
     #       Dividing integers should namely return a float too, not an integer.
     #       This means also that the nodata value is hardcoded to be NaN.
     result = data_tile1 / data_tile2
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [numpy.nan, 0, 1, 2],
@@ -459,6 +469,8 @@ def test_basic_operations_with_other_grids(grid):
     )
     numpy.testing.assert_allclose(result, expected)
     result = data_tile2 / data_tile1
+    assert result.nx == 4
+    assert result.ny == 4
     expected = numpy.array(
         [
             [numpy.nan, 0, 1, 2],
@@ -468,6 +480,38 @@ def test_basic_operations_with_other_grids(grid):
         ]
     )
     numpy.testing.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1),
+        RectGrid(size=1),
+        HexGrid(size=1),
+    ],
+)
+def test_basic_operations_nodata_handling(grid):
+    tile1 = Tile(grid, (0, 0), 3, 3)
+    tile2 = Tile(grid, (-1, -1), 3, 3)
+    data_tile1 = DataTile(tile1, numpy.full((3, 3), 3), nodata_value=3)
+    data_tile2 = DataTile(tile2, numpy.full((3, 3), -1), nodata_value=-1)
+
+    result = data_tile1 + data_tile2
+    assert len(result == result.nodata_value) == 16
+    assert len(result.nodata_cells) == 16
+
+    result = data_tile1 - data_tile2
+    assert len(result == result.nodata_value) == 16
+    assert len(result.nodata_cells) == 16
+
+    result = data_tile1 * data_tile2
+    assert len(result == result.nodata_value) == 16
+    assert len(result.nodata_cells) == 16
+
+    result = data_tile1 / data_tile2
+    # Cannot test using == because of NaNs
+    assert numpy.all(numpy.isnan(result))
+    assert len(result.nodata_cells) == 16
 
 
 @pytest.mark.parametrize(
