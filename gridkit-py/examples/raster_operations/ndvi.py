@@ -24,8 +24,8 @@ import numpy
 from gridkit.io import raster_to_data_tile
 
 # Read in the bands required to determine the NDVI
-band_4 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B04_raw.tiff")
-band_8 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B08_raw.tiff")
+band_4 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B04_raw.tiff").astype(float)
+band_8 = raster_to_data_tile("../../tests/data/20220708_S2_L2A_B08_raw.tiff").astype(float)
 
 # %%
 #

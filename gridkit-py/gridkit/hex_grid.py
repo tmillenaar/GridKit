@@ -548,7 +548,7 @@ class HexGrid(BaseGrid):
 
             ..
 
-        adjust_rotation: `bool`, False
+        adjust_rotation: bool (default: False)
             If False, the grid in the new crs has the same rotation as the original grid.
             Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
             If True, set the new rotation to match the orientation of the grid at ``location`` after coordinate transformation.

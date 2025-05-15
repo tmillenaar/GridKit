@@ -918,7 +918,16 @@ class DataTile(Tile):
 
     def __add__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._add_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._add_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot add DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when adding DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
+
+
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -931,7 +940,14 @@ class DataTile(Tile):
 
     def __radd__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._add_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._add_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot add DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when adding DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -944,7 +960,14 @@ class DataTile(Tile):
 
     def __sub__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._subtract_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._subtract_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot subtract DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when subtracting DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -956,7 +979,14 @@ class DataTile(Tile):
 
     def __rsub__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._subtract_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._subtract_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot subtract DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when subtracting DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -968,7 +998,14 @@ class DataTile(Tile):
 
     def __mul__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._multiply_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._multiply_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot multiply DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when multiplying DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -980,7 +1017,14 @@ class DataTile(Tile):
 
     def __rmul__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._multiply_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._multiply_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot multiply DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when multiplying DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -992,7 +1036,14 @@ class DataTile(Tile):
 
     def __truediv__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._divide_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._divide_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot divide DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when dividing DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)
@@ -1004,7 +1055,14 @@ class DataTile(Tile):
 
     def __rtruediv__(self, other):
         if isinstance(other, DataTile):
-            _data_tile = self._data_tile._divide_tile(other._data_tile)
+            try:
+                _data_tile = self._data_tile._divide_tile(other._data_tile)
+            except BaseException as e:
+                if type(e).__name__ == "TypeError":
+                    raise TypeError(f"Cannot divide DataTiles of `{self.dtype}` and `{other.dtype}`") from e
+                elif type(e).__name__ == "PanicException":
+                    if "overflow" in e.args[0]:
+                        raise TypeError(f"Overflow encountered when dividing DataTiles of `{self.dtype}` and `{other.dtype}`. Consider using a different data format.") from e
         else:
             try:
                 other_converted = numpy.array(other, dtype=self.dtype)

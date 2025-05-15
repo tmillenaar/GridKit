@@ -287,7 +287,10 @@ def test_to_crs(adjust_rotation):
 
     # Check cell size has changed after changing crs
     numpy.testing.assert_allclose(
-        [grid_degrees.dx, grid_degrees.dy],
+        [
+            grid_degrees.dx,
+            grid_degrees.dy,
+        ],
         [6.737364630896411e-06, 1.1669457849830117e-05],
     )
     # Make sure original grid is unaffected

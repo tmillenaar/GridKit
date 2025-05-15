@@ -4,7 +4,7 @@ Release notes
 ================
 
 Version 0.14.1 (December 25, 2024)
---------------------------------
+----------------------------------
 Features
  - Add arguments ``location`` and ``adjust_rotation`` to :meth:`.TriGrid.to_crs`, :meth:`.RectGrid.to_crs` and :meth:`.HexGrid.to_crs` for more accurate conversions.
 
@@ -31,7 +31,7 @@ Misc
    these represent Rust classes. PyO3 seems to be less ambiguous for it makes sense from both perspectives.
 
 Version 0.13.0 (July 10, 2024)
------------------------------
+------------------------------
 Features
  - Option to initialize grid using ``side_length`` instead of ``size`` or ``area``
 
