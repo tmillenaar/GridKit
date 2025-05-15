@@ -921,10 +921,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:
-
-                dtype = get_value_dtype(other)
-                # nocheckin, check other dtype with data dtype and convert in
-                _data_tile = self._data_tile._add_scalar(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._add_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
@@ -936,8 +934,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._add_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._add_scalar_reverse(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._add_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
@@ -949,8 +947,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._subtract_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._subtract_scalar(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._subtract_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -961,8 +959,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._subtract_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._subtract_scalar_reverse(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._subtract_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -973,8 +971,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._multiply_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._multiply_scalar(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._multiply_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -985,8 +983,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._multiply_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._multiply_scalar_reverse(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._multiply_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -997,8 +995,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._divide_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._divide_scalar(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._divide_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -1009,8 +1007,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._divide_tile(other._data_tile)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._divide_scalar_reverse(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._divide_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -1025,8 +1023,8 @@ class DataTile(Tile):
             _data_tile = self._data_tile._powi(other)
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._powf(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._powf(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -1039,8 +1037,8 @@ class DataTile(Tile):
             )
         else:
             try:
-                other = numpy.array(other, dtype=self.dtype)
-                _data_tile = self._data_tile._powf_reverse(other)
+                other_converted = numpy.array(other, dtype=self.dtype)
+                _data_tile = self._data_tile._powf_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
         combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
@@ -1050,8 +1048,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile == other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile == other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"
@@ -1061,8 +1059,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile != other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile != other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"
@@ -1072,8 +1070,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile >= other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile >= other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"
@@ -1083,8 +1081,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile > other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile > other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"
@@ -1094,8 +1092,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile <= other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile <= other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"
@@ -1105,8 +1103,8 @@ class DataTile(Tile):
         if isinstance(other, DataTile):
             raise NotImplementedError()
         try:
-            other = numpy.array(other, dtype=self.dtype)
-            return GridIndex(self._data_tile < other)
+            other_converted = numpy.array(other, dtype=self.dtype)
+            return GridIndex(self._data_tile < other_converted)
         except ValueError:
             raise TypeError(
                 f"Cannot compare DataTile with object of type '{type(other)}'"

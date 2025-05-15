@@ -1535,8 +1535,8 @@ fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_class::<PyO3DataTileU32>()?;
     module.add_class::<PyO3DataTileU16>()?;
     module.add_class::<PyO3DataTileU8>()?;
-    // nocheckin, add complex128 (in rust probably num_complex::Complex::Complex<f64>)
-    // nocheckin, add support for boolean arrays
+    // TODO: add complex128 (in rust probably num_complex::Complex::Complex<f64>)
+    // TODO: add support for boolean arrays
     module.add_wrapped(wrap_pymodule!(interp))?;
     module.add_wrapped(wrap_pymodule!(shapes))?;
     module.add_wrapped(wrap_pymodule!(tile_utils))?;
