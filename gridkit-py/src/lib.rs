@@ -825,7 +825,7 @@ impl PyO3Tile {
                 let grid = match &new_tile.grid {
                     grid::Grid::TriGrid(grid) => PyO3Grid::PyO3TriGrid(PyO3TriGrid::new(
                         grid.cellsize,
-                        &grid.cell_orientation.to_string(),
+                        &grid.orientation.to_string(),
                         grid.offset.into(),
                         grid.rotation(),
                     )?),
@@ -837,7 +837,7 @@ impl PyO3Tile {
                     )),
                     grid::Grid::HexGrid(grid) => PyO3Grid::PyO3HexGrid(PyO3HexGrid::new(
                         grid.cellsize,
-                        &grid.cell_orientation.to_string(),
+                        &grid.orientation.to_string(),
                         grid.offset.into(),
                         grid.rotation(),
                     )?),
@@ -892,13 +892,13 @@ impl PyO3TriGrid {
     #[new]
     fn new(
         cellsize: f64,
-        cell_orientation: &str,
+        orientation: &str,
         offset: (f64, f64),
         rotation: f64,
     ) -> PyResult<Self> {
-        match Orientation::from_string(cell_orientation) {
-            Some(cell_orientation) => {
-                let mut _grid = tri_grid::TriGrid::new(cellsize, cell_orientation);
+        match Orientation::from_string(orientation) {
+            Some(orientation) => {
+                let mut _grid = tri_grid::TriGrid::new(cellsize, orientation);
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
                 Ok(PyO3TriGrid {
@@ -908,8 +908,8 @@ impl PyO3TriGrid {
                 })
             }
             None => Err(PyException::new_err(format!(
-                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
-                cell_orientation
+                "Unrecognized orientation. Use 'Flat' or 'Pointy'. Got {}",
+                orientation
             ))),
         }
     }
@@ -1214,13 +1214,13 @@ impl PyO3HexGrid {
     #[new]
     fn new(
         cellsize: f64,
-        cell_orientation: &str,
+        orientation: &str,
         offset: (f64, f64),
         rotation: f64,
     ) -> PyResult<Self> {
-        match Orientation::from_string(cell_orientation) {
-            Some(cell_orientation) => {
-                let mut _grid = hex_grid::HexGrid::new(cellsize, cell_orientation);
+        match Orientation::from_string(orientation) {
+            Some(orientation) => {
+                let mut _grid = hex_grid::HexGrid::new(cellsize, orientation);
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
                 Ok(PyO3HexGrid {
@@ -1230,22 +1230,22 @@ impl PyO3HexGrid {
                 })
             }
             None => Err(PyException::new_err(format!(
-                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
-                cell_orientation
+                "Unrecognized orientation. Use 'Flat' or 'Pointy'. Got {}",
+                orientation
             ))),
         }
     }
 
-    fn cell_orientation<'py>(&self, py: Python<'py>) -> &'py PyString {
-        PyString::new(py, &self._grid.cell_orientation.to_string())
+    fn orientation<'py>(&self, py: Python<'py>) -> &'py PyString {
+        PyString::new(py, &self._grid.orientation.to_string())
     }
 
-    fn set_cell_orientation(&mut self, cell_orientation: &str) -> PyResult<()> {
-        match Orientation::from_string(cell_orientation) {
-            Some(cell_orientation) => Ok(self._grid.set_cell_orientation(cell_orientation)),
+    fn set_orientation(&mut self, orientation: &str) -> PyResult<()> {
+        match Orientation::from_string(orientation) {
+            Some(orientation) => Ok(self._grid.set_orientation(orientation)),
             None => Err(PyException::new_err(format!(
-                "Unrecognized cell_orientation. Use 'Flat' or 'Pointy'. Got {}",
-                cell_orientation
+                "Unrecognized orientation. Use 'Flat' or 'Pointy'. Got {}",
+                orientation
             ))),
         }
     }

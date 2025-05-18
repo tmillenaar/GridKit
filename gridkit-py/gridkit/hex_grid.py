@@ -119,7 +119,7 @@ class HexGrid(BaseGrid):
         self._shape = shape
         self._grid = PyO3HexGrid(
             cellsize=size,
-            cell_orientation=shape,
+            orientation=shape,
             offset=offset,
             rotation=self._rotation,
         )
@@ -780,7 +780,7 @@ class HexGrid(BaseGrid):
         if rotation is None:
             rotation = self.rotation
         return PyO3HexGrid(
-            cellsize=size, offset=offset, rotation=rotation, cell_orientation=self.shape
+            cellsize=size, offset=offset, rotation=rotation, orientation=self.shape
         )
 
     def update(

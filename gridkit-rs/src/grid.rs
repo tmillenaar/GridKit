@@ -184,8 +184,8 @@ impl ToString for Orientation {
 }
 
 impl Orientation {
-    pub fn from_string(cell_orientation: &str) -> Option<Self> {
-        match cell_orientation.to_lowercase().as_str() {
+    pub fn from_string(orientation: &str) -> Option<Self> {
+        match orientation.to_lowercase().as_str() {
             "flat" => Some(Orientation::Flat),
             "pointy" => Some(Orientation::Pointy),
             _ => None,
