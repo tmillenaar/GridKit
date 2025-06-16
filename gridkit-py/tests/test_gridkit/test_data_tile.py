@@ -758,3 +758,35 @@ def test_from_bounds_as_rect(nodata_value):
         numpy.testing.assert_allclose(data_tile.nodata_value, 9223372036854775807)
     else:
         numpy.testing.assert_allclose(data_tile.nodata_value, nodata_value)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=10, rotation=13, orientation="flat"),
+        TriGrid(size=10, rotation=13, orientation="pointy"),
+        RectGrid(size=10, rotation=13),
+        HexGrid(size=10, rotation=13, shape="flat"),
+        HexGrid(size=10, rotation=13, shape="pointy"),
+    ],
+)
+@pytest.mark.parametrize("method", ["linear", "nearest", "cubic"])
+def test_from_interpolated_points(grid, method):
+    numpy.random.seed(0)
+    x = 100 * numpy.random.rand(100)
+    numpy.random.seed(1)
+    y = 100 * numpy.random.rand(100)
+    value = numpy.sin(x / (10 * numpy.pi)) * numpy.sin(y / (10 * numpy.pi))
+
+    data_tile = DataTile.from_interpolated_points(
+        grid,
+        numpy.array([x, y]).T,
+        value,
+        method=method,
+        nodata_value=float("nan"),
+    )
+
+    # Test for same order of magnitude as input data, not quite strict
+    numpy.testing.assert_allclose(data_tile.max(), numpy.max(value), atol=0.1)
+    numpy.testing.assert_allclose(data_tile.min(), numpy.min(value), atol=0.1)
+    numpy.testing.assert_allclose(data_tile.median(), numpy.median(value), atol=0.1)

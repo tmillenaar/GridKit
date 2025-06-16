@@ -663,6 +663,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         --------
         :py:meth:`.BoundedGrid.resample`
         :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.DataTile.from_interpolated_points`
         """
         points = numpy.array(points)
         values = numpy.array(values)

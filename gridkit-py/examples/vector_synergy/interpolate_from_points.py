@@ -7,14 +7,14 @@ Fill a BoundedGrid based on point data
 Introduction
 ------------
 
-In this example a BoundedGrid is created from a set of points by interpolating between the points.
+In this example a :class:`.DataTile` is created from a set of points by interpolating between the points.
 For this operation we need:
 
 #. locations of the points
 #. values of the points
 #. a grid to interpolate on
 
-In this example, we simulate the point data using a 2d sinusoidal equation.
+In this example, we simulate the point data using a 2D sinusoidal equation.
 We sample the equation at pseudo-random locations.
 
 """
@@ -43,14 +43,14 @@ plt.show()
 
 # %%
 #
-# Now we can create a grid and interpolate onto that grid.
+# Now we can create a grid with your desired specifications and interpolate onto that grid.
 
-from gridkit import HexGrid
+from gridkit import DataTile, HexGrid
 
-empty_grid = HexGrid(size=6, shape="pointy")
-data_grid = empty_grid.interp_from_points(points, values)
+empty_grid = HexGrid(size=6, shape="pointy", offset=(2, 0))
+data_tile = DataTile.from_interpolated_points(empty_grid, points, values)
 
-from matplotlib.patches import Rectangle
+import shapely.geometry
 
 # %%
 #
@@ -62,29 +62,30 @@ from gridkit.doc_utils import plot_polygons
 fig, axes = plt.subplots(1, 3, sharey=True, figsize=(12, 5))
 
 for ax, method in zip(axes, ("nearest", "linear", "cubic")):
-    data_grid = empty_grid.interp_from_points(
+    data_tile = DataTile.from_interpolated_points(
+        empty_grid,
         points,
         values,
         method=method,
     )
 
     # plot the interpolated values at the cells
-    plot_polygons(data_grid.to_shapely(), data_grid.data.ravel(), "viridis", ax=ax)
+    plot_polygons(
+        data_tile.to_shapely(), data_tile.to_numpy().ravel(), "viridis", ax=ax
+    )
 
     # plot original data
     ax.scatter(x, y, c=values, edgecolors="black")
 
     # add outline of the grid bounds
-    b = data_grid.bounds
-    rect = Rectangle(
-        (b[0], b[1]),
-        b[2] - b[0],
-        b[3] - b[1],
+    plot_polygons(
+        shapely.geometry.Polygon(data_tile.corners()),
+        colors="red",
+        fill=False,
         linewidth=1,
-        edgecolor="r",
-        facecolor="none",
+        ax=ax,
+        set_zoom_to_bounds=False,
     )
-    ax.add_patch(rect)
 
     ax.set_title(method, fontdict={"fontsize": 30})
 
@@ -94,7 +95,7 @@ plt.show()
 # %%
 #
 # In this example, the `cubic` interpolation represents the original function the best, but this will differ per usecase.
-# Note how the BoundedGrid has nodata values at the border in the "linear" and "cubic" cases.
-# The bounds of the grid are automatically chosen to align with the supplied grid and accommodate all points.
+# Note how the DataTile has nodata values at the border in the "linear" and "cubic" cases.
+# The bounds of the grid are automatically chosen include all points.
 # Cells of which the center is not within the convex hull of the data,
-# but are within the selected bounds, get a `nodata_value` as specified in ``interp_from_points`` (default numpy.nan).
+# but are within the selected tile, get a `nodata_value` as specified when calling :meth:`.DataTile.from_interpolated_points` (default numpy.nan or dtype equivalent).

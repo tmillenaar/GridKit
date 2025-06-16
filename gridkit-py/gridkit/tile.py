@@ -1,7 +1,9 @@
+import functools
 import warnings
 from typing import List, Literal, Tuple, Union
 
 import numpy
+import scipy
 from pyproj import Transformer
 from shapely.geometry import MultiPoint
 
@@ -519,6 +521,82 @@ class DataTile(Tile):
         start_id = grid.cell_at_point(start_cell_centroid)
         tile = Tile(grid, start_id, nx, ny)
         return tile.to_data_tile(data, nodata_value=nodata_value)
+
+    @classmethod
+    def from_interpolated_points(
+        cls, grid, points, values, method="linear", nodata_value=numpy.nan
+    ):
+        """Create a DataTile based on the supplied `grid` that encapsulates the supplied `points`
+        and assignes values to cells based on interpolated `values`. The size and location of the
+        Tile are determined by the extent of the supplied `points`.
+
+        .. Note ::
+            This function is significantly slower than :meth:`.DataTile.interpolate`
+
+        Parameters
+        ----------
+        grid: class:`.BaseGrid`
+            The grid on which to interpolate the data
+        points: `numpy.ndarray`
+            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]
+        values: `numpy.ndarray`
+            The values corresponding to the supplied `points`, used as input for interpolation
+        method: :class:`str`
+            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".
+
+        Returns
+        -------
+        :class:`.DataTile`
+            A DataTile based on the supplied grid where the data is interpolated between the supplied points.
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.resample`
+        :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.Grid.interp_from_points`
+        """
+        points = numpy.array(points)
+        values = numpy.array(values)
+
+        method_lut = dict(
+            nearest=scipy.interpolate.NearestNDInterpolator,
+            linear=functools.partial(
+                scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value
+            ),
+            cubic=functools.partial(
+                scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value
+            ),
+        )
+
+        if method not in method_lut:
+            raise ValueError(
+                f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}"
+            )
+
+        cells = grid.cell_at_point(points)
+        start_id = (
+            cells.x.min(),
+            cells.y.min(),
+        )
+        nx = cells.x.max() - start_id[0] + 1
+        ny = cells.y.max() - start_id[1] + 1
+
+        tile = Tile(grid, start_id, nx, ny)
+
+        interp_func = method_lut[method]
+        if numpy.isnan(nodata_value):
+            nodata_mask = numpy.isfinite(values)
+        else:
+            nodata_mask = values != nodata_value
+
+        interpolator = interp_func(
+            points[nodata_mask],
+            values[nodata_mask],
+        )
+        centroids = tile.centroid()
+
+        interp_values = interpolator(centroids)
+        return cls(tile, interp_values, nodata_value)
 
     @property
     def dtype(self):
