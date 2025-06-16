@@ -109,7 +109,7 @@ def test_cell_at_point_v2():
 
     correct = []
     geoms = grid.to_shapely(ids)
-    for id, point, geom in zip(ids, points, geoms):
+    for id, point, geom in zip(ids, points, geoms.geoms):
         assert geom.contains(
             shapely.geometry.Point(point)
         ), f"Shape does not contain point for point:{point} and id:{id}"
@@ -542,22 +542,12 @@ def test_bounded_cell_corners(basic_bounded_tri_grid):
     )
 
 
-@pytest.mark.parametrize("as_multipolygon", [False, True])
-def test_bounded_to_shapely(basic_bounded_tri_grid, as_multipolygon):
+def test_bounded_to_shapely(basic_bounded_tri_grid):
     grid = basic_bounded_tri_grid
-    geoms1 = grid.to_shapely(as_multipolygon=as_multipolygon)
-    geoms2 = grid.to_shapely(
-        grid.cells_in_bounds(grid.bounds), as_multipolygon=as_multipolygon
-    )
+    geoms1 = grid.to_shapely()
+    geoms2 = grid.to_shapely(grid.cells_in_bounds(grid.bounds))
 
-    if as_multipolygon:
-        geoms1 = geoms1.geoms
-        geoms2 = geoms2.geoms
-    else:
-        geoms1 = geoms1.ravel()
-        geoms2 = geoms2.ravel()
-
-    for geom1, geom2 in zip(geoms1, geoms2):
+    for geom1, geom2 in zip(geoms1.geoms, geoms2.geoms):
         assert geom1.wkb == geom2.wkb
 
 

@@ -31,7 +31,7 @@ target_loc = (0, 0)
 def get_cells_around_target(grid):
     target_cell = grid.cell_at_point(target_loc)
     ids = grid.neighbours(target_cell, depth=3 * 10 / grid.size)
-    shapes = grid.to_shapely(ids, as_multipolygon=True)
+    shapes = grid.to_shapely(ids)
     return shapes
 
 

@@ -32,7 +32,7 @@ xx, yy = numpy.meshgrid(ids_x, ids_y)
 ids = numpy.stack([xx.ravel(), yy.ravel()]).T
 
 centroids = grid.centroid(ids)
-geometries = grid.to_shapely(ids, as_multipolygon=True)
+geometries = grid.to_shapely(ids)
 
 # Plot centroids
 plt.scatter(*centroids.T, marker="x")
@@ -78,7 +78,7 @@ ids = numpy.stack([xx.ravel(), yy.ravel()]).T
 
 def plot_rotated_grid(rotation, ax):
     grid = TriGrid(size=1, rotation=rotation)
-    geometries = grid.to_shapely(ids, as_multipolygon=True)
+    geometries = grid.to_shapely(ids)
     plot_polygons(geometries.geoms, colors="black", fill=False, linewidth=2, ax=ax)
 
 

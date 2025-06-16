@@ -250,10 +250,21 @@ class Tile:
         return Tile.from_pyo3_tile(self.grid, _tile)
 
     @validate_index
-    def to_shapely(self, index=None, as_multipolygon=True):
+    def to_shapely(self, index=None):
+        """Refer to parent method :meth:`.BaseGrid.to_shapely`
+
+        Difference with parent method:
+            `index` is optional.
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        """
+
         if index is None:
             index = self.indices
-        return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
+        return self.grid.to_shapely(index)
 
     def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
         """Convert the index referring to a cell from the tile reference frame to that of the grid.
@@ -468,16 +479,29 @@ class DataTile(Tile):
         bounds=None,
         nodata_value=None,
     ):
-        """Create a DataTile given a 2d numpy array.
+        """Create a DataTile given a 2D numpy array on a rectangular grid.
+        The location of the data is defined by the `bounds` paramter.
+        The grid attributes such as the cell size are infered from the restrictions created
+        by the dimensions of the data and the space available in the bounds.
+
+        This approach assumes the bounding box, and by extension the created DataTile, is not rotated.
 
         Parameters
         ----------
         data: class:`numpy.ndarray`
             A 2D array with the data for the DataTile
         bounds: `tuple(minx, miny, maxx, maxy)`
-            The boundaries describing the location of the edges of the data in (minx, miny, maxx, maxy).
+            The bounding box describing the location of the edges of the data in (minx, miny, maxx, maxy).
+            If None, the dimensions of the `data` array will be used, resulting in a dx and dy of 1
+            and the lower left corner of the Tile at the origin: (0,0).
         nodata_value:
-            A cell with this value is considered to be empty
+            A cell with this value is considered to be empty.
+            If None, a default will be chosen based on the dtype of the `data` array.
+
+        Returns
+        -------
+        class:`.DataTile`
+            A DataTile containing the suplied data
         """
         data = data if isinstance(data, numpy.ndarray) else numpy.array(data)
         if data.ndim != 2:

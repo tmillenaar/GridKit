@@ -641,7 +641,7 @@ def test_interpolate(grid, interp_method):
     assert numpy.nanmin(result) >= data_tile.min()
 
     if interp_method == "nearest":
-        ref_geoms = data_tile.to_shapely(as_multipolygon=True)
+        ref_geoms = data_tile.to_shapely()
     elif interp_method == "linear" or interp_method == "inverse_distance":
         # Create a reference grid and spcify the cells in which the points should contain data
         if isinstance(grid, TriGrid):
@@ -649,14 +649,14 @@ def test_interpolate(grid, interp_method):
             ref_grid = HexGrid(size=grid.size, rotation=grid.rotation)
             ref_grid = ref_grid.update(offset=(0, ref_grid.dy / 2))
             ref_geoms = ref_grid.to_shapely(
-                [[1, 2], [0, 2], [0, 1], [0, 0], [1, 0], [0, -1]], as_multipolygon=True
+                [[1, 2], [0, 2], [0, 1], [0, 0], [1, 0], [0, -1]]
             )
         elif isinstance(grid, RectGrid):
             ref_grid = grid.update(
                 offset=(grid.offset[0] + grid.dx / 2, grid.offset[1] - grid.dy / 2)
             )
             ref_tile = Tile(ref_grid, (-1, -1), 4, 4)
-            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+            ref_geoms = ref_tile.to_shapely()
         elif isinstance(grid, HexGrid):
             ref_grid = TriGrid(
                 side_length=grid.dx,
@@ -664,7 +664,7 @@ def test_interpolate(grid, interp_method):
                 offset=(grid.dx / 2, grid.dy / 2),
             )
             ref_tile = Tile(ref_grid, (-2, -1), 8, 4)
-            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+            ref_geoms = ref_tile.to_shapely()
 
     for i, (point, val) in enumerate(zip(points, result)):
         # Unfortunately we have to check the point for every cell in python.
@@ -753,7 +753,7 @@ def test_from_bounds_as_rect(nodata_value):
     numpy.testing.assert_allclose(data_tile_bounds, bounds)
     assert data_tile.grid.rotation == bounded_grid.rotation == 0
 
-    if nodata_value is None or numpy.isnan(nodata_value):
+    if nodata_value is None:
         # Current nodata default for integer, likely to change in future
         numpy.testing.assert_allclose(data_tile.nodata_value, 9223372036854775807)
     else:

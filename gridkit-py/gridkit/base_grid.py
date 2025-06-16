@@ -600,25 +600,28 @@ class BaseGrid(metaclass=abc.ABCMeta):
                 cells_in_bounds = self.cells_in_bounds(geom_bounds).ravel()
 
             cell_shapes = self.to_shapely(cells_in_bounds)
-            mask = [geom.intersects(cell) for cell in cell_shapes]
+            mask = [geom.intersects(cell) for cell in cell_shapes.geoms]
             intersecting_cells.extend(cells_in_bounds[mask])
         return GridIndex(intersecting_cells).unique()
 
     @validate_index
-    def to_shapely(self, index, as_multipolygon: bool = False):
-        """Represent the cells as Shapely Polygons
+    def to_shapely(self, index):
+        """Represent the cells as Shapely Polygons.
+        If `index` contains one cell, a single Polygon is returned.
+        If `index` contains multiple cells, a MultoPolygon is returned.
 
         Parameters
         ----------
         index: `numpy.ndarray`
             The indices of the cells to convert to Shapely Polygons
-        as_multipolygon: `numpy.ndarray`
-            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False
+
+        Returns
+        -------
+        class:`shapely.MultiPolygon` or class:`shapely.Polygon`
 
         See also
         --------
-        :meth:`.BoundedRectGrid.to_shapely`
-        :meth:`.BoundedHexGrid.to_shapely`
+        :meth:`.Tile.to_shapely`
         """
         cell_arr_shape = index.shape
         vertices = self.cell_corners(index.ravel())
@@ -627,10 +630,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         if vertices.ndim == 2:
             vertices = vertices[numpy.newaxis]
         multipoly_wkb = shapes.multipolygon_wkb(vertices)
-        multipoly = shapely.from_wkb(multipoly_wkb.hex())
-        if as_multipolygon == True:
-            return multipoly
-        return numpy.array(multipoly.geoms).reshape(cell_arr_shape)
+        return shapely.from_wkb(multipoly_wkb.hex())
 
     def interp_from_points(
         self, points, values, method="linear", nodata_value=numpy.nan

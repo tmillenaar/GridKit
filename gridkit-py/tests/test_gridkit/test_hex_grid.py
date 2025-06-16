@@ -320,16 +320,14 @@ def test_to_shapely_1_cell(shape):
     # The bits outside the rectangle perfectly compensate for the missing bits inside the rectangle
 
 
-@pytest.mark.parametrize("as_mp", [True, False])
 @pytest.mark.parametrize("shape", ["flat", "pointy"])
-def test_to_shapely(as_mp, shape):
+def test_to_shapely(shape):
     grid = HexGrid(size=1.5, shape=shape)
     ids = [[-3, 2], [3, -6]]
-    geoms = grid.to_shapely(ids, as_multipolygon=as_mp)
+    geoms = grid.to_shapely(ids)
 
-    if as_mp:
-        assert isinstance(geoms, shapely.geometry.MultiPolygon)
-        geoms = geoms.geoms
+    assert isinstance(geoms, shapely.geometry.MultiPolygon)
+    geoms = geoms.geoms
 
     centroids = [[geom.centroid.x, geom.centroid.y] for geom in geoms]
     numpy.testing.assert_allclose(centroids, grid.centroid(ids))

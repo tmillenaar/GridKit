@@ -34,7 +34,7 @@ tile = Tile(
     ny=5,
 )
 
-geoms = grid.to_shapely(tile.indices, as_multipolygon=True)
+geoms = grid.to_shapely(tile.indices)
 
 bbox = Polygon(tile.corners())
 plot_polygons(geoms, fill=True, linewidth=2, alpha=0.3)
@@ -62,9 +62,10 @@ bboxes = [Polygon(t.corners()) for t in tiles]
 for i, (tile, color) in enumerate(
     zip(tiles, ["peru", "deepskyblue", "orange", "teal", "purple"])
 ):
+    # Note how I call tile.grid.to_shapely and not grid.to_shapely, read on for explenation
     geoms = tile.grid.to_shapely(
-        tile.indices, as_multipolygon=True
-    )  # Note how I call tile.grid.to_shapely, read on for explenation
+        tile.indices
+    )  # Equivalent to calling `tile.to_shapely()`
     plot_polygons(geoms, fill=True, linewidth=2, alpha=0.3, colors=color)
     center = tile.corners().mean(axis=0)
     plt.text(*center, i, size=30)
@@ -94,7 +95,7 @@ for i, (tile, color) in enumerate(
     zip(tiles, ["peru", "deepskyblue", "orange", "teal", "purple"])
 ):
     geoms = grid.to_shapely(
-        tile.indices, as_multipolygon=True
+        tile.indices
     )  # Note how I call grid.to_shapely and not tile.grid.to_shapely!
     plot_polygons(geoms, fill=True, linewidth=2, alpha=0.3, colors=color)
     center = tile.corners().mean(axis=0)

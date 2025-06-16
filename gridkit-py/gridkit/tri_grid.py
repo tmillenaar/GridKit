@@ -657,7 +657,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         return super(BoundedTriGrid, self).cell_corners(index=index)
 
     @validate_index
-    def to_shapely(self, index=None, as_multipolygon: bool = False):
+    def to_shapely(self, index=None, as_multipolygon: bool = True):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
         Difference with parent method:
@@ -667,11 +667,14 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         See also
         --------
         :meth:`.BaseGrid.to_shapely`
-        :meth:`.BoundedHexGrid.to_shapely`
         """
+        if as_multipolygon == False:
+            raise RuntimeError(
+                "The argument 'as_multipolygon' has been deprecated. Now always a Shapely object is returned. Call '.geoms' on it to get an iterable"
+            )
         if index is None:
             index = self.indices
-        return super().to_shapely(index, as_multipolygon)
+        return super().to_shapely(index)
 
     def _bilinear_interpolation(self, sample_points):
         if not isinstance(sample_points, numpy.ndarray):

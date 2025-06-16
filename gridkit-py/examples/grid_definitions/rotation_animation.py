@@ -42,7 +42,7 @@ def update_frame(rotation):
     ax.clear()
     ax.scatter(0, 0)
     grid.rotation = rotation
-    geoms = grid.to_shapely(ids, as_multipolygon=True)
+    geoms = grid.to_shapely(ids)
     im = plot_polygons(geoms.geoms, colors=distance, fill=True, ax=ax)
     ax.set_title(f"Rotation: {rotation} degrees")
     ax.set_xlim(-5, 5)

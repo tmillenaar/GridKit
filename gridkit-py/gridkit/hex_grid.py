@@ -1009,7 +1009,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             index = self.indices()
         return super(BoundedHexGrid, self).cell_corners(index=index)
 
-    def to_shapely(self, index=None, as_multipolygon: bool = False):
+    def to_shapely(self, index=None):
         """Refer to :meth:`.BaseGrid.to_shapely`
 
         Difference with :meth:`.BaseGrid.to_shapely`:
@@ -1023,7 +1023,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         """
         if index is None:
             index = self.indices
-        return super().to_shapely(index, as_multipolygon)
+        return super().to_shapely(index)
 
     def _bilinear_interpolation(self, sample_points):
         """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation

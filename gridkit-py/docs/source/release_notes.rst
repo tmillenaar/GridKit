@@ -20,6 +20,15 @@ Features
 Fixes
  - adjust example :ref:`flower_of_life.py <example flower of life>` to work with shapely 2.1.0
 
+Deprecations
+ - Remove as_multipolygon argument from :meth:`.BaseGrid.to_shapely()` and always return a Shapely object.
+   The user can call `.geoms` on the Shapely object to get an iterable.
+   Reason: the to_shapely() function always created a Shapely object and then called .geoms on
+   it if as_multipolygon was set to False. This was implicit and one might assume that
+   this saves the creation of a Shapely object hence being more performant. This was removed
+   to make this more explicit since now the user has to call .geoms for themselves if they want
+   an iterable.
+
 Misc
  - Drop support for python 3.9
  - Moved :meth:`.BaseGrid.anchor` to Rust

@@ -972,7 +972,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
             index = self.indices()
         return super(BoundedRectGrid, self).cell_corners(index=index)
 
-    def to_shapely(self, index=None, as_multipolygon: bool = False):
+    def to_shapely(self, index=None):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
         Difference with parent method:
@@ -986,7 +986,7 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
         """
         if index is None:
             index = self.indices
-        return super().to_shapely(index, as_multipolygon)
+        return super().to_shapely(index)
 
     def _bilinear_interpolation(self, sample_points):
         """Interpolate the value at the location of `sample_points` by doing a bilinear interpolation

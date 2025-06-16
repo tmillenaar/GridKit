@@ -61,7 +61,7 @@ def generate_plot():
     fig, ax = plt.subplots()
     ax.imshow(dem, extent=dem.mpl_extent)
 
-    for poly in dem.to_shapely(river_cell_ids):
+    for poly in dem.to_shapely(river_cell_ids).geoms:
         x, y = poly.exterior.xy
         ax.fill(x, y, alpha=0.5, color="red")
 
