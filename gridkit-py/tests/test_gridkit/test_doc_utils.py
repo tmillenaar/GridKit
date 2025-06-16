@@ -32,7 +32,7 @@ def test_plot_polygons(filled, colors):
 
     colors = colors(nr_shapes)
     doc_utils.plot_polygons(
-        nr_shapes * [poly], colors=colors, cmap="viridis", ax=ax, filled=filled
+        nr_shapes * [poly], colors=colors, cmap="viridis", ax=ax, fill=filled
     )
 
     artists = ax.get_children()

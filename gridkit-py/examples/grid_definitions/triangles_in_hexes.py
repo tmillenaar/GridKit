@@ -65,9 +65,9 @@ hex_grid = hex_tile.grid
 
 ax = plt.subplot()
 tri_geoms = tri_tile.to_shapely()
-plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2, ax=ax)
+plot_polygons(tri_geoms, fill=False, colors="pink", linewidth=2, ax=ax)
 hex_geoms = hex_tile.to_shapely()
-plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":", ax=ax)
+plot_polygons(hex_geoms, fill=False, colors="cyan", linewidth=2, linestyle=":", ax=ax)
 # Create lattice with spacing of dx and dy to highlight cell bounds
 ax.set_xticks([i * hex_grid.dx for i in range(-5, 5)])
 ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
@@ -112,9 +112,9 @@ hex_grid.offset = (hex_grid.dx / 2, 0)
 
 ax = plt.subplot()
 tri_geoms = tri_tile.to_shapely()
-plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=2)
+plot_polygons(tri_geoms, fill=False, colors="pink", linewidth=2)
 hex_geoms = hex_tile.to_shapely()
-plot_polygons(hex_geoms, filled=False, colors="cyan", linewidth=2, linestyle=":")
+plot_polygons(hex_geoms, fill=False, colors="cyan", linewidth=2, linestyle=":")
 # Create lattice with spacing of dx and dy to highlight cell bounds
 ax.set_xticks([i * hex_grid.dx + hex_grid.dx / 2 for i in range(-5, 5)])
 ax.set_yticks([i * hex_grid.dy for i in range(-5, 5)])
@@ -146,8 +146,8 @@ tri_centroids = tri_grid.centroid(tri_tile.indices)
 hex_ids = hex_grid.cell_at_point(tri_centroids).ravel()
 value_map = {tuple(cell): i for (i, cell) in enumerate(hex_ids.unique().index)}
 color_values = [value_map[tuple(cell)] for cell in hex_ids.index]
-plot_polygons(tri_geoms, filled=True, cmap="viridis", colors=color_values, linewidth=2)
-plot_polygons(tri_geoms, filled=False, colors="pink", linewidth=0.3, linestyle=":")
+plot_polygons(tri_geoms, fill=True, cmap="viridis", colors=color_values, linewidth=2)
+plot_polygons(tri_geoms, fill=False, colors="pink", linewidth=0.3, linestyle=":")
 plt.show()
 
 # %%
@@ -170,7 +170,7 @@ for id in hex_ids.ravel().index:
     else:  # add id to dictionary if not present yet
         id_counter[id] = 1
     color_values.append(id_counter[id] + 2 * id[1])
-plot_polygons(tri_geoms, filled=True, cmap="viridis", colors=color_values, linewidth=2)
+plot_polygons(tri_geoms, fill=True, cmap="viridis", colors=color_values, linewidth=2)
 plt.show()
 
 # %%

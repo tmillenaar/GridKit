@@ -104,7 +104,7 @@ def plot_flat_and_pointy(flat_tile, pointy_tile):
     plot_polygons(  # Plot 1, show tile bounds
         Polygon(flat_tile.corners()),
         colors="red",
-        filled=False,
+        fill=False,
         ax=ax_flat,
     )
 
@@ -118,7 +118,7 @@ def plot_flat_and_pointy(flat_tile, pointy_tile):
     plot_polygons(  # Plot 2, show tile bounds
         Polygon(pointy_tile.corners()),
         colors="red",
-        filled=False,
+        fill=False,
         ax=ax_pointy,
     )
     ax_flat.set_aspect("equal")

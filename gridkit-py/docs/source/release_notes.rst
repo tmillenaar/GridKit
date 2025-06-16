@@ -1,9 +1,9 @@
 .. _release_notes:
 
-Release notes // Changelog
-==========================
+Release notes
+=============
 
-This is list of changes of GridKit over time.
+This is the changelog listing the changes of GridKit over time.
 
 Version 1.0.0 (nocheckin, add data)
 -----------------------------------
@@ -28,6 +28,7 @@ Deprecations
    this saves the creation of a Shapely object hence being more performant. This was removed
    to make this more explicit since now the user has to call .geoms for themselves if they want
    an iterable.
+ - Remove 'filled' keyword argument from :func:`gridkit.doc_utils.plot_polygons` in favor of 'fill'
 
 Misc
  - Drop support for python 3.9

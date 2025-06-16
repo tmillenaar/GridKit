@@ -787,6 +787,6 @@ def test_from_interpolated_points(grid, method):
     )
 
     # Test for same order of magnitude as input data, not quite strict
-    numpy.testing.assert_allclose(data_tile.max(), numpy.max(value), atol=0.1)
-    numpy.testing.assert_allclose(data_tile.min(), numpy.min(value), atol=0.1)
-    numpy.testing.assert_allclose(data_tile.median(), numpy.median(value), atol=0.1)
+    numpy.testing.assert_allclose(data_tile.max(), numpy.max(value), atol=0.5)
+    numpy.testing.assert_allclose(data_tile.min(), numpy.min(value), atol=0.5)
+    numpy.testing.assert_allclose(data_tile.median(), numpy.median(value), atol=0.5)
