@@ -1,5 +1,6 @@
 use crate::grid::*;
 use crate::tile::*;
+use crate::RectGrid;
 use core::f64;
 use ndarray::*;
 use num_traits::{AsPrimitive, Bounded, FromPrimitive, Num, NumCast, ToPrimitive};
@@ -104,6 +105,34 @@ impl<
         let tile = Tile {
             grid,
             start_id,
+            nx,
+            ny,
+        };
+        DataTile {
+            tile: tile,
+            data,
+            nodata_value,
+        }
+    }
+
+    pub fn from_bounds_as_rect(
+        bounds: (f64, f64, f64, f64),
+        data: Array2<T>,
+        nodata_value: T,
+    ) -> Self {
+        // Note: not used in python, that has it's own version. This one is untested.
+        let nx = data.shape()[1] as u64;
+        let ny = data.shape()[0] as u64;
+        let dx = (bounds.2 - bounds.0) / nx as f64;
+        let dy = (bounds.3 - bounds.1) / ny as f64;
+        let mut grid = RectGrid::new(dx, dy);
+        // nocheckin determine offset!
+        let start_cell_centroid = [bounds.0 + dx/2., bounds.1+dy/2.];
+        grid.anchor_inplace(&start_cell_centroid, CellElement::Centroid);
+        let start_id = grid.cell_at_point(&start_cell_centroid);
+        let tile = Tile {
+            grid: Grid::RectGrid(grid),
+            start_id: start_id.into(), // nocheckin, align tpye of start_id, use [] intead of ()
             nx,
             ny,
         };

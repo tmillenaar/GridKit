@@ -435,7 +435,6 @@ class TriGrid(BaseGrid):
             area = new_dx * new_dy
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
-        # new_grid = self.parent_grid_class(area=area, offset=new_offset, crs=crs, rotation=rotation)
         new_grid = self.parent_grid_class(
             size=size, offset=new_offset, crs=crs, rotation=rotation
         )

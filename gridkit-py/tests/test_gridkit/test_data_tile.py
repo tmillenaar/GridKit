@@ -3,7 +3,7 @@ import pytest
 import shapely
 import shapely.geometry
 
-from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
+from gridkit import BoundedRectGrid, DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 
 @pytest.mark.parametrize(
@@ -724,3 +724,37 @@ def test_resample(grid, interp_method):
     assert result.min() >= data_tile.min()
     assert result.max() <= data_tile.max()
     assert result.mean() > data_tile.min() and result.mean() < data_tile.max()
+
+
+@pytest.mark.parametrize("nodata_value", [None, 1, 9223372036854775807])
+def test_from_bounds_as_rect(nodata_value):
+    nx = 4
+    ny = 3
+    data = numpy.arange(nx * ny).reshape((ny, nx))
+    bounds = (-1.2, -3.3, 4.3, 5.2)
+    data_tile = DataTile.from_bounds_as_rect(
+        data, bounds=bounds, nodata_value=nodata_value
+    )
+    bounded_grid = BoundedRectGrid(data, bounds=bounds)
+
+    data_tile_bounds = [
+        data_tile.corners()[:, 0].min(),
+        data_tile.corners()[:, 1].min(),
+        data_tile.corners()[:, 0].max(),
+        data_tile.corners()[:, 1].max(),
+    ]
+    numpy.testing.assert_allclose(data_tile.nx, bounded_grid.width)
+    numpy.testing.assert_allclose(data_tile.ny, bounded_grid.height)
+    numpy.testing.assert_allclose(data_tile.grid.dx, bounded_grid.dx)
+    numpy.testing.assert_allclose(data_tile.grid.dy, bounded_grid.dy)
+    numpy.testing.assert_allclose(data_tile.grid.offset, bounded_grid.offset)
+    numpy.testing.assert_allclose(data_tile.to_numpy(), bounded_grid.data)
+    numpy.testing.assert_allclose(bounded_grid.bounds, bounds)
+    numpy.testing.assert_allclose(data_tile_bounds, bounds)
+    assert data_tile.grid.rotation == bounded_grid.rotation == 0
+
+    if nodata_value is None or numpy.isnan(nodata_value):
+        # Current nodata default for integer, likely to change in future
+        numpy.testing.assert_allclose(data_tile.nodata_value, 9223372036854775807)
+    else:
+        numpy.testing.assert_allclose(data_tile.nodata_value, nodata_value)

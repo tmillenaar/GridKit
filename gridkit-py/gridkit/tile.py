@@ -463,6 +463,39 @@ class DataTile(Tile):
         # _tile is used by the Tile parent class
         self._tile = self._data_tile.get_tile()
 
+    def from_bounds_as_rect(
+        data,
+        bounds=None,
+        nodata_value=None,
+    ):
+        """Create a DataTile given a 2d numpy array.
+
+        Parameters
+        ----------
+        data: class:`numpy.ndarray`
+            A 2D array with the data for the DataTile
+        bounds: `tuple(minx, miny, maxx, maxy)`
+            The boundaries describing the location of the edges of the data in (minx, miny, maxx, maxy).
+        nodata_value:
+            A cell with this value is considered to be empty
+        """
+        data = data if isinstance(data, numpy.ndarray) else numpy.array(data)
+        if data.ndim != 2:
+            raise TypeError("Expected a numpy array with two dimensions.")
+
+        nx = data.shape[1]
+        ny = data.shape[0]
+        if bounds is None:
+            bounds = (0, 0, ny, nx)
+        dx = (bounds[2] - bounds[0]) / nx
+        dy = (bounds[3] - bounds[1]) / ny
+        grid = RectGrid(dx=dx, dy=dy)
+        start_cell_centroid = (bounds[0] + dx / 2, bounds[1] + dy / 2)
+        grid.anchor(start_cell_centroid, cell_element="centroid", in_place=True)
+        start_id = grid.cell_at_point(start_cell_centroid)
+        tile = Tile(grid, start_id, nx, ny)
+        return tile.to_data_tile(data, nodata_value=nodata_value)
+
     @property
     def dtype(self):
         dtype_method_map = {

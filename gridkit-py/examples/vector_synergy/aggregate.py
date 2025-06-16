@@ -15,12 +15,12 @@ Introduction
 
 Grouping points in cells (here referred to as 'aggregation') is a common occurrence in spatial data processing.
 This is often used to generate heatmaps, obtain statistics of the data or to reduce the size of the data for easier processing.
-By grouping nearby points in the same cell, 
+By grouping nearby points in the same cell,
 you can for example calculate the standard deviation to get a feel for the variability of your data.
 
 In this example we will count the number of points in a cell.
 This gives a sense of the distribution of the points.
-Other common operations for this kind of exercise are: 
+Other common operations for this kind of exercise are:
 std, mean, median, percentile, min and max.
 
 .. Tip ::
@@ -35,7 +35,7 @@ Generate input data
 -------------------
 
 Let's start by generating some points.
-The data will be a set of points scattered around a circle to create 
+The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
 I'll plot the input here to show what it looks like.
 
