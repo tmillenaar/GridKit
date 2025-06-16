@@ -19,6 +19,8 @@ Features
 
 Fixes
  - adjust example :ref:`flower_of_life.py <example flower of life>` to work with shapely 2.1.0
+ - properly raise error if :meth:`.BaseGrid.align_bounds` or :meth:`.BaseGrid.are_bounds_aligned` is called on a rotated grid.
+   Before this just gave unreliable results.
 
 Deprecations
  - Remove as_multipolygon argument from :meth:`.BaseGrid.to_shapely()` and always return a Shapely object.
