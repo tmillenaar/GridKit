@@ -28,7 +28,7 @@ def test_documentation_build(tmp_path):
         "search.html",
         "api_reference.html",
         "_sources",
-        "getting_started.html",
+        "introduction.html",
         ".doctrees",
         "example_gallery",
         "index.html",
