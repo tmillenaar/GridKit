@@ -3,7 +3,7 @@ use crate::utils::*;
 use ndarray::Slice;
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: [f64; 2],

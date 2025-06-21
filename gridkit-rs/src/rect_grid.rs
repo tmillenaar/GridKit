@@ -3,7 +3,7 @@ use crate::tile::*;
 use crate::utils::*;
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RectGrid {
     pub _dx: f64,
     pub _dy: f64,

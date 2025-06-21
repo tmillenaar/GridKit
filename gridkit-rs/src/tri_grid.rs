@@ -5,7 +5,7 @@ use crate::interpolate;
 use crate::utils::*;
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: [f64; 2],
