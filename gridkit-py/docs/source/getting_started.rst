@@ -16,9 +16,8 @@ and finally the polygon description of these cells will be obtained.
    >>> points = [[2, 7], [-6, 2]]
    >>> cell_ids = grid.cell_at_point(points)
    >>> geoms = grid.to_shapely(cell_ids)
-   >>> print(geoms)
-   [<POLYGON ((2.5 5.052, 2.5 7.939, 1.768e-16 9.382, -2.5 7.939, -2.5 5.052, -5...>
-    <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>]
+   >>> print(list(geoms.geoms))
+   [<POLYGON ((2.5 5.052, 2.5 7.939, 1.768e-16 9.382, -2.5 7.939, -2.5 5.052, -5...>, <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>]
 
 ..
 
