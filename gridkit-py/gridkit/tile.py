@@ -252,7 +252,7 @@ class Tile:
         return Tile.from_pyo3_tile(self.grid, _tile)
 
     @validate_index
-    def to_shapely(self, index=None):
+    def to_shapely(self, index=None, as_multipolygon=None):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
         Difference with parent method:
@@ -266,7 +266,7 @@ class Tile:
 
         if index is None:
             index = self.indices
-        return self.grid.to_shapely(index)
+        return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
 
     def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
         """Convert the index referring to a cell from the tile reference frame to that of the grid.

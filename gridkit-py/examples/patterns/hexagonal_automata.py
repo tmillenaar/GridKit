@@ -1,8 +1,8 @@
 """
 .. _hexagonal automata:
 
-Hexagonal automata
-==================
+Cellular automata: Hexagonal automata
+=====================================
 
 
 This script is based on the example shown in :ref:`game_of_life.py <example game of life>`, but here a Hexagonal grid is used with slightly differnt rules.
@@ -11,13 +11,15 @@ Here the 6 neighbours around a cell are used. The rules are:
     1. If a cell is alive, it stays alive if two and only two of it's neighbours are alive.
     2. If a cell is dead, it becomes alive if one and only one of it's neighbours is alive.
 
-This makes remarkably beautiful patterns on larger scales. I encourage you to play with this, though matplotlib as a backend is not very suitable for this.
-Consider that a cell in a line has two neighbours, so it remains alive.
+This makes remarkably beautiful patterns on larger scales.
+A cell in a line has two neighbours, so it remains alive.
 In this configuration, straight lines are stable and corners are not.
 Because of this, the pattern can only grow form corners and not from a line. This results in remarkable patterns when played out over longer sessions.
 
 Also pretty cool, notice that on frame 1 we have a ring that forms a hexagon and again on frames 3, 7 and 15.
-Can you guess what frame the next hexagonal ring will form?
+Do you see the pattern?
+
+I encourage you to play with this, though matplotlib as a backend is not very performant when animating many shapes.
 
 """
 
@@ -34,7 +36,7 @@ from gridkit.doc_utils import plot_polygons
 shape = (33, 33)
 data = numpy.zeros(shape)
 grid = BoundedHexGrid(data=data)
-geoms = grid.to_shapely(as_multipolygon=True)  # Used for plotting
+geoms = grid.to_shapely()  # Used for plotting
 
 neighbours = grid.neighbours(grid.indices)
 neighbours = numpy.stack(grid.grid_id_to_numpy_id(neighbours.ravel())).T.reshape(

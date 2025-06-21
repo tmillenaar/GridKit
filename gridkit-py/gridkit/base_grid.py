@@ -613,7 +613,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return GridIndex(intersecting_cells).unique()
 
     @validate_index
-    def to_shapely(self, index):
+    def to_shapely(self, index, as_multipolygon=None):
         """Represent the cells as Shapely Polygons.
         If `index` contains one cell, a single Polygon is returned.
         If `index` contains multiple cells, a MultoPolygon is returned.
@@ -631,7 +631,20 @@ class BaseGrid(metaclass=abc.ABCMeta):
         --------
         :meth:`.Tile.to_shapely`
         """
-        cell_arr_shape = index.shape
+        if as_multipolygon is not None:
+            if as_multipolygon is True:
+                warnings.warn(
+                    """The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.
+                    The function now always returns a Shapely object. If you have multiple shapes and want an iterable,
+                    call '.geoms' on the MultiPolygon.""",
+                )
+            else:
+                raise RuntimeError(
+                    """The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.
+                The function now always returns a Shapely object. If you have multiple shapes and want an iterable,
+                call '.geoms' on the MultiPolygon."""
+                )
+
         vertices = self.cell_corners(index.ravel())
         if index.index.ndim == 1:
             return shapely.geometry.Polygon(vertices)

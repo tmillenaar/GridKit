@@ -668,13 +668,9 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         --------
         :meth:`.BaseGrid.to_shapely`
         """
-        if as_multipolygon == False:
-            raise RuntimeError(
-                "The argument 'as_multipolygon' has been deprecated. Now always a Shapely object is returned. Call '.geoms' on it to get an iterable"
-            )
         if index is None:
             index = self.indices
-        return super().to_shapely(index)
+        return super().to_shapely(index, as_multipolygon=as_multipolygon)
 
     def _bilinear_interpolation(self, sample_points):
         if not isinstance(sample_points, numpy.ndarray):

@@ -4,20 +4,19 @@
 Cellular automata: Conway's game of life
 ========================================
 
-Cellular automata are a set of rules that determine whether a cell is either alive or dead.
-The same rules are applied over and over in an iterative manner to the same grid.
+Cellular automata are a small set of rules relating to cells on a grid that can create complex patterns when applied repeatedly.
 There is a near infinite veriety of rules, but far and away the most well known set of rules is that of the so called Conway's game of life.
 The setup is as follows:
-    - The board is a 2d rectangular grid
-    - The 8 neighbouring cells are considered, so this includes the diagonal neighbours
-    - A cell has two possbile states: alive or dead
+ - The board is a 2d rectangular grid
+ - The 8 neighbouring cells are considered, so this includes the diagonal neighbours
+ - A cell has two possbile states: alive or dead
 
 The rules as taken from https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life:
 
-    1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-    2. Any live cell with two or three live neighbours lives on to the next generation.
-    3. Any live cell with more than three live neighbours dies, as if by overpopulation.
-    4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+ 1. Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+ 2. Any live cell with two or three live neighbours lives on to the next generation.
+ 3. Any live cell with more than three live neighbours dies, as if by overpopulation.
+ 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 
 Initial conditions
 ------------------
