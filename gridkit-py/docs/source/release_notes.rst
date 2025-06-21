@@ -10,9 +10,8 @@ Version 1.0.0 (nocheckin, add data)
 Features
  - Introduce DataTile class to replace BoundedGrid because of their ability to represent rotated Tiles
  - Replace usages to bounded grids in examples with data tiles
- - gridkit.count, sum and mean now also apply to data tiles
- - TriGrid orign moved to better match the RectGrid and HexGrid
- - TriGrid size definition halved to better match the RectGrid and HexGrid
+ - :func:`.count`, :func:`.sum` and :func:`.mean` now also apply to data tiles
+ - TriGrid orign moved and size definition halved to better match the RectGrid and HexGrid, see https://github.com/tmillenaar/GridKit/issues/94
  - Provide a flat and pointy version of TriGrid
  - Fix offset having to be specified in (y,x) if for 'flat' HexGrids, now (x,y)
  - Add set_zoom_to_bounds option to :func:`.doc_utils.plot_polygons` to allow to turn it off
