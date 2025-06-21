@@ -120,8 +120,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Sets the x and y value of the offset"""
         if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        if getattr(self, "orientation", None) == "flat":  # flat hex grid
-            value = value[::-1]  # swap xy to yx
         new_offset = (value[0] % self.cell_width, value[1] % self.cell_height)
         self._offset = new_offset
         self._grid = self._update_inner_grid(offset=new_offset)

@@ -198,10 +198,10 @@ class HexGrid(BaseGrid):
         if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
         offset_x, offset_y = value[0], value[1]
-        if self.shape == "pointy":
+        if self.orientation == "pointy":
             if ((offset_y // self.dy) % 2) != 0:  # Row is odd
                 offset_x -= self.dx / 2
-        elif self.shape == "flat":
+        elif self.orientation == "flat":
             if ((offset_x // self.dx) % 2) != 0:  # Row is odd
                 offset_y -= self.dy / 2
         offset_x = offset_x % self.dx
