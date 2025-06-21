@@ -416,12 +416,12 @@ def test_is_aligned_with():
     other_grid = HexGrid(size=1.2, shape="flat")
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
-    assert "shape" in reason
+    assert "orientation" in reason
 
     other_grid = HexGrid(size=1.1, shape="flat", offset=(1, 1), crs=4326)
     is_aligned, reason = grid.is_aligned_with(other_grid)
     assert not is_aligned
-    assert all(attr in reason for attr in ["CRS", "shape", "cellsize", "offset"])
+    assert all(attr in reason for attr in ["CRS", "orientation", "cellsize", "offset"])
 
     with pytest.raises(TypeError):
         other_grid = 1

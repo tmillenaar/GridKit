@@ -28,10 +28,13 @@ class HexGrid(BaseGrid):
         The area of a cell. Cannot be supplied together with `size` or 'side_length'.
     side_length: `float`, None
         The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or 'area'.
-    shape: `Literal["pointy", "flat"]`, "pointy"
-        The shape of the layout of the grid.
-        If ``shape`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
-        If ``shape`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.
+    orientation: `Literal["pointy", "flat"]`, "pointy"
+        Formerly called 'shape'.
+        The orientation of the cells in the grid.
+        If ``orientation`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
+        If ``orientation`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.
+    shape: `Literal["pointy", "flat"]`, None
+        Renamed to 'orientation'. Still a vible arguement for now for legacy reasons, will be removed in the future.
     offset: `Tuple(float, float)`, (0,0)
         The offset in dx and dy.
         Shifts the whole grid by the specified amount.
@@ -59,11 +62,26 @@ class HexGrid(BaseGrid):
         size=None,
         area=None,
         side_length=None,
-        shape="pointy",
+        orientation=None,  # default "pointy"
+        shape=None,  # deprecated in favor of orientation
         offset=(0, 0),
         rotation=0,
         **kwargs,
     ):
+        if shape is not None:
+            if orientation is not None:
+                raise ValueError(
+                    "Both 'orientation' and 'shape' have been provided. 'shape' is deprecated, please only use 'orientaiton'."
+                )
+            else:
+                orientation = shape
+                warnings.warn(
+                    "'shape' has been renamed to 'orientation' and will be deprecated in a future version",
+                    DeprecationWarning,
+                )
+        elif orientation is None:  # Set default
+            orientation = "pointy"
+
         supplied_sizes = set()
         if area is not None:
             supplied_sizes.add("area")
@@ -85,14 +103,16 @@ class HexGrid(BaseGrid):
         if side_length is not None:
             size = self._side_length_to_size(side_length)
 
-        self._size = size
+        self._orientation = orientation
         self._radius = size / 3**0.5
         self._rotation = rotation
 
-        if shape == "pointy":
+        self._size = size
+
+        if orientation == "pointy":
             self._dx = size
             self._dy = 3 / 2 * self._radius
-        elif shape == "flat":
+        elif orientation == "flat":
             self._dy = size
             self._dx = 3 / 2 * self._radius
         else:
@@ -101,10 +121,10 @@ class HexGrid(BaseGrid):
             )
 
         offset_x, offset_y = offset[0], offset[1]
-        if shape == "pointy":
+        if orientation == "pointy":
             if ((offset_y // self.dy) % 2) != 0:  # Row is odd
                 offset_x -= self.dx / 2
-        elif shape == "flat":
+        elif orientation == "flat":
             if ((offset_x // self.dx) % 2) != 0:  # Row is odd
                 offset_y -= self.dy / 2
 
@@ -113,10 +133,9 @@ class HexGrid(BaseGrid):
 
         offset = (offset_x, offset_y)
 
-        self._shape = shape
         self._grid = PyO3HexGrid(
             cellsize=size,
-            cell_orientation=shape,
+            cell_orientation=orientation,
             offset=offset,
             rotation=self._rotation,
         )
@@ -127,7 +146,7 @@ class HexGrid(BaseGrid):
     def definition(self):
         return dict(
             size=self.size,
-            shape=self.shape,
+            orientation=self.orientation,
             offset=self.offset,
             rotation=self.rotation,
             crs=self.crs,
@@ -208,24 +227,35 @@ class HexGrid(BaseGrid):
         return self._radius
 
     @property
-    def shape(self) -> str:
-        """The shape of the grid as supplied when initiating the class.
-        This can be either "flat" or "pointy" referring to the top of the cells.
+    def orientation(self) -> str:
+        """The orientation of the cells as supplied when initiating the class.
+        This can be either "flat" or "pointy" referring to whether the cell is
+        lying down flat or standing on a point.
         """
-        return self._shape
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, value):
+        """Set the orientation to a new value. Possible values: 'pointy' or 'flat'"""
+        if not value in ("pointy", "flat"):
+            raise ValueError(
+                f"Orientation cannot be set to '{value}', must be either 'pointy' or 'flat'"
+            )
+        rot = self.rotation
+        self._orientation = value
+        self.rotation = rot  # Re-run rotation settter to update rotaiton according to new orientation
+
+    @property
+    def shape(self) -> str:
+        """See :meth:`.HexGrid.orientation`, depercated but kept for backwards compatibility, will be removed in the future."""
+        return self._orientation
 
     @shape.setter
     def shape(self, value):
-        """Set the shape of the grid to a new value. Possible values: 'pointy' or 'flat'"""
-        if not value in ("pointy", "flat"):
-            raise ValueError(
-                f"Shape cannot be set to '{value}', must be either 'pointy' or 'flat'"
-            )
-        rot = self.rotation
-        self._shape = value
-        self.rotation = (
-            rot  # Re-run rotation settter to update rotaiton according to new shape
-        )
+        """Set the orientation to a new value. Possible values: 'pointy' or 'flat'.
+        See :meth:`.HexGrid.orientation`, shape is depercated but kept for backwards compatibility, will be removed in the future.
+        """
+        self.orientation = value
 
     def to_bounded(self, bounds, fill_value=numpy.nan):
         _, shape = self.cells_in_bounds(bounds, return_cell_count=True)
@@ -234,7 +264,7 @@ class HexGrid(BaseGrid):
             data=data,
             bounds=bounds,
             nodata_value=fill_value,
-            shape=self.shape,
+            orientation=self.orientation,
             crs=self.crs,
         )
 
@@ -271,8 +301,8 @@ class HexGrid(BaseGrid):
         The direct neighbours of a cell can be returned by using depth=1, which is the default.
         For hexagonal grids, the relative indices of the neighbours differs depending on the index.
         There are two cases, neighbour indices for even colums and neighbour indices for odd columns,
-        in the case of a grid 'pointy' shape.
-        This works on rows if the grid has a 'flat' shape.
+        in the case of a 'pointy' orientation.
+        This works on rows if the cells have a 'flat' orientation.
 
         .. code-block:: python
 
@@ -349,10 +379,10 @@ class HexGrid(BaseGrid):
             row_length = depth + i + 1
             row_slice = slice(start_slice, start_slice + row_length)
             max_val = int(numpy.floor(row_length / 2))
-            if self._shape == "pointy":
+            if self._orientation == "pointy":
                 pointy_axis = 1
                 flat_axis = 0
-            elif self._shape == "flat":
+            elif self._orientation == "flat":
                 pointy_axis = 0
                 flat_axis = 1
 
@@ -659,14 +689,14 @@ class HexGrid(BaseGrid):
             [left_top, left_bottom, right_top, right_bottom]
         ).index
 
-        if self._shape == "pointy":
+        if self._orientation == "pointy":
             nr_cells_flat = round(((bounds[2] - bounds[0]) / self.dx))
-        elif self._shape == "flat":
+        elif self._orientation == "flat":
             nr_cells_flat = round(((bounds[3] - bounds[1]) / self.dy))
 
         ids_x = numpy.arange(left_bottom_id[0] - 2, right_top_id[0] + 2)
         ids_y = numpy.arange(left_bottom_id[1] - 2, right_top_id[1] + 2)
-        if self._shape == "flat":
+        if self._orientation == "flat":
             ids_x_full, ids_y_full = numpy.meshgrid(ids_x, ids_y, indexing="ij")
             ids_y_full = numpy.fliplr(ids_y_full)
         else:
@@ -709,7 +739,7 @@ class HexGrid(BaseGrid):
         .. Note ::
 
             In order to properly align the new TriGrid, it will be rotated by 30 degrees
-            if the ``shape`` of the hexagonal grid is 'pointy'.
+            if the ``orientation`` of the hexagonal grid cells is 'pointy'.
 
         The number of cells scale with the supplied ``factor`` in the following way: ``6 * factor**2``.
         So if ``factor`` is 1, there will be 6 times as many cells in the new grid.
@@ -753,10 +783,8 @@ class HexGrid(BaseGrid):
 
         # Turn Hex Grid into TriGrid, adjust definition appropriately
         definition = self.definition
-        definition.pop(
-            "shape"
-        )  # shape does not exist for TriGrids, FIXME: it does now though
-        extra_rot = 30 if self.shape == "pointy" else 0
+        definition.pop("orientation")
+        extra_rot = 30 if self.orientation == "pointy" else 0
         definition["rotation"] += extra_rot
         definition["size"] = self.r / factor
         sub_grid = TriGrid(**definition)
@@ -777,13 +805,17 @@ class HexGrid(BaseGrid):
         if rotation is None:
             rotation = self.rotation
         return PyO3HexGrid(
-            cellsize=size, offset=offset, rotation=rotation, cell_orientation=self.shape
+            cellsize=size,
+            offset=offset,
+            rotation=rotation,
+            cell_orientation=self.orientation,
         )
 
     def update(
         self,
         size=None,
-        shape=None,
+        orientation=None,
+        shape=None,  # deprecated in favor of 'orientation'
         area=None,
         offset=None,
         rotation=None,
@@ -799,8 +831,10 @@ class HexGrid(BaseGrid):
             The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.
         area: float
             The area of a cell. Cannot be supplied together with ``size``.
+        orientation: Literal["pointy", "flat"]
+            The new orientation of the grid cells
         shape: Literal["pointy", "flat"]
-            The new shape of the grid cells
+            The new orientation of the grid cells. Note: only exposed for backwards compatibility, use orientation instead.
         offset: Tuple[float, float]
             The new offset of the origin of the grid
         rotation: float
@@ -818,8 +852,19 @@ class HexGrid(BaseGrid):
         """
         if size is None and area is None:
             size = self.size
-        if shape is None:
-            shape = self.shape
+        if shape is not None:
+            if orientation is None:
+                orientation = shape
+                warnings.warn(
+                    "'Shape' has been renamed to 'orientation' and will be removed in a future version.",
+                    DeprecationWarning,
+                )
+            else:
+                raise ValueError(
+                    "Both 'shape' and 'orientation' were supplied, please only use 'orientation' and not use 'shape', which will be deprecated."
+                )
+        if orientation is None:
+            orientation = self.orientation
         if offset is None:
             offset = self.offset
         if rotation is None:
@@ -828,7 +873,7 @@ class HexGrid(BaseGrid):
             crs = self.crs
         return HexGrid(
             size=size,
-            shape=shape,
+            orientation=orientation,
             area=area,
             offset=offset,
             rotation=rotation,
@@ -846,10 +891,13 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         A 2D ndarray containing the data
     bounds: `Tuple(float, float, float, float)`
         The extend of the data in minx, miny, maxx, maxy.
-    shape: `Literal["pointy", "flat"]`
-        The shape of the cells in the grid.
-        If ``shape`` is "pointy", the hexagons will be standing upright on a point with the flat sides to the left and right.
-        If ``shape`` is "flat", the hexagons will be flat side up and below and pointy side on the left and right.
+    orientation: `Literal["pointy", "flat"]`, "pointy"
+        Formerly called 'shape'.
+        The orientation of the cells in the grid.
+        If ``orientation`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.
+        If ``orientation`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.
+    shape: `Literal["pointy", "flat"]`, None
+        Renamed to 'orientation'. Still a vible arguement for now for legacy reasons, will be removed in the future.
     crs: `pyproj.CRS` (optional)
         The coordinate reference system of the grid.
         The value can be anything accepted by pyproj.CRS.from_user_input(),
@@ -864,7 +912,22 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
     """
 
-    def __init__(self, data, *args, bounds=None, shape="flat", **kwargs):
+    def __init__(
+        self, data, *args, bounds=None, orientation=None, shape=None, **kwargs
+    ):
+        if shape is not None:
+            if orientation is not None:
+                raise ValueError(
+                    "Both 'orientation' and 'shape' have been provided. 'shape' is deprecated, please only use 'orientaiton'."
+                )
+            else:
+                orientation = shape
+                warnings.warn(
+                    "'shape' has been renamed to 'orientation' and will be deprecated in a future version",
+                    DeprecationWarning,
+                )
+        elif orientation is None:  # Set default
+            orientation = "pointy"
 
         data = numpy.array(data) if not isinstance(data, numpy.ndarray) else data
 
@@ -874,7 +937,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             )
 
         if bounds is None:
-            if shape == "pointy":
+            if orientation == "pointy":
                 bounds = (0, 0, data.shape[1] * 2 / 3**0.5, data.shape[0])
             else:
                 bounds = (0, 0, data.shape[0] * 3**0.5 / 2, data.shape[1])
@@ -884,7 +947,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
                 f"Incerrect bounds. Minimum value exceeds maximum value for bounds {bounds}"
             )
 
-        if shape == "pointy":
+        if orientation == "pointy":
             dx = (bounds[2] - bounds[0]) / data.shape[1]
             dy = (bounds[3] - bounds[1]) / data.shape[0]
             size = dx
@@ -892,7 +955,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
                 raise ValueError(
                     "The supplied data cannot be covered by hexagons with sides of equal length."
                 )
-        elif shape == "flat":
+        elif orientation == "flat":
             dx = (bounds[2] - bounds[0]) / data.shape[0]
             dy = (bounds[3] - bounds[1]) / data.shape[1]
             size = dy
@@ -909,7 +972,13 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             0 if numpy.isclose(offset_y, dy) else offset_y,
         )
         super(BoundedHexGrid, self).__init__(
-            data, *args, size=size, bounds=bounds, offset=offset, shape=shape, **kwargs
+            data,
+            *args,
+            size=size,
+            bounds=bounds,
+            offset=offset,
+            orientation=orientation,
+            **kwargs,
         )
 
         if not self.are_bounds_aligned(bounds):
@@ -1002,7 +1071,9 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
 
     def _data_slice_from_bounds(self, bounds):
         slice_y, slice_x = super()._data_slice_from_bounds(bounds=bounds)
-        return (slice_y, slice_x) if self.shape == "pointy" else (slice_x, slice_y)
+        return (
+            (slice_y, slice_x) if self.orientation == "pointy" else (slice_x, slice_y)
+        )
 
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
         if index is None:
@@ -1111,7 +1182,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
 
-        if self._shape == "pointy":
+        if self.orientation == "pointy":
             index = numpy.array(
                 [
                     index_topleft.x + np_index[1],
@@ -1123,7 +1194,7 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             )
             offset_rows = index[1] % 2 == 1
             index[0][offset_rows] -= 1
-        elif self._shape == "flat":
+        elif self.orientation == "flat":
             index = numpy.array(
                 [
                     index_topleft.x + np_index[0],
@@ -1141,18 +1212,18 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
             raise ValueError(
                 "Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"
             )
-        if self._shape == "pointy":
+        if self.orientation == "pointy":
             offset_rows = index.y % 2 == 1
             index.x[offset_rows] += 1
-        elif self._shape == "flat":
+        elif self.orientation == "flat":
             offset_rows = index.x % 2 == 1
             index.y[offset_rows] += 1
 
         centroid_topleft = (self.bounds[0] + self.dx / 2, self.bounds[3] - self.dy / 2)
         index_topleft = self.cell_at_point(centroid_topleft)
-        if self._shape == "pointy":
+        if self.orientation == "pointy":
             np_id = (index_topleft.y - index.y, index.x - index_topleft.x)
-        elif self._shape == "flat":
+        elif self.orientation == "flat":
             np_id = ((index.x - index_topleft.x), (index_topleft.y - index.y))
         return np_id
 
@@ -1206,16 +1277,39 @@ class BoundedHexGrid(BoundedGrid, HexGrid):
         new_inf_grid = self.parent_grid.anchor(target_loc, cell_element, in_place=False)
         return self.resample(new_inf_grid, method=resample_method)
 
-    def update(self, new_data, bounds=None, crs=None, nodata_value=None, shape=None):
+    def update(
+        self,
+        new_data,
+        bounds=None,
+        crs=None,
+        nodata_value=None,
+        orientation=None,
+        shape=None,  # Deprecated in favor of orientation
+    ):
         # TODO figure out how to update size, offset
+        if shape is not None:
+            if orientation is None:
+                orientation = shape
+                warnings.warn(
+                    "'Shape' has been renamed to 'orientation' and will be removed in a future version.",
+                    DeprecationWarning,
+                )
+            else:
+                raise ValueError(
+                    "Both 'shape' and 'orientation' were supplied, please only use 'orientation' and not use 'shape', which will be deprecated."
+                )
+        if orientation is None:
+            orientation = self.orientation
         if not bounds:
             bounds = self.bounds
         if not crs:
             crs = self.crs
         if not nodata_value:
             nodata_value = self.nodata_value
-        if not shape:
-            shape = self.shape
         return self.__class__(
-            new_data, bounds=bounds, crs=crs, nodata_value=nodata_value, shape=shape
+            new_data,
+            bounds=bounds,
+            crs=crs,
+            nodata_value=nodata_value,
+            orientation=orientation,
         )

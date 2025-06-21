@@ -120,7 +120,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Sets the x and y value of the offset"""
         if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
+        if getattr(self, "orientation", None) == "flat":  # flat hex grid
             value = value[::-1]  # swap xy to yx
         new_offset = (value[0] % self.cell_width, value[1] % self.cell_height)
         self._offset = new_offset
@@ -349,7 +349,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         - the CRS is the same
         - the cell_size is the same
         - the offset from origin is the same
-        - the cell shape is the same
+        - the cell orientation is the same
 
         Returns
         -------
@@ -395,9 +395,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
             aligned = False
             reasons.append("offset")
 
-        if getattr(self, "shape", "") != getattr(other, "shape", ""):
+        if getattr(self, "orientation", "") != getattr(other, "orientation", ""):
             aligned = False
-            reasons.append("shape")
+            reasons.append("orientation")
 
         if self.rotation != other.rotation:
             aligned = False
@@ -720,8 +720,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
             crs=self.crs,
             nodata_value=nodata_value,
         )
-        if hasattr(self, "_shape"):
-            grid_kwargs["shape"] = self._shape
+        if hasattr(self, "_orientation"):
+            grid_kwargs["orientation"] = self._orientation
         return self.bounded_cls(**grid_kwargs)
 
     @abc.abstractmethod
@@ -729,5 +729,13 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update(self, size=None, shape=None, offset=None, rotation=None, **kwargs):
+    def update(
+        self,
+        size=None,
+        orientation=None,
+        shape=None,
+        offset=None,
+        rotation=None,
+        **kwargs,
+    ):
         pass
