@@ -1,7 +1,40 @@
 .. _release_notes:
 
 Release notes
-================
+=============
+
+This is the changelog listing the changes of GridKit over time.
+
+Version 1.0.0 (nocheckin, add date)
+-----------------------------------
+Features
+ - Introduce DataTile class to replace BoundedGrid because of their ability to represent rotated Tiles
+ - Replace usages to bounded grids in examples with data tiles
+ - :func:`.count`, :func:`.sum` and :func:`.mean` now also apply to data tiles
+ - TriGrid orign moved and size definition halved to better match the RectGrid and HexGrid, see https://github.com/tmillenaar/GridKit/issues/94
+ - Provide a flat and pointy version of TriGrid
+ - Fix offset having to be specified in (y,x) if for 'flat' HexGrids, now (x,y)
+ - Add set_zoom_to_bounds option to :func:`.doc_utils.plot_polygons` to allow to turn it off
+
+Fixes
+ - adjust example :ref:`flower_of_life.py <example flower of life>` to work with shapely 2.1.0
+ - properly raise error if :meth:`.BaseGrid.align_bounds` or :meth:`.BaseGrid.are_bounds_aligned` is called on a rotated grid.
+   Before this just gave unreliable results.
+
+Deprecations
+ - Remove as_multipolygon argument from :meth:`.BaseGrid.to_shapely()` and always return a Shapely object.
+   The user can call `.geoms` on the Shapely object to get an iterable.
+   Reason: the to_shapely() function always created a Shapely object and then called .geoms on
+   it if as_multipolygon was set to False. This was implicit and one might assume that
+   this saves the creation of a Shapely object hence being more performant. This was removed
+   to make this more explicit since now the user has to call .geoms for themselves if they want
+   an iterable.
+ - Remove 'filled' keyword argument from :func:`gridkit.doc_utils.plot_polygons` in favor of 'fill'
+
+Misc
+ - Drop support for python 3.9
+ - Moved :meth:`.BaseGrid.anchor` to Rust
+ - Remove DeprecationWarning for flat HexGrids, turns out they are useful in data tiles and bounded grid contexts
 
 Version 0.14.1 (December 25, 2024)
 ----------------------------------

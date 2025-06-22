@@ -17,7 +17,7 @@ In this example, an animation is created where the grid rotates around the origi
 The grid is centered around zero and rotated a little more every frame.
 Since hexagonal grids have a six-fold symmetry, we only have to animate from
 0-60 and loop it. It will look like a continuous rotation.
-Every frame, a new grid is created that is centered around 0,0 and rotated 
+Every frame, a new grid is created that is centered around 0,0 and rotated
 two degrees more than the previous frame.
 
 """
@@ -42,7 +42,7 @@ def update_frame(rotation):
     ax.clear()
     ax.scatter(0, 0)
     grid.rotation = rotation
-    geoms = grid.to_shapely(ids, as_multipolygon=True)
+    geoms = grid.to_shapely(ids)
     im = plot_polygons(geoms.geoms, colors=distance, fill=True, ax=ax)
     ax.set_title(f"Rotation: {rotation} degrees")
     ax.set_xlim(-5, 5)

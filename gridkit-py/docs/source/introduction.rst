@@ -1,10 +1,48 @@
-.. _getting_started:
+.. _introduction:
+
+Introduction
+------------
+
+What is GridKit?
+================
+
+GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids where the cells can be either triangles, rectangles or hexagons.
+Grids are defined in terms of properties like cell-size and rotation. These grids then conceptially span an infinite plane.
+The information of a particular cell can then be obtained. For example, if you have a point you can figure out what cell that point is located in and then obtain
+the corners of that cell, or obtain the neighbouring cells, you name it. GridKit also provides abstractions that represent a :class:`.Tile` on a grid.
+If this tile has data, like with a raster, you could use a :class:`.DataTile`. Treating rasters like tiles on a grid makes many operations rather simple,
+for example getting the intersecting cells between two tiles.
+
+**Core features:**
+
+ * tessellation of an infinite surface [#]_
+ * grids of various shapes
+
+    * triangular
+    * rectangular
+    * hexahonal
+
+ * working with geospatial data
+
+    * geocoded grids
+    * resampling
+    * coordinate transformations (akin to geopanda's `to_crs`)
+
+ * combining raster and vector data
+
+    * gridcell-vector intersections
+    * interpolation
+    * aggregation statistics
+
+
+.. rubric:: Footnotes
+
+.. [#] In practice the "*infinite surface*" is bounded by machine precision. No grid cell can be referenced of which the index does not fit in a 64 byte integer.
+
 
 Getting Started
 ================
 
-Quick example
--------------
 As a quick demonstration a grid and two points are created.
 Then the grid cells that cover those points will be obtained
 and finally the polygon description of these cells will be obtained.
@@ -16,103 +54,65 @@ and finally the polygon description of these cells will be obtained.
    >>> points = [[2, 7], [-6, 2]]
    >>> cell_ids = grid.cell_at_point(points)
    >>> geoms = grid.to_shapely(cell_ids)
-   >>> print(geoms)
-   [<POLYGON ((2.5 5.052, 2.5 7.939, 1.768e-16 9.382, -2.5 7.939, -2.5 5.052, -5...>
-    <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>]
+   >>> print(list(geoms.geoms))
+   [<POLYGON ((2.5 5.052, 2.5 7.939, 1.768e-16 9.382, -2.5 7.939, -2.5 5.052, -5...>, <POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...>]
 
 ..
 
 More elaborate examples can be found in the :ref:`Example gallery <example_gallery>`
 
-What is GridKit?
-----------------
-
-GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids.
-
-**Core features:**
-
- * tessellation of an infinite surface [#]_
- * working with geospatial data
-
-    * geocoded grids
-    * resampling
-    * coordinate transformations (akin to geopanda's `to_crs`)
-
- * bridging the gap between raster and vector data
-
-    * gridcell-vector intersections
-    * sampling
-    * interpolation
-    * aggregation statistics (planned)
-
- * grids of various shapes
-
-    * rectangular
-    * hexahonal (planned)
-    * triangular (planned)
-
-
-.. rubric:: Footnotes
-
-.. [#] In practice the "*infinite surface*" is bounded by machine precision. No grid cell can be referenced of which the index does not fit in a 64 byte integer.
-
 
 What GridKit is not
--------------------
+===================
 
 Many common operations are done on grids or rasters.
 Restrictions therefore keep clarity around which features make sense for GridKit, and which are best left to to other packages.
 
 Most notably, there are many software solutions out there that focuss on rasters, or bounded rectangular grids (some of these are mentioned below).
 Often, these software packages focuss around operations on raster bands.
-GridKit, in contrast, is build around infinite grids and works with indices reprecenting individual grid cells.
-Here, the grid cell is the fundamental unit instead of the raster band.
 
-Some features will overlap, such as cropping and resampling.
-Other features you may have come to expect from raster oriented software might be missing in GridKit.
-
+Some features, such as cropping and resampling, will overlap with other common packages.
 
 **GridKit is not:**
 
  * GDAL
     GDAL is a versitile toolbox of everything geospatial, for both vector and raster operations.
     It's raster operations are specifically tuned to work with bounded geospatial rectangular grids, often with multiple data bands.
-    The great advantage of GDAl is that the amount and veriety raster operations that is supported out of the box, is unmatched.
+    The amount and veriety of raster operations that GDAL supports out of the box, is unmatched.
     In GridKit, no attempt will be made to match GDAL in this regard.
-    However, while python bindings for GDAL are available, the use is not very Pythonic.
-    One example of this is that for every raster operation, GDAL expects a path to a raster file as input and writes a new raster file as output.
-    While the rasters can be written to memory as a workaround to save the IO, this is not a style of programming most python developers are comfortable with.
-    In GridKit, the grids are python classes which allows for a more pythonic style of programming and easier chaining of operations.
  * Rasterio
     Rasterio, as the name suggest, is a package that focusses on the reading and writing of raster files.
     Besides reading and writing, Rasterio provides functionality for warping, cropping and interpolating data.
     Some of this functionality overlaps with that of GridKit.
-    Most notably rasterio uses affine transforms to represent the position of a raster, whereas gridkit uses the bounding box.
-    GridKit utilizes Rasterio for the reading and writing of geotiffs.
+    A notable difference is that rasterio uses affine transforms to represent the position of a raster,
+    whereas gridkit uses indices on a grid with certain parameters like cell size and rotation.
+    GridKit utilizes Rasterio for the reading and writing of geotiffs (which on it's turn depends on GDAL).
  * RioXarray
     RioXarray is a package that acts, not surprisingly, as an interface between Rasterio (rio) and Xarray.
     This is a powerful combination that converts raster files to Xarray objects.
     This is a more pythonic way of working with data than the methods mentioned above,
     but is still fundamentally oriented around the bounded rectangular datatype, with the option for multiple bands.
-    If your aim is primarily to work with raster bands, give RioXarray a look.
+    It supports Dask out of the box for tiled data handling. While Dask can also be used with GridKit (example: :ref:`aggregate_dask.py <example aggregate_dask>`),
+    there is no out of the box integration here.
+    If your aim is primarily to work with rectangular raster bands, give RioXarray a look.
 
-**Conclusion, when to use GridKit**
+Conclusion, when to use GridKit
+===============================
 
-Gridkit is not nesecarily build to work with multiband rasters.
-If this is the kind of data you are most likely to use, you may consider one of the packages mentined in the previous section.
+Use gridkit if you want to
 
-GridKit's cell-based approach can be beneficial if you want to:
+ * work with triangular or hexagonal grids
+ * want to be able to easily obtain information of individual cells, such a cell's corner locations or neighbour values.
 
- * relate rasters of different spatial extends
- * relate vector data to grid cells
- * exercise fine grained control over particular cells and their properties, such as obtaining a cell's corner locations or finding it's neighbouring cells
+Consider Xarray if you want to work witn large n-dimensional rasters.
+Consider GDAL if you want to have access to a wide range of geospatial algorithms such as hillshading and contour generation.
 
 
 Infinite grids, the fundamentals
---------------------------------
+================================
 
 A grid is little more than a surface that is subdivided into cells.
-We chan choose how we subdivide this surface by choosing the type shape and size of the cells, as well as an origin (a starting point).
+We chan choose how we subdivide this surface by choosing the type, shape and size of the cells, as well as an origin (a starting point).
 Once we have chose these parameters, we can say something about each cell, like it's position relative to the origin or relative other cells.
 Since this plane has no defined end, the cells can keep on tiling to infinity. Hence the term '*infinite grid*'.
 
@@ -150,10 +150,10 @@ Offsets
 ^^^^^^^
 Two grids with the same cell shape and the same cell dimentions, are not nesecarily the same.
 If their origin differs, the grids are shifted with respect to each other.
-This shift can be less then the size of a cell.
 If this is the case, the grid lines of the two grids do not nicely overlap.
 The distance between a grid line of one grid and the grid line of another grid is considered to be the *offset* between the two grids.
 If this is the case, the grids are not *aligned*.
+To describe this shift we only need to consider offsets that are smaller than the size of a cell.
 When one grid is offset by exactly one cell (or a multiple), the gridlines of the two grids still overlap.
 Such grids are considered to be *aligned*.
 In fact, in GridKit there is no distinction between these two grids, they are considered to be one and the same.

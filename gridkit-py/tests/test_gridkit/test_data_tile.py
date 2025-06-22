@@ -3,7 +3,7 @@ import pytest
 import shapely
 import shapely.geometry
 
-from gridkit import DataTile, HexGrid, RectGrid, Tile, TriGrid
+from gridkit import BoundedRectGrid, DataTile, HexGrid, RectGrid, Tile, TriGrid
 
 
 @pytest.mark.parametrize(
@@ -641,7 +641,7 @@ def test_interpolate(grid, interp_method):
     assert numpy.nanmin(result) >= data_tile.min()
 
     if interp_method == "nearest":
-        ref_geoms = data_tile.to_shapely(as_multipolygon=True)
+        ref_geoms = data_tile.to_shapely()
     elif interp_method == "linear" or interp_method == "inverse_distance":
         # Create a reference grid and spcify the cells in which the points should contain data
         if isinstance(grid, TriGrid):
@@ -649,14 +649,14 @@ def test_interpolate(grid, interp_method):
             ref_grid = HexGrid(size=grid.size, rotation=grid.rotation)
             ref_grid = ref_grid.update(offset=(0, ref_grid.dy / 2))
             ref_geoms = ref_grid.to_shapely(
-                [[1, 2], [0, 2], [0, 1], [0, 0], [1, 0], [0, -1]], as_multipolygon=True
+                [[1, 2], [0, 2], [0, 1], [0, 0], [1, 0], [0, -1]]
             )
         elif isinstance(grid, RectGrid):
             ref_grid = grid.update(
                 offset=(grid.offset[0] + grid.dx / 2, grid.offset[1] - grid.dy / 2)
             )
             ref_tile = Tile(ref_grid, (-1, -1), 4, 4)
-            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+            ref_geoms = ref_tile.to_shapely()
         elif isinstance(grid, HexGrid):
             ref_grid = TriGrid(
                 side_length=grid.dx,
@@ -664,7 +664,7 @@ def test_interpolate(grid, interp_method):
                 offset=(grid.dx / 2, grid.dy / 2),
             )
             ref_tile = Tile(ref_grid, (-2, -1), 8, 4)
-            ref_geoms = ref_tile.to_shapely(as_multipolygon=True)
+            ref_geoms = ref_tile.to_shapely()
 
     for i, (point, val) in enumerate(zip(points, result)):
         # Unfortunately we have to check the point for every cell in python.
@@ -724,3 +724,69 @@ def test_resample(grid, interp_method):
     assert result.min() >= data_tile.min()
     assert result.max() <= data_tile.max()
     assert result.mean() > data_tile.min() and result.mean() < data_tile.max()
+
+
+@pytest.mark.parametrize("nodata_value", [None, 1, 9223372036854775807])
+def test_from_bounds_as_rect(nodata_value):
+    nx = 4
+    ny = 3
+    data = numpy.arange(nx * ny).reshape((ny, nx))
+    bounds = (-1.2, -3.3, 4.3, 5.2)
+    data_tile = DataTile.from_bounds_as_rect(
+        data, bounds=bounds, nodata_value=nodata_value
+    )
+    bounded_grid = BoundedRectGrid(data, bounds=bounds)
+
+    data_tile_bounds = [
+        data_tile.corners()[:, 0].min(),
+        data_tile.corners()[:, 1].min(),
+        data_tile.corners()[:, 0].max(),
+        data_tile.corners()[:, 1].max(),
+    ]
+    numpy.testing.assert_allclose(data_tile.nx, bounded_grid.width)
+    numpy.testing.assert_allclose(data_tile.ny, bounded_grid.height)
+    numpy.testing.assert_allclose(data_tile.grid.dx, bounded_grid.dx)
+    numpy.testing.assert_allclose(data_tile.grid.dy, bounded_grid.dy)
+    numpy.testing.assert_allclose(data_tile.grid.offset, bounded_grid.offset)
+    numpy.testing.assert_allclose(data_tile.to_numpy(), bounded_grid.data)
+    numpy.testing.assert_allclose(bounded_grid.bounds, bounds)
+    numpy.testing.assert_allclose(data_tile_bounds, bounds)
+    assert data_tile.grid.rotation == bounded_grid.rotation == 0
+
+    if nodata_value is None:
+        # Current nodata default for integer, likely to change in future
+        numpy.testing.assert_allclose(data_tile.nodata_value, 9223372036854775807)
+    else:
+        numpy.testing.assert_allclose(data_tile.nodata_value, nodata_value)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=10, rotation=13, orientation="flat"),
+        TriGrid(size=10, rotation=13, orientation="pointy"),
+        RectGrid(size=10, rotation=13),
+        HexGrid(size=10, rotation=13, shape="flat"),
+        HexGrid(size=10, rotation=13, shape="pointy"),
+    ],
+)
+@pytest.mark.parametrize("method", ["linear", "nearest", "cubic"])
+def test_from_interpolated_points(grid, method):
+    numpy.random.seed(0)
+    x = 100 * numpy.random.rand(100)
+    numpy.random.seed(1)
+    y = 100 * numpy.random.rand(100)
+    value = numpy.sin(x / (10 * numpy.pi)) * numpy.sin(y / (10 * numpy.pi))
+
+    data_tile = DataTile.from_interpolated_points(
+        grid,
+        numpy.array([x, y]).T,
+        value,
+        method=method,
+        nodata_value=float("nan"),
+    )
+
+    # Test for same order of magnitude as input data, not quite strict
+    numpy.testing.assert_allclose(data_tile.max(), numpy.max(value), atol=0.5)
+    numpy.testing.assert_allclose(data_tile.min(), numpy.min(value), atol=0.5)
+    numpy.testing.assert_allclose(data_tile.median(), numpy.median(value), atol=0.5)

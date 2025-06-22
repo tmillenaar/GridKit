@@ -281,6 +281,11 @@ class BoundedGrid(metaclass=_AbstractBoundedGridMeta):
         prevent_copy: bool = False,
         **kwargs,
     ) -> None:
+
+        warnings.warn(
+            "BoundedGrid is deprecated in favour of DataTile", DeprecationWarning
+        )
+
         if "rotation" in kwargs:
             raise NotImplementedError("'rotation' is not supported for Bounded grids")
 

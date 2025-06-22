@@ -12,7 +12,7 @@ Source: https://github.com/tmillenaar/GridKit
    :maxdepth: 2
    :caption: Contents:
 
-   getting_started
+   introduction
    example_gallery/index.rst
    api_reference
    roadmap

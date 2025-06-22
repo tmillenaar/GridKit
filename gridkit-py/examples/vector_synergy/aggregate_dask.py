@@ -55,6 +55,7 @@ I will print ``npartitions`` to show the number of chunks the array is divided i
 import dask
 import dask.array
 import dask.dataframe
+import numpy
 
 from gridkit.doc_utils import generate_2d_scatter_doughnut, plot_polygons
 
@@ -124,7 +125,7 @@ def shapely_geom_from_index_1d(id_1d):
     """Generate the Shapely geometry for each 1D index.
     This operation is meant to map to each DataFrame partition
     """
-    return grid.to_shapely(GridIndex.from_index_1d(id_1d))
+    return numpy.array(grid.to_shapely(GridIndex.from_index_1d(id_1d)).geoms)
 
 
 polygons = occurrences.index.map_partitions(shapely_geom_from_index_1d)

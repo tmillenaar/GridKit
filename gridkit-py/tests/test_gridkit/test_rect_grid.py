@@ -348,15 +348,13 @@ def test_to_bounded():
     assert numpy.all(numpy.isnan(result.data))
 
 
-@pytest.mark.parametrize("as_mp", [True, False])
-def test_to_shapely(as_mp):
+def test_to_shapely():
     grid = RectGrid(dx=1.5, dy=1.5)
     ids = [[-3, 2], [3, -6]]
-    geoms = grid.to_shapely(ids, as_multipolygon=as_mp)
+    geoms = grid.to_shapely(ids)
 
-    if as_mp:
-        assert isinstance(geoms, shapely.geometry.MultiPolygon)
-        geoms = geoms.geoms
+    assert isinstance(geoms, shapely.geometry.MultiPolygon)
+    geoms = geoms.geoms
 
     centroids = [[geom.centroid.x, geom.centroid.y] for geom in geoms]
     numpy.testing.assert_allclose(centroids, grid.centroid(ids))

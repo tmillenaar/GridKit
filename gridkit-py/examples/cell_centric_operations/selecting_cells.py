@@ -50,13 +50,13 @@ coarse_grid = HexGrid(size=3 * fine_grid.size).anchor(target_loc)
 # define an area of interest, slightly larger than what we want to plot
 target_cell_fine = fine_grid.cell_at_point(target_loc)
 fine_cell_ids = fine_grid.neighbours(target_cell_fine, depth=3 * 10 / fine_grid.size)
-shapes_fine = fine_grid.to_shapely(fine_cell_ids, as_multipolygon=True)
+shapes_fine = fine_grid.to_shapely(fine_cell_ids)
 
 target_cell_coarse = coarse_grid.cell_at_point(target_loc)
 cell_ids_coarse = coarse_grid.neighbours(
     target_cell_coarse, depth=3 * 10 / coarse_grid.size, include_selected=True
 )
-shapes_coarse = coarse_grid.to_shapely(cell_ids_coarse, as_multipolygon=True)
+shapes_coarse = coarse_grid.to_shapely(cell_ids_coarse)
 
 # %%
 #

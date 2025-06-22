@@ -44,7 +44,6 @@ def plot_polygons(
     colors: Union[numpy.ndarray, str] = None,
     cmap: str = "viridis",
     fill: bool = True,
-    filled: bool = None,
     ax=None,
     add_colorbar=False,
     set_zoom_to_bounds=True,
@@ -93,12 +92,6 @@ def plot_polygons(
     None
 
     """
-    if filled is not None:
-        warnings.warn(
-            """The argument 'filled' for doc_utils has been deprecated in favor of 'fill' and will be removed in a future version."""
-        )
-        fill = filled
-
     if ax is None:
         ax = plt.gca()
 

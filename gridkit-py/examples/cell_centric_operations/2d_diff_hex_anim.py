@@ -321,7 +321,7 @@ data[np_ids_hot] = T_hot
 # Let's take a look at what these starting conditions look like
 
 plot_polygons(
-    tile_outer.to_shapely(as_multipolygon=True),
+    tile_outer.to_shapely(),
     colors=data.ravel().copy(),
     fill=True,
     cmap="magma",

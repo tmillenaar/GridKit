@@ -435,7 +435,6 @@ class TriGrid(BaseGrid):
             area = new_dx * new_dy
         size = numpy.linalg.norm(numpy.subtract(point_end, point_start))
 
-        # new_grid = self.parent_grid_class(area=area, offset=new_offset, crs=crs, rotation=rotation)
         new_grid = self.parent_grid_class(
             size=size, offset=new_offset, crs=crs, rotation=rotation
         )
@@ -658,7 +657,7 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         return super(BoundedTriGrid, self).cell_corners(index=index)
 
     @validate_index
-    def to_shapely(self, index=None, as_multipolygon: bool = False):
+    def to_shapely(self, index=None, as_multipolygon: bool = True):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
 
         Difference with parent method:
@@ -668,11 +667,10 @@ class BoundedTriGrid(BoundedGrid, TriGrid):
         See also
         --------
         :meth:`.BaseGrid.to_shapely`
-        :meth:`.BoundedHexGrid.to_shapely`
         """
         if index is None:
             index = self.indices
-        return super().to_shapely(index, as_multipolygon)
+        return super().to_shapely(index, as_multipolygon=as_multipolygon)
 
     def _bilinear_interpolation(self, sample_points):
         if not isinstance(sample_points, numpy.ndarray):

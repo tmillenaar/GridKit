@@ -120,8 +120,6 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """Sets the x and y value of the offset"""
         if not isinstance(value, tuple) and not len(value) == 2:
             raise TypeError(f"Expected a tuple of length 2. Got: {value}")
-        if getattr(self, "shape", None) == "flat":  # flat hex grid
-            value = value[::-1]  # swap xy to yx
         new_offset = (value[0] % self.cell_width, value[1] % self.cell_height)
         self._offset = new_offset
         self._grid = self._update_inner_grid(offset=new_offset)
@@ -349,7 +347,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         - the CRS is the same
         - the cell_size is the same
         - the offset from origin is the same
-        - the cell shape is the same
+        - the cell orientation is the same
 
         Returns
         -------
@@ -395,9 +393,9 @@ class BaseGrid(metaclass=abc.ABCMeta):
             aligned = False
             reasons.append("offset")
 
-        if getattr(self, "shape", "") != getattr(other, "shape", ""):
+        if getattr(self, "orientation", "") != getattr(other, "orientation", ""):
             aligned = False
-            reasons.append("shape")
+            reasons.append("orientation")
 
         if self.rotation != other.rotation:
             aligned = False
@@ -517,7 +515,12 @@ class BaseGrid(metaclass=abc.ABCMeta):
         """
 
     def are_bounds_aligned(self, bounds, separate=False):
-        # Fixme: gives weird results for rotated grids
+
+        if self.rotation:
+            raise NotImplementedError(
+                "are_bounds_aligned is not supported for rotated grids"
+            )
+
         is_aligned = lambda val, cellsize: numpy.isclose(val, 0) or numpy.isclose(
             val, cellsize
         )
@@ -530,7 +533,10 @@ class BaseGrid(metaclass=abc.ABCMeta):
         return per_axis if separate else numpy.all(per_axis)
 
     def align_bounds(self, bounds, mode="expand"):
-        # Fixme: gives weird results for rotated grids
+
+        if self.rotation:
+            raise NotImplementedError("align_bounds is not supported for rotated grids")
+
         if self.are_bounds_aligned(bounds):
             return bounds
 
@@ -600,37 +606,50 @@ class BaseGrid(metaclass=abc.ABCMeta):
                 cells_in_bounds = self.cells_in_bounds(geom_bounds).ravel()
 
             cell_shapes = self.to_shapely(cells_in_bounds)
-            mask = [geom.intersects(cell) for cell in cell_shapes]
+            mask = [geom.intersects(cell) for cell in cell_shapes.geoms]
             intersecting_cells.extend(cells_in_bounds[mask])
         return GridIndex(intersecting_cells).unique()
 
     @validate_index
-    def to_shapely(self, index, as_multipolygon: bool = False):
-        """Represent the cells as Shapely Polygons
+    def to_shapely(self, index, as_multipolygon=None):
+        """Represent the cells as Shapely Polygons.
+        If `index` contains one cell, a single Polygon is returned.
+        If `index` contains multiple cells, a MultoPolygon is returned.
 
         Parameters
         ----------
         index: `numpy.ndarray`
             The indices of the cells to convert to Shapely Polygons
-        as_multipolygon: `numpy.ndarray`
-            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False
+
+        Returns
+        -------
+        class:`shapely.MultiPolygon` or class:`shapely.Polygon`
 
         See also
         --------
-        :meth:`.BoundedRectGrid.to_shapely`
-        :meth:`.BoundedHexGrid.to_shapely`
+        :meth:`.Tile.to_shapely`
         """
-        cell_arr_shape = index.shape
+        if as_multipolygon is not None:
+            if as_multipolygon is True:
+                warnings.warn(
+                    """The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.
+                    The function now always returns a Shapely object. If you have multiple shapes and want an iterable,
+                    call '.geoms' on the MultiPolygon.""",
+                )
+            else:
+                raise RuntimeError(
+                    """The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.
+                The function now always returns a Shapely object. If you have multiple shapes and want an iterable,
+                call '.geoms' on the MultiPolygon."""
+                )
+
         vertices = self.cell_corners(index.ravel())
         if index.index.ndim == 1:
             return shapely.geometry.Polygon(vertices)
         if vertices.ndim == 2:
             vertices = vertices[numpy.newaxis]
         multipoly_wkb = shapes.multipolygon_wkb(vertices)
-        multipoly = shapely.from_wkb(multipoly_wkb.hex())
-        if as_multipolygon == True:
-            return multipoly
-        return numpy.array(multipoly.geoms).reshape(cell_arr_shape)
+        return shapely.from_wkb(multipoly_wkb.hex())
 
     def interp_from_points(
         self, points, values, method="linear", nodata_value=numpy.nan
@@ -663,6 +682,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         --------
         :py:meth:`.BoundedGrid.resample`
         :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.DataTile.from_interpolated_points`
         """
         points = numpy.array(points)
         values = numpy.array(values)
@@ -711,8 +731,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
             crs=self.crs,
             nodata_value=nodata_value,
         )
-        if hasattr(self, "_shape"):
-            grid_kwargs["shape"] = self._shape
+        if hasattr(self, "_orientation"):
+            grid_kwargs["orientation"] = self._orientation
         return self.bounded_cls(**grid_kwargs)
 
     @abc.abstractmethod
@@ -720,5 +740,14 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def update(self, size=None, shape=None, offset=None, rotation=None, **kwargs):
+    def update(
+        self,
+        size=None,
+        orientation=None,
+        shape=None,  # deprecated in favor of 'orientation'
+        area=None,
+        offset=None,
+        rotation=None,
+        **kwargs,
+    ):
         pass

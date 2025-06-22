@@ -1,7 +1,9 @@
+import functools
 import warnings
 from typing import List, Literal, Tuple, Union
 
 import numpy
+import scipy
 from pyproj import Transformer
 from shapely.geometry import MultiPoint
 
@@ -250,7 +252,18 @@ class Tile:
         return Tile.from_pyo3_tile(self.grid, _tile)
 
     @validate_index
-    def to_shapely(self, index=None, as_multipolygon=True):
+    def to_shapely(self, index=None, as_multipolygon=None):
+        """Refer to parent method :meth:`.BaseGrid.to_shapely`
+
+        Difference with parent method:
+            `index` is optional.
+            If `index` is None (default) the cells containing data are used as the `index` argument.
+
+        See also
+        --------
+        :meth:`.BaseGrid.to_shapely`
+        """
+
         if index is None:
             index = self.indices
         return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
@@ -462,6 +475,128 @@ class DataTile(Tile):
 
         # _tile is used by the Tile parent class
         self._tile = self._data_tile.get_tile()
+
+    def from_bounds_as_rect(
+        data,
+        bounds=None,
+        nodata_value=None,
+    ):
+        """Create a DataTile given a 2D numpy array on a rectangular grid.
+        The location of the data is defined by the `bounds` paramter.
+        The grid attributes such as the cell size are infered from the restrictions created
+        by the dimensions of the data and the space available in the bounds.
+
+        This approach assumes the bounding box, and by extension the created DataTile, is not rotated.
+
+        Parameters
+        ----------
+        data: class:`numpy.ndarray`
+            A 2D array with the data for the DataTile
+        bounds: `tuple(minx, miny, maxx, maxy)`
+            The bounding box describing the location of the edges of the data in (minx, miny, maxx, maxy).
+            If None, the dimensions of the `data` array will be used, resulting in a dx and dy of 1
+            and the lower left corner of the Tile at the origin: (0,0).
+        nodata_value:
+            A cell with this value is considered to be empty.
+            If None, a default will be chosen based on the dtype of the `data` array.
+
+        Returns
+        -------
+        class:`.DataTile`
+            A DataTile containing the suplied data
+        """
+        data = data if isinstance(data, numpy.ndarray) else numpy.array(data)
+        if data.ndim != 2:
+            raise TypeError("Expected a numpy array with two dimensions.")
+
+        nx = data.shape[1]
+        ny = data.shape[0]
+        if bounds is None:
+            bounds = (0, 0, ny, nx)
+        dx = (bounds[2] - bounds[0]) / nx
+        dy = (bounds[3] - bounds[1]) / ny
+        grid = RectGrid(dx=dx, dy=dy)
+        start_cell_centroid = (bounds[0] + dx / 2, bounds[1] + dy / 2)
+        grid.anchor(start_cell_centroid, cell_element="centroid", in_place=True)
+        start_id = grid.cell_at_point(start_cell_centroid)
+        tile = Tile(grid, start_id, nx, ny)
+        return tile.to_data_tile(data, nodata_value=nodata_value)
+
+    @classmethod
+    def from_interpolated_points(
+        cls, grid, points, values, method="linear", nodata_value=numpy.nan
+    ):
+        """Create a DataTile based on the supplied `grid` that encapsulates the supplied `points`
+        and assignes values to cells based on interpolated `values`. The size and location of the
+        Tile are determined by the extent of the supplied `points`.
+
+        .. Note ::
+            This function is significantly slower than :meth:`.DataTile.interpolate`
+
+        Parameters
+        ----------
+        grid: class:`.BaseGrid`
+            The grid on which to interpolate the data
+        points: `numpy.ndarray`
+            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]
+        values: `numpy.ndarray`
+            The values corresponding to the supplied `points`, used as input for interpolation
+        method: :class:`str`
+            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".
+
+        Returns
+        -------
+        :class:`.DataTile`
+            A DataTile based on the supplied grid where the data is interpolated between the supplied points.
+
+        See also
+        --------
+        :py:meth:`.BoundedGrid.resample`
+        :py:meth:`.BoundedGrid.interpolate`
+        :py:meth:`.Grid.interp_from_points`
+        """
+        points = numpy.array(points)
+        values = numpy.array(values)
+
+        method_lut = dict(
+            nearest=scipy.interpolate.NearestNDInterpolator,
+            linear=functools.partial(
+                scipy.interpolate.LinearNDInterpolator, fill_value=nodata_value
+            ),
+            cubic=functools.partial(
+                scipy.interpolate.CloughTocher2DInterpolator, fill_value=nodata_value
+            ),
+        )
+
+        if method not in method_lut:
+            raise ValueError(
+                f"Method '{method}' is not supported. Supported methods: {method_lut.keys()}"
+            )
+
+        cells = grid.cell_at_point(points)
+        start_id = (
+            cells.x.min(),
+            cells.y.min(),
+        )
+        nx = cells.x.max() - start_id[0] + 1
+        ny = cells.y.max() - start_id[1] + 1
+
+        tile = Tile(grid, start_id, nx, ny)
+
+        interp_func = method_lut[method]
+        if numpy.isnan(nodata_value):
+            nodata_mask = numpy.isfinite(values)
+        else:
+            nodata_mask = values != nodata_value
+
+        interpolator = interp_func(
+            points[nodata_mask],
+            values[nodata_mask],
+        )
+        centroids = tile.centroid()
+
+        interp_values = interpolator(centroids)
+        return cls(tile, interp_values, nodata_value)
 
     @property
     def dtype(self):
