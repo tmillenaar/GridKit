@@ -81,26 +81,38 @@ def read_geotiff(*args, bands=1, **kwargs):
     return read_raster(*args, **kwargs)
 
 
-def write_raster(grid, path):
-    """Write a BoundedRectGrid to a raster file (eg .tiff).
+def _write_data_tile_to_raster(data_tile, path):
+    """Intended to be called only through :func:`.write_raster`"""
+    if data_tile.grid.rotation:
+        raise ValueError(
+            "Cannot write a data tile as raster if the grid has a rotaion."
+        )
+    corners = data_tile.corners()
+    bounds = (
+        corners[2][0],
+        corners[2][1],
+        corners[1][0],
+        corners[1][1],
+    )
+    transform = rasterio.transform.from_bounds(*bounds, data_tile.nx, data_tile.ny)
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=data_tile.ny,
+        width=data_tile.nx,
+        count=1,  # nr bands
+        dtype=data_tile.dtype,
+        crs=data_tile.grid.crs,
+        nodata=data_tile.nodata_value,
+        transform=transform,
+    ) as dst:
+        dst.write(numpy.expand_dims(data_tile.to_numpy(), 0))
+    return path
 
-    Parameters
-    ----------
-    grid: :class:`.BoundedRectGrid`
-        The grid to write to a raster file.
-        This can only be a BoundedRectGrid.
-    path: `str`
-        The locatin of the file to write to (eg ./my_raster.tiff).
 
-    Returns
-    -------
-    `str`
-        The path pointing to the written file
-
-    See also
-    --------
-    :func:`read_raster`
-    """
+def _write_bounded_grid_to_raster(grid, path):
+    """Intended to be called only through :func:`.write_raster`"""
     transform = rasterio.transform.from_bounds(*grid.bounds, grid.width, grid.height)
     with rasterio.open(
         path,
@@ -118,7 +130,34 @@ def write_raster(grid, path):
     return path
 
 
-# TODO: Add a write data_tile to raster function
+def write_raster(data, path):
+    """Write a BoundedRectGrid to a raster file (eg .tiff).
+
+    Parameters
+    ----------
+    grid: :class:`.DataTile` | :class:`.BoundedRectGrid`
+        The data to write to a raster file.
+        This can either be a BoundedRectGrid or a DataTile on a rectangular grid.
+    path: `str`
+        The locatin of the file to write to (eg ./my_raster.tiff).
+
+    Returns
+    -------
+    `str`
+        The path pointing to the written file
+
+    See also
+    --------
+    :func:`read_raster`
+    """
+
+    if isinstance(data, DataTile):
+        return _write_data_tile_to_raster(data, path)
+    elif isinstance(data, BoundedRectGrid):
+        return _write_bounded_grid_to_raster(data, path)
+    raise TypeError(f"Expected a DataTile or BoundedRectGrid, got: {type(grid)}")
+
+
 def raster_to_data_tile(
     path,
     bounds=None,
