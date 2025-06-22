@@ -5,7 +5,7 @@ Release notes
 
 This is the changelog listing the changes of GridKit over time.
 
-Version 1.0.0 (nocheckin, add data)
+Version 1.0.0 (nocheckin, add date)
 -----------------------------------
 Features
  - Introduce DataTile class to replace BoundedGrid because of their ability to represent rotated Tiles
