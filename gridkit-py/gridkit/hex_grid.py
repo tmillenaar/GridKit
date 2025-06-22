@@ -117,7 +117,7 @@ class HexGrid(BaseGrid):
             self._dx = 3 / 2 * self._radius
         else:
             raise ValueError(
-                f"A HexGrid's `shape` can either be 'pointy' or 'flat', got '{shape}'"
+                f"A HexGrid's `orientation` can either be 'pointy' or 'flat', got '{orientation}'"
             )
 
         offset_x, offset_y = offset[0], offset[1]
@@ -135,7 +135,7 @@ class HexGrid(BaseGrid):
 
         self._grid = PyO3HexGrid(
             cellsize=size,
-            cell_orientation=orientation,
+            orientation=orientation,
             offset=offset,
             rotation=self._rotation,
         )
@@ -808,7 +808,7 @@ class HexGrid(BaseGrid):
             cellsize=size,
             offset=offset,
             rotation=rotation,
-            cell_orientation=self.orientation,
+            orientation=self.orientation,
         )
 
     def update(

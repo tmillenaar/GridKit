@@ -5,11 +5,11 @@ use crate::interpolate;
 use crate::utils::*;
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct TriGrid {
     pub cellsize: f64,
     pub offset: [f64; 2],
-    pub cell_orientation: Orientation,
+    pub orientation: Orientation,
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
@@ -21,13 +21,13 @@ impl GridTraits for TriGrid {
     }
 
     fn dx(&self) -> f64 {
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => self.cellsize / 2.,
             Orientation::Pointy => self.cell_width(),
         }
     }
     fn dy(&self) -> f64 {
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => self.cell_height(),
             Orientation::Pointy => self.cellsize / 2.,
         }
@@ -60,21 +60,21 @@ impl GridTraits for TriGrid {
     }
 
     fn radius(&self) -> f64 {
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => 2. / 3. * self.cell_height(),
             Orientation::Pointy => 2. / 3. * self.cell_width(),
         }
     }
 
     fn cell_height(&self) -> f64 {
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => self.dx() * (3_f64).sqrt(),
             Orientation::Pointy => self.cellsize,
         }
     }
 
     fn cell_width(&self) -> f64 {
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => self.cellsize,
             Orientation::Pointy => self.dy() * (3_f64).sqrt(),
         }
@@ -84,7 +84,7 @@ impl GridTraits for TriGrid {
         let mut centroid_x: f64;
         let mut centroid_y: f64;
 
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Flat => {
                 centroid_x = x as f64 * self.dx() + self.dx() + self.offset[0];
                 centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset[1];
@@ -138,11 +138,11 @@ impl GridTraits for TriGrid {
         let id_y_axis = self.inconsistent_axis();
         let offset_x = self.offset[id_x_axis];
         let offset_y = self.offset[id_y_axis];
-        let cell_width = match self.cell_orientation() {
+        let cell_width = match self.orientation() {
             Orientation::Flat => self.cell_width(),
             Orientation::Pointy => self.cell_height(),
         };
-        let cell_height = match self.cell_orientation() {
+        let cell_height = match self.orientation() {
             Orientation::Flat => self.cell_height(),
             Orientation::Pointy => self.cell_width(),
         };
@@ -200,7 +200,7 @@ impl GridTraits for TriGrid {
         for cell_id in 0..corners.shape()[0] {
             let [centroid_x, centroid_y] =
                 self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            match self.cell_orientation() {
+            match self.orientation() {
                 Orientation::Flat => {
                     if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                         // Cell with flat base at bottom and pointing up
@@ -293,7 +293,7 @@ impl GridTraits for TriGrid {
             // The nearby cells will depend on which corner of the cell the point is located at, and
             // whether the cell is pointing up or down.
             let rel_nearby_cells: Array2<i64>;
-            match self.cell_orientation() {
+            match self.orientation() {
                 Orientation::Flat => {
                     if !self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
                     {
@@ -390,50 +390,50 @@ impl GridTraits for TriGrid {
 }
 
 impl TriGrid {
-    pub fn new(cellsize: f64, cell_orientation: Orientation) -> Self {
+    pub fn new(cellsize: f64, orientation: Orientation) -> Self {
         let _rotation_matrix = rotation_matrix_from_angle(0.);
         let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         TriGrid {
             cellsize,
             offset: [0., 0.],
-            cell_orientation: cell_orientation,
+            orientation: orientation,
             _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
         }
     }
 
-    pub fn cell_orientation(&self) -> &Orientation {
-        &self.cell_orientation
+    pub fn orientation(&self) -> &Orientation {
+        &self.orientation
     }
 
-    pub fn set_cell_orientation(&mut self, cell_orientation: Orientation) {
-        self.cell_orientation = cell_orientation;
+    pub fn set_orientation(&mut self, orientation: Orientation) {
+        self.orientation = orientation;
     }
 
     pub fn consistent_axis(&self) -> usize {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => 1,
             Orientation::Flat => 0,
         }
     }
 
     pub fn inconsistent_axis(&self) -> usize {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => 0,
             Orientation::Flat => 1,
         }
     }
 
     pub fn stepsize_consistent_axis(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.dy(),
             Orientation::Flat => self.dx(),
         }
     }
 
     pub fn stepsize_inconsistent_axis(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.dx(),
             Orientation::Flat => self.dy(),
         }

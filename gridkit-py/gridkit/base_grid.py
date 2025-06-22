@@ -744,7 +744,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         self,
         size=None,
         orientation=None,
-        shape=None,
+        shape=None,  # deprecated in favor of 'orientation'
+        area=None,
         offset=None,
         rotation=None,
         **kwargs,

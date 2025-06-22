@@ -4,7 +4,7 @@ use std::{f32::MAX, f64, i64, u64};
 use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Tile {
     pub grid: Grid,
     pub start_id: (i64, i64),

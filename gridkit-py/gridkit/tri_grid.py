@@ -87,7 +87,7 @@ class TriGrid(BaseGrid):
             cellsize=size,
             offset=tuple(offset),
             rotation=rotation,
-            cell_orientation=orientation,
+            orientation=orientation,
         )
 
         self.bounded_cls = BoundedTriGrid
@@ -453,12 +453,12 @@ class TriGrid(BaseGrid):
         if rotation is None:
             rotation = self.rotation
         if orientation is None:
-            cell_orientation = self.orientation
+            orientation = self.orientation
         return PyO3TriGrid(
             cellsize=size,
             offset=offset,
             rotation=rotation,
-            cell_orientation=cell_orientation,
+            orientation=orientation,
         )
 
     def update(

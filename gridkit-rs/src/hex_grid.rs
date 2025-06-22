@@ -3,11 +3,11 @@ use crate::utils::*;
 use ndarray::Slice;
 use ndarray::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HexGrid {
     pub cellsize: f64,
     pub offset: [f64; 2],
-    pub cell_orientation: Orientation,
+    pub orientation: Orientation,
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
@@ -19,13 +19,13 @@ impl GridTraits for HexGrid {
     }
 
     fn dx(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.cellsize,
             Orientation::Flat => 3. / 2. * self.radius(),
         }
     }
     fn dy(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => 3. / 2. * self.radius(),
             Orientation::Flat => self.cellsize,
         }
@@ -73,14 +73,14 @@ impl GridTraits for HexGrid {
     }
 
     fn cell_height(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.radius() * 2.,
             Orientation::Flat => self.dy(),
         }
     }
 
     fn cell_width(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.dx(),
             Orientation::Flat => self.radius() * 2.,
         }
@@ -90,7 +90,7 @@ impl GridTraits for HexGrid {
         let mut centroid_x = x as f64 * self.dx() + (self.dx() / 2.) + self.offset[0];
         let mut centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset[1];
 
-        match self.cell_orientation() {
+        match self.orientation() {
             Orientation::Pointy => {
                 if !iseven(y) {
                     centroid_x = centroid_x + self.dx() / 2.;
@@ -202,7 +202,7 @@ impl GridTraits for HexGrid {
 
         for cell_id in 0..index.shape()[0] {
             for corner_id in 0..6 {
-                let angle_deg = match self.cell_orientation() {
+                let angle_deg = match self.orientation() {
                     Orientation::Pointy => 60. * corner_id as f64 - 30.,
                     Orientation::Flat => 60. * corner_id as f64,
                 };
@@ -274,7 +274,7 @@ impl GridTraits for HexGrid {
             let direction_x = points[Ix2(cell_id, 0)] - centroid[0];
             let direction_y = points[Ix2(cell_id, 1)] - centroid[1];
             let mut azimuth = direction_x.atan2(direction_y) * 180. / std::f64::consts::PI;
-            match self.cell_orientation() {
+            match self.orientation() {
                 // it is easier to work with ranges starting at 0 rather than -30;
                 Orientation::Pointy => {
                     azimuth += 30.;
@@ -293,7 +293,7 @@ impl GridTraits for HexGrid {
 
             // Offset the nearby cells by one depending whether the cell points up or down
             let is_offset = !iseven(cell_ids[Ix2(cell_id, self.inconsistent_axis())]) as i64;
-            match self.cell_orientation() {
+            match self.orientation() {
                 Orientation::Pointy => {
                     match quadrant_id {
                         0 => {
@@ -379,50 +379,50 @@ impl GridTraits for HexGrid {
 }
 
 impl HexGrid {
-    pub fn new(cellsize: f64, cell_orientation: Orientation) -> Self {
+    pub fn new(cellsize: f64, orientation: Orientation) -> Self {
         let _rotation_matrix = rotation_matrix_from_angle(0.);
         let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
         HexGrid {
             cellsize,
             offset: [0., 0.],
-            cell_orientation,
+            orientation,
             _rotation: 0.,
             _rotation_matrix,
             _rotation_matrix_inv,
         }
     }
 
-    pub fn cell_orientation(&self) -> &Orientation {
-        &self.cell_orientation
+    pub fn orientation(&self) -> &Orientation {
+        &self.orientation
     }
 
-    pub fn set_cell_orientation(&mut self, cell_orientation: Orientation) {
-        self.cell_orientation = cell_orientation;
+    pub fn set_orientation(&mut self, orientation: Orientation) {
+        self.orientation = orientation;
     }
 
     pub fn consistent_axis(&self) -> usize {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => 0,
             Orientation::Flat => 1,
         }
     }
 
     pub fn inconsistent_axis(&self) -> usize {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => 1,
             Orientation::Flat => 0,
         }
     }
 
     pub fn stepsize_consistent_axis(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.dx(),
             Orientation::Flat => self.dy(),
         }
     }
 
     pub fn stepsize_inconsistent_axis(&self) -> f64 {
-        match self.cell_orientation {
+        match self.orientation {
             Orientation::Pointy => self.dy(),
             Orientation::Flat => self.dx(),
         }
