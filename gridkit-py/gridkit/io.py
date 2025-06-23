@@ -39,11 +39,18 @@ def read_raster(
     --------
     :func:`.write_raster`
     """
+    warnings.warn(
+        "`read_raster` returns a BoudedRectGrid. This is now legacy but kept for backwards compatibility. In the future it will return a DataTile. For now it is recommended to use 'raster_to_data_tile()'.",
+        DeprecationWarning,
+    )
+
     with rasterio.open(path) as raster_file:
-        crs = str(raster_file.crs)
+        crs = raster_file.crs
+        if crs is not None:
+            crs = str(crs)
 
         if bounds is not None:
-            if bounds_crs is not None:
+            if bounds_crs is not None and crs is not None:
                 bounds_crs = CRS.from_user_input(bounds_crs)
                 transformer = Transformer.from_crs(bounds_crs, crs, always_xy=True)
                 bounds = transformer.transform_bounds(*bounds)
@@ -89,12 +96,24 @@ def _write_data_tile_to_raster(data_tile, path):
         )
     corners = data_tile.corners()
     bounds = (
-        corners[2][0],
+        corners[0][0],
         corners[2][1],
-        corners[1][0],
-        corners[1][1],
+        corners[2][0],
+        corners[0][1],
     )
     transform = rasterio.transform.from_bounds(*bounds, data_tile.nx, data_tile.ny)
+
+    if data_tile.dtype == "float64":
+        warnings.warn(
+            "GDAL does not support rasters with a dtype of float64, downcasting to float32."
+        )
+        data_tile = data_tile.astype(numpy.float32)
+    elif data_tile.dtype == "int64":
+        warnings.warn(
+            "GDAL does not support rasters with a dtype of int64, downcasting to int32."
+        )
+        data_tile = data_tile.astype(numpy.int32)
+
     with rasterio.open(
         path,
         "w",
@@ -107,13 +126,27 @@ def _write_data_tile_to_raster(data_tile, path):
         nodata=data_tile.nodata_value,
         transform=transform,
     ) as dst:
-        dst.write(numpy.expand_dims(data_tile.to_numpy(), 0))
+        data = numpy.expand_dims(data_tile.to_numpy(), 0)
+        dst.write(data)
     return path
 
 
 def _write_bounded_grid_to_raster(grid, path):
     """Intended to be called only through :func:`.write_raster`"""
     transform = rasterio.transform.from_bounds(*grid.bounds, grid.width, grid.height)
+
+    data = numpy.expand_dims(grid._data.copy(), 0)
+    if isinstance(data.dtype, numpy.dtypes.Float64DType):
+        warnings.warn(
+            "GDAL does not support rasters with a dtype of float64, downcasting to float32."
+        )
+        data = data.astype(numpy.float32)
+    elif isinstance(data.dtype, numpy.dtypes.Int64DType):
+        warnings.warn(
+            "GDAL does not support rasters with a dtype of int64, downcasting to int32."
+        )
+        data = data.astype(numpy.int32)
+
     with rasterio.open(
         path,
         "w",
@@ -121,12 +154,12 @@ def _write_bounded_grid_to_raster(grid, path):
         height=grid.height,
         width=grid.width,
         count=1,  # nr bands
-        dtype=grid._data.dtype,
+        dtype=data.dtype,
         crs=grid.crs,
         nodata=grid.nodata_value,
         transform=transform,
     ) as dst:
-        dst.write(numpy.expand_dims(grid._data.copy(), 0))
+        dst.write(data)
     return path
 
 
@@ -204,7 +237,9 @@ def raster_to_data_tile(
         A data tile with spatial properties based on the input raster
     """
     with rasterio.open(path) as raster_file:
-        crs = str(raster_file.crs)
+        crs = raster_file.crs
+        if crs is not None:
+            crs = str(crs)
 
         if bounds is None and border_buffer < 0:
             # Allow for shrinking of full dataset using border_buffer if no bounds are supplied
@@ -220,7 +255,7 @@ def raster_to_data_tile(
                 bounds[:2] -= border_buffer
                 bounds[2:] += border_buffer
 
-            if bounds_crs is not None:
+            if bounds_crs is not None and crs is not None:
                 bounds_crs = CRS.from_user_input(bounds_crs)
                 transformer = Transformer.from_crs(bounds_crs, crs, always_xy=True)
                 bounds = transformer.transform_bounds(*bounds)

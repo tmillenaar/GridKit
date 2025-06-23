@@ -24,14 +24,19 @@ def test_write_raster(tmp_path, basic_bounded_rect_grid):
     assert filepath.suffix == ".tiff"
 
     result = raster_to_data_tile(filepath)
-    assert numpy.testing.assert_allclose(result, basic_bounded_rect_grid.data)
-    assert numpy.testing.assert_allclose(result.offset, basic_bounded_rect_grid.offset)
-    assert result.rotation == 0
-    assert numpy.testing.assert_allclose(result.dx, basic_bounded_rect_grid.dx)
-    assert numpy.testing.assert_allclose(result.dy, basic_bounded_rect_grid.dy)
-    assert numpy.testing.assert_allclose(
-        result.start_id, basic_bounded_rect_grid.start_id
-    )
+    numpy.testing.assert_allclose(result, basic_bounded_rect_grid.data)
+    numpy.testing.assert_allclose(result.grid.offset, basic_bounded_rect_grid.offset)
+    assert result.grid.rotation == 0
+    numpy.testing.assert_allclose(result.grid.dx, basic_bounded_rect_grid.dx)
+    numpy.testing.assert_allclose(result.grid.dy, basic_bounded_rect_grid.dy)
+    b = basic_bounded_rect_grid.bounds
+    corners = [
+        [b[0], b[3]],
+        [b[2], b[3]],
+        [b[2], b[1]],
+        [b[0], b[1]],
+    ]
+    numpy.testing.assert_allclose(result.corners(), corners)
 
 
 def test_write_raster_data_tile(tmp_path):
@@ -46,12 +51,12 @@ def test_write_raster_data_tile(tmp_path):
     assert filepath.suffix == ".tiff"
 
     result = raster_to_data_tile(filepath)
-    assert numpy.testing.assert_allclose(result, data)
-    assert numpy.testing.assert_allclose(result.offset, data.offset)
-    assert result.rotation == 0
-    assert numpy.testing.assert_allclose(result.dx, grid.dx)
-    assert numpy.testing.assert_allclose(result.dy, grid.dy)
-    assert numpy.testing.assert_allclose(result.start_id, tile.start_id)
+    numpy.testing.assert_allclose(result, data)
+    numpy.testing.assert_allclose(result.grid.offset, grid.offset)
+    assert result.grid.rotation == 0
+    numpy.testing.assert_allclose(result.grid.dx, grid.dx)
+    numpy.testing.assert_allclose(result.grid.dy, grid.dy)
+    numpy.testing.assert_allclose(result.start_id, tile.start_id)
 
 
 def test_raster_to_data_tile():
