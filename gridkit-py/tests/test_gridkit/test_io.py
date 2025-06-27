@@ -1,8 +1,14 @@
 import numpy
 import pytest
 
-from gridkit import (DataTile, RectGrid, Tile, raster_to_data_tile,
-                     read_raster, write_raster)
+from gridkit import (
+    DataTile,
+    RectGrid,
+    Tile,
+    raster_to_data_tile,
+    read_raster,
+    write_raster,
+)
 
 
 def test_read_raster():

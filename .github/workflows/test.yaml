@@ -34,7 +34,7 @@ jobs:
         working-directory: ./gridkit-py
 
       - name: Run isort check
-        run: python3 -m isort gridkit tests --check
+        run: python3 -m isort gridkit tests --check --profile black
         working-directory: ./gridkit-py
 
       - name: Run wordwarden check
