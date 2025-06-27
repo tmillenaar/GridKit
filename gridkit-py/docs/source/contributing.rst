@@ -23,19 +23,28 @@ Naturally, you'll first want to fork or clone the repository.
 Of course we start by cloning or forking from `GitHub <https://github.com/tmillenaar/GridKit>`_.
 
 Then go into the folder and the gridkit-py sub-directory
->>> cd GridKit/gridkit-py
+
+.. code-block:: shell
+
+    cd GridKit/gridkit-py
 
 Now let's create a venv to use.
 
->>> python3 -m venv gridkit_venv
+.. code-block:: shell
+
+    python3 -m venv gridkit_venv
 
 Activate the venv
 
->>> source gridkit_venv/bin/activate
+.. code-block:: shell
+
+    source gridkit_venv/bin/activate
 
 Upgrade the basics: pip, setuptools, wheel
 
->>> python3 -m pip install pip setuptools wheel
+.. code-block:: shell
+
+    python3 -m pip install pip setuptools wheel
 
 .. Note ::
     When running ``pip install .``, it is assumed that ``rustup`` and ``Cargo`` are installed.
@@ -47,14 +56,18 @@ Install the package with the additional 'doc' and 'test' dependencies.
 Here the ``-e`` flag will make sure the the local files are used. If this flag is omitted, a copy is installed in the venv
 which will be used over the local files and not reflect any changes you make in the repository.
 
->>> python3 -m pip install -e .[doc,test]
+.. code-block:: shell
+
+    python3 -m pip install -e .[doc,test]
 
 Since the python code partially uses functions defined in Rust, we have to compile the rust binary.
 This is done automatically when installing the python package. If changes are made in the rust code
 (in the ../gridkit-rs directory) the rust binary needs to be re-build for the changes to take effect.
 Run the following to compile the Rust binary for use in python:
 
->>> maturin develop --release
+.. code-block:: shell
+
+    maturin develop --release
 
 The '--release' flag will do some further optimizations.
 This is optional when testing. The compilation will take slightly longer but the code in the binary will run faster.
@@ -69,15 +82,21 @@ These packages are installed when the ``[test]`` argument is used during install
 Pytest-black will test the format of the python files.
 Code that does not pass the test should be reformatted using black
 
->>> python3 -m black gridkit tests/test_gridkit/
+.. code-block:: shell
+
+    python3 -m black gridkit tests/test_gridkit/
 
 and isort
 
->>> python3 -m isort gridkit tests/test_gridkit/
+.. code-block:: shell
+
+    python3 -m isort gridkit tests/test_gridkit/
 
 It is recommended to install the pre-commit hook, which will check the code format on commit and fix it if needed
 
->>> pre-commit install
+.. code-block:: shell
+
+    pre-commit install
 
 This process should take away a lot of strain around neatly formatting the code and
 ensures the same code standards are enforced all over the codebase.
@@ -87,11 +106,15 @@ Running tests and building docs
 
 Now the package is installed, the unittests can be ran by calling pytest
 
->>> python3 -m pytest tests
+.. code-block:: shell
+
+    python3 -m pytest tests
 
 Run the doctests
 
->>> python3 -m pytest gridkit/ --doctest-modules
+.. code-block:: shell
+
+    python3 -m pytest gridkit/ --doctest-modules
 
 To build the documentation, a script was created at docs/build_docs/sh.
 This script can be called like so `bash docs/build_docs.sh`, note that in order for the script to work you need to use `bash` and not `sh`.
@@ -99,17 +122,21 @@ The script will build documentation for all released versions (after v0.7.0). Th
 latest version to place outdated warnings on all older versions. To do this the GRIDKIT_DOC_BUILD_LATEST_VERSION environment variable needs to be set.
 So you can build all docs by:
 
->>> export GRIDKIT_DOC_BUILD_LATEST_VERSION="v0.14.1"
->>> bash docs/build_docs.sh
+.. code-block:: shell
+
+    export GRIDKIT_DOC_BUILD_LATEST_VERSION="v0.14.1"
+    bash docs/build_docs.sh
 
 Note here that we arbitrarily set v0.14.1 as the latest release, feel free to change this to the version that is acutally the last release at your time of building the docs.
 
 Building the docs for all versions takes a lot of time though, so if you want to iterate quickly it is recommended to do the following:
 
->>> export GRIDKIT_DOC_BUILD_LATEST_VERSION="dev"
->>> export GRIDKIT_DOC_BUILD_CURRENT_VERSION="dev"
->>> export GRIDKIT_DOC_BUILD_TAGS="['dev']"
->>> python3 -m sphinx.cmd.build docs/source build/sphinx/dev/html
+.. code-block:: shell
+
+    export GRIDKIT_DOC_BUILD_LATEST_VERSION="dev"
+    export GRIDKIT_DOC_BUILD_CURRENT_VERSION="dev"
+    export GRIDKIT_DOC_BUILD_TAGS="['dev']"
+    python3 -m sphinx.cmd.build docs/source build/sphinx/dev/html
 
 This assumes that you have an environment in which gridkit is installed with the doc dependencies. To install this from a checkout of the repository, run `pip install -e ./[doc]`.
 
