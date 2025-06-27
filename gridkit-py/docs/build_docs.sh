@@ -11,6 +11,10 @@ rootdir="$PWD"
 # Any version before v0.7.0 does not properly build the documentation
 tags=$(git tag | grep '^v' | sort -V | awk 'BEGIN{keep=0} $0=="v0.7.0"{keep=1} keep' | sort -Vr)
 
+# Add dev tag which will represent the head of the main branch
+tags="dev
+$tags"
+
 echo "Building docs for the following versions: $tags"
 
 # Export tags to be used in conf.py
@@ -25,14 +29,25 @@ for tag in $tags; do
     echo "Building docs to $html_destination"
 
     # Check out code of tagged commit in /tmp folder
-    tag_workdir=/tmp/gridkit_docs/$tag
-    mkdir $tag_workdir
-    if [ -d "$tag_workdir/gridkit-py" ]; then
-      tag_workdir="$tag_workdir/gridkit-py"
+    git_dir=/tmp/gridkit_docs/$tag
+    echo "Building $tag in $git_dir"
+
+    rm -r $git_dir
+    git clone "${rootdir}/.." $git_dir
+
+    if [ "$tag" = "dev" ]; then
+        git -C $git_dir fetch origin main
+        git -C $git_dir checkout origin/main
+    else
+        git -C $git_dir checkout $tag
     fi
-    echo "Building $tag in $tag_workdir"
-    mkdir -p $tag_workdir
-    git --work-tree=$tag_workdir checkout $tag -- .
+
+    # Older structure did not have gridkit-py, add it to workdir if it exists
+    if [ -d "$git_dir/gridkit-py" ]; then
+      tag_workdir="$git_dir/gridkit-py"
+    else
+      tag_workdir="$git_dir"
+    fi
 
     # Copy critical sphinx files that might not be up to date in older versions
     cp "${rootdir}/docs/source/conf.py" "${tag_workdir}/docs/source/conf.py"
@@ -48,7 +63,11 @@ for tag in $tags; do
     source "${tag_workdir}/venv/bin/activate"
 
     # Use pypi-timemachine to install the package dependencies in the state at the time of release
-    tag_date=$(git log -1 --format=%aI "$tag" | cut -d'T' -f1)
+    if [ "$tag" = "dev" ]; then
+        tag_date=$(date +%Y-%m-%d)
+    else
+        tag_date=$(git log -1 --format=%aI "$tag" | cut -d'T' -f1)
+    fi
     yy_doy=$(date -d "$tag_date" +%y%j)  # use shorter representation as port, use year and day of year (out of 365)
     echo "Limiting PyPI to date: $tag_date"
     pip install pypi-timemachine
