@@ -1,7 +1,19 @@
 {% extends "!layout.html" %}
 
 {% block content %}
-  {% if current_version != latest_version %}
+  {% if current_version == 'dev' %}
+    <div style="
+        background-color: #f5dfed;
+        color:#2d2c2e;
+        padding: 1em;
+        border-bottom: 2px solid #ecacfa;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing the <strong>development version</strong> of the documentation ({{ current_version }}).<br>
+      This is the bleeding edge. Changes might not yet be released and may be changed or reverted.
+    </div>
+  {% elif current_version != latest_version %}
     <div style="
         background-color: #ffefc2;
         color: #333;
@@ -10,9 +22,8 @@
         font-weight: bold;
         text-align: center;
     ">
-      You are viewing an outdated version of the documentation ({{ current_version }}). <br>
+      You are viewing an <strong>outdated version</strong> of the documentation ({{ current_version }}).<br>
       Latest version: <a href="{{ pathto('../' ~ latest_version ~ '/index.html', 1) }}">{{ latest_version }}</a>
-
     </div>
   {% endif %}
   {{ super() }}

@@ -1,4 +1,10 @@
 <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
   <span class="rst-current-version" data-toggle="rst-current-version">
     Version: {{ current_version }}
     <span class="fa fa-caret-down"></span>
@@ -8,7 +14,9 @@
     <dl>
       <dt>{{ _('Versions') }}</dt>
       {% for the_version, url in versions %}
-        <li><a href="{{ url }}/index.html">{{ the_version }}</a></li>
+        <li {% if the_version == current_version %}class="current"{% endif %}>
+          <a href="{{ url }}/index.html">{{ the_version }}</a> {% if the_version == current_version %}  <--{% endif %}
+        </li>
       {% endfor %}
     </dl>
     {% endif %}

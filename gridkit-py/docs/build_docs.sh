@@ -32,7 +32,7 @@ for tag in $tags; do
     git_dir=/tmp/gridkit_docs/$tag
     echo "Building $tag in $git_dir"
 
-    rm -r $git_dir
+    rm -rf $git_dir
     git clone "${rootdir}/.." $git_dir
 
     if [ "$tag" = "dev" ]; then
@@ -83,11 +83,11 @@ for tag in $tags; do
 
     # Clean up this version's build reamnants
     kill "$PTM_PID"  # Quit the localhost supporting the pypi-timemachine
-    rm -r $tag_workdir
+    rm -rf $tag_workdir
 done
 
 # Link landing page to most recent version
 ln -sf "${rootdir}/build/sphinx/html/versions/${GRIDKIT_DOC_BUILD_LATEST_VERSION}/index.html" "${rootdir}/build/sphinx/html/index.html"
 
 # Left over cleanup
-rm -r /tmp/gridkit_docs
+rm -rf /tmp/gridkit_docs
