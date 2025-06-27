@@ -113,7 +113,10 @@ class Tile:
             if numpy.issubdtype(data.dtype, float):
                 nodata_value = numpy.nan
             else:
-                nodata_value = numpy.iinfo(data.dtype).max
+                # Subtract one form default max value because some large values
+                # that are acceptable values to numpy is too large for rasterio.
+                # nodata_value = numpy.iinfo(data.dtype).max - 512
+                nodata_value = numpy.iinfo(data.dtype).max - 1024
 
         return DataTile(self, data, nodata_value)
 

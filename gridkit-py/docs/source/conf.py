@@ -65,6 +65,31 @@ sphinx_gallery_conf = {
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
+version_tags = os.environ.get("GRIDKIT_DOC_BUILD_TAGS", [])
+current_version = os.environ.get("GRIDKIT_DOC_BUILD_CURRENT_VERSION", None)
+latest_version = os.environ.get("GRIDKIT_DOC_BUILD_LATEST_VERSION", None)
+
+assert version_tags, "Please set environment variable GRIDKIT_DOC_BUILD_TAGS"
+assert (
+    current_version is not None
+), "Please set environment variable GRIDKIT_DOC_BUILD_CURRENT_VERSION"
+assert (
+    latest_version is not None
+), "Please set environment variable GRIDKIT_DOC_BUILD_LATEST_VERSION"
+
+rootdir = os.environ.get("GRIDKIT_DOC_BUILD_ROOTDIR", [])
+version_tags = [t.strip() for t in version_tags.split("\n")]
+print("Version tags: ", version_tags)
+print("Current version: ", current_version)
+print("Latest version: ", latest_version)
+html_context = {
+    "current_version": current_version,
+    "latest_version": latest_version,
+    "versions": [
+        [tag, f"{rootdir}/build/sphinx/html/versions/" + tag] for tag in version_tags
+    ],
+}
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
