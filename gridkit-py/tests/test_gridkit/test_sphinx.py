@@ -8,6 +8,19 @@ import pytest
 def test_documentation_build(tmp_path):
     build_dir = tmp_path / "_build/html"
 
+    # Handle env vars needed for building docs
+    env_original_build_tags = os.environ.get("GRIDKIT_DOC_BUILD_TAGS", None)
+    env_original_curernt_version = os.environ.get(
+        "GRIDKIT_DOC_BUILD_CURRENT_VERSION", None
+    )
+    env_original_latest_version = os.environ.get(
+        "GRIDKIT_DOC_BUILD_LATEST_VERSION", None
+    )
+
+    os.environ["GRIDKIT_DOC_BUILD_TAGS"] = "['dev']"
+    os.environ["GRIDKIT_DOC_BUILD_CURRENT_VERSION"] = "dev"
+    os.environ["GRIDKIT_DOC_BUILD_LATEST_VERSION"] = "dev"
+
     # Run the Sphinx build command and capture its output
     try:
         result = subprocess.run(
@@ -52,3 +65,20 @@ def test_documentation_build(tmp_path):
     # # Check if there are any warnings in the Sphinx build output
     # if "build succeeded" not in result.stdout.lower():
     #     pytest.fail("Documentation build completed, but there were errors or warnings.")
+
+    # Clean up environment variables
+    # Reset to original value or remove them if they were not originally set.
+    if env_original_build_tags is None:
+        del os.environ["GRIDKIT_DOC_BUILD_TAGS"]
+    else:
+        os.environ["GRIDKIT_DOC_BUILD_TAGS"] = env_original_build_tags
+
+    if env_original_curernt_version is None:
+        del os.environ["GRIDKIT_DOC_BUILD_CURRENT_VERSION"]
+    else:
+        os.environ["GRIDKIT_DOC_BUILD_CURRENT_VERSION"] = env_original_curernt_version
+
+    if env_original_latest_version is None:
+        del os.environ["GRIDKIT_DOC_BUILD_LATEST_VERSION"]
+    else:
+        os.environ["GRIDKIT_DOC_BUILD_LATEST_VERSION"] = env_original_latest_version
