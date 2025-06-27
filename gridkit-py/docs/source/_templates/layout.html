@@ -1,0 +1,19 @@
+{% extends "!layout.html" %}
+
+{% block content %}
+  {% if current_version != latest_version %}
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an outdated version of the documentation ({{ current_version }}). <br>
+      Latest version: <a href="{{ pathto('../' ~ latest_version ~ '/index.html', 1) }}">{{ latest_version }}</a>
+
+    </div>
+  {% endif %}
+  {{ super() }}
+{% endblock %}

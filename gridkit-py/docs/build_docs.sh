@@ -37,6 +37,7 @@ for tag in $tags; do
     cp "${rootdir}/docs/source/conf.py" "${tag_workdir}/docs/source/conf.py"
     mkdir -p "${tag_workdir}/docs/source/_templates"
     cp "${rootdir}/docs/source/_templates/versions.html" "${tag_workdir}/docs/source/_templates/versions.html"
+    cp "${rootdir}/docs/source/_templates/layout.html" "${tag_workdir}/docs/source/_templates/layout.html"
 
     # Make sure the docs report the tagged version
     sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"$tag\"|" $tag_workdir/gridkit/version.py
@@ -53,13 +54,20 @@ for tag in $tags; do
     pypi-timemachine --port $yy_doy $tag_date & # Use trailing & to save pid
     PTM_PID=$! # save pid to kill background process later
 
+    # Install package and dependencies using the time boxed pypi proxy
     pip install -e $tag_workdir/[doc] --index-url "http://127.0.0.1:${yy_doy}/"
 
     # Build the docs for this version
     export GRIDKIT_DOC_BUILD_CURRENT_VERSION=$tag
     sphinx-build ${tag_workdir}/docs/source $html_destination
 
+    # Clean up this version's build reamnants
     kill "$PTM_PID" # Quit the localhost supporting the pypi-timemachine
+    rm -r $tag_workdir
 done
 
+# Link landing page to most recent version
+ln -sf "${rootdir}/build/sphinx/html/versions/${GRIDKIT_DOC_BUILD_LATEST_VERSION}/index.html" "${rootdir}/build/sphinx/html/index.html"
+
+# Left over cleanup
 rm -r /tmp/gridkit_docs
