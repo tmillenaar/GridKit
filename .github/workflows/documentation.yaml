@@ -16,10 +16,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetches full history
+            fetch-tags: true
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: 3.10
 
@@ -27,16 +30,19 @@ jobs:
         run: |
           pip install -e ./[doc]
 
-      - name: Build Sphinx documentation
+      - name: Set GRIDKIT_DOC_BUILD_LATEST_VERSION
         run: |
           if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
-            version="${{ github.event.inputs.custom_tag }}"
+            echo "Using manual tag input: ${{ github.event.inputs.custom_tag }}"
+            echo "GRIDKIT_DOC_BUILD_LATEST_VERSION=${{ github.event.inputs.custom_tag }}" >> $GITHUB_ENV
           else
-            version="${GITHUB_REF/refs\/tags\//}"
+            tag="${GITHUB_REF#refs/tags/}"
+            echo "Using pushed tag: $tag"
+            echo "GRIDKIT_DOC_BUILD_LATEST_VERSION=$tag" >> $GITHUB_ENV
           fi
-          bash docs/build_docs.sh
-          # Link landing page to the version we are currently tagging, usually the latest version
-          ln "build/sphinx/html/versions/${version}/index.html" "build/sphinx/html/index.html"
+
+      - name: Build Sphinx documentation
+        run: bash docs/build_docs.sh
 
       - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
