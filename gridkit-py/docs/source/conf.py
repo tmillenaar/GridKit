@@ -85,7 +85,7 @@ print("Latest version: ", latest_version)
 html_context = {
     "current_version": current_version,
     "latest_version": latest_version,
-    "versions": [[tag, f"GridKit/versions/{tag}/"] for tag in version_tags],
+    "versions": [[tag, f"versions/{tag}/"] for tag in version_tags],
 }
 html_baseurl = f"https://tmilenaar.github.io/GridKit/versions/{current_version}"
 
