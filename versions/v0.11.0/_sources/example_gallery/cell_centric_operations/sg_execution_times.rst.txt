@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_2d_diff_hex_anim.py` (``2d_diff_hex_anim.py``)
-     - 00:03.624
+     - 00:03.642
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py` (``downslope_path.py``)
-     - 00:01.171
+     - 00:01.158
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py` (``selecting_cells.py``)
-     - 00:00.588
+     - 00:00.584
      - 0.0

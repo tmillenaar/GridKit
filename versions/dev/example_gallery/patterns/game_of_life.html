@@ -15,6 +15,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+    <link rel="canonical" href="https://tmilenaar.github.io/GridKit/versions/dev/example_gallery/patterns/game_of_life.html" />
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=3ce10a4d"></script>
@@ -470,42 +471,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img277f5ba397bc4d8e9b4e6f97ef8b87f4">
+  <img id="_anim_imgacc743e09468494d83b543b43677e563">
   <div class="anim-controls">
-    <input id="_anim_slider277f5ba397bc4d8e9b4e6f97ef8b87f4" type="range" class="anim-slider"
+    <input id="_anim_slideracc743e09468494d83b543b43677e563" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.set_frame(parseInt(this.value));">
+           oninput="animacc743e09468494d83b543b43677e563.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animacc743e09468494d83b543b43677e563.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animacc743e09468494d83b543b43677e563.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animacc743e09468494d83b543b43677e563.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animacc743e09468494d83b543b43677e563.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animacc743e09468494d83b543b43677e563.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animacc743e09468494d83b543b43677e563.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animacc743e09468494d83b543b43677e563.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animacc743e09468494d83b543b43677e563.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim277f5ba397bc4d8e9b4e6f97ef8b87f4.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animacc743e09468494d83b543b43677e563.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select277f5ba397bc4d8e9b4e6f97ef8b87f4"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectacc743e09468494d83b543b43677e563"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_277f5ba397bc4d8e9b4e6f97ef8b87f4"
+      <input type="radio" name="state" value="once" id="_anim_radio1_acc743e09468494d83b543b43677e563"
              >
-      <label for="_anim_radio1_277f5ba397bc4d8e9b4e6f97ef8b87f4">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_277f5ba397bc4d8e9b4e6f97ef8b87f4"
+      <label for="_anim_radio1_acc743e09468494d83b543b43677e563">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_acc743e09468494d83b543b43677e563"
              checked>
-      <label for="_anim_radio2_277f5ba397bc4d8e9b4e6f97ef8b87f4">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_277f5ba397bc4d8e9b4e6f97ef8b87f4"
+      <label for="_anim_radio2_acc743e09468494d83b543b43677e563">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_acc743e09468494d83b543b43677e563"
              >
-      <label for="_anim_radio3_277f5ba397bc4d8e9b4e6f97ef8b87f4">Reflect</label>
+      <label for="_anim_radio3_acc743e09468494d83b543b43677e563">Reflect</label>
     </form>
   </div>
 </div>
@@ -515,9 +516,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img277f5ba397bc4d8e9b4e6f97ef8b87f4";
-    var slider_id = "_anim_slider277f5ba397bc4d8e9b4e6f97ef8b87f4";
-    var loop_select_id = "_anim_loop_select277f5ba397bc4d8e9b4e6f97ef8b87f4";
+    var img_id = "_anim_imgacc743e09468494d83b543b43677e563";
+    var slider_id = "_anim_slideracc743e09468494d83b543b43677e563";
+    var loop_select_id = "_anim_loop_selectacc743e09468494d83b543b43677e563";
     var frames = new Array(6);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -846,12 +847,12 @@ bfUXAAAAAElFTkSuQmCC\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim277f5ba397bc4d8e9b4e6f97ef8b87f4 = new Animation(frames, img_id, slider_id, 299.0,
+        animacc743e09468494d83b543b43677e563 = new Animation(frames, img_id, slider_id, 299.0,
                                  loop_select_id);
     }, 0);
   })()
 </script></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.831 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.814 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-game-of-life-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/db59fcf48fc31c66c74814d2cc0f0459/game_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">game_of_life.ipynb</span></code></a></p>
@@ -909,71 +910,71 @@ bfUXAAAAAElFTkSuQmCC\
       <dt>Versions</dt>
       
         <li class="current">
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a>   <--
+          <a href="GridKit/versions/dev//index.html">dev</a>   <--
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+          <a href="GridKit/versions/v0.14.1//index.html">v0.14.1</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+          <a href="GridKit/versions/v0.14.0//index.html">v0.14.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+          <a href="GridKit/versions/v0.13.0//index.html">v0.13.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+          <a href="GridKit/versions/v0.12.1//index.html">v0.12.1</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+          <a href="GridKit/versions/v0.12.0//index.html">v0.12.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+          <a href="GridKit/versions/v0.11.1//index.html">v0.11.1</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+          <a href="GridKit/versions/v0.11.0//index.html">v0.11.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+          <a href="GridKit/versions/v0.10.0//index.html">v0.10.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+          <a href="GridKit/versions/v0.9.2//index.html">v0.9.2</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+          <a href="GridKit/versions/v0.9.1//index.html">v0.9.1</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+          <a href="GridKit/versions/v0.9.0//index.html">v0.9.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+          <a href="GridKit/versions/v0.8.0//index.html">v0.8.0</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+          <a href="GridKit/versions/v0.7.3//index.html">v0.7.3</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+          <a href="GridKit/versions/v0.7.2//index.html">v0.7.2</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+          <a href="GridKit/versions/v0.7.1//index.html">v0.7.1</a> 
         </li>
       
         <li >
-          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+          <a href="GridKit/versions/v0.7.0//index.html">v0.7.0</a> 
         </li>
       
     </dl>

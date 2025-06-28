@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.825** total execution time for 2 files **from example_gallery/grid_definitions**:
+**00:01.826** total execution time for 2 files **from example_gallery/grid_definitions**:
 
 .. container::
 
@@ -36,5 +36,5 @@ Computation times
      - 00:01.342
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``)
-     - 00:00.483
+     - 00:00.484
      - 0.0
