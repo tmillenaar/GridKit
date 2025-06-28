@@ -118,16 +118,12 @@ Run the doctests
 
 To build the documentation, a script was created at docs/build_docs/sh.
 This script can be called like so `bash docs/build_docs.sh`, note that in order for the script to work you need to use `bash` and not `sh`.
-The script will build documentation for all released versions (after v0.7.0). The script does need to know the
-latest version to place outdated warnings on all older versions. To do this the GRIDKIT_DOC_BUILD_LATEST_VERSION environment variable needs to be set.
-So you can build all docs by:
+The script will build documentation for all released versions (after v0.7.0), as well as the head of the main branch.
+So you can build all docs by running the following from the gridkit-py directory:
 
 .. code-block:: shell
 
-    export GRIDKIT_DOC_BUILD_LATEST_VERSION="v0.14.1"
     bash docs/build_docs.sh
-
-Note here that we arbitrarily set v0.14.1 as the latest release, feel free to change this to the version that is acutally the last release at your time of building the docs.
 
 Building the docs for all versions takes a lot of time though, so if you want to iterate quickly it is recommended to do the following:
 
