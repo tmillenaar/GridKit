@@ -1,4 +1,4 @@
-name: Pytest
+name: Test
 on:
   push:
     branches:
@@ -10,27 +10,40 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: pip install -e ./[test]
+        working-directory: ./gridkit-py
 
       - name: Run pytest
         run: python -m pytest tests --cov --verbose
+        working-directory: ./gridkit-py
 
       - name: Run doctest
-        run: python -m pytest gridkit/ --doctest-modules
+        run: python -m pytest gridkit/ docs/source/*.rst --doctest-modules
+        working-directory: ./gridkit-py
 
       - name: Run black check
         run: python3 -m black gridkit tests --check
+        working-directory: ./gridkit-py
 
       - name: Run isort check
-        run: python3 -m isort gridkit tests --check
+        run: python3 -m isort gridkit tests --check --profile black
+        working-directory: ./gridkit-py
+
+      - name: Run wordwarden check
+        run: |
+          sudo apt update && sudo apt install -y build-essential curl
+          curl https://sh.rustup.rs -sSf | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          cargo install word_warden
+          word_warden $(ls ./gridkit-py/gridkit/*.py ./gridkit-py/tests/*.py ./gridkit-py/src/*.rs ./gridkit-rs/src/*.rs) "breakpoint()" "set_trace()" "WIP" "nocheckin" "println(" # wordwarden:skip-line
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

@@ -2,45 +2,36 @@ name: Build and Deploy Sphinx Documentation
 
 on:
   push:
+    branches:
+      - main
     tags:
-      - '*'
-  workflow_dispatch:
-    inputs:
-      custom_tag:
-        description: 'Custom tag to be displayed in doc as the gridkit version'
-        required: true
+      - "*"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+            fetch-depth: 0  # Fetches full history
+            fetch-tags: true
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10
 
-    - name: Install dependencies
-      run: |
-        pip install -e ./[doc]
+      - name: Install dependencies
+        run: |
+          pip install -e ./[doc]
 
-    - name: Build Sphinx documentation
-      run: |
-        if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
-          version="${{ github.event.inputs.custom_tag }}"
-        else
-          version="${GITHUB_REF/refs\/tags\//}"
-        fi
-        sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${version}\"|" ./gridkit/version.py
-        cat ./gridkit/version.py
-        python3 -c "import gridkit; print(gridkit.__version__)"
-        sphinx-build docs/source build/sphinx/html -v
+      - name: Build Sphinx documentation
+        run: bash docs/build_docs.sh
 
-    - name: Deploy to Github Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: "build/sphinx/html"
+      - name: Deploy to Github Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: "build/sphinx/html"

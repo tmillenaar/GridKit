@@ -1,0 +1,18 @@
+[package]
+name = "gridkit"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "gridkit"
+crate-type = ["lib"]
+
+[dependencies]
+enum_delegate = "0.2.0"
+geo-types = "0.7.12"
+ndarray = "0.15.6"      # Has to match the version of ndarray used by numpy in gridkit-py/Cargo.toml. Use `cargo tree` from that dir to check
+num-traits = "0.2.19"
+wkb = "0.7.1"
+
+[dev-dependencies]
+bresenham = "0.1.1" # Used in examples/rotating_grid

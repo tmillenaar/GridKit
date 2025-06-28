@@ -1,10 +1,32 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 24.1.1 # Replace by any tag/version: https://github.com/psf/black/tags
+    rev: 25.1.0 # Replace by any tag/version: https://github.com/psf/black/tags
     hooks:
       - id: black
         language_version: python3
+
   - repo: https://github.com/timothycrosley/isort
-    rev: 5.11.5 # Replace by any tag/version: https://github.com/PyCQA/isort/tags
+    rev: 6.0.1 # Replace by any tag/version: https://github.com/PyCQA/isort/tags
     hooks:
-    -   id: isort
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/tmillenaar/wordwarden
+    rev: v0.1.5
+    hooks:
+      - id: wordwarden
+        name: Word Warden - Debug Statements
+        entry: word_warden
+        args: ["breakpoint()", ".set_trace()", "println("]
+        stages: [pre-commit, pre-push]
+        types_or: [python, pyi, rust, rst]
+
+  - repo: https://github.com/tmillenaar/wordwarden
+    rev: v0.1.5
+    hooks:
+      - id: wordwarden
+        name: Word Warden - WIP comments
+        entry: word_warden
+        args: ["WIP", "FIXME", "nocheckin"]
+        stages: [pre-push]
+        types_or: [python, pyi, rust, rst]

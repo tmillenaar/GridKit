@@ -2,7 +2,7 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 jobs:
   linux:
@@ -14,9 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.10"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.10"
           architecture: ${{ matrix.target }}
       - name: Set the gridkit version in version.py to that of the tag
         run: (Get-Content -Path .\gridkit\version.py -Raw) -replace '\"[0-9]+\.[0-9]+\.[0-9]+.+', ('"{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\gridkit\version.py ; Get-Content .\gridkit\version.py
@@ -56,7 +56,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
+          sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Upload wheels
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.10"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
@@ -84,7 +84,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           args: --release --out dist --find-interpreter
-          sccache: 'true'
+          sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Upload wheels
@@ -96,7 +96,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
       - name: Set the gridkit version in pyproject.toml to that of the tag
