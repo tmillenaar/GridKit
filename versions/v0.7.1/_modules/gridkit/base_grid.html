@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gridkit.base_grid &mdash; GridKit v0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a1b19286"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.7.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.7.1).<br>
+      Latest version: <a href="../../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gridkit.base_grid</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gridkit.base_grid</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">shapely</span>
+<span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">CRS</span><span class="p">,</span> <span class="n">Transformer</span>
+
+<span class="kn">from</span> <span class="nn">gridkit.gridkit_rs</span> <span class="kn">import</span> <span class="n">shapes</span>
+<span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span><span class="p">,</span> <span class="n">validate_index</span>
+
+
+<div class="viewcode-block" id="BaseGrid">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid">[docs]</a>
+<span class="k">class</span> <span class="nc">BaseGrid</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstraction base class that represents an infinite grid.</span>
+
+<span class="sd">    Initialization parameters</span>
+<span class="sd">    -------------------------</span>
+<span class="sd">    offset: `Tuple(float, float)` (optional)</span>
+<span class="sd">        The offset in dx and dy.</span>
+<span class="sd">        Shifts the whole grid by the specified amount.</span>
+<span class="sd">        The shift is always reduced to be maximum one cell size.</span>
+<span class="sd">        If the supplied shift is larger,</span>
+<span class="sd">        a shift will be performed such that the new center is a multiple of dx or dy away.</span>
+<span class="sd">        Default: (0,0)</span>
+<span class="sd">    crs: `pyproj.CRS` (optional)</span>
+<span class="sd">        The coordinate reference system of the grid.</span>
+<span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
+<span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
+<span class="sd">        If None, no CRS is set.</span>
+<span class="sd">        Default: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># limit offset to be positive and max 1 cell-size</span>
+        <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span> <span class="o">=</span> <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">offset_x</span> <span class="o">=</span> <span class="n">offset_x</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
+        <span class="n">offset_y</span> <span class="o">=</span> <span class="n">offset_y</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span><span class="p">)</span>
+
+        <span class="c1"># set the CRS using crs.setter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `pyproj.CRS`</span>
+<span class="sd">            None if the CRS is not set, and to set the value it</span>
+<span class="sd">            :getter: Returns a ``pyproj.CRS`` or None. When setting, the value</span>
+<span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
+<span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crs</span>
+
+    <span class="nd">@crs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value of the crs&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crs</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="k">else</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BaseGrid.dx">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dx">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">dx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The distance in x-direction between two adjacent cell centers.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.dy">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dy">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">dy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The distance in y-direction between two adjacent cell centers.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The offset off the grid in dx and dy.</span>
+<span class="sd">        The offset is never larger than the size of a single grid cell.</span>
+<span class="sd">        The offset represents the shift from the origin (0,0).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span>
+
+    <span class="nd">@offset</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the x and y value of the offset&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="BaseGrid.centroid">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.centroid">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by ``index``.</span>
+
+<span class="sd">        If this method is called on a &#39;Bounded&#39; class, the ``index`` argument is optional.</span>
+<span class="sd">        In such a case the cell IDs of the cells contained in the Bounded product are returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: :class:`.GridIndex`</span>
+<span class="sd">            The index of the cell(s) of which the centroid is to be obtained.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        `numpy.ndarray`</span>
+<span class="sd">            Multidimensional array containing the longitude and latitude of the center of each cell respectively,</span>
+<span class="sd">            in (width, height, lonlat)</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            No `index` parameter was supplied to a grid that does not contain data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.cells_near_point">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_near_point">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cells_near_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The cells nearest to a point, often used in interpolation at the location of the point.</span>
+<span class="sd">        For a TriGrid there are 6 nearby points.</span>
+<span class="sd">        For a HexGrid there are 3 nearby points.</span>
+<span class="sd">        For a RectGrid there are 4 nearby points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.to_bounded">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_bounded">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a bounded version of this grid where the data in the bounds is filled with the supplied `fill_value`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds: :class:`tuple`</span>
+<span class="sd">            The bounds of the area of interest in (minx, miny, maxx, maxy).</span>
+<span class="sd">            The bounds need to be aligned to the grid.</span>
+<span class="sd">            See :meth:`.BaseGrid.align_bounds`</span>
+<span class="sd">        fill_value: `numpy.dtype` (optional)</span>
+<span class="sd">            The value to assign to the newly created array that fills the supplied bounds.</span>
+<span class="sd">            Default: numpy.nan</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.BoundedHexGrid` or :class:`.BoundedRectGrid`</span>
+<span class="sd">            A bounded version of the current grid where the data is filled with `fill_value`.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`.BaseGrid.to_bounded`</span>
+<span class="sd">        :meth:`.RectGrid.to_bounded`</span>
+<span class="sd">        :meth:`.HexGrid.to_bounded`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.relative_neighbours">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.relative_neighbours">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">relative_neighbours</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.neighbours">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours">[docs]</a>
+    <span class="nd">@validate_index</span>
+    <span class="k">def</span> <span class="nf">neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The indices of the neighbouring cells.</span>
+<span class="sd">        The argument &#39;depth&#39; can be used to include cells from further away.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: `numpy.ndarray`</span>
+<span class="sd">            The index of the cell(s) of which to get the neighbours.</span>
+<span class="sd">        depth: :class:`int` Default: 1</span>
+<span class="sd">            Determines the number of neighbours that are returned.</span>
+<span class="sd">            If `depth=1` the direct neighbours are returned.</span>
+<span class="sd">            If `depth=2` the direct neighbours are returned, as well as the neighbours of these neighbours.</span>
+<span class="sd">            `depth=3` returns yet another layer of neighbours, and so forth.</span>
+<span class="sd">        connect_corners: :class:`bool` Default: False</span>
+<span class="sd">            Whether to consider cells that touch corners but not sides as neighbours.</span>
+<span class="sd">            This does not apply to :py:meth:`.HexGrid.relative_neighbours`.</span>
+<span class="sd">            For further information on this argument, refer to :py:meth:`.RectGrid.relative_neighbours`.</span>
+<span class="sd">        include_selected: :class:`bool` Default: False</span>
+<span class="sd">            Whether to include the specified cell in the return array.</span>
+<span class="sd">            Even though the specified cell can never be a neighbour of itself,</span>
+<span class="sd">            this can be useful when for example a weighted average of the neighbours is desired</span>
+<span class="sd">            in which case the cell itself often should also be included.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        The direct neighbours of a cell can be returned by using depth=1, which is the default.</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            &gt;&gt;&gt; from gridkit.rect_grid import RectGrid</span>
+<span class="sd">            &gt;&gt;&gt; grid = RectGrid(dx=2, dy=3)</span>
+<span class="sd">            &gt;&gt;&gt; grid.neighbours([1,2]).index</span>
+<span class="sd">            array([[1, 3],</span>
+<span class="sd">                   [0, 2],</span>
+<span class="sd">                   [2, 2],</span>
+<span class="sd">                   [1, 1]])</span>
+
+<span class="sd">        ..</span>
+
+<span class="sd">        For more detailed examples:</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :py:meth:`.RectGrid.relative_neighbours`</span>
+<span class="sd">        :py:meth:`.HexGrid.relative_neighbours`</span>
+<span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">original_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span>
+            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+            <span class="n">connect_corners</span><span class="o">=</span><span class="n">connect_corners</span><span class="p">,</span>
+            <span class="n">include_selected</span><span class="o">=</span><span class="n">include_selected</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">index</span>
+
+        <span class="c1"># neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">index</span>
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span>
+            <span class="n">neighbours</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">original_shape</span><span class="p">,</span> <span class="o">*</span><span class="n">neighbours</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.cell_at_point">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_at_point">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the ID of the cell in which `point` falls.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point: :class:`tuple`</span>
+<span class="sd">            The coordinates of the point to which to match the cell</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`tuple`</span>
+<span class="sd">            The ID of the cell in (x,y)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.cell_corners">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_corners">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates of the cell corners as specified by `index`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :class:`~.index.GridIndex`</span>
+<span class="sd">            The indices of the cells of interest. Each id contains an `x` and `y` value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        index: `numpy.ndarray`</span>
+<span class="sd">            A list of coordinates in (x,y) specifying each of the corners.</span>
+<span class="sd">            If an ND index is supplied, the returned array will be of the same shpae,</span>
+<span class="sd">            but with an extra axis containing the corners.</span>
+<span class="sd">            The last axis is always of size 2 (x,y).</span>
+<span class="sd">            The second to last axis is the length of the corners.</span>
+<span class="sd">            The other axis are in the shape of the supplied index.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.is_aligned_with">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.is_aligned_with">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_aligned_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if grids are algined and False if they are not.</span>
+<span class="sd">        Grids are considered to be aligned when:</span>
+<span class="sd">         - they are the same type of grid</span>
+<span class="sd">         - the CRS is the same</span>
+<span class="sd">         - the cell_size is the same</span>
+<span class="sd">         - the offset from origin is the same</span>
+<span class="sd">         - the cell shape is the same</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`bool`</span>
+<span class="sd">            Whether or not the grids are aligned</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a (child of) BaseGrid, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">aligned</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">reasons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">:</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Grid type is not the same. This is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">, the other is a </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CRS&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">is_exact_same</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">crs</span><span class="p">):</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CRS&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;cellsize&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dy</span>
+            <span class="p">):</span>
+                <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;cellsize&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
+        <span class="p">):</span>  <span class="c1"># FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;offset&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+            <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
+
+        <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;The following attributes are not the same: </span><span class="si">{</span><span class="n">reasons</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="n">reasons</span>
+            <span class="k">else</span> <span class="n">reason</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">reason</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.to_crs">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_crs">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
+<span class="sd">        This will update the cell size and the origin offset.</span>
+
+<span class="sd">        The ``crs`` attribute on the current grid must be set.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
+<span class="sd">            The value can be anything accepted</span>
+<span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        Examples:</span>
+
+<span class="sd">        :ref:`Example: coordinate transformations &lt;example coordinate transformations&gt;`</span>
+
+<span class="sd">        Methods:</span>
+
+<span class="sd">        :meth:`.RectGrid.to_crs`</span>
+<span class="sd">        :meth:`.HexGrid.to_crs`</span>
+<span class="sd">        :meth:`.BoundedRectGrid.to_crs`</span>
+<span class="sd">        :meth:`.BoundedHexGrid.to_crs`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parent_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">(</span>
+            <span class="n">dx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span>
+        <span class="p">)</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="k">def</span> <span class="nf">parent_grid_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="BaseGrid.cells_in_bounds">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_in_bounds">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bounds: :class:`tuple`</span>
+<span class="sd">            The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)</span>
+<span class="sd">        return_cell_count: :class:`bool`</span>
+<span class="sd">            Return a tuple containing the nr of cells in x and y direction inside the provided bounds</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.GridIndex`</span>
+<span class="sd">            The indices of the cells contained in the bounds</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.are_bounds_aligned">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.are_bounds_aligned">[docs]</a>
+    <span class="k">def</span> <span class="nf">are_bounds_aligned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">separate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">is_aligned</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+            <span class="n">val</span><span class="p">,</span> <span class="n">cellsize</span>
+        <span class="p">)</span>
+        <span class="n">per_axis</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span>  <span class="c1"># left</span>
+            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">),</span>  <span class="c1"># bottom</span>
+            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">),</span>  <span class="c1"># right</span>
+            <span class="n">is_aligned</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">),</span>  <span class="c1"># top</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">per_axis</span> <span class="k">if</span> <span class="n">separate</span> <span class="k">else</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">per_axis</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.align_bounds">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.align_bounds">[docs]</a>
+    <span class="k">def</span> <span class="nf">align_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">bounds</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;expand&quot;</span><span class="p">:</span>
+            <span class="n">left_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+            <span class="n">right_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">top_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;contract&quot;</span><span class="p">:</span>
+            <span class="n">left_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+            <span class="n">right_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">top_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+            <span class="n">left_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+            <span class="n">right_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+            <span class="n">top_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;mode = &#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported modes: (&#39;expand&#39;, &#39;contract&#39;, &#39;nearest&#39;)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">left_rounded</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">bottom_rounded</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">right_rounded</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">top_rounded</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.intersect_geometries">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.intersect_geometries">[docs]</a>
+    <span class="k">def</span> <span class="nf">intersect_geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometries</span><span class="p">,</span> <span class="n">suppress_point_warning</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometries</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
+            <span class="n">geometries</span> <span class="o">=</span> <span class="p">[</span><span class="n">geometries</span><span class="p">]</span>
+        <span class="n">intersecting_cells</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">_geom_iterator</span><span class="p">():</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Unpack `Multi` geometries, improving performance if the geometries are far apart.&quot;&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">geometry</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometry</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">geom</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">geometry</span>
+
+        <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">_geom_iterator</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">suppress_point_warning</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">suppress_point_warning</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Only warn once per function call</span>
+            <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+            <span class="n">geom_bounds</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># buffer bounds to be on the safe side</span>
+                <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+                <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
+                <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+                <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">cells_in_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">geom_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="p">):</span>  <span class="c1"># happens only if point or line lies on an edge</span>
+                <span class="n">geom</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span>
+                    <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span>
+                <span class="p">)</span>  <span class="c1"># buffer may never reach further then a single cell size</span>
+                <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+                <span class="n">cells_in_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">geom_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+            <span class="n">cell_shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">cell_shapes</span><span class="p">]</span>
+            <span class="n">intersecting_cells</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">intersecting_cells</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.to_shapely">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely">[docs]</a>
+    <span class="nd">@validate_index</span>
+    <span class="k">def</span> <span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent the cells as Shapely Polygons</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        index: `numpy.ndarray`</span>
+<span class="sd">            The indices of the cells to convert to Shapely Polygons</span>
+<span class="sd">        as_multipolygon: `numpy.ndarray`</span>
+<span class="sd">            Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :meth:`.BoundedRectGrid.to_shapely`</span>
+<span class="sd">        :meth:`.BoundedHexGrid.to_shapely`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cell_arr_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">vertices</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">multipoly_wkb</span> <span class="o">=</span> <span class="n">shapes</span><span class="o">.</span><span class="n">multipolygon_wkb</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span>
+        <span class="n">multipoly</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">from_wkb</span><span class="p">(</span><span class="n">multipoly_wkb</span><span class="o">.</span><span class="n">hex</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">as_multipolygon</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">multipoly</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">multipoly</span><span class="o">.</span><span class="n">geoms</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cell_arr_shape</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BaseGrid.interp_from_points">
+<a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points">[docs]</a>
+    <span class="k">def</span> <span class="nf">interp_from_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
+
+<span class="sd">        This function turns any set of points at arbitrary location into a regularly spaced :class:`.BoundedGrid`</span>
+<span class="sd">        that has the properties of the current :class:`.BaseGrid` (``self``).</span>
+<span class="sd">        :meth:`.BoundedGrid.interpolate` works in the other direction, where a values on a :class:`.BoundedGrid`</span>
+<span class="sd">        are sampled in order to obtain values at arbitrary location.</span>
+
+<span class="sd">        .. Note ::</span>
+<span class="sd">            This function is significantly slower than :meth:`.BoundedGrid.interpolate`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        point: `numpy.ndarray`</span>
+<span class="sd">            A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</span>
+<span class="sd">        values: `numpy.ndarray`</span>
+<span class="sd">            The values corresponding to the supplied `points`, used as input for interpolation</span>
+<span class="sd">        method: :class:`str`</span>
+<span class="sd">            The interpolation method to be used. Options are (&quot;nearest&quot;, &quot;linear&quot;, &quot;cubic&quot;). Default: &quot;linear&quot;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.BoundedGrid`</span>
+<span class="sd">            A Bounded version of the supplied grid where the data is interpolated between the supplied points.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :py:meth:`.BoundedGrid.resample`</span>
+<span class="sd">        :py:meth:`.BoundedGrid.interpolate`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="n">method_lut</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">nearest</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">NearestNDInterpolator</span><span class="p">,</span>
+            <span class="n">linear</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">LinearNDInterpolator</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span>
+            <span class="p">),</span>
+            <span class="n">cubic</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
+                <span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">CloughTocher2DInterpolator</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method_lut</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="nb">min</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+        <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">interp_values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+            <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">)</span>
+
+        <span class="n">interp_func</span> <span class="o">=</span> <span class="n">method_lut</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+        <span class="n">nodata_mask</span> <span class="o">=</span> <span class="n">values</span> <span class="o">==</span> <span class="n">nodata_value</span>
+
+        <span class="n">interpolator</span> <span class="o">=</span> <span class="n">interp_func</span><span class="p">(</span>
+            <span class="n">points</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
+            <span class="n">values</span><span class="p">[</span><span class="o">~</span><span class="n">nodata_mask</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">centroids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">ids</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+
+        <span class="n">interp_values</span><span class="o">.</span><span class="n">ravel</span><span class="p">()[:]</span> <span class="o">=</span> <span class="n">interpolator</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
+        <span class="n">grid_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">interp_values</span><span class="p">,</span>
+            <span class="n">bounds</span><span class="o">=</span><span class="n">aligned_bounds</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+            <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_shape&quot;</span><span class="p">):</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shape</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span><span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.7.1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

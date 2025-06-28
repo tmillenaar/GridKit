@@ -1,0 +1,49 @@
+
+:orphan:
+
+.. _sphx_glr_example_gallery_grid_definitions_sg_execution_times:
+
+
+Computation times
+=================
+**00:05.257** total execution time for 5 files **from example_gallery/grid_definitions**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_rotation_animation.py` (``rotation_animation.py``)
+     - 00:03.571
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_rotated_grids.py` (``rotated_grids.py``)
+     - 00:00.684
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py` (``triangles_in_hexes.py``)
+     - 00:00.473
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``)
+     - 00:00.276
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_tiles.py` (``tiles.py``)
+     - 00:00.253
+     - 0.0

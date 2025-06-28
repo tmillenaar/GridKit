@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Release notes &mdash; GridKit v0.12.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=cae63847"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.12.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-12-0-may-10-2024">Version 0.12.0 (May 10, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-11-1-june-01-2024">Version 0.11.1 (June 01, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-11-0-may-29-2024">Version 0.11.0 (May 29, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-10-0-april-21-2024">Version 0.10.0 (April 21, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-2-april-03-2024">Version 0.9.2 (April 03, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-1-march-17-2024">Version 0.9.1 (March 17, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-9-0-march-10-2024">Version 0.9.0 (March 10, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-8-0-march-03-2024">Version 0.8.0 (March 03, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-7-3-february-25-2024">Version 0.7.3 (February 25, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-7-2-february-18-2024">Version 0.7.2 (February 18, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-7-1-february-11-2024">Version 0.7.1 (February 11, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-7-0-february-04-2024">Version 0.7.0 (February 04, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-6-0-january-07-2024">Version 0.6.0 (January 07, 2024)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-1-october-08-2023">Version 0.5.1 (October 08, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-5-0-october-01-2023">Version 0.5.0 (October 01, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-8-september-18-2023">Version 0.4.8 (September 18, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-7-september-10-2023">Version 0.4.7 (September 10, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-6-september-4-2023">Version 0.4.6 (September 4, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-5-august-27-2023">Version 0.4.5 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-4-august-27-2023">Version 0.4.4 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-3-august-27-2023">Version 0.4.3 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-2-august-27-2023">Version 0.4.2 (August 27, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-1-august-20-2023">Version 0.4.1 (August 20, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-4-0-august-13-2023">Version 0.4.0 (August 13, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-1-july-23-2023">Version 0.3.1 (July 23, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-3-0-july-16-2023">Version 0.3.0 (July 16, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-2-0-july-10-2023">Version 0.2.0 (July 10, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-1-march-17-2023">Version 0.1.1 (March 17, 2023)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-0-1-0-march-17-2023">Version 0.1.0 (March 17, 2023)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.12.0).<br>
+      Latest version: <a href="../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Release notes</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/release_notes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="release-notes">
+<span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
+<section id="version-0-12-0-may-10-2024">
+<h2>Version 0.12.0 (May 10, 2024)<a class="headerlink" href="#version-0-12-0-may-10-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Featrures</dt><dd><ul class="simple">
+<li><p>Create a new grid with a smaller gridsize that fits perfectily inside the orignal grid using <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.subdivide" title="gridkit.tri_grid.TriGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.subdivide()</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.subdivide" title="gridkit.rect_grid.RectGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.subdivide()</span></code></a> or <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.subdivide" title="gridkit.hex_grid.HexGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.subdivide()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add tip to <a class="reference internal" href="example_gallery/grid_definitions/triangles_in_hexes.html#example-triangles-in-hexes"><span class="std std-ref">triangles_in_hexes.py</span></a> hinting to the use of the new <code class="docutils literal notranslate"><span class="pre">subdivide</span></code> and <code class="docutils literal notranslate"><span class="pre">anchor</span></code> methods.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-11-1-june-01-2024">
+<h2>Version 0.11.1 (June 01, 2024)<a class="headerlink" href="#version-0-11-1-june-01-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add method <code class="docutils literal notranslate"><span class="pre">anchor</span></code> to Bounded Grids (grids with data) that resamples the data after shifting, see <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.anchor" title="gridkit.tri_grid.BoundedTriGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedTriGrid.anchor()</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.anchor" title="gridkit.rect_grid.BoundedRectGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.anchor()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.anchor" title="gridkit.hex_grid.BoundedHexGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.anchor()</span></code></a></p></li>
+<li><p>Shift nearby corner to specified location using <code class="docutils literal notranslate"><span class="pre">cell_element=&quot;corner&quot;</span></code> in <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a> and their bounded equavalents mentioned above</p></li>
+<li><p>Add an easy method to access all important paramers defining the grid: <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.definition" title="gridkit.base_grid.BaseGrid.definition"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.definition()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-11-0-may-29-2024">
+<h2>Version 0.11.0 (May 29, 2024)<a class="headerlink" href="#version-0-11-0-may-29-2024" title="Link to this heading"></a></h2>
+<dl class="simple" id="release-notes-v0-11-0">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Easier shifting of grids using <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fix issue in HexGrid where offsets were incorrectly applied when the supplied offsets were not between 0:cell size</p></li>
+<li><p>Fix ‘flat’ HexGrids rotating in the other direction</p></li>
+<li><p>Fix error regarding the datatype when supplying the offset for a TriGrid as a non-tuple iterable such as a list or numpy array</p></li>
+<li><p>Fix <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.hex_grid.HexGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cell_at_point()</span></code></a> not properly taking x-offset into account</p></li>
+<li><p>Fix issue where the offset would flip for ‘flat’ HexGrids when using the offset setter but not when calling <cite>grid.update(offset=new_offset)</cite></p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Simplify centering of grids in examples <a class="reference internal" href="example_gallery/cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">selecting_cells.py</span></a>, <a class="reference internal" href="example_gallery/grid_definitions/rotation_animation.html#example-rotated-animation"><span class="std std-ref">rotation_animation.py</span></a> and <a class="reference internal" href="example_gallery/grid_definitions/hex_grids.html#example-hexagon-grids"><span class="std std-ref">rotation_animation.py</span></a></p></li>
+</ul>
+</dd>
+<dt>Deprecations</dt><dd><ul class="simple">
+<li><p>‘flat’ <code class="docutils literal notranslate"><span class="pre">shape</span></code> for HexGrid will be deprecated in favor of <code class="docutils literal notranslate"><span class="pre">rotation</span></code> in v1.0.0. A warning will be raised on class initiation.</p></li>
+</ul>
+</dd>
+<dt>Known Issues</dt><dd><ul class="simple">
+<li><p>The implementation of ‘flat’ HexGrids is done by swapping the x and y axes compared to a ‘pointy’ grid.
+With this release, several issues related to the offset were fixed, but this implementation aspect now leaks into the offset.
+This means the user might specify an offset of (0,1) and expect a shift of 1 in the y-axis but the shift occurs in the x-axis.
+Since ‘flat’ HexGrids will be deprecated in release v1.0.0, fixing this is not worth the effort, meaning this leaky abstraction will be deliberately ignored.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-10-0-april-21-2024">
+<h2>Version 0.10.0 (April 21, 2024)<a class="headerlink" href="#version-0-10-0-april-21-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.sort" title="gridkit.index.GridIndex.sort"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.sort()</span></code></a></p></li>
+<li><p>Allow plotting of RGB(A) values in <a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">doc_utils.plot_polygons()</span></code></a></p></li>
+<li><p>Improve performance of <a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">doc_utils.plot_polygons()</span></code></a></p></li>
+<li><p>Improve performance of initializing a new <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> if the supplied indices are already in an appropriate numpy integer ndarray.</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fix incorrect <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a> and by extension <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.base_grid.BaseGrid.neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.neighbours()</span></code></a> for <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> when supplying multiple grid indices at a time</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/cell_centric_operations/2d_diff_hex_anim.html#example-diffusion"><span class="std std-ref">2d_diff_hex_anim.py</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-9-2-april-03-2024">
+<h2>Version 0.9.2 (April 03, 2024)<a class="headerlink" href="#version-0-9-2-april-03-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add new initialization argument <code class="docutils literal notranslate"><span class="pre">area</span></code> to <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> for specifying the cell area of the grid</p></li>
+<li><p>Add new property <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.area" title="gridkit.base_grid.BaseGrid.area"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.area()</span></code></a></p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">shape</span></code> to <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> to further unify the class API between the three grid types</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Prevent passing rotation argument to Bounded grids, which were not designed with rotation in mind because that breaks the tiling.</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Update example <a class="reference internal" href="example_gallery/raster_operations/resampling.html#example-resampling"><span class="std std-ref">resampling.py</span></a></p></li>
+<li><p>Improve docstrings about initialization of <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-9-1-march-17-2024">
+<h2>Version 0.9.1 (March 17, 2024)<a class="headerlink" href="#version-0-9-1-march-17-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Change the following attributes using a setter: <code class="docutils literal notranslate"><span class="pre">rotation</span></code>, <code class="docutils literal notranslate"><span class="pre">offset</span></code> and (<code class="docutils literal notranslate"><span class="pre">size</span></code> for <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>) or (<code class="docutils literal notranslate"><span class="pre">dx</span></code> and <code class="docutils literal notranslate"><span class="pre">dy</span></code> for <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>)</p></li>
+<li><p>Add <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_height" title="gridkit.base_grid.BaseGrid.cell_height"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_height()</span></code></a> and <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_width" title="gridkit.base_grid.BaseGrid.cell_width"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_width()</span></code></a></p></li>
+<li><p>Add <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.update" title="gridkit.base_grid.BaseGrid.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.update()</span></code></a> method for easily making small changes to grid specs</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">offset</span></code> is now properly taken into account for <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.hex_grid.HexGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cell_at_point()</span></code></a></p></li>
+<li><p>Less restrictive offsets by limiting offset for all grids with <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_height" title="gridkit.base_grid.BaseGrid.cell_height"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_height()</span></code></a> and <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_width" title="gridkit.base_grid.BaseGrid.cell_width"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_width()</span></code></a> instead of dx and dy.</p></li>
+<li><p>Rotation of “flat” <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> is no longer in the opposite direction (was clockwise)</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/grid_definitions/rotation_animation.html#example-rotated-animation"><span class="std std-ref">rotation_animation.py</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-9-0-march-10-2024">
+<h2>Version 0.9.0 (March 10, 2024)<a class="headerlink" href="#version-0-9-0-march-10-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>Rotation for <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a></dt><dd><ul>
+<li><p>Note: not for the bounded versions</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>Fixes:</dt><dd><ul class="simple">
+<li><p>Fixed <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_near_point" title="gridkit.rect_grid.RectGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.cells_near_point()</span></code></a> returning incorrect cells for negative points</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/grid_definitions/rotated_grids.html#example-rotated-grids"><span class="std std-ref">rotated_grids.py</span></a>.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-8-0-march-03-2024">
+<h2>Version 0.8.0 (March 03, 2024)<a class="headerlink" href="#version-0-8-0-march-03-2024" title="Link to this heading"></a></h2>
+<dl>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Return <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> from <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point" title="gridkit.hex_grid.HexGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cells_near_point()</span></code></a></p></li>
+<li><p>Align return shape of index <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_near_point" title="gridkit.rect_grid.RectGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.cells_near_point()</span></code></a> with those of <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cells_near_point" title="gridkit.tri_grid.TriGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cells_near_point()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point" title="gridkit.hex_grid.HexGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cells_near_point()</span></code></a> (!API change)</p></li>
+<li><p>Allow multi-dimensional input and returns form method <cite>cells_near_point</cite> on the three grid types</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul>
+<li><p>Move the following methods to Rust:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cells_near_point" title="gridkit.rect_grid.RectGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.cells_near_point()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point" title="gridkit.hex_grid.HexGrid.cells_near_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cells_near_point()</span></code></a></p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-7-3-february-25-2024">
+<h2>Version 0.7.3 (February 25, 2024)<a class="headerlink" href="#version-0-7-3-february-25-2024" title="Link to this heading"></a></h2>
+<dl>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Properly handle negative offsets in Rust grid classes</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul>
+<li><p>Move the following methods to Rust:</p>
+<blockquote>
+<div><blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.centroid" title="gridkit.rect_grid.RectGrid.centroid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.centroid()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cell_at_point" title="gridkit.rect_grid.RectGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.cell_at_point()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.cell_corners" title="gridkit.rect_grid.RectGrid.cell_corners"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.cell_corners()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid" title="gridkit.hex_grid.HexGrid.centroid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.centroid()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.hex_grid.HexGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cell_at_point()</span></code></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_corners" title="gridkit.hex_grid.HexGrid.cell_corners"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.cell_corners()</span></code></a></p></li>
+</ul>
+</div></blockquote>
+<p>This is done in preparation of rotation of un-bounded grids and provides a minor speedup.</p>
+</div></blockquote>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-7-2-february-18-2024">
+<h2>Version 0.7.2 (February 18, 2024)<a class="headerlink" href="#version-0-7-2-february-18-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">GridIndex._1d_view</span></code> with <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a>, which is an int64 instead of a custom data type.</p></li>
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">index._nd_view</span></code> with <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.from_index_1d" title="gridkit.index.GridIndex.from_index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.from_index_1d()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Remove redundant array allocation in <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cells_in_bounds" title="gridkit.tri_grid.TriGrid.cells_in_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cells_in_bounds()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Remove <code class="docutils literal notranslate"><span class="pre">dask_geopandas</span></code> dependency in example <a class="reference internal" href="example_gallery/vector_synergy/aggregate_dask.html#example-aggregate-dask"><span class="std std-ref">aggregate_dask.py</span></a>. Use <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a> instead.</p></li>
+<li><p>Use numpy array <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a> in example <a class="reference internal" href="example_gallery/vector_synergy/aggregate.html#example-aggregate"><span class="std std-ref">aggregate.py</span></a> instead of a python list of <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> objects.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-7-1-february-11-2024">
+<h2>Version 0.7.1 (February 11, 2024)<a class="headerlink" href="#version-0-7-1-february-11-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Remove allocation of unused array</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add building of Rust binary to the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">contributing guide</span></a></p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Improve performance of <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-7-0-february-04-2024">
+<h2>Version 0.7.0 (February 04, 2024)<a class="headerlink" href="#version-0-7-0-february-04-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid" title="gridkit.tri_grid.BoundedTriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a></p></li>
+<li><p>Improved performance of linear resampling for <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></p></li>
+<li><p>“inverse_distance” interpolation method for <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a> and <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fixed incorrect cell returned for points in <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_at_point" title="gridkit.tri_grid.TriGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cell_at_point()</span></code></a> near the cell edge</p></li>
+<li><p>Allow for nd input in <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.cell_at_point" title="gridkit.tri_grid.TriGrid.cell_at_point"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.cell_at_point()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-6-0-january-07-2024">
+<h2>Version 0.6.0 (January 07, 2024)<a class="headerlink" href="#version-0-6-0-january-07-2024" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a> (Only base variant, BoundedTriGrid is yet to come)</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a> now properly handles ND input</p></li>
+<li><p><a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a> now properly handles ND input</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/grid_definitions/triangles_in_hexes.html#example-triangles-in-hexes"><span class="std std-ref">triangles_in_hexes.py</span></a></p></li>
+<li><p><a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">doc_utils.plot_polygons()</span></code></a> used in examples now plots both lines and filled polygons</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Add Rust bindings using the maturin package</p></li>
+<li><p>Renamed the test rasters used in example <a class="reference internal" href="example_gallery/raster_operations/ndvi.html#example-ndvi"><span class="std std-ref">ndvi.py</span></a> because Windows failed on special characters in the name</p></li>
+<li><p>Put index as first argument instead of second in <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>CICD</dt><dd><ul class="simple">
+<li><p>Retire setup.py in favour of pyproject.toml</p></li>
+<li><p>Build package using maturin</p></li>
+<li><p>Test deploy for linux, macos and windows before uploading the sdist to PyPi</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-5-1-october-08-2023">
+<h2>Version 0.5.1 (October 08, 2023)<a class="headerlink" href="#version-0-5-1-october-08-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a> now returns single Polygon if a single GridIndex was supplied</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/vector_synergy/aggregate_dask.html#example-aggregate-dask"><span class="std std-ref">aggregate_dask.py</span></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-5-0-october-01-2023">
+<h2>Version 0.5.0 (October 01, 2023)<a class="headerlink" href="#version-0-5-0-october-01-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Make return argument <cite>shape</cite> optional in <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_in_bounds" title="gridkit.base_grid.BaseGrid.cells_in_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cells_in_bounds()</span></code></a> by adding the <cite>return_cell_shape</cite> argument (default False)</p></li>
+<li><p>Structure the <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> returned by <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_in_bounds" title="gridkit.base_grid.BaseGrid.cells_in_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cells_in_bounds()</span></code></a> in the shape of the grid (2D)</p></li>
+<li><p>Now the return shape of <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a> is the same as the input shape of the <cite>index</cite> argument (if <cite>as_multipolygon</cite> is <cite>False</cite>)</p></li>
+<li><p>Allow <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.centroid" title="gridkit.rect_grid.BoundedRectGrid.centroid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.centroid()</span></code></a> to be called without specifying the <cite>index</cite> argument, use the cells in it’s bounds by default</p></li>
+<li><p>Better error when <cite>index</cite> is not supplied to <cite>centroid</cite> method on grids that are not bounded</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Remove placeholder methods that no longer fit the curent API</p></li>
+<li><p>Add tests for <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p></li>
+<li><p>Add tests for <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_corners" title="gridkit.base_grid.BaseGrid.cell_corners"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.cell_corners()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-8-september-18-2023">
+<h2>Version 0.4.8 (September 18, 2023)<a class="headerlink" href="#version-0-4-8-september-18-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add methods <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_bounded" title="gridkit.rect_grid.RectGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_bounded()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_bounded" title="gridkit.hex_grid.HexGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_bounded()</span></code></a> to turn an infinite grid into a bounded grid.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-7-september-10-2023">
+<h2>Version 0.4.7 (September 10, 2023)<a class="headerlink" href="#version-0-4-7-september-10-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.concat" title="gridkit.index.concat"><code class="xref py py-meth docutils literal notranslate"><span class="pre">concat()</span></code></a> for combining <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> objects</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Fixed problems related to slicing ‘flat’ <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> objects</p></li>
+<li><p>Swap formerly incorrect <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.height" title="gridkit.hex_grid.BoundedHexGrid.height"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.height()</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.width" title="gridkit.hex_grid.BoundedHexGrid.width"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.width()</span></code></a> for ‘flat’ <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> objects</p></li>
+<li><p>Fixed nesting issue in menu navigation</p></li>
+<li><p>Add colorbars to example <a class="reference internal" href="example_gallery/raster_operations/parial_overlap.html#example-partial-overlap"><span class="std std-ref">partial_overlap.py</span></a></p></li>
+<li><p>Simplify example <a class="reference internal" href="example_gallery/raster_operations/elevation_distribution_per_land_cover.html#example-elevation-distribution-landcover"><span class="std std-ref">elevation_distribution_per_landcover.py</span></a></p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Add basic tests for statistical functions <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum" title="gridkit._statistical_functions.sum"><code class="xref py py-func docutils literal notranslate"><span class="pre">sum()</span></code></a>, <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean" title="gridkit._statistical_functions.mean"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>CICD</dt><dd><ul class="simple">
+<li><p>Allow for manual triggering of documentation pipeline</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-6-september-4-2023">
+<h2>Version 0.4.6 (September 4, 2023)<a class="headerlink" href="#version-0-4-6-september-4-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Make ‘index’ argument optional in <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value" title="gridkit.bounded_grid.BoundedGrid.value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.value()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add example <a class="reference internal" href="example_gallery/raster_operations/parial_overlap.html#example-partial-overlap"><span class="std std-ref">partial_overlap.py</span></a></p></li>
+<li><p>Update the way docs are build in the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">contributing guide</span></a></p></li>
+<li><p>Improve docstring of <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value" title="gridkit.bounded_grid.BoundedGrid.value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.value()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-5-august-27-2023">
+<h2>Version 0.4.5 (August 27, 2023)<a class="headerlink" href="#version-0-4-5-august-27-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Replace all mentions of <code class="docutils literal notranslate"><span class="pre">read_geotiff</span></code> in example gallery to <code class="docutils literal notranslate"><span class="pre">write_geotiff</span></code></p></li>
+<li><p>build docs without referencing setup.py</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Add test to verify if the documentation builds succesfully</p></li>
+<li><p>Add docs_require to tests_require in setup.py</p></li>
+<li><p>remove restriction on sphinx version</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-4-august-27-2023">
+<h2>Version 0.4.4 (August 27, 2023)<a class="headerlink" href="#version-0-4-4-august-27-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Add missing matplotlib to docs_require</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-3-august-27-2023">
+<h2>Version 0.4.3 (August 27, 2023)<a class="headerlink" href="#version-0-4-3-august-27-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Pin sphinx version to prevent docs build step from erroring</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-2-august-27-2023">
+<h2>Version 0.4.2 (August 27, 2023)<a class="headerlink" href="#version-0-4-2-august-27-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">to_crs</span></code> on <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> and <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> (only worked on bounded equivalents)</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Improved docstrings for <code class="docutils literal notranslate"><span class="pre">to_crs</span></code> on <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>,  <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> and  <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a></p></li>
+<li><p>Add docstrings to <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_raster" title="gridkit.io.read_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_raster()</span></code></a> and <a class="reference internal" href="api/gridkit.io.html#gridkit.io.write_raster" title="gridkit.io.write_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">write_raster()</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>Import <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>, <a class="reference internal" href="api/gridkit.index.html#gridkit.index.validate_index" title="gridkit.index.validate_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_index()</span></code></a>, <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a>, <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> as part of gridkit to make for more convenient importing (eg <cite>from gridkit import HexGrid</cite>)</p></li>
+<li><p>Move pytest and matplotlib requirements from requirements.txt to tests_require in setup.py</p></li>
+<li><p>Rename <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_geotiff" title="gridkit.io.read_geotiff"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_geotiff()</span></code></a> to <a class="reference internal" href="api/gridkit.io.html#gridkit.io.read_raster" title="gridkit.io.read_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_raster()</span></code></a>. The former will be deprecated in a future release.</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-1-august-20-2023">
+<h2>Version 0.4.1 (August 20, 2023)<a class="headerlink" href="#version-0-4-1-august-20-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>make <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> hashable so it works as pandas index</p></li>
+<li><p>remove any empty axis on <a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> initialization</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>create example script <a class="reference internal" href="example_gallery/vector_synergy/aggregate.html#example-aggregate"><span class="std std-ref">aggregate.py</span></a></p></li>
+<li><p>rename <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">interactions</span></code> section to <code class="docutils literal notranslate"><span class="pre">Vector</span> <span class="pre">data</span> <span class="pre">interactions</span></code></p></li>
+<li><p>create <code class="docutils literal notranslate"><span class="pre">doc_utils.py</span></code> to contain helper functions for plotting and input generation used in examples</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-4-0-august-13-2023">
+<h2>Version 0.4.0 (August 13, 2023)<a class="headerlink" href="#version-0-4-0-august-13-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> class to unify index representation</p></li>
+<li><p><a class="reference internal" href="api/gridkit.index.html#gridkit.index.validate_index" title="gridkit.index.validate_index"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_index()</span></code></a> decorator to turn any index represetntation into a GridIndex on function call</p></li>
+<li><p>Operations that return grid indices now return GridIndex instances instead of numpy arrays</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-3-1-july-23-2023">
+<h2>Version 0.3.1 (July 23, 2023)<a class="headerlink" href="#version-0-3-1-july-23-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>add <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id" title="gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">numpy_id_to_grid_id()</span></code></a> to <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></p></li>
+<li><p>add <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id" title="gridkit.hex_grid.BoundedHexGrid.grid_id_to_numpy_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">grid_id_to_numpy_id()</span></code></a> to <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a></p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>resolve shift in data when using comparisson and mathematical operators on BoudedHexGrid</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add examle on coordinate transformations</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-3-0-july-16-2023">
+<h2>Version 0.3.0 (July 16, 2023)<a class="headerlink" href="#version-0-3-0-july-16-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Resample method for BoundedHexGrid</p></li>
+<li><p>Bilinear interpolation method for BoundedHexGrid</p></li>
+<li><p>Split <code class="docutils literal notranslate"><span class="pre">Interpolate</span></code> method from <code class="docutils literal notranslate"><span class="pre">resample</span></code> method</p></li>
+<li><p>Codecov integration</p></li>
+</ul>
+</dd>
+<dt>CICD</dt><dd><ul class="simple">
+<li><p>black and isort checks in test pipeline</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>Add missing docstrings to resample method</p></li>
+</ul>
+</dd>
+<dt>Misc</dt><dd><ul class="simple">
+<li><p>reformat python files using black and isort</p></li>
+<li><p>move <code class="docutils literal notranslate"><span class="pre">Resample</span></code> method one step up in the inheritance hierarchy, to BoundedGrid</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-2-0-july-10-2023">
+<h2>Version 0.2.0 (July 10, 2023)<a class="headerlink" href="#version-0-2-0-july-10-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Add hex_grid.HexGrid class</p></li>
+<li><p>Add hex_grid.BoundedHexGrid class</p></li>
+<li><p><cite>to_shapely()</cite> on bounded grids returns the shapes in the bounds when no index is supplied</p></li>
+<li><p>add action for pytest and doctest on push</p></li>
+<li><p>turn bounded_grid.indices into a property</p></li>
+</ul>
+</dd>
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>set proper version when documentation is build</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>build documentation when tagged instead of merged in main</p></li>
+<li><p>add example “Hexagon grids”</p></li>
+<li><p>add example “Cell selection using other grids”</p></li>
+<li><p>add example “Resampling”</p></li>
+<li><p>use hexagons instead of squares in example “Interpolate from points”</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-1-1-march-17-2023">
+<h2>Version 0.1.1 (March 17, 2023)<a class="headerlink" href="#version-0-1-1-march-17-2023" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li><p>Fix <cite>__version__`</cite> missing an ending quotation mark</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="version-0-1-0-march-17-2023">
+<h2>Version 0.1.0 (March 17, 2023)<a class="headerlink" href="#version-0-1-0-march-17-2023" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>release first version to PyPi</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.12.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,897 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tile &mdash; GridKit dev documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=3ce10a4d"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tri_grid" href="gridkit.tri_grid.html" />
+    <link rel="prev" title="rect_grid" href="gridkit.rect_grid.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GridKit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gridkit.html">gridkit</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.doc_utils.html">doc_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.index.html">index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.rect_grid.html">rect_grid</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">tile</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.get_value_dtype"><code class="docutils literal notranslate"><span class="pre">get_value_dtype()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.Tile"><code class="docutils literal notranslate"><span class="pre">Tile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.DataTile"><code class="docutils literal notranslate"><span class="pre">DataTile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.combine_tiles"><code class="docutils literal notranslate"><span class="pre">combine_tiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.count_tiles"><code class="docutils literal notranslate"><span class="pre">count_tiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.sum_data_tiles"><code class="docutils literal notranslate"><span class="pre">sum_data_tiles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.tile.average_data_tiles"><code class="docutils literal notranslate"><span class="pre">average_data_tiles()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.tri_grid.html">tri_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.version.html">version</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #f5dfed;
+        color:#2d2c2e;
+        padding: 1em;
+        border-bottom: 2px solid #ecacfa;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing the <strong>development version</strong> of the documentation (dev).<br>
+      This is the bleeding edge. Changes might not yet be released and may be changed or reverted.
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API reference</a></li>
+          <li class="breadcrumb-item"><a href="gridkit.html">gridkit</a></li>
+      <li class="breadcrumb-item active">tile</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/gridkit.tile.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gridkit.tile">
+<span id="tile"></span><h1>tile<a class="headerlink" href="#module-gridkit.tile" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.tile.get_value_dtype">
+<span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">get_value_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#get_value_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.get_value_dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gridkit.tile.Tile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">Tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><span class="pre">BaseGrid</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><span class="pre">GridIndex</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A Tile describes a set of cells defined by the <code class="docutils literal notranslate"><span class="pre">start_id</span></code>,
+which is the cell that defines the bottom-left corner of the tile,
+and <code class="docutils literal notranslate"><span class="pre">nx</span></code> and <code class="docutils literal notranslate"><span class="pre">ny</span></code>, which are the number of cells in the x and y directions, respectively.</p>
+<p>Each tile is associated with a particular grid and the Tile refers to a selection
+of grid indices on that grid. The associated grid can be accessed using the <code class="docutils literal notranslate"><span class="pre">.grid</span></code> property.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">nx</span></code> and <code class="docutils literal notranslate"><span class="pre">ny</span></code> can be seen as ‘right’ and ‘up’, respectively, when the rotation of the grid is zero.
+If the grid is rotated, the tile rotates with it (naturally).
+This means that for a grid that is rotated 90 degrees,
+<code class="docutils literal notranslate"><span class="pre">nx</span></code> refers to the number of cells up, and <code class="docutils literal notranslate"><span class="pre">ny</span></code> refers to the number of cells to the left.</p>
+</div>
+<section id="init-parameters">
+<h2>Init parameters<a class="headerlink" href="#init-parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>grid: <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></dt><dd><p>The <a class="reference internal" href="gridkit.tri_grid.html#gridkit.tri_grid.TriGrid" title="gridkit.tri_grid.TriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriGrid</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a> or <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.hex_grid.HexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">HexGrid</span></code></a> the tile is associated with</p>
+</dd>
+<dt>start_id: Union[Tuple[int, int], GridIndex]</dt><dd><p>The starting cell of the Tile.
+The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.</p>
+</dd>
+<dt>nx: int</dt><dd><p>The number of cells in x direction, starting from the <code class="docutils literal notranslate"><span class="pre">start_id</span></code></p>
+</dd>
+<dt>ny: int</dt><dd><p>The number of cells in y direction, starting from the <code class="docutils literal notranslate"><span class="pre">start_id</span></code></p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.from_pyo3_tile">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pyo3_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pyo3_tile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.from_pyo3_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.from_pyo3_tile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.to_data_tile">
+<span class="sig-name descname"><span class="pre">to_data_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.to_data_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.to_data_tile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.to_data_tile_with_value">
+<span class="sig-name descname"><span class="pre">to_data_tile_with_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fill_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.to_data_tile_with_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.to_data_tile_with_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.start_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_id</span></span><a class="headerlink" href="#gridkit.tile.Tile.start_id" title="Link to this definition"></a></dt>
+<dd><p>The starting cell of the Tile.
+The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.nx">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nx</span></span><a class="headerlink" href="#gridkit.tile.Tile.nx" title="Link to this definition"></a></dt>
+<dd><p>The number of cells in x direction, starting from the <code class="docutils literal notranslate"><span class="pre">start_id</span></code></p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.ny">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ny</span></span><a class="headerlink" href="#gridkit.tile.Tile.ny" title="Link to this definition"></a></dt>
+<dd><p>The number of cells in y direction, starting from the <code class="docutils literal notranslate"><span class="pre">start_id</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.corner_ids">
+<span class="sig-name descname"><span class="pre">corner_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.corner_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.corner_ids" title="Link to this definition"></a></dt>
+<dd><p>The ids at the corners of the Tile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> that contains the ids of the cells at
+the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
+(assuming the assicaited grid is not rotated)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.corners">
+<span class="sig-name descname"><span class="pre">corners</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.corners" title="Link to this definition"></a></dt>
+<dd><p>The coordinates at the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
+(assuming the assicaited grid is not rotated)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A two-dimensional array that contais the x and y coordinates of the corners</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.indices">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">indices</span></span><a class="headerlink" href="#gridkit.tile.Tile.indices" title="Link to this definition"></a></dt>
+<dd><p>The ids of all cells in the Tile.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> that contains the indices in the Tile</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.mpl_extent">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mpl_extent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">tuple</span></em><a class="headerlink" href="#gridkit.tile.Tile.mpl_extent" title="Link to this definition"></a></dt>
+<dd><p>Raster Bounds</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The extent of the data as defined expected by matplotlib in (left, right, bottom, top) or equivalently (min-x, max-x, min-y, max-y)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.intersects">
+<span class="sig-name descname"><span class="pre">intersects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.intersects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.intersects" title="Link to this definition"></a></dt>
+<dd><p>Only checks bounds, not grid type, alignment etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.centroid">
+<span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.centroid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.overlap">
+<span class="sig-name descname"><span class="pre">overlap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.overlap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.overlap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.to_shapely">
+<span class="sig-name descname"><span class="pre">to_shapely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_multipolygon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.to_shapely"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.to_shapely" title="Link to this definition"></a></dt>
+<dd><p>Refer to parent method <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p>
+<dl class="simple">
+<dt>Difference with parent method:</dt><dd><p><cite>index</cite> is optional.
+If <cite>index</cite> is None (default) the cells containing data are used as the <cite>index</cite> argument.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.tile_id_to_grid_id">
+<span class="sig-name descname"><span class="pre">tile_id_to_grid_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.tile_id_to_grid_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.tile_id_to_grid_id" title="Link to this definition"></a></dt>
+<dd><p>Convert the index referring to a cell from the tile reference frame to that of the grid.
+The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+but depending on where in the world the tile is placed it can have any starting value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tile_id</strong> (<em>Tuple</em>) – The tile index in the format: ((y0, y1, y2), (x0, x1, x2)).
+If None, return a GridIndex that includes all cells in the tile.</p></li>
+<li><p><strong>oob_value</strong> (<em>int</em>) – The value to assign to indices not in the tile. Default: maximum numpy.in64 value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index referring to the same cell but in grid coordinates instead of tile coordinates</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Let’s first start by creating a data_tile that we can sample using either grid ids or tile ids.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">RectGrid</span><span class="p">,</span> <span class="n">Tile</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nx</span> <span class="o">=</span> <span class="n">ny</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tile</span> <span class="o">=</span> <span class="n">Tile</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">start_id</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">nx</span><span class="o">=</span><span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="n">ny</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ny</span><span class="o">*</span><span class="n">nx</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ny</span><span class="p">,</span><span class="n">nx</span><span class="p">)</span> <span class="c1"># Note that numpy indexes in the form (y,x)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_tile</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">to_data_tile</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_tile</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+<span class="go">[[ 0  1  2  3]</span>
+<span class="go"> [ 4  5  6  7]</span>
+<span class="go"> [ 8  9 10 11]</span>
+<span class="go"> [12 13 14 15]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tile_ids</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid_ids</span> <span class="o">=</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">tile_id_to_grid_id</span><span class="p">(</span><span class="n">tile_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">grid_ids</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="go">[[4 5]</span>
+<span class="go"> [3 4]</span>
+<span class="go"> [2 3]]</span>
+</pre></div>
+</div>
+<p>Note the differnce in value due to the tile’s start_id of (2,3), as well as the difference in array shape.</p>
+<p>The method <cite>tile_id_to_grid_id</cite> exists on both Tile and DataTile objects.
+The tile and data_tile here are at the same location on the grid,
+the difference is just that the data_tile has data.
+Doing the id conversion should yield the same result in both cases.</p>
+<p>The value obtained from data_tile.value using the grid_id should be the same as obtaining
+the value from data_tile.to_numpy() using the tile_ids.
+You can shorthand this by just indexing directly on the data_tile.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">grid_ids</span> <span class="o">==</span> <span class="n">tile</span><span class="o">.</span><span class="n">tile_id_to_grid_id</span><span class="p">(</span><span class="n">tile_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_tile</span><span class="p">[</span><span class="n">tile_ids</span><span class="p">])</span>
+<span class="go">[ 6  9 12]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">data_tile</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">grid_ids</span><span class="p">))</span>
+<span class="go">[ 6  9 12]</span>
+</pre></div>
+</div>
+<p>We should of course be able to get the tile_ids back using <a class="reference internal" href="#gridkit.tile.Tile.grid_id_to_tile_id" title="gridkit.tile.Tile.grid_id_to_tile_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.grid_id_to_tile_id()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reverted_tile_ids</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">grid_id_to_tile_id</span><span class="p">(</span><span class="n">grid_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">reverted_tile_ids</span><span class="p">)</span>
+<span class="go">(array([1, 2, 3]), array([2, 1, 0]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">tile_ids</span><span class="p">,</span> <span class="n">reverted_tile_ids</span><span class="p">)</span>
+</pre></div>
+</div>
+<p># We get a tuple of numpy arrays back instead of a tuple of tuples,
+# but numerically they are the same as the tuple we started with.
+# <a class="reference internal" href="#gridkit.tile.Tile.grid_id_to_tile_id" title="gridkit.tile.Tile.grid_id_to_tile_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.grid_id_to_tile_id()</span></code></a> always returns a tuple of arrays but
+# <a class="reference internal" href="#gridkit.tile.Tile.tile_id_to_grid_id" title="gridkit.tile.Tile.tile_id_to_grid_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.tile_id_to_grid_id()</span></code></a> accepts a tuple of lists, tuple of tuples or tuple of arrays.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#gridkit.tile.Tile.grid_id_to_tile_id" title="gridkit.tile.Tile.grid_id_to_tile_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.grid_id_to_tile_id()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.grid_id_to_tile_id">
+<span class="sig-name descname"><span class="pre">grid_id_to_tile_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9223372036854775807</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.grid_id_to_tile_id"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.grid_id_to_tile_id" title="Link to this definition"></a></dt>
+<dd><p>Convert the index referring to a cell from the grid reference frame to that of the tile.
+The tile id follows the numpy convention and is in the form [[y0, y1, y2], [x0, x1, x2]].
+The grid id is int the form [(x0, y0), (x1,y1), (x2, y2)].
+The tile id will start at the top-left at [0,0]. The grid id starts at the bottom left,
+but depending on where in the world the tile is placed it can have any starting value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The grid index in the form [(x0, y0), (x1,y1), (x2, y2)].
+If None, return the tile indices for each cell. Note that they are in raveled form.</p></li>
+<li><p><strong>oob_value</strong> (<em>int</em>) – The value to assign to indices not in the tile. Default: maximum numpy.in64 value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The index referring to the same cell but in tile coordinates instead of tile coordinates</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>For an elaborate example showing going from tile_id to grid_id and back, see <a class="reference internal" href="#gridkit.tile.Tile.tile_id_to_grid_id" title="gridkit.tile.Tile.tile_id_to_grid_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.tile_id_to_grid_id()</span></code></a></p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#gridkit.tile.Tile.tile_id_to_grid_id" title="gridkit.tile.Tile.tile_id_to_grid_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Tile.tile_id_to_grid_id()</span></code></a></p>
+</div>
+</dd></dl>
+
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">DataTile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#gridkit.tile.Tile" title="gridkit.tile.Tile"><span class="pre">Tile</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#gridkit.tile.Tile" title="gridkit.tile.Tile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tile</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.from_bounds_as_rect">
+<span class="sig-name descname"><span class="pre">from_bounds_as_rect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.from_bounds_as_rect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.from_bounds_as_rect" title="Link to this definition"></a></dt>
+<dd><p>Create a DataTile given a 2D numpy array on a rectangular grid.
+The location of the data is defined by the <cite>bounds</cite> paramter.
+The grid attributes such as the cell size are infered from the restrictions created
+by the dimensions of the data and the space available in the bounds.</p>
+<p>This approach assumes the bounding box, and by extension the created DataTile, is not rotated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (class:<cite>numpy.ndarray</cite>) – A 2D array with the data for the DataTile</p></li>
+<li><p><strong>bounds</strong> (<cite>tuple(minx, miny, maxx, maxy)</cite>) – The bounding box describing the location of the edges of the data in (minx, miny, maxx, maxy).
+If None, the dimensions of the <cite>data</cite> array will be used, resulting in a dx and dy of 1
+and the lower left corner of the Tile at the origin: (0,0).</p></li>
+<li><p><strong>nodata_value</strong> – A cell with this value is considered to be empty.
+If None, a default will be chosen based on the dtype of the <cite>data</cite> array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>class</strong> – A DataTile containing the suplied data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>.DataTile</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.from_interpolated_points">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_interpolated_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.from_interpolated_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.from_interpolated_points" title="Link to this definition"></a></dt>
+<dd><p>Create a DataTile based on the supplied <cite>grid</cite> that encapsulates the supplied <cite>points</cite>
+and assignes values to cells based on interpolated <cite>values</cite>. The size and location of the
+Tile are determined by the extent of the supplied <cite>points</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is significantly slower than <a class="reference internal" href="#gridkit.tile.DataTile.interpolate" title="gridkit.tile.DataTile.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataTile.interpolate()</span></code></a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid</strong> (class:<cite>.BaseGrid</cite>) – The grid on which to interpolate the data</p></li>
+<li><p><strong>points</strong> (<cite>numpy.ndarray</cite>) – A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</p></li>
+<li><p><strong>values</strong> (<cite>numpy.ndarray</cite>) – The values corresponding to the supplied <cite>points</cite>, used as input for interpolation</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The interpolation method to be used. Options are (“nearest”, “linear”, “cubic”). Default: “linear”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DataTile based on the supplied grid where the data is interpolated between the supplied points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tile.DataTile" title="gridkit.tile.DataTile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataTile</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>, <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">Grid.interp_from_points()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.dtype">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dtype</span></span><a class="headerlink" href="#gridkit.tile.DataTile.dtype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.astype">
+<span class="sig-name descname"><span class="pre">astype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.astype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.astype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.nodata_value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodata_value</span></span><a class="headerlink" href="#gridkit.tile.DataTile.nodata_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.is_nodata">
+<span class="sig-name descname"><span class="pre">is_nodata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.is_nodata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.is_nodata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.nodata_cells">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nodata_cells</span></span><a class="headerlink" href="#gridkit.tile.DataTile.nodata_cells" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.from_pyo3_data_tile">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pyo3_data_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pyo3_data_tile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.from_pyo3_data_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.from_pyo3_data_tile" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.to_numpy">
+<span class="sig-name descname"><span class="pre">to_numpy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.to_numpy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.to_numpy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ny</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.get_tile">
+<span class="sig-name descname"><span class="pre">get_tile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.get_tile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.get_tile" title="Link to this definition"></a></dt>
+<dd><p>A Tile object with the same properties as this DataTile, but without the data attached.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.corner_ids">
+<span class="sig-name descname"><span class="pre">corner_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.corner_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.corner_ids" title="Link to this definition"></a></dt>
+<dd><p>The ids at the corners of the Tile</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The <a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a> that contains the ids of the cells at
+the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
+(assuming the assicaited grid is not rotated)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.crop">
+<span class="sig-name descname"><span class="pre">crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crop_tile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.crop" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.value">
+<span class="sig-name descname"><span class="pre">value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oob_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.intersects">
+<span class="sig-name descname"><span class="pre">intersects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.intersects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.intersects" title="Link to this definition"></a></dt>
+<dd><p>Only checks bounds, not grid type, alignment etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.interpolate">
+<span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'nearest'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'bilinear'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'inverse_distance'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'nearest'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">interp_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.interpolate" title="Link to this definition"></a></dt>
+<dd><p>Interpolate the value at the location of <code class="docutils literal notranslate"><span class="pre">sample_points</span></code>.</p>
+<p>Points that are outside of the bounds of the tile are assigned <cite>self.nodata_value</cite>, or ‘NaN’ if no nodata value is set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample_points</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>) – The coordinates of the points at which to sample the data</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
+Supported methods:
+- “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+- “bilinear”, linear interpolation using the four cells surrounding the point
+- “inverse_distance”, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+Default: “nearest”</p></li>
+<li><p><strong>**interp_kwargs</strong> (<cite>dict</cite>) – The keyword argument passed to the interpolation function corresponding to the specified <cite>method</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interpolated values at the supplied points</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>, <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points" title="gridkit.base_grid.BaseGrid.interp_from_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.interp_from_points()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alignment_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">interp_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.resample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.resample" title="Link to this definition"></a></dt>
+<dd><p>Resample the grid onto another grid.
+This will take the locations of the grid cells of the other grid (here called <code class="docutils literal notranslate"><span class="pre">alignment_grid</span></code>)
+and determine the value on these location based on the values of the original grid (<code class="docutils literal notranslate"><span class="pre">self</span></code>).</p>
+<blockquote>
+<div><dl class="simple">
+<dt>The steps are as follows:</dt><dd><ol class="arabic simple">
+<li><p>Transform the bounds of the original data to the CRS of the alignment grid (if not already the same)
+No transformation is done if any of the grids has no CRS set.</p></li>
+<li><p>Find the cells of the alignment grid within these transformed bounds</p></li>
+<li><p>Find the cells of the original grid that are nearby each of the centroids of the cells found in 2.
+How many nearby cells are selected depends on the selected <code class="docutils literal notranslate"><span class="pre">method</span></code></p></li>
+<li><p>Interpolate the values using the supplied <code class="docutils literal notranslate"><span class="pre">method</span></code> at each of the centroids of the alignment grid cells selected in 2.</p></li>
+<li><p>Create a new bounded grid using the attributes of the alignment grid</p></li>
+</ol>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alignment_grid</strong> (<a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a>) – <p>The grid with the desired attributes on which to resample.
+For the new data tile with the interpolated values, a tile extent will be chosen that closely matches
+the tile with the original data.
+If a <a class="reference internal" href="#gridkit.tile.Tile" title="gridkit.tile.Tile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tile</span></code></a> is provided, this step is skipped and the data is interpolated onto the cells of the
+tile as provided.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If the two grids don’t align very well, you can play with the offset of the alignment grid to try to
+make it match the orignal grid a bit better. You could for example <code class="docutils literal notranslate"><span class="pre">anchor</span></code> a cell corner of the
+alignment grid to the corner of the tile like so: <code class="docutils literal notranslate"><span class="pre">my_data_tile.resample(my_grid.anchor(my_data_tile.corners()[0],</span> <span class="pre">cell_element=&quot;corner&quot;))</span></code></p>
+</div>
+</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <cite>‘nearest’, ‘bilinear’, ‘inverse_distance’</cite>, optional) – The interpolation method used to determine the value at the supplied <cite>sample_points</cite>.
+Supported methods:
+- “nearest”, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point
+- “bilinear”, linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+- “inverse_distance”, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.
+Default: “nearest”</p></li>
+<li><p><strong>**interp_kwargs</strong> (<cite>dict</cite>) – The keyword argument passed to the interpolation function corresponding to the specified <cite>method</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The interpolated values at the supplied points</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a>, <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points" title="gridkit.base_grid.BaseGrid.interp_from_points"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.interp_from_points()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.to_crs">
+<span class="sig-name descname"><span class="pre">to_crs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nearest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.to_crs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.to_crs" title="Link to this definition"></a></dt>
+<dd><p>Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+This will modify the cell size and the bounds accordingly.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current grid must be set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
+by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p></li>
+<li><p><strong>resample_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The resampling method to be used for <a class="reference internal" href="#gridkit.tile.DataTile.resample" title="gridkit.tile.DataTile.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DataTile.resample()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the grid with modified cell spacing and bounds to match the specified CRS</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Examples:</p>
+<p><a class="reference internal" href="../example_gallery/raster_operations/coordinate_transformations.html#example-coordinate-transformations"><span class="std std-ref">Example: coordinate transformations</span></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.max">
+<span class="sig-name descname"><span class="pre">max</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.max" title="Link to this definition"></a></dt>
+<dd><p>Get the maximum value in the data tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.min">
+<span class="sig-name descname"><span class="pre">min</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.min"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.min" title="Link to this definition"></a></dt>
+<dd><p>Get the maximum value in the data tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.mean">
+<span class="sig-name descname"><span class="pre">mean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.mean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.mean" title="Link to this definition"></a></dt>
+<dd><p>Get the maximum value in the data tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.sum">
+<span class="sig-name descname"><span class="pre">sum</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.sum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.sum" title="Link to this definition"></a></dt>
+<dd><p>Get the sum of all values in the data tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.median">
+<span class="sig-name descname"><span class="pre">median</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.median"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.median" title="Link to this definition"></a></dt>
+<dd><p>Get the median value of the data tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.percentile">
+<span class="sig-name descname"><span class="pre">percentile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percentile</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.percentile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.percentile" title="Link to this definition"></a></dt>
+<dd><p>Get the percentile of the data tile at the specified value, disregarding the nodata_value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.DataTile.std">
+<span class="sig-name descname"><span class="pre">std</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#DataTile.std"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.DataTile.std" title="Link to this definition"></a></dt>
+<dd><p>Get the standard deviation of the data in the tile, disregarding the nodata_value.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.tile.combine_tiles">
+<span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">combine_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#combine_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.combine_tiles" title="Link to this definition"></a></dt>
+<dd><p>Create a tile that covers all supplied tiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tiles</strong> (<em>List</em><em>[</em><a class="reference internal" href="#gridkit.tile.Tile" title="gridkit.tile.Tile"><em>Tile</em></a><em>]</em>) – A list of tiles around which the combined tile will be created.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Tile that covers the supplied Tiles</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tile.Tile" title="gridkit.tile.Tile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.tile.count_tiles">
+<span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">count_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiles</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#count_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.count_tiles" title="Link to this definition"></a></dt>
+<dd><p>Count how many times a cell occurs in a tile for the list of tiles provided.
+Regions where many tiles overlap will have a high count, regions where few tiles
+overlap will have low count.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tiles</strong> (<cite>List[Tile]</cite> or <cite>List[DataTile]</cite>) – The tiles from which the overlap count will be determined.
+For each Tile that is supplied in the list, all cells in the tile contribute to the count.
+For each DataTile that is supplied in the list, the cells with a value equal to the
+nodata_value of the DataTile are ignored for the count.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data tile where each value indicates by how many tiles this cell was covered.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tile.DataTile" title="gridkit.tile.DataTile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataTile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.tile.sum_data_tiles">
+<span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">sum_data_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_tiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#sum_data_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.sum_data_tiles" title="Link to this definition"></a></dt>
+<dd><p>Add the DataTiles in the data_tiles list. Nodata_values will be ignored.
+Each cell will then contain the sum of the value that cell accross the supplied DataTiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_tiles</strong> (<cite>List[Tile]</cite> or <cite>List[DataTile]</cite>) – A list of DataTiles to add together.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data tile with the values of the provided data_tiles added together</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tile.DataTile" title="gridkit.tile.DataTile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataTile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.tile.average_data_tiles">
+<span class="sig-prename descclassname"><span class="pre">gridkit.tile.</span></span><span class="sig-name descname"><span class="pre">average_data_tiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_tiles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#average_data_tiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.average_data_tiles" title="Link to this definition"></a></dt>
+<dd><p>Average the DataTiles in the data_tiles list. Nodata_values will be ignored.
+Each cell will then contain the mean or average value of that cell accross the supplied DataTiles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data_tiles</strong> (<cite>List[Tile]</cite> or <cite>List[DataTile]</cite>) – A list of DataTiles to average.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A data tile with the averaged values of the provided data_tiles</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.tile.DataTile" title="gridkit.tile.DataTile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataTile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gridkit.rect_grid.html" class="btn btn-neutral float-left" title="rect_grid" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gridkit.tri_grid.html" class="btn btn-neutral float-right" title="tri_grid" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: dev
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

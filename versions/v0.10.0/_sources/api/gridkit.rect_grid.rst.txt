@@ -1,0 +1,9 @@
+
+rect_grid
+=================
+
+.. automodule:: gridkit.rect_grid
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:

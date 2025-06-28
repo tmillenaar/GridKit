@@ -1,0 +1,435 @@
+:orphan:
+
+.. _example_gallery:
+
+Example Gallery
+---------------
+
+The examples listed here are intended to familiarize the reader with the workflow of GridKit,
+and to serve as inspiration regarding the types of problems that can be solved using GridKit.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+Cell centric
+============
+
+These examples highlight operations where specific cells are targeted.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use a DEM to determine the downslope path from a point on the DEM to the edge.">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_downslope_path_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Downslope path</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Identify specific cells using other grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_selecting_cells_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Cell selection using other grids</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="2D Diffusion on a HexGrid">
+
+.. only:: html
+
+  .. image:: /example_gallery/cell_centric_operations/images/thumb/sphx_glr_2d_diff_hex_anim_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_cell_centric_operations_2d_diff_hex_anim.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">2D Diffusion</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/cell_centric_operations/downslope_path
+   /example_gallery/cell_centric_operations/selecting_cells
+   /example_gallery/cell_centric_operations/2d_diff_hex_anim
+
+
+Grid definitions
+================
+
+These examples highlight the different ways grids can be constructed and manipulated.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Animated visualization of grid rotation">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_rotation_animation_thumb.gif
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_rotation_animation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Rotation animation</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Rotation of grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_rotated_grids_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_rotated_grids.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Rotating grids</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Adjusting shapes and sizes">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_hex_grids_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hexagon grids</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Aligning different types of grids">
+
+.. only:: html
+
+  .. image:: /example_gallery/grid_definitions/images/thumb/sphx_glr_triangles_in_hexes_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Triangles in hexagons</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/grid_definitions/rotation_animation
+   /example_gallery/grid_definitions/rotated_grids
+   /example_gallery/grid_definitions/hex_grids
+   /example_gallery/grid_definitions/triangles_in_hexes
+
+
+Raster operations
+=================
+
+These examples show how traditional raster data can be analysed and modified using GridKit.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Operation using two raster bands">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_ndvi_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">NDVI</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Merge rasters with different spatial extent">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_parial_overlap_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_parial_overlap.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Partial overlap</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Resample data from one grid onto another.">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_resampling_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_resampling.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Resampling</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Transform a grid from one CRS to another">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_coordinate_transformations_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_coordinate_transformations.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Coordinate transformations</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Create an elevation histogram for a particular land cover">
+
+.. only:: html
+
+  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_elevation_distribution_per_land_cover_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Combining land cover and DEM</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/raster_operations/ndvi
+   /example_gallery/raster_operations/parial_overlap
+   /example_gallery/raster_operations/resampling
+   /example_gallery/raster_operations/coordinate_transformations
+   /example_gallery/raster_operations/elevation_distribution_per_land_cover
+
+
+Vector data interactions
+========================
+
+The following examples highlight the interactions between vector data and regular grids.
+
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Group points into grid cells">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_aggregate_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Aggregate from points</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Group points into grid cells in a tiled manner, using Dask.">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_aggregate_dask_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Tiled aggregation from points with Dask</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Obtain the cells that intersect with vector geometries.">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_intersect_geometries_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Geometry intersections</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Fill a BoundedGrid based on point data">
+
+.. only:: html
+
+  .. image:: /example_gallery/vector_synergy/images/thumb/sphx_glr_interpolate_from_points_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Interpolate from points</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /example_gallery/vector_synergy/aggregate
+   /example_gallery/vector_synergy/aggregate_dask
+   /example_gallery/vector_synergy/intersect_geometries
+   /example_gallery/vector_synergy/interpolate_from_points
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: example_gallery_python.zip </example_gallery/example_gallery_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: example_gallery_jupyter.zip </example_gallery/example_gallery_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

@@ -1,0 +1,9 @@
+
+bounded_grid
+====================
+
+.. automodule:: gridkit.bounded_grid
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:

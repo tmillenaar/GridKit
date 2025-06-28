@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Combining land cover and DEM &mdash; GridKit v0.7.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=a1b19286"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Aggregate from points" href="../vector_synergy/aggregate.html" />
+    <link rel="prev" title="Coordinate transformations" href="coordinate_transformations.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.7.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ndvi.html">NDVI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="parial_overlap.html">Partial overlap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="resampling.html">Resampling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="coordinate_transformations.html">Coordinate transformations</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Combining land cover and DEM</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#reading-and-resampling">Reading and resampling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#relating-cells-between-datasets">Relating cells between datasets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.7.1).<br>
+      Latest version: <a href="../../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Combining land cover and DEM</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/example_gallery/raster_operations/elevation_distribution_per_land_cover.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-example-gallery-raster-operations-elevation-distribution-per-land-cover-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="combining-land-cover-and-dem">
+<span id="example-elevation-distribution-landcover"></span><span id="sphx-glr-example-gallery-raster-operations-elevation-distribution-per-land-cover-py"></span><h1>Combining land cover and DEM<a class="headerlink" href="#combining-land-cover-and-dem" title="Link to this heading"></a></h1>
+<p>Create an elevation histogram for a particular land cover</p>
+<p>Land cover data source: <a class="reference external" href="https://land.copernicus.eu/pan-european/corine-land-cover/clc2018">https://land.copernicus.eu/pan-european/corine-land-cover/clc2018</a></p>
+<p>DEM data source: <a class="reference external" href="https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem">https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem</a></p>
+<section id="reading-and-resampling">
+<h2>Reading and resampling<a class="headerlink" href="#reading-and-resampling" title="Link to this heading"></a></h2>
+<p>We want to be able to relate cells from one dataset to those of another.
+To do this the grids need to be ‘aligned’.
+We can do this by resampling both datasets onto the same grid.
+The simplest way to achive this is to resample one dataset onto the grid of the other dataset.
+In order to maintain the DEM’s higher resolution, we resample the land cover dataset onto the DEM’s grid.</p>
+<p>The datasets can be large and we may not want to read the whole dataset into RAM if we don’t have to.
+We can supply a bounding box when reading the data to only read the data we need.
+If this bounding box is not defined in the coordinates native to the file,
+<code class="docutils literal notranslate"><span class="pre">bounds_crs</span></code> can be supplied to transform the bounds before reading.
+We can make use of this to read out a crop of the same area form different files.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After reading a crop from a different CRS, the area is often not an exact match.
+When bounds are transformed to a different CRS, the bounds are warped.
+A bounding box is a rectagnle in it’s original CRS,
+but due to this warping it is often a paralellogram in a different CRS.
+In the current implementation, the furthest extent of the paralellogram define what data to crop.
+This means that more data is read when the bounds are warped more severely after the transformation.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">read_raster</span>
+
+<span class="c1"># Define the bounding box of interest and the corresponding CRS</span>
+<span class="n">bounds_matterhorn</span> <span class="o">=</span> <span class="p">(</span><span class="mi">817723</span><span class="p">,</span> <span class="mi">5826030</span><span class="p">,</span> <span class="mi">964482</span><span class="p">,</span> <span class="mi">5893982</span><span class="p">)</span>
+<span class="n">bounds_crs</span> <span class="o">=</span> <span class="mi">3857</span>
+
+<span class="c1"># Define the paths to the data files</span>
+<span class="n">path_landuse</span> <span class="o">=</span> <span class="s2">&quot;../../tests/data/alps_landuse.tiff&quot;</span>
+<span class="n">path_dem</span> <span class="o">=</span> <span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span>
+
+<span class="c1"># Read a part of the digital elevation model (DEM) and set to desired CRS</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span><span class="n">path_dem</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds_matterhorn</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">bounds_crs</span><span class="p">)</span>
+
+<span class="c1"># Read the same part of the landuse dataset and resample onto the DEM</span>
+<span class="n">landuse</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span>
+    <span class="n">path_landuse</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="n">bounds_matterhorn</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="n">bounds_crs</span>
+<span class="p">)</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The resampling <code class="docutils literal notranslate"><span class="pre">method</span></code> ‘nearest’ was used to keep the land cover values discrete.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you are unsure if your grids are aligned, you can put the resample step inside an if-statement.
+For this example that could look like so:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="ow">not</span> <span class="n">dem</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">landuse</span><span class="p">):</span>
+    <span class="n">landuse</span> <span class="o">=</span> <span class="n">landuse</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>To get a feel for the area, I will plot the datasets side by side.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize figure for plotting the dem and landuse datasets</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Plot DEM</span>
+<span class="n">im_dem</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gist_earth&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im_dem</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Plot Landuse</span>
+<span class="n">im_landuse</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span>
+    <span class="n">landuse</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;tab20c_r&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">landuse</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">50</span>
+<span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im_landuse</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Landuse value&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Landuse&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_001.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_001.png" alt="Elevation [m], Landuse" class = "sphx-glr-single-img"/><p>To get a rough feeling for the land cover plot,
+the orange shades roughly correspond to snow, ice and bare rock
+and the green shades roughly correspond to vegetation.
+To inspect the land cover categories with better accuracy,
+visit the source of the data mentioned a the top of this page.
+You may notice the grey areas around the land cover dataset.
+These are nodata values used to fill empty areas during the resampling step.</p>
+</section>
+<section id="relating-cells-between-datasets">
+<h2>Relating cells between datasets<a class="headerlink" href="#relating-cells-between-datasets" title="Link to this heading"></a></h2>
+<p>To get the elevation distribution for a particular land cover we need to:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>determine what cells hava a particular land cover</p></li>
+<li><p>obtain the elevation values for these cells</p></li>
+<li><p>plot the histogram</p></li>
+</ol>
+</div></blockquote>
+<p>The first step is as simple as using a comparison operation on the grid.
+<code class="docutils literal notranslate"><span class="pre">landuse</span> <span class="pre">==</span> <span class="pre">1</span></code> will return the IDs of all cells where the land cover value is equal to 1.
+Since the landuse dataset has been resampled onto the grid of the DEM, the grids are ‘aligned’.
+This means we can simply use the IDs obtained from the landuse dataset to obtain the values of the DEM.
+First we obtain all ids in a dict. Then we loop through the dict and get the values from the <code class="docutils literal notranslate"><span class="pre">dem</span></code> grid
+using the ids obtains through the <code class="docutils literal notranslate"><span class="pre">landuse</span></code> grid.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">index</span>
+
+<span class="c1"># Determine elevation for the landuses of interest.</span>
+<span class="n">ids_per_landuse</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">grass_and_shrub</span><span class="o">=</span><span class="n">index</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">26</span><span class="p">,</span> <span class="n">landuse</span> <span class="o">==</span> <span class="mi">29</span><span class="p">]),</span>
+    <span class="n">bare_rock</span><span class="o">=</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">31</span><span class="p">,</span>
+    <span class="n">glacier</span><span class="o">=</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">34</span><span class="p">,</span>
+    <span class="n">conifer_forest</span><span class="o">=</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="n">mixed_forest</span><span class="o">=</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="n">broad_leaved_forest</span><span class="o">=</span><span class="n">landuse</span> <span class="o">==</span> <span class="mi">23</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Here the grass and shrub ids are combined using index.concat.
+Since the <code class="docutils literal notranslate"><span class="pre">GridIndex</span></code> returned by the comparison operation is based on <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>,
+this is similar to calling <code class="docutils literal notranslate"><span class="pre">numpy.vstack([landuse</span> <span class="pre">==</span> <span class="pre">26,</span> <span class="pre">landuse</span> <span class="pre">==</span> <span class="pre">29])</span></code>.
+Naturally, the former will return a GridIndex and the latter a numpy ndarray.
+<code class="docutils literal notranslate"><span class="pre">dem.value</span></code> accepts either, so in this usecsae the two methods are equally viable.</p>
+</div>
+<p>Plotting the histogram distribution of the various land covers gives the following plot:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot forest histograms</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">dem</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">50</span><span class="p">))</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
+    <span class="p">[</span><span class="s2">&quot;palegreen&quot;</span><span class="p">,</span> <span class="s2">&quot;lightsalmon&quot;</span><span class="p">,</span> <span class="s2">&quot;lightseagreen&quot;</span><span class="p">,</span> <span class="s2">&quot;darkgreen&quot;</span><span class="p">,</span> <span class="s2">&quot;yellowgreen&quot;</span><span class="p">,</span> <span class="s2">&quot;orange&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">ids</span> <span class="ow">in</span> <span class="n">ids_per_landuse</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+        <span class="n">dem</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">ids</span><span class="p">),</span>
+        <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">),</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Nr. of cells per elevation bin&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Alpine land cover histogram&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" srcset="../../_images/sphx_glr_elevation_distribution_per_land_cover_002.png" alt="Alpine land cover histogram" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 2.173 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-elevation-distribution-per-land-cover-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/cf694633f3e991afdbf4fa942cfe0584/elevation_distribution_per_land_cover.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">elevation_distribution_per_land_cover.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5c14cf556019e9b7d189db937fd6175f/elevation_distribution_per_land_cover.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">elevation_distribution_per_land_cover.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="coordinate_transformations.html" class="btn btn-neutral float-left" title="Coordinate transformations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../vector_synergy/aggregate.html" class="btn btn-neutral float-right" title="Aggregate from points" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.7.1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+
+errors
+==============
+
+.. automodule:: gridkit.errors
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:

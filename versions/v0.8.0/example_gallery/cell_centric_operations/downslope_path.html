@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Downslope path &mdash; GridKit v0.8.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=b3dab91b"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Cell selection using other grids" href="selecting_cells.html" />
+    <link rel="prev" title="Example Gallery" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.8.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Downslope path</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#method">Method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#results">Results</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="selecting_cells.html">Cell selection using other grids</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.8.0).<br>
+      Latest version: <a href="../../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Downslope path</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/example_gallery/cell_centric_operations/downslope_path.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="downslope-path">
+<span id="sphx-glr-example-gallery-cell-centric-operations-downslope-path-py"></span><h1>Downslope path<a class="headerlink" href="#downslope-path" title="Link to this heading"></a></h1>
+<p>Use a DEM to determine the downslope path from a point on the DEM to the edge.</p>
+<p>DEM data source: <a class="reference external" href="https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem">https://www.eea.europa.eu/data-and-maps/data/copernicus-land-monitoring-service-eu-dem</a></p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>In this example the downslope path is found from a given point on a DEM.
+This can be conceptualized as the path water would flow donw from a given source.
+This algorithm does not stop at a local minimum, but continues when the edge of the DEM is reached.
+The path can therefore be best conceptualized as a stram, possibly with small lakes, rather than a single droplet.</p>
+</section>
+<section id="method">
+<h2>Method<a class="headerlink" href="#method" title="Link to this heading"></a></h2>
+<p>This is done by iteratively finding the neighbour with the lowest elevation.</p>
+<dl class="simple">
+<dt>In this example, the flow is as follows:</dt><dd><ol class="arabic simple">
+<li><p>A cell is supplied to the “downslope_path” function</p></li>
+<li><p>The neighbouring cells are obtained</p></li>
+<li><p>These cells are added to a list containing all neighbours along the path so far</p></li>
+<li><p>The neighbour along the path so far with the lowest elevation is added to the path, at which point we start again at 1.</p></li>
+</ol>
+</dd>
+</dl>
+<p>The loop stops when NaNs are encountered, which happens when the border of the DEM crop is reached.
+This is of course assuming there are no nodata_values in the DEM.</p>
+<p>First let’s import the dependencies and read in the DEM.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">read_raster</span>
+
+<span class="n">dem</span> <span class="o">=</span> <span class="n">read_raster</span><span class="p">(</span>
+    <span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">29200</span><span class="p">,</span> <span class="mi">167700</span><span class="p">,</span> <span class="mi">29800</span><span class="p">,</span> <span class="mi">168100</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, set up the recursive function and the required empty lists.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Python’s recursion limit can be reached with this approach for paths longer than shown here.
+While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may want to reconsider the approach and use a while-loop instead of recursion.</p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">visited_cells</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_neighbours</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">neighbour_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">def</span> <span class="nf">downslope_path</span><span class="p">(</span><span class="n">cell_id</span><span class="p">):</span>
+    <span class="n">visited_cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span>
+    <span class="c1"># add new neigbours and their values to their respective lists</span>
+    <span class="n">neighbours</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)):</span>
+        <span class="n">cell</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">visited_cells</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">all_neighbours</span><span class="p">:</span>
+            <span class="n">all_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
+            <span class="n">neighbour_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># stop when we encounter nodata values, assuming these only occur byound the bounds of the DEM crop</span>
+    <span class="k">if</span> <span class="n">dem</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">in</span> <span class="n">neighbour_values</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># determine the next cell and remove it from the neighbour-lists</span>
+    <span class="n">min_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">neighbour_values</span><span class="p">)</span>
+    <span class="n">next_cell</span> <span class="o">=</span> <span class="n">all_neighbours</span><span class="p">[</span><span class="n">min_id</span><span class="p">]</span>
+    <span class="n">all_neighbours</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span>
+    <span class="n">neighbour_values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">downslope_path</span><span class="p">(</span><span class="n">next_cell</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Determine the starting cell and call the function</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
+<span class="n">downslope_path</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">start_cell_id</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="results">
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
+<p>Let’s plot the path on the DEM</p>
+<p>For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;longitude&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;latitude&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Downslope path from a chosen starting point&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="n">path_label</span> <span class="o">=</span> <span class="s2">&quot;Downslope path&quot;</span>
+<span class="k">for</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">dem</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">visited_cells</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">path_label</span><span class="p">)</span>
+    <span class="n">path_label</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Only show the label in the legend once</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">dem</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">start_cell_id</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Starting point&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
+They can for example be used to obtain values form a different dataset along the path,
+or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.150 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/a495658098a2a10d0a6d919a5b81ba21/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/df89e8dce4f564036c6eab559331be35/downslope_path.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">downslope_path.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Example Gallery" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="selecting_cells.html" class="btn btn-neutral float-right" title="Cell selection using other grids" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.8.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

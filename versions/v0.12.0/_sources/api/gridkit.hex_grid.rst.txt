@@ -1,0 +1,9 @@
+
+hex_grid
+================
+
+.. automodule:: gridkit.hex_grid
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:

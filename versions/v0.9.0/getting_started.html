@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; GridKit v0.9.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=c20ff342"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Example Gallery" href="example_gallery/index.html" />
+    <link rel="prev" title="Welcome to GridKit’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.9.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-example">Quick example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-gridkit">What is GridKit?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-gridkit-is-not">What GridKit is not</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#infinite-grids-the-fundamentals">Infinite grids, the fundamentals</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bounded-vs-infinite-grids-an-example">Bounded vs infinite grids, an example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cell-indices-what-are-they">Cell indices, what are they?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#offsets">Offsets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.9.0).<br>
+      Latest version: <a href="../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<section id="quick-example">
+<h2>Quick example<a class="headerlink" href="#quick-example" title="Link to this heading"></a></h2>
+<p>As a quick demonstration a grid and two points are created.
+Then the grid cells that cover those points will be obtained
+and finally the polygon description of these cells will be obtained.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geoms</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cell_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geoms</span>
+<span class="go">array([&lt;POLYGON ((2.5 5.052, 2.5 7.939, 0 9.382, -2.5 7.939, -2.5 5.052, 0 3.608, 2...&gt;,</span>
+<span class="go">      &lt;POLYGON ((-5 0.722, -5 3.608, -7.5 5.052, -10 3.608, -10 0.722, -7.5 -0.722...&gt;],</span>
+<span class="go">      dtype=object)</span>
+</pre></div>
+</div>
+<p>More elaborate examples can be found in the <a class="reference internal" href="example_gallery/index.html#example-gallery"><span class="std std-ref">Example gallery</span></a></p>
+</section>
+<section id="what-is-gridkit">
+<h2>What is GridKit?<a class="headerlink" href="#what-is-gridkit" title="Link to this heading"></a></h2>
+<p>GridKit is an open source Python library that provides a high-level API to work with regularly tiled grids.</p>
+<p><strong>Core features:</strong></p>
+<blockquote>
+<div><ul>
+<li><p>tessellation of an infinite surface <a class="footnote-reference brackets" href="#id3" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p></li>
+<li><p>working with geospatial data</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>geocoded grids</p></li>
+<li><p>resampling</p></li>
+<li><p>coordinate transformations (akin to geopanda’s <cite>to_crs</cite>)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>bridging the gap between raster and vector data</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>gridcell-vector intersections</p></li>
+<li><p>sampling</p></li>
+<li><p>interpolation</p></li>
+<li><p>aggregation statistics (planned)</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>grids of various shapes</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>rectangular</p></li>
+<li><p>hexahonal (planned)</p></li>
+<li><p>triangular (planned)</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>In practice the “<em>infinite surface</em>” is bounded by machine precision. No grid cell can be referenced of which the index does not fit in a 64 byte integer.</p>
+</aside>
+</aside>
+</section>
+<section id="what-gridkit-is-not">
+<h2>What GridKit is not<a class="headerlink" href="#what-gridkit-is-not" title="Link to this heading"></a></h2>
+<p>Many common operations are done on grids or rasters.
+Restrictions therefore keep clarity around which features make sense for GridKit, and which are best left to to other packages.</p>
+<p>Most notably, there are many software solutions out there that focuss on rasters, or bounded rectangular grids (some of these are mentioned below).
+Often, these software packages focuss around operations on raster bands.
+GridKit, in contrast, is build around infinite grids and works with indices reprecenting individual grid cells.
+Here, the grid cell is the fundamental unit instead of the raster band.</p>
+<p>Some features will overlap, such as cropping and resampling.
+Other features you may have come to expect from raster oriented software might be missing in GridKit.</p>
+<p><strong>GridKit is not:</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>GDAL</dt><dd><p>GDAL is a versitile toolbox of everything geospatial, for both vector and raster operations.
+It’s raster operations are specifically tuned to work with bounded geospatial rectangular grids, often with multiple data bands.
+The great advantage of GDAl is that the amount and veriety raster operations that is supported out of the box, is unmatched.
+In GridKit, no attempt will be made to match GDAL in this regard.
+However, while python bindings for GDAL are available, the use is not very Pythonic.
+One example of this is that for every raster operation, GDAL expects a path to a raster file as input and writes a new raster file as output.
+While the rasters can be written to memory as a workaround to save the IO, this is not a style of programming most python developers are comfortable with.
+In GridKit, the grids are python classes which allows for a more pythonic style of programming and easier chaining of operations.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Rasterio</dt><dd><p>Rasterio, as the name suggest, is a package that focusses on the reading and writing of raster files.
+Besides reading and writing, Rasterio provides functionality for warping, cropping and interpolating data.
+Some of this functionality overlaps with that of GridKit.
+Most notably rasterio uses affine transforms to represent the position of a raster, whereas gridkit uses the bounding box.
+GridKit utilizes Rasterio for the reading and writing of geotiffs.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>RioXarray</dt><dd><p>RioXarray is a package that acts, not surprisingly, as an interface between Rasterio (rio) and Xarray.
+This is a powerful combination that converts raster files to Xarray objects.
+This is a more pythonic way of working with data than the methods mentioned above,
+but is still fundamentally oriented around the bounded rectangular datatype, with the option for multiple bands.
+If your aim is primarily to work with raster bands, give RioXarray a look.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p><strong>Conclusion, when to use GridKit</strong></p>
+<p>Gridkit is not nesecarily build to work with multiband rasters.
+If this is the kind of data you are most likely to use, you may consider one of the packages mentined in the previous section.</p>
+<p>GridKit’s cell-based approach can be beneficial if you want to:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>relate rasters of different spatial extends</p></li>
+<li><p>relate vector data to grid cells</p></li>
+<li><p>exercise fine grained control over particular cells and their properties, such as obtaining a cell’s corner locations or finding it’s neighbouring cells</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="infinite-grids-the-fundamentals">
+<h2>Infinite grids, the fundamentals<a class="headerlink" href="#infinite-grids-the-fundamentals" title="Link to this heading"></a></h2>
+<p>A grid is little more than a surface that is subdivided into cells.
+We chan choose how we subdivide this surface by choosing the type shape and size of the cells, as well as an origin (a starting point).
+Once we have chose these parameters, we can say something about each cell, like it’s position relative to the origin or relative other cells.
+Since this plane has no defined end, the cells can keep on tiling to infinity. Hence the term ‘<em>infinite grid</em>’.</p>
+<p>A grid that is defined by it’s cell shape, size and the grid’s origin does not need to store a lot of data in memory.
+All other information regarding grid cells of interest (such as their area, center location, corner locations or neighbours) can be calculated on demand.</p>
+<section id="bounded-vs-infinite-grids-an-example">
+<h3>Bounded vs infinite grids, an example<a class="headerlink" href="#bounded-vs-infinite-grids-an-example" title="Link to this heading"></a></h3>
+<p>Out of practicality, most data that can be thought of as a grid is bounded in the real world.
+A computer screen can be thought of as a rectangular grid of say 1920x1080 pixels.
+This is clearly a bounded grid, where pixel (2000, 500) has little meaning, for it is out of the bounds of the screen and hence does not reflect a real-world pixel.
+However, when two screens are placed next to each other and attached to the same device,
+the screens can be combined and their shared pixel space can thought of as one of 3840x1080 pixels.
+In this scenario pixel (2000, 500) refers to a pixel on the second screen.
+Conceptually, these two screens then sare the same grid.
+This is an illustration of bounded data living on an infinte grid.</p>
+</section>
+<section id="cell-indices-what-are-they">
+<h3>Cell indices, what are they?<a class="headerlink" href="#cell-indices-what-are-they" title="Link to this heading"></a></h3>
+<p>In GridKit, one cell in a grid is set to be cell (0,0), the starting cell.
+From this cell you can move one or more cells to the left, right, down or up.
+The first number indicates how many cells you moved in the x-direction (left or right).
+The second number indicates how many cells you moved in the y-direction (up or down).
+The directions up and right are defined to be the positive directins.
+Thus, a cell with index (-2,3) is two cells left of cell (0,0), and three cells above it.
+Similarly, cell (-1,3) is one cell right of cell (-2,3), but on the same row.</p>
+<p>Based on the cell size, all kinds of information can be calculated.
+For example, a rectangular grid where the cell size in x-direciton is 1, and in y-direction is 2, the center of the first cell (0,0) is at location <em>x=0.5</em>, <em>y=1</em>).</p>
+</section>
+<section id="offsets">
+<h3>Offsets<a class="headerlink" href="#offsets" title="Link to this heading"></a></h3>
+<p>Two grids with the same cell shape and the same cell dimentions, are not nesecarily the same.
+If their origin differs, the grids are shifted with respect to each other.
+This shift can be less then the size of a cell.
+If this is the case, the grid lines of the two grids do not nicely overlap.
+The distance between a grid line of one grid and the grid line of another grid is considered to be the <em>offset</em> between the two grids.
+If this is the case, the grids are not <em>aligned</em>.
+When one grid is offset by exactly one cell (or a multiple), the gridlines of the two grids still overlap.
+Such grids are considered to be <em>aligned</em>.
+In fact, in GridKit there is no distinction between these two grids, they are considered to be one and the same.
+To refer back to the screen example, the two screens that are attached to the same device conceptually occupy the same pixel-space.
+Hence they live on the same grid, with the same origin.
+In this conceptualization, the second screen’s first pixel would start at index (1921,0).</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to GridKit’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_gallery/index.html" class="btn btn-neutral float-right" title="Example Gallery" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.9.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

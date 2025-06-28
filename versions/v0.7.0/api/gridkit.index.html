@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>index &mdash; GridKit v0.7.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=05c9169f"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="io" href="gridkit.io.html" />
+    <link rel="prev" title="hex_grid" href="gridkit.hex_grid.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.7.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gridkit.html">gridkit</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.base_grid.html">base_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.doc_utils.html">doc_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">index</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.index.validate_index"><code class="docutils literal notranslate"><span class="pre">validate_index()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.index.concat"><code class="docutils literal notranslate"><span class="pre">concat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.index.GridIndex"><code class="docutils literal notranslate"><span class="pre">GridIndex</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.rect_grid.html">rect_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.tri_grid.html">tri_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.version.html">version</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.7.0).<br>
+      Latest version: <a href="../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API reference</a></li>
+          <li class="breadcrumb-item"><a href="gridkit.html">gridkit</a></li>
+      <li class="breadcrumb-item active">index</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/gridkit.index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gridkit.index">
+<span id="index"></span><h1>index<a class="headerlink" href="#module-gridkit.index" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.index.validate_index">
+<span class="sig-prename descclassname"><span class="pre">gridkit.index.</span></span><span class="sig-name descname"><span class="pre">validate_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#validate_index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.validate_index" title="Link to this definition"></a></dt>
+<dd><p>Decorator to convert the index argument of a function to a GridIndex object.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gridkit.index.concat">
+<span class="sig-prename descclassname"><span class="pre">gridkit.index.</span></span><span class="sig-name descname"><span class="pre">concat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#concat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.concat" title="Link to this definition"></a></dt>
+<dd><p>Concatenate supplied GridIndex instances into one.
+Duplicate indices are allowed.
+If duplicates are not desired for your usecase,
+consider calling <a class="reference internal" href="#gridkit.index.GridIndex.unique" title="gridkit.index.GridIndex.unique"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.unique()</span></code></a> after concatenating.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>grid_ids</strong> – A list of GridIndex isntances to concatenate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.index.</span></span><span class="sig-name descname"><span class="pre">GridIndex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Index to be used with grid classes.
+These GridIndex class instances contain the references to the grid cells by ID (idx, idy).
+Several methods are implemented to treat the indices as sets, where one (idx, idy) pair is considered one unit, one cell-ID.
+The GridIndex class also allows for generic operators such as: (+, -, <em>, /, //, *</em>, %, &gt;=, &lt;=, &gt;, &lt;)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>Union</em><em>[</em><em>numpy.ndarray</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>, </em><a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><em>GridIndex</em></a><em>]</em>) – The index containing the cell-id.
+This is assumed to either be a single (idx, idy) pair or a list, tuple or ndarray containing multiple of such pairs.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – When the shape of the index does not match the expected shape of (2,) or (N,2) where N is the number of cells, a ValuError is raised.</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.x">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#gridkit.index.GridIndex.x" title="Link to this definition"></a></dt>
+<dd><p>The X-component of the cell-IDs</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.y">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">y</span></span><a class="headerlink" href="#gridkit.index.GridIndex.y" title="Link to this definition"></a></dt>
+<dd><p>The Y-component of the cell-IDs</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.shape">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#gridkit.index.GridIndex.shape" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.unique">
+<span class="sig-name descname"><span class="pre">unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.unique" title="Link to this definition"></a></dt>
+<dd><p>The unique IDs contained in the index. Remove duplicate IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>**kwargs</strong> – The keyword arguments to pass to numpy.unique</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.intersection">
+<span class="sig-name descname"><span class="pre">intersection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.intersection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.intersection" title="Link to this definition"></a></dt>
+<dd><p>The intersection of two GridIndex instances. Keep the IDs contained in both.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.difference">
+<span class="sig-name descname"><span class="pre">difference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.difference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.difference" title="Link to this definition"></a></dt>
+<dd><p>The differenceof two GridIndex instances. Keep the IDs contained in <code class="docutils literal notranslate"><span class="pre">self</span></code> that are not in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.isdisjoint">
+<span class="sig-name descname"><span class="pre">isdisjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.isdisjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.isdisjoint" title="Link to this definition"></a></dt>
+<dd><p>True if none of the IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> are in <code class="docutils literal notranslate"><span class="pre">other</span></code>. False if any ID in <code class="docutils literal notranslate"><span class="pre">self</span></code> is also in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.issubset">
+<span class="sig-name descname"><span class="pre">issubset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.issubset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.issubset" title="Link to this definition"></a></dt>
+<dd><p>True if all of the IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> are in <code class="docutils literal notranslate"><span class="pre">other</span></code>. False if not all IDs in <code class="docutils literal notranslate"><span class="pre">self</span></code> is also in <code class="docutils literal notranslate"><span class="pre">other</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.issuperset">
+<span class="sig-name descname"><span class="pre">issuperset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.issuperset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.issuperset" title="Link to this definition"></a></dt>
+<dd><p>True if all of the IDs in <code class="docutils literal notranslate"><span class="pre">other</span></code> are in <code class="docutils literal notranslate"><span class="pre">self</span></code>. False if not all IDs in <code class="docutils literal notranslate"><span class="pre">other</span></code> is also in <code class="docutils literal notranslate"><span class="pre">self</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The GridIndex instance to compare with</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.ravel">
+<span class="sig-name descname"><span class="pre">ravel</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.ravel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.ravel" title="Link to this definition"></a></dt>
+<dd><p>Flatten a nd-index</p>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.index</span> <span class="kn">import</span> <span class="n">GridIndex</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[[ 0,  1],</span>
+<span class="go">        [ 2,  3],</span>
+<span class="go">        [ 4,  5]],</span>
+
+<span class="go">       [[ 6,  7],</span>
+<span class="go">        [ 8,  9],</span>
+<span class="go">        [10, 11]]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flat_index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">flat_index</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[ 0,  1],</span>
+<span class="go">       [ 2,  3],</span>
+<span class="go">       [ 4,  5],</span>
+<span class="go">       [ 6,  7],</span>
+<span class="go">       [ 8,  9],</span>
+<span class="go">       [10, 11]])</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A flattened copy of te index</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.append" title="Link to this definition"></a></dt>
+<dd><p>Add cell ids to the end of the current index.
+This updates the .index attribute in-place as would an append on a python list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The cell_ids to append to the current index</p></li>
+<li><p><strong>in_place</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
+Returns a copy if False.
+Note: This does not improve performance as you might expect form a true in-place operation.
+The copy is made regardless since the data stored in the GridIndex is based on a numpy
+array and not on a Python List.
+The <code class="docutils literal notranslate"><span class="pre">in-place</span></code> option is for convenience only, not performance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([0, 1])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">cell_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[ 0,  1],</span>
+<span class="go">       [-5,  9]])</span>
+</pre></div>
+</div>
+<p>Alternatively, by specifying <code class="docutils literal notranslate"><span class="pre">in_place=True</span></code> the original object can be updated.
+As noted at the <code class="docutils literal notranslate"><span class="pre">in_place</span></code> parameter description, this does not result in performance gains.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&lt;gridkit.index.GridIndex object at ...&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cell_ids</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[ 0,  1],</span>
+<span class="go">       [-5,  9]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.delete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.delete" title="Link to this definition"></a></dt>
+<dd><p>Remove all instances of ‘item’ from self.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The cell ids to remove from <code class="docutils literal notranslate"><span class="pre">self</span></code></p></li>
+<li><p><strong>in_place</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> (optional, default False )) – Updates the index of <code class="docutils literal notranslate"><span class="pre">self</span></code> if True.
+Returns a copy if False.
+Note: This does not improve performance as you might expect form a true in-place operation.
+The copy is made regardless since the data stored in the GridIndex is based on a numpy
+array and not on a Python List.
+The <code class="docutils literal notranslate"><span class="pre">in-place</span></code> option is for convenience only, not performance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The new index where the supplied ids were removed</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Alternatively, by specifying <code class="docutils literal notranslate"><span class="pre">in_place=True</span></code> the original object can be updated.
+As noted at the <code class="docutils literal notranslate"><span class="pre">in_place</span></code> parameter description, this does not result in performance gains.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.index.GridIndex.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/index.html#GridIndex.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.index.GridIndex.copy" title="Link to this definition"></a></dt>
+<dd><p>Return an immutable copy of self.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gridkit.hex_grid.html" class="btn btn-neutral float-left" title="hex_grid" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gridkit.io.html" class="btn btn-neutral float-right" title="io" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.7.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a>   <--
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

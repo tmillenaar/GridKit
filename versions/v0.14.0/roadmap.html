@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roadmap &mdash; GridKit v0.14.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=356883d0"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="version" href="api/gridkit.version.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.14.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Roadmap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#on-the-roadmap">On the roadmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hexagonal-and-triangular-cells">Hexagonal and triangular cells</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sparse-data-grids">Sparse data grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aggregation">Aggregation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fft-and-convolutions">FFT and convolutions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pathfinding">Pathfinding</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#not-on-the-roadmap">Not on the Roadmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#storing-data-on-edges-and-vertices">Storing data on edges and vertices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#irregualr-grids">Irregualr grids</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.14.0).<br>
+      Latest version: <a href="../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Roadmap</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/roadmap.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="roadmap">
+<h1>Roadmap<a class="headerlink" href="#roadmap" title="Link to this heading"></a></h1>
+<p>This page provides an overview of the major themes in GridKit’s development.
+Each of these topics fits in the vision of what the package is meant to become.
+These items are estimated to requires a significant amount of effort to implement.</p>
+<p>This page is meant to give a rough overview.
+For these items, there is no time estimation and there are no guarantees a topic on this page will make it in the package.
+Unexpected issues may prevent the adoption of this feature.</p>
+<p>A topic not being on this page, naturally, does not exclude it from possible adoption.
+Smaller topics are not on this page and recommendations for new features can be made in the <a class="reference external" href="https://github.com/tmillenaar/GridKit/issues">issue tracker</a>.</p>
+<section id="on-the-roadmap">
+<h2>On the roadmap<a class="headerlink" href="#on-the-roadmap" title="Link to this heading"></a></h2>
+<section id="hexagonal-and-triangular-cells">
+<h3>Hexagonal and triangular cells<a class="headerlink" href="#hexagonal-and-triangular-cells" title="Link to this heading"></a></h3>
+<p>Rectangular grids are far from the only types of grids that can tile the plane.
+However, there are only three types of primitive shapes that can tile the plane without the need of a second shape to make it fit.
+These shapes are triangles, rectangles and hexagons.
+In GridKit, these three shapes should be supported.
+Combinations of shapes that tile the plane come in an infinite veriety.
+While these can yield interesting patterns, for practical purposes GridKit will only support single shapes that tile the plane.</p>
+</section>
+<section id="sparse-data-grids">
+<h3>Sparse data grids<a class="headerlink" href="#sparse-data-grids" title="Link to this heading"></a></h3>
+<p>The most common way to store rasters is as a 2D-array.
+This is also the way the data of the grid is stored in GridKit, through the <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a> mixin.
+This approach makes sense for continuous datasets, possibly with a nodata value here and there.
+However, this approach does not lend itself well for sparse data sets.
+To store sparse data, it is a lot more memory efficient to store a list of cell IDs along with a list of values.
+Any cell not in this list will be considered to contain no data.
+A new <cite>SparseGrid</cite> can be created alongside the <a class="reference internal" href="api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a> to store sparse data.
+Some operations will only work on bounded data, like convolutions for example.
+Other operations are more suitable for sparse data, like aggregation and possibly A* pathfinding.
+Some operations (such as aggregation) might get the keyword argument ‘<cite>sparse</cite>’, specifying whether a sparse or bounded grid is to be returned.</p>
+</section>
+<section id="aggregation">
+<h3>Aggregation<a class="headerlink" href="#aggregation" title="Link to this heading"></a></h3>
+<p>There are several ways of converting a dataset of points to a grid.
+Currently, only interpolation is supported.
+Another method is aggregation, where all points contained within the same cell are <cite>aggregated</cite>, or combined.
+There are of course multiple ways by which these points can be combined.
+The value of the operation is then stored on that grid cell.</p>
+<p>Common operations when aggregating are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>count (number of points in cell)</p></li>
+<li><p>mean</p></li>
+<li><p>standard deviation</p></li>
+<li><p><cite>n</cite> th percentile</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="fft-and-convolutions">
+<h3>FFT and convolutions<a class="headerlink" href="#fft-and-convolutions" title="Link to this heading"></a></h3>
+<p>The most common image processing operations use Fast Fourier Transforms (FFT) and/or convolutions.
+In fact, a convolution <a class="reference external" href="https://en.wikipedia.org/wiki/Convolution_theorem">can be done through the use of an FFT</a>.
+While GridKit is not trying to be an image processing library, these operations can be very powerful.
+For rectangular grids, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.fft.fft2.html">numpy.fft.fft2</a> and
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.fft.fft2.html">scipy.fft.fft2</a> can be used to determine the FFT.
+Hence there is no real need to implement this directly into gridkit.
+However, when hexagonal grids are implemented, these approaches cannot be used.
+Algorithms for the <a class="reference external" href="https://en.wikipedia.org/wiki/Hexagonal_fast_Fourier_transform">Hexagonal Fast Fourier Transform (HFFT)</a> have been devised.
+This can be implemented in gridkit to allow for basic image processing on hexagonal grids.
+Because of the hexagonal grids better represend curves, and each neighbour is equidistant, image processing on hexagonal data can be beneficial.</p>
+</section>
+<section id="pathfinding">
+<h3>Pathfinding<a class="headerlink" href="#pathfinding" title="Link to this heading"></a></h3>
+<p>Pathfinding is a common usecase for grids and is not currently part of GridKit.
+Adding a weighted A* pathfinding algorithm only makes sense.
+Other pathfinding algorithm could be added too, but A* would be a good start.
+It is a general algorithm that could be performed on grids of different shapes.
+The obstacles could be defined either as bounded or sparse data, see the section on Sparse Data Grids.</p>
+</section>
+</section>
+<section id="not-on-the-roadmap">
+<h2>Not on the Roadmap<a class="headerlink" href="#not-on-the-roadmap" title="Link to this heading"></a></h2>
+<p>Some operations make sense for grids, but are not on the roadmap for GridKit.
+Sometimes this is simply because it has not been considered yet,
+but sometimes this is because it does not fit with the project’s vision, dispite it being a common operation to perform on grids.
+Some features that fall in the latter category are mentioned here, in an attempt to explain why this is not being considered at the moment.</p>
+<p>If you think one of these features should, in fact, be considered for the roadmap, you can try to make a compelling case in the <a class="reference external" href="https://github.com/tmillenaar/GridKit/issues">issue tracker</a></p>
+<section id="storing-data-on-edges-and-vertices">
+<h3>Storing data on edges and vertices<a class="headerlink" href="#storing-data-on-edges-and-vertices" title="Link to this heading"></a></h3>
+<p>There are many types of operations that could benefit from storing the values not in the cell center, but on the vertices or edges instead.
+Some solutions utilize some or all of these in combination.
+An example would be storing temperature values in a cell and flux at the edges.</p>
+<p>While there is clear value in this feature, it is a large effort to develop this and, more importantly, a lot harder to maintain.
+Every new feature would have to work on cells, edges and vertices, or specifically exclude a data type and yield the appropriate error.</p>
+</section>
+<section id="irregualr-grids">
+<h3>Irregualr grids<a class="headerlink" href="#irregualr-grids" title="Link to this heading"></a></h3>
+<p>Not all grids are regular grids. Irregular grids often are grids where the cell shapes vary in shape or size.
+This approach, does not match with the architecture of GridKit’s implementation.
+Implementations involving irregualr grids need to store the information of each cell, such as the location of the vertices.
+In GridKit, the location of a cell is inferred, not stored.
+This is possible because the cell distribution of a regular grid is predicatable.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api/gridkit.version.html" class="btn btn-neutral float-left" title="version" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.14.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

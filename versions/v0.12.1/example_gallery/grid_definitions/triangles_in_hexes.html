@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Triangles in hexagons &mdash; GridKit v0.12.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=6e9ebc5e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NDVI" href="../raster_operations/ndvi.html" />
+    <link rel="prev" title="Hexagon grids" href="hex_grids.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.12.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="rotation_animation.html">Rotation animation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rotated_grids.html">Rotating grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hex_grids.html">Hexagon grids</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Triangles in hexagons</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.12.1).<br>
+      Latest version: <a href="../../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Triangles in hexagons</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/example_gallery/grid_definitions/triangles_in_hexes.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-example-gallery-grid-definitions-triangles-in-hexes-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="triangles-in-hexagons">
+<span id="example-triangles-in-hexes"></span><span id="sphx-glr-example-gallery-grid-definitions-triangles-in-hexes-py"></span><h1>Triangles in hexagons<a class="headerlink" href="#triangles-in-hexagons" title="Link to this heading"></a></h1>
+<p>Aligning different types of grids</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>In this example a triangle and a hexagon grid are defined in such a way
+that they perfectly line up. A hexagon can be neatly divided into six triangles.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The process in this example has been greatly simplified with the introduction
+of <a class="reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.subdivide" title="gridkit.hex_grid.HexGrid.subdivide"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.subdivide()</span></code></a> in v0.12.0.
+This example shows the more cumbersome approach, but I will leave this example
+up for now for educational purposes, for it shows how to manipulate cell size
+and offsets to position the grid the way you want.</p>
+</div>
+<dl class="simple">
+<dt>For the two grids to align, two things will need to match:</dt><dd><ul class="simple">
+<li><p>the length of the edge connecting two vertices needs to be the same</p></li>
+<li><p>they need an origin point that lines them up properly</p></li>
+</ul>
+</dd>
+</dl>
+<p>When initializing a grid in GridKit, the size specified by the user reflects the
+distance between the centroids of two neighboring cells (dx).
+For the hexagonal grid this will be a different value than for the triangle grid.
+The triangle grid is easiest. The side length is <cite>2*dx</cite>.
+Let’s say we want side lengths of 1, we specify a size for the triangle grid of 0.5.
+For the hexagonal grid this is less intuitive, it works out
+to be three over the square root of three: <cite>3 / sqrt(3)</cite>.
+At least this is the case if we use a ‘flat’ orientation for our hexagonal grid,
+which we will need to do in order for the grids to overlap.
+If this is not obvious, I encourage you to do this exercise with a ‘pointy’ hexagonal grid.
+It will be obvious from the plot.
+I should probably make grid definitions on side lengths possible to facilitate this process.
+Feel free to raise a github issue if your are interested in this.</p>
+<p>Let’s first plot some cells of these two grids and compare them.
+From there we can figure out how to shift the grids in order to align them.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">gridkit</span> <span class="kn">import</span> <span class="n">HexGrid</span><span class="p">,</span> <span class="n">TriGrid</span>
+<span class="kn">from</span> <span class="nn">gridkit.doc_utils</span> <span class="kn">import</span> <span class="n">plot_polygons</span>
+
+<span class="n">tri_grid</span> <span class="o">=</span> <span class="n">TriGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">hex_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;flat&quot;</span><span class="p">)</span>
+
+<span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">7.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">()</span>
+<span class="n">tri_bounds</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
+<span class="n">tri_ids</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">tri_bounds</span><span class="p">)</span>
+<span class="n">tri_geoms</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">hex_bounds</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span>
+<span class="n">hex_ids</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">hex_bounds</span><span class="p">)</span>
+<span class="n">hex_geoms</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">hex_ids</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">hex_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Create lattice with spacing of dx and dy to highlight cell bounds</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dy</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_triangles_in_hexes_001.png" srcset="../../_images/sphx_glr_triangles_in_hexes_001.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/tmp/gridkit_docs/v0.12.1/gridkit/hex_grid.py:86: UserWarning: A &#39;flat&#39; ``shape`` will be deprecated in version v1.0.0. It is advised to use ``rotation=30`` instead.
+  warnings.warn(
+/tmp/gridkit_docs/v0.12.1/gridkit/doc_utils.py:96: UserWarning: The argument &#39;filled&#39; for doc_utils has been deprecated in favor of &#39;fill&#39; and will be removed in a future version.
+  warnings.warn(
+</pre></div>
+</div>
+<p>Hooray! The grids are already aligned.
+It looks like the default origin already works well for this case,
+but let’s say we want to position the hexagon around zero.
+If the grids don’t match I often find it easier to figure out
+how to shift each grid to origin rather than figure out the
+relative offset between the grids.
+From visually inspecting the plot I can tell we’d have to
+shift the hexagon to the right by half a dx.
+The triangles though will then need to cross at the origin,
+so we’d need to either shift them half a side length to the left or
+3/4rth of a side length to the right.
+This works out to half a dx to the left or one and a half dx to the right.
+Let’s do the latter</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When dealing with a ‘flat’ hex grid, the x and y of <cite>offset</cite> need to
+be set in reverse order: (y,x). This is a known conceptual inconsistency
+but will not be fixed since ‘flat’ HexGrids will be removed in a future version
+in favor of <cite>rotation</cite>. See: <a class="reference internal" href="../../release_notes.html#release-notes-v0-11-0"><span class="std std-ref">release notes: v0.11.0</span></a></p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>For simpler centering of grids around origin, see <a class="reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a></p>
+</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tri_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.5</span> <span class="o">*</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">hex_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">()</span>
+<span class="n">tri_geoms</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">hex_geoms</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">hex_ids</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">hex_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="c1"># Create lattice with spacing of dx and dy to highlight cell bounds</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">+</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">dy</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_triangles_in_hexes_002.png" srcset="../../_images/sphx_glr_triangles_in_hexes_002.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><p>Et voila. Our grids are centered around the origin.
+Now we can play with the interaction between these grids.
+We can for example figure out what triangles belong to what hexagon.
+The simplest way to do this is to get the centroids of the triangles
+and call cell_at_point on the hexagon grid using these centroids.
+We can even give every triangle in the top-left of a hexagon the same color for example.
+Because of the way we ordered the cell-ids, we know that
+the first triangle will be in the top left of the hexagon.
+If you obtained the cell id’s in a different manner,
+you can sort them to make sure this is the case.
+You can use numpy for this, like <code class="docutils literal notranslate"><span class="pre">numpy.sort(tri_ids.ravel())</span></code> for example.</p>
+<p>First let’s find all the hex_ids.
+We can then assign each hex id a different value.
+Then we plot the triangles using these values and expect the hexagon
+grid to be reflected in the colors</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tri_centroids</span> <span class="o">=</span> <span class="n">tri_grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">tri_ids</span><span class="p">)</span>
+<span class="n">hex_ids</span> <span class="o">=</span> <span class="n">hex_grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">tri_centroids</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+<span class="n">value_map</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="p">):</span> <span class="n">i</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">cell</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">hex_ids</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">)}</span>
+<span class="n">color_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">value_map</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="p">)]</span> <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">hex_ids</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color_values</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;pink&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_triangles_in_hexes_003.png" srcset="../../_images/sphx_glr_triangles_in_hexes_003.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><p>As mentioned above, we can use the order of the data to color the
+cells based on whether they are the first, second, third etc. occurrence
+for the given hexagon. For good measure let’s also make the color dependent
+on the y-value of the hexagon, for good measure.
+We can create a dictionary based on the tuple representation of the index
+to keep track of the number of triangles in the grid.
+Then we create a colors list that will have a number for each triangle
+based on whether it was the first, second, etc. triangle in that hexagon.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">id_counter</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">color_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">hex_ids</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">id_counter</span><span class="p">:</span>  <span class="c1"># increment value for hexagon if present</span>
+        <span class="n">id_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># add id to dictionary if not present yet</span>
+        <span class="n">id_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">color_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_counter</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">id</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plot_polygons</span><span class="p">(</span><span class="n">tri_geoms</span><span class="p">,</span> <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color_values</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_triangles_in_hexes_004.png" srcset="../../_images/sphx_glr_triangles_in_hexes_004.png" alt="triangles in hexes" class = "sphx-glr-single-img"/><p>Ain’t that pretty?</p>
+<p>This kind of trick can be used for resampling.
+Each cell is then divided into smaller cells.
+A nearest neighbour resampling is then used on the smaller
+cells, after which the mean or majority can be used to determine
+the value of the larger cell.
+Maybe I will implement that as a default method some day.
+It’s fun but also arguably a good way to go about resampling
+in many cases.</p>
+<p>This is called remapping in the following publication:</p>
+<p>Accadia, C., S. Mariani, M. Casaioli, A. Lavagnini, and A. Speranza, 2003:
+Sensitivity of Precipitation Forecast Skill Scores to Bilinear Interpolation and
+a Simple Nearest-Neighbor Average Method on High-Resolution Verification Grids.
+Wea. Forecasting, 18, 918–932, <a class="reference external" href="https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2">https://doi.org/10.1175/1520-0434(2003)018&lt;0918:SOPFSS&gt;2.0.CO;2</a> .</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.467 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-triangles-in-hexes-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/3ef8508f3fe8d2ff60db217ac866cd81/triangles_in_hexes.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">triangles_in_hexes.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/99f0d9e26fa725df3cdab1bd918283f6/triangles_in_hexes.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">triangles_in_hexes.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="hex_grids.html" class="btn btn-neutral float-left" title="Hexagon grids" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../raster_operations/ndvi.html" class="btn btn-neutral float-right" title="NDVI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.12.1
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

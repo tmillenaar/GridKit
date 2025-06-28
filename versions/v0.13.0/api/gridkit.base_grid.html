@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>base_grid &mdash; GridKit v0.13.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=bb33721e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="bounded_grid" href="gridkit.bounded_grid.html" />
+    <link rel="prev" title="_statistical_functions" href="gridkit._statistical_functions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            GridKit
+          </a>
+              <div class="version">
+                v0.13.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_gallery/index.html">Example Gallery</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_reference.html">API reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gridkit.html">gridkit</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gridkit._statistical_functions.html">_statistical_functions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">base_grid</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gridkit.base_grid.BaseGrid"><code class="docutils literal notranslate"><span class="pre">BaseGrid</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.bounded_grid.html">bounded_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.doc_utils.html">doc_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.errors.html">errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.hex_grid.html">hex_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.index.html">index</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.io.html">io</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.rect_grid.html">rect_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.tri_grid.html">tri_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="gridkit.version.html">version</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+    <div style="
+        background-color: #ffefc2;
+        color: #333;
+        padding: 1em;
+        border-bottom: 2px solid #e6c200;
+        font-weight: bold;
+        text-align: center;
+    ">
+      You are viewing an <strong>outdated version</strong> of the documentation (v0.13.0).<br>
+      Latest version: <a href="../../v0.14.1/index.html">v0.14.1</a>
+    </div>
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_reference.html">API reference</a></li>
+          <li class="breadcrumb-item"><a href="gridkit.html">gridkit</a></li>
+      <li class="breadcrumb-item active">base_grid</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/gridkit.base_grid.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gridkit.base_grid">
+<span id="base-grid"></span><h1>base_grid<a class="headerlink" href="#module-gridkit.base_grid" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">gridkit.base_grid.</span></span><span class="sig-name descname"><span class="pre">BaseGrid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstraction base class that represents an infinite grid.</p>
+<section id="initialization-parameters">
+<h2>Initialization parameters<a class="headerlink" href="#initialization-parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>offset: <cite>Tuple(float, float)</cite> (optional)</dt><dd><p>The offset in dx and dy.
+Shifts the whole grid by the specified amount.
+The shift is always reduced to be maximum one cell size.
+If the supplied shift is larger,
+a shift will be performed such that the new center is a multiple of dx or dy away.
+Default: (0,0)</p>
+</dd>
+<dt>crs: <cite>pyproj.CRS</cite> (optional)</dt><dd><p>The coordinate reference system of the grid.
+The value can be anything accepted by pyproj.CRS.from_user_input(),
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.
+If None, no CRS is set.
+Default: None</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.definition">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">definition</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.definition" title="Link to this definition"></a></dt>
+<dd><p>The parameters that define the infinite grid.
+Passing these parameters into a new object instance will create a perfectly aligned grid.
+Note that Bounded Grids are defined by the bounds and data.
+Therefore, the properties returned by this property do describe the grid but cannot be used
+to create a new Bounded Grid object instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary outlying the parameters that define the grid</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.crs">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">crs</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.crs" title="Link to this definition"></a></dt>
+<dd><p>The Coordinate Reference System (CRS) represented as a <code class="docutils literal notranslate"><span class="pre">pyproj.CRS</span></code> object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None if the CRS is not set, and to set the value it
+:getter: Returns a <code class="docutils literal notranslate"><span class="pre">pyproj.CRS</span></code> or None. When setting, the value
+Coordinate Reference System of the geometry objects. Can be anything accepted by
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
+such as an authority string (eg “EPSG:4326”) or a WKT string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>pyproj.CRS</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.size" title="Link to this definition"></a></dt>
+<dd><p>The size of the cell as supplied when initiating the class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.dx">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dx</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.dx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.dx" title="Link to this definition"></a></dt>
+<dd><p>The distance in x-direction between two adjacent cell centers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.dy">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.dy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.dy" title="Link to this definition"></a></dt>
+<dd><p>The distance in y-direction between two adjacent cell centers.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cell_height">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cell_height" title="Link to this definition"></a></dt>
+<dd><p>The height of a cell</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cell_width">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cell_width" title="Link to this definition"></a></dt>
+<dd><p>The width of a cell</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.offset">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">offset</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.offset" title="Link to this definition"></a></dt>
+<dd><p>The offset off the grid in dx and dy.
+The offset is never larger than the size of a single grid cell.
+The offset represents the shift from the origin (0,0).</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.rotation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotation" title="Link to this definition"></a></dt>
+<dd><p>The counter-clockwise rotation of the grid around the origin in degrees.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.rotation_matrix">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotation_matrix</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotation_matrix" title="Link to this definition"></a></dt>
+<dd><p>The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.
+Note: makes a copy every time this is called.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.rotation_matrix_inv">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotation_matrix_inv</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.rotation_matrix_inv" title="Link to this definition"></a></dt>
+<dd><p>The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.
+Note: makes a copy every time this is called.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.area">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">area</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.area" title="Link to this definition"></a></dt>
+<dd><p>The area of a cell. The unit is the unit used for the cell’s <a class="reference internal" href="#gridkit.base_grid.BaseGrid.size" title="gridkit.base_grid.BaseGrid.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.size()</span></code></a>, squared.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.centroid">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.centroid" title="Link to this definition"></a></dt>
+<dd><p>Coordinates at the center of the cell(s) specified by <code class="docutils literal notranslate"><span class="pre">index</span></code>.</p>
+<p>If this method is called on a ‘Bounded’ class, the <code class="docutils literal notranslate"><span class="pre">index</span></code> argument is optional.
+In such a case the cell IDs of the cells contained in the Bounded product are returned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The index of the cell(s) of which the centroid is to be obtained.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Multidimensional array containing the longitude and latitude of the center of each cell respectively,
+in (width, height, lonlat)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – No <cite>index</cite> parameter was supplied to a grid that does not contain data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cells_near_point">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_near_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.cells_near_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cells_near_point" title="Link to this definition"></a></dt>
+<dd><p>The cells nearest to a point, often used in interpolation at the location of the point.
+For a TriGrid there are 6 nearby points.
+For a HexGrid there are 3 nearby points.
+For a RectGrid there are 4 nearby points.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.to_bounded">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_bounded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.to_bounded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.to_bounded" title="Link to this definition"></a></dt>
+<dd><p>Create a bounded version of this grid where the data in the bounds is filled with the supplied <cite>fill_value</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounds of the area of interest in (minx, miny, maxx, maxy).
+The bounds need to be aligned to the grid.
+See <a class="reference internal" href="#gridkit.base_grid.BaseGrid.align_bounds" title="gridkit.base_grid.BaseGrid.align_bounds"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.align_bounds()</span></code></a></p></li>
+<li><p><strong>fill_value</strong> (<cite>numpy.dtype</cite> (optional)) – The value to assign to the newly created array that fills the supplied bounds.
+Default: numpy.nan</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A bounded version of the current grid where the data is filled with <cite>fill_value</cite>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a> or <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#gridkit.base_grid.BaseGrid.to_bounded" title="gridkit.base_grid.BaseGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_bounded()</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_bounded" title="gridkit.rect_grid.RectGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_bounded()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_bounded" title="gridkit.hex_grid.HexGrid.to_bounded"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_bounded()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.relative_neighbours">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">relative_neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.relative_neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.relative_neighbours" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.neighbours">
+<span class="sig-name descname"><span class="pre">neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.neighbours" title="Link to this definition"></a></dt>
+<dd><p>The indices of the neighbouring cells.
+The argument ‘depth’ can be used to include cells from further away.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index of the cell(s) of which to get the neighbours.</p></li>
+<li><p><strong>depth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> Default: 1) – Determines the number of neighbours that are returned.
+If <cite>depth=1</cite> the direct neighbours are returned.
+If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
+<cite>depth=3</cite> returns yet another layer of neighbours, and so forth.</p></li>
+<li><p><strong>connect_corners</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to consider cells that touch corners but not sides as neighbours.
+This does not apply to <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a>.
+For further information on this argument, refer to <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>.</p></li>
+<li><p><strong>include_selected</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code> Default: False) – Whether to include the specified cell in the return array.
+Even though the specified cell can never be a neighbour of itself,
+this can be useful when for example a weighted average of the neighbours is desired
+in which case the cell itself often should also be included.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>The direct neighbours of a cell can be returned by using depth=1, which is the default.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">gridkit.rect_grid</span> <span class="kn">import</span> <span class="n">RectGrid</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">index</span>
+<span class="go">array([[1, 3],</span>
+<span class="go">       [0, 2],</span>
+<span class="go">       [2, 2],</span>
+<span class="go">       [1, 1]])</span>
+</pre></div>
+</div>
+<p>For more detailed examples:</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.relative_neighbours" title="gridkit.hex_grid.HexGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.relative_neighbours()</span></code></a>, <a class="reference internal" href="gridkit.tri_grid.html#gridkit.tri_grid.TriGrid.relative_neighbours" title="gridkit.tri_grid.TriGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">TriGrid.relative_neighbours()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cell_at_point">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_at_point</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">point</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.cell_at_point"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cell_at_point" title="Link to this definition"></a></dt>
+<dd><p>Determine the ID of the cell in which <cite>point</cite> falls.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>point</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The coordinates of the point to which to match the cell</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ID of the cell in (x,y)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cell_corners">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cell_corners</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.cell_corners"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cell_corners" title="Link to this definition"></a></dt>
+<dd><p>Coordinates of the cell corners as specified by <code class="docutils literal notranslate"><span class="pre">index</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a>) – The indices of the cells of interest. Each id contains an <cite>x</cite> and <cite>y</cite> value.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An array of coordinates in (x,y) specifying each of the corners.
+The returned array will be of the same shape as the input <code class="docutils literal notranslate"><span class="pre">index</span></code>,
+but with an extra axis containing the corners.
+The last axis is always of size 2 (x,y).
+The second to last axis is the length of the corners.
+The other axis are in the shape of the supplied index.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>numpy.ndarray</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.is_aligned_with">
+<span class="sig-name descname"><span class="pre">is_aligned_with</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.is_aligned_with"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.is_aligned_with" title="Link to this definition"></a></dt>
+<dd><p>Returns True if grids are algined and False if they are not.
+Grids are considered to be aligned when:
+- they are the same type of grid
+- the CRS is the same
+- the cell_size is the same
+- the offset from origin is the same
+- the cell shape is the same</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether or not the grids are aligned</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.to_crs">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_crs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">crs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.to_crs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.to_crs" title="Link to this definition"></a></dt>
+<dd><p>Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.
+This will update the cell size and the origin offset.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">crs</span></code> attribute on the current grid must be set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>crs</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>pyproj.CRS</em><em>]</em>) – The value can be anything accepted
+by <code class="xref py py-meth docutils literal notranslate"><span class="pre">pyproj.CRS.from_user_input()</span></code>,
+such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Examples:</p>
+<p><a class="reference internal" href="../example_gallery/raster_operations/coordinate_transformations.html#example-coordinate-transformations"><span class="std std-ref">Example: coordinate transformations</span></a></p>
+<p>Methods:</p>
+<p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.to_crs" title="gridkit.rect_grid.RectGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs" title="gridkit.hex_grid.HexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HexGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_crs" title="gridkit.rect_grid.BoundedRectGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.to_crs()</span></code></a>
+<a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs" title="gridkit.hex_grid.BoundedHexGrid.to_crs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_crs()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.parent_grid">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_grid</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.parent_grid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.anchor">
+<span class="sig-name descname"><span class="pre">anchor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'centroid'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'corner'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'centroid'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_place</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.anchor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.anchor" title="Link to this definition"></a></dt>
+<dd><p>Position a specified part of a grid cell at a specified location.
+This shifts (the origin of) the grid such that the specified <code class="docutils literal notranslate"><span class="pre">cell_element</span></code> is positioned at the specified <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.
+This is useful for example to align two grids by anchoring them to the same location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_loc</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – The coordinates of the point at which to anchor the grid in (x,y)</p></li>
+<li><p><strong>cell_element</strong> (<em>Literal</em><em>[</em><em>&quot;centroid&quot;</em><em>, </em><em>&quot;corner&quot;</em><em>] </em><em>- Default: &quot;centroid&quot;</em>) – The part of the cell that is to be positioned at the specified <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.
+Currently only “centroid” and “corner” are supported.
+When “centroid” is specified, the cell is centered around the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.
+When “corner” is specified, a nearby cell_corner is placed onto the <code class="docutils literal notranslate"><span class="pre">target_loc</span></code>.</p></li>
+<li><p><strong>in_place</strong> (<cite>bool</cite> (Default: False)) – <p>The original grid instance is modified if <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code> and no return argument is specified.
+If <code class="docutils literal notranslate"><span class="pre">in_place</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, the original grid instance remains unchanged and a modified copy is returned.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Even though <code class="docutils literal notranslate"><span class="pre">in_place=True</span></code> saves the creation of a Python object,
+a new Python object that wraps the Rust implementation needs to be updated
+and hence a new Python object is still created.
+Nevertheless, creating one new object is often better than creating two new objects.</p>
+</div>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a> if <code class="docutils literal notranslate"><span class="pre">in_place=False</span></code> or <cite>None</cite> if <code class="docutils literal notranslate"><span class="pre">in_place=True</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a> | None</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid.anchor" title="gridkit.tri_grid.BoundedTriGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedTriGrid.anchor()</span></code></a>, <a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.anchor" title="gridkit.rect_grid.BoundedRectGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.anchor()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.anchor" title="gridkit.hex_grid.BoundedHexGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.anchor()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.parent_grid_class">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">parent_grid_class</span></span><a class="headerlink" href="#gridkit.base_grid.BaseGrid.parent_grid_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.cells_in_bounds">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cells_in_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_cell_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.cells_in_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.cells_in_bounds" title="Link to this definition"></a></dt>
+<dd><p>Cells contained within a bounding box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>) – The bounding box in which to find the cells in (min_x, min_y, max_x, max_y)</p></li>
+<li><p><strong>return_cell_count</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Return a tuple containing the nr of cells in x and y direction inside the provided bounds</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The indices of the cells contained in the bounds</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.index.html#gridkit.index.GridIndex" title="gridkit.index.GridIndex"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridIndex</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.are_bounds_aligned">
+<span class="sig-name descname"><span class="pre">are_bounds_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.are_bounds_aligned"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.are_bounds_aligned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.align_bounds">
+<span class="sig-name descname"><span class="pre">align_bounds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'expand'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.align_bounds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.align_bounds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.intersect_geometries">
+<span class="sig-name descname"><span class="pre">intersect_geometries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">geometries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_point_warning</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.intersect_geometries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.intersect_geometries" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.to_shapely">
+<span class="sig-name descname"><span class="pre">to_shapely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_multipolygon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.to_shapely"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.to_shapely" title="Link to this definition"></a></dt>
+<dd><p>Represent the cells as Shapely Polygons</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The indices of the cells to convert to Shapely Polygons</p></li>
+<li><p><strong>as_multipolygon</strong> (<cite>numpy.ndarray</cite>) – Returns a Shapely MultiPolygon if True, returns a list of Shapely Polygons if False</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.to_shapely" title="gridkit.rect_grid.BoundedRectGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedRectGrid.to_shapely()</span></code></a>, <a class="reference internal" href="gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely" title="gridkit.hex_grid.BoundedHexGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedHexGrid.to_shapely()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.interp_from_points">
+<span class="sig-name descname"><span class="pre">interp_from_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.interp_from_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.interp_from_points" title="Link to this definition"></a></dt>
+<dd><p>Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</p>
+<p>This function turns any set of points at arbitrary location into a regularly spaced <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>
+that has the properties of the current <a class="reference internal" href="#gridkit.base_grid.BaseGrid" title="gridkit.base_grid.BaseGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGrid</span></code></a> (<code class="docutils literal notranslate"><span class="pre">self</span></code>).
+<a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a> works in the other direction, where a values on a <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a>
+are sampled in order to obtain values at arbitrary location.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is significantly slower than <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>point</strong> (<cite>numpy.ndarray</cite>) – A 2d numpy array containing the points in the form [[x1,y1], [x2,y2]]</p></li>
+<li><p><strong>values</strong> (<cite>numpy.ndarray</cite>) – The values corresponding to the supplied <cite>points</cite>, used as input for interpolation</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – The interpolation method to be used. Options are (“nearest”, “linear”, “cubic”). Default: “linear”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Bounded version of the supplied grid where the data is interpolated between the supplied points.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid" title="gridkit.bounded_grid.BoundedGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedGrid</span></code></a></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample" title="gridkit.bounded_grid.BoundedGrid.resample"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.resample()</span></code></a>, <a class="reference internal" href="gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interpolate" title="gridkit.bounded_grid.BoundedGrid.interpolate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundedGrid.interpolate()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.base_grid.BaseGrid.update">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/base_grid.html#BaseGrid.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.base_grid.BaseGrid.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gridkit._statistical_functions.html" class="btn btn-neutral float-left" title="_statistical_functions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="gridkit.bounded_grid.html" class="btn btn-neutral float-right" title="bounded_grid" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v0.13.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li class="current">
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.13.0/index.html">v0.13.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="/home/runner/work/GridKit/GridKit/gridkit-py/build/sphinx/html/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
