@@ -90,7 +90,7 @@ html_context = {
         for tag in version_tags
     ],
 }
-html_baseurl = f"https://tmilenaar.github.io/GridKit/versions/{current_version}"
+html_baseurl = f"https://tmillenaar.github.io/GridKit/versions/{current_version}"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
