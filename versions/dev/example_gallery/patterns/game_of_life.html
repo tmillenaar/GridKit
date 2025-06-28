@@ -471,42 +471,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img7bc39b5e72874d90a73e49e10938c849">
+  <img id="_anim_imgd5c766de8b2c480f971309c3872510a6">
   <div class="anim-controls">
-    <input id="_anim_slider7bc39b5e72874d90a73e49e10938c849" type="range" class="anim-slider"
+    <input id="_anim_sliderd5c766de8b2c480f971309c3872510a6" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim7bc39b5e72874d90a73e49e10938c849.set_frame(parseInt(this.value));">
+           oninput="animd5c766de8b2c480f971309c3872510a6.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim7bc39b5e72874d90a73e49e10938c849.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animd5c766de8b2c480f971309c3872510a6.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim7bc39b5e72874d90a73e49e10938c849.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animd5c766de8b2c480f971309c3872510a6.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim7bc39b5e72874d90a73e49e10938c849.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animd5c766de8b2c480f971309c3872510a6.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim7bc39b5e72874d90a73e49e10938c849.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animd5c766de8b2c480f971309c3872510a6.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim7bc39b5e72874d90a73e49e10938c849.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animd5c766de8b2c480f971309c3872510a6.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim7bc39b5e72874d90a73e49e10938c849.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animd5c766de8b2c480f971309c3872510a6.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim7bc39b5e72874d90a73e49e10938c849.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animd5c766de8b2c480f971309c3872510a6.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim7bc39b5e72874d90a73e49e10938c849.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animd5c766de8b2c480f971309c3872510a6.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim7bc39b5e72874d90a73e49e10938c849.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animd5c766de8b2c480f971309c3872510a6.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select7bc39b5e72874d90a73e49e10938c849"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd5c766de8b2c480f971309c3872510a6"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_7bc39b5e72874d90a73e49e10938c849"
+      <input type="radio" name="state" value="once" id="_anim_radio1_d5c766de8b2c480f971309c3872510a6"
              >
-      <label for="_anim_radio1_7bc39b5e72874d90a73e49e10938c849">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_7bc39b5e72874d90a73e49e10938c849"
+      <label for="_anim_radio1_d5c766de8b2c480f971309c3872510a6">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_d5c766de8b2c480f971309c3872510a6"
              checked>
-      <label for="_anim_radio2_7bc39b5e72874d90a73e49e10938c849">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_7bc39b5e72874d90a73e49e10938c849"
+      <label for="_anim_radio2_d5c766de8b2c480f971309c3872510a6">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_d5c766de8b2c480f971309c3872510a6"
              >
-      <label for="_anim_radio3_7bc39b5e72874d90a73e49e10938c849">Reflect</label>
+      <label for="_anim_radio3_d5c766de8b2c480f971309c3872510a6">Reflect</label>
     </form>
   </div>
 </div>
@@ -516,9 +516,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img7bc39b5e72874d90a73e49e10938c849";
-    var slider_id = "_anim_slider7bc39b5e72874d90a73e49e10938c849";
-    var loop_select_id = "_anim_loop_select7bc39b5e72874d90a73e49e10938c849";
+    var img_id = "_anim_imgd5c766de8b2c480f971309c3872510a6";
+    var slider_id = "_anim_sliderd5c766de8b2c480f971309c3872510a6";
+    var loop_select_id = "_anim_loop_selectd5c766de8b2c480f971309c3872510a6";
     var frames = new Array(6);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -847,12 +847,12 @@ bfUXAAAAAElFTkSuQmCC\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim7bc39b5e72874d90a73e49e10938c849 = new Animation(frames, img_id, slider_id, 299.0,
+        animd5c766de8b2c480f971309c3872510a6 = new Animation(frames, img_id, slider_id, 299.0,
                                  loop_select_id);
     }, 0);
   })()
 </script></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.812 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.808 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-game-of-life-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/db59fcf48fc31c66c74814d2cc0f0459/game_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">game_of_life.ipynb</span></code></a></p>
@@ -910,71 +910,71 @@ bfUXAAAAAElFTkSuQmCC\
       <dt>Versions</dt>
       
         <li class="current">
-          <a href="https://tmilenaar.github.io/GridKit/versions/dev/index.html">dev</a>   <--
+          <a href="https://tmillenaar.github.io/GridKit/versions/dev/index.html">dev</a>   <--
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.14.1/index.html">v0.14.1</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.14.1/index.html">v0.14.1</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.14.0/index.html">v0.14.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.14.0/index.html">v0.14.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.13.0/index.html">v0.13.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.13.0/index.html">v0.13.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.12.1/index.html">v0.12.1</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.12.1/index.html">v0.12.1</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.12.0/index.html">v0.12.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.12.0/index.html">v0.12.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.11.1/index.html">v0.11.1</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.11.1/index.html">v0.11.1</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.11.0/index.html">v0.11.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.11.0/index.html">v0.11.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.10.0/index.html">v0.10.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.10.0/index.html">v0.10.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.9.2/index.html">v0.9.2</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.2/index.html">v0.9.2</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.9.1/index.html">v0.9.1</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.1/index.html">v0.9.1</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.9.0/index.html">v0.9.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.0/index.html">v0.9.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.8.0/index.html">v0.8.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.8.0/index.html">v0.8.0</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.7.3/index.html">v0.7.3</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.3/index.html">v0.7.3</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.7.2/index.html">v0.7.2</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.2/index.html">v0.7.2</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.7.1/index.html">v0.7.1</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.1/index.html">v0.7.1</a> 
         </li>
       
         <li >
-          <a href="https://tmilenaar.github.io/GridKit/versions/v0.7.0/index.html">v0.7.0</a> 
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.0/index.html">v0.7.0</a> 
         </li>
       
     </dl>
