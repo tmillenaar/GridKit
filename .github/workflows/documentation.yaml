@@ -24,14 +24,15 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: |
-          pip install -e ./[doc]
+        run: pip install -e ./[doc]
+        working-directory: ./gridkit-py
 
       - name: Build Sphinx documentation
         run: bash docs/build_docs.sh
+        working-directory: ./gridkit-py
 
       - name: Deploy to Github Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: "build/sphinx/html"
+          publish_dir: "gridkit-py/build/sphinx/html"
