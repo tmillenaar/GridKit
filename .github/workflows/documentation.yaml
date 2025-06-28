@@ -2,13 +2,10 @@ name: Build and Deploy Sphinx Documentation
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "*"
-  workflow_dispatch:
-    inputs:
-      custom_tag:
-        description: "Custom tag to be displayed in doc as the gridkit version"
-        required: true
 
 jobs:
   build-and-deploy:
@@ -29,17 +26,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -e ./[doc]
-
-      - name: Set GRIDKIT_DOC_BUILD_LATEST_VERSION
-        run: |
-          if [ -n "${{ github.event.inputs.custom_tag }}" ]; then
-            echo "Using manual tag input: ${{ github.event.inputs.custom_tag }}"
-            echo "GRIDKIT_DOC_BUILD_LATEST_VERSION=${{ github.event.inputs.custom_tag }}" >> $GITHUB_ENV
-          else
-            tag="${GITHUB_REF#refs/tags/}"
-            echo "Using pushed tag: $tag"
-            echo "GRIDKIT_DOC_BUILD_LATEST_VERSION=$tag" >> $GITHUB_ENV
-          fi
 
       - name: Build Sphinx documentation
         run: bash docs/build_docs.sh
