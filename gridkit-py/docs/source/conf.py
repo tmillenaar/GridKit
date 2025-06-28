@@ -86,7 +86,7 @@ html_context = {
     "current_version": current_version,
     "latest_version": latest_version,
     "versions": [
-        [tag, f"https://tmilenaar.github.io/GridKit/versions/{tag}"]
+        [tag, f"https://tmillenaar.github.io/GridKit/versions/{tag}"]
         for tag in version_tags
     ],
 }
