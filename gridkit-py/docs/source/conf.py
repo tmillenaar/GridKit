@@ -85,10 +85,9 @@ print("Latest version: ", latest_version)
 html_context = {
     "current_version": current_version,
     "latest_version": latest_version,
-    "versions": [
-        [tag, f"{rootdir}/build/sphinx/html/versions/" + tag] for tag in version_tags
-    ],
+    "versions": [[tag, f"GridKit/versions/{tag}/"] for tag in version_tags],
 }
+html_baseurl = f"https://tmilenaar.github.io/GridKit/versions/{current_version}"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
