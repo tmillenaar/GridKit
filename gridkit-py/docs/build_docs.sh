@@ -89,7 +89,7 @@ for tag in $tags; do
 done
 
 # Link landing page to most recent version
-ln -sf "${rootdir}/build/sphinx/html/versions/${GRIDKIT_DOC_BUILD_LATEST_VERSION}/index.html" "${rootdir}/build/sphinx/html/index.html"
+rsync -a "${rootdir}/build/sphinx/html/versions/${GRIDKIT_DOC_BUILD_LATEST_VERSION}/" "${rootdir}/build/sphinx/html/"
 
 # Left over cleanup
 rm -rf /tmp/gridkit_docs
