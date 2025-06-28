@@ -1,0 +1,27 @@
+
+gridkit
+=======
+
+Submodules:
+
+.. toctree::
+   :maxdepth: 1
+
+   gridkit._statistical_functions
+   gridkit.base_grid
+   gridkit.bounded_grid
+   gridkit.doc_utils
+   gridkit.errors
+   gridkit.hex_grid
+   gridkit.index
+   gridkit.io
+   gridkit.rect_grid
+   gridkit.tile
+   gridkit.tri_grid
+   gridkit.version
+
+.. automodule:: gridkit
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:
