@@ -10,6 +10,7 @@ rootdir="$PWD"
 # Get all tags starting with 'v', remove all tags before v0.7.0 and sort with largest version at the top.
 # Any version before v0.7.0 does not properly build the documentation
 tags=$(git tag | grep '^v' | sort -V | awk 'BEGIN{keep=0} $0=="v0.7.0"{keep=1} keep' | sort -Vr)
+latest_version=$(echo "$tags" | head -n1)
 
 # Add dev tag which will represent the head of the main branch
 tags="dev
@@ -20,6 +21,7 @@ echo "Building docs for the following versions: $tags"
 # Export tags to be used in conf.py
 export GRIDKIT_DOC_BUILD_ROOTDIR=$rootdir
 export GRIDKIT_DOC_BUILD_TAGS=$tags
+export GRIDKIT_DOC_BUILD_LATEST_VERSION=$latest_version
 
 mkdir -p /tmp/gridkit_docs
 for tag in $tags; do
