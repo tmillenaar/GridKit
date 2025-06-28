@@ -19,13 +19,15 @@ jobs:
           python-version: "3.10"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+        working-directory: ./gridkit-py
       - name: Set the gridkit version in pyproject.toml to that of the tag
         run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+        working-directory: ./gridkit-py
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
+          args: -m ./gridkit-py --release --out dist --find-interpreter
           sccache: "true"
           manylinux: auto
         env:
@@ -34,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: gridkit-py/dist
 
   windows:
     runs-on: windows-latest
@@ -49,13 +51,15 @@ jobs:
           architecture: ${{ matrix.target }}
       - name: Set the gridkit version in version.py to that of the tag
         run: (Get-Content -Path .\gridkit\version.py -Raw) -replace '\"[0-9]+\.[0-9]+\.[0-9]+.+', ('"{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\gridkit\version.py ; Get-Content .\gridkit\version.py
+        working-directory: ./gridkit-py
       - name: Set the gridkit version in pyproject.toml to that of the tag
         run: (Get-Content -Path .\pyproject.toml -Raw) -replace 'version = "[0-9]+\.[0-9]+\.[0-9]+.+', ('version = "{0}"' -f ($env:GITHUB_REF -replace 'refs/tags/','')) | Set-Content -Path .\pyproject.toml ; Get-Content .\pyproject.toml
+        working-directory: ./gridkit-py
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
+          args: -m ./gridkit-py --release --out dist --find-interpreter
           sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
@@ -63,7 +67,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: gridkit-py/dist
 
   macos:
     runs-on: macos-latest
@@ -77,13 +81,15 @@ jobs:
           python-version: "3.10"
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+        working-directory: ./gridkit-py
       - name: Set the gridkit version in pyproject.toml to that of the tag
         run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+        working-directory: ./gridkit-py
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --find-interpreter
+          args: -m ./gridkit-py --release --out dist --find-interpreter
           sccache: "true"
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
@@ -91,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: gridkit-py/dist
 
   sdist:
     runs-on: ubuntu-latest
@@ -99,25 +105,27 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set the gridkit version in version.py to that of the tag
         run: sed -i -r "s|\"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|\"${GITHUB_REF/refs\/tags\//}\"|" ./gridkit/version.py; cat ./gridkit/version.py
+        working-directory: ./gridkit-py
       - name: Set the gridkit version in pyproject.toml to that of the tag
         run: sed -i -r "s|version = \"[[:alnum:]]+\.[[:alnum:]]+\.[[:alnum:]]+.+|version = \"${GITHUB_REF/refs\/tags\//}\"|" ./pyproject.toml; cat ./pyproject.toml
+        working-directory: ./gridkit-py
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
-          args: --out dist
+          args: -m ./gridkit-py --out dist
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Test installing dist
         run: |
-          pip install --force-reinstall --verbose dist/*.tar.gz
+          pip install --force-reinstall --verbose gridkit-py/dist/*.tar.gz
           cd ..
           python -c "import gridkit"
       - name: Upload sdist
         uses: actions/upload-artifact@v3
         with:
           name: wheels
-          path: dist
+          path: gridkit-py/dist
 
   release:
     name: Release
@@ -134,4 +142,4 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
         with:
           command: upload
-          args: --non-interactive --skip-existing *
+          args: -m gridkit-py --non-interactive --skip-existing *
