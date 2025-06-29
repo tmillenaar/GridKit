@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:07.993** total execution time for 5 files **from example_gallery/raster_operations**:
+**00:07.538** total execution time for 5 files **from example_gallery/raster_operations**:
 
 .. container::
 
@@ -33,17 +33,17 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``ndvi.py``)
-     - 00:03.645
+     - 00:03.618
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``elevation_distribution_per_land_cover.py``)
-     - 00:02.271
+     - 00:02.207
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_parial_overlap.py` (``parial_overlap.py``)
-     - 00:00.805
+     - 00:00.668
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_resampling.py` (``resampling.py``)
-     - 00:00.641
+     - 00:00.559
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_coordinate_transformations.py` (``coordinate_transformations.py``)
-     - 00:00.631
+     - 00:00.487
      - 0.0

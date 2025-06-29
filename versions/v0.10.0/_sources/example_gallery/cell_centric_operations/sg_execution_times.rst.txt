@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:04.725** total execution time for 3 files **from example_gallery/cell_centric_operations**:
+**00:05.248** total execution time for 3 files **from example_gallery/cell_centric_operations**:
 
 .. container::
 
@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_2d_diff_hex_anim.py` (``2d_diff_hex_anim.py``)
-     - 00:03.084
+     - 00:03.534
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py` (``downslope_path.py``)
-     - 00:01.138
+     - 00:01.144
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py` (``selecting_cells.py``)
-     - 00:00.503
+     - 00:00.569
      - 0.0
