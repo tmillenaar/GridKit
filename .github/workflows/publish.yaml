@@ -27,7 +27,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --interpreter python3
+          args: --release --out dist --interpreter python3.10
           sccache: "true"
           manylinux: auto
           working-directory: gridkit-py
@@ -36,7 +36,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}-${{ runner.os }}
           path: gridkit-py/dist
 
   windows:
@@ -60,7 +60,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --interpreter python3
+          args: --release --out dist --interpreter python3.10
           sccache: "true"
           working-directory: gridkit-py
         env:
@@ -68,7 +68,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}-${{ runner.os }}
           path: gridkit-py/dist
 
   macos:
@@ -91,7 +91,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist --interpreter python3
+          args: --release --out dist --interpreter python3.10
           sccache: "true"
           working-directory: gridkit-py
         env:
@@ -99,7 +99,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}-${{ runner.os }}
           path: gridkit-py/dist
 
   sdist:
@@ -128,7 +128,7 @@ jobs:
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
-          name: wheels
+          name: wheels-${{ matrix.target }}-${{ runner.os }}
           path: gridkit-py/dist
 
   release:
@@ -137,9 +137,9 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, windows, macos, sdist]
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: wheels
+          path: dist
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
         env:
