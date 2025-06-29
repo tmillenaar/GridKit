@@ -233,42 +233,42 @@ I encourage you to play with this, though matplotlib as a backend is not very pe
      </style>
 
      <div class="animation">
-       <img id="_anim_img94ead852953c4c6dbabeb26610c99242">
+       <img id="_anim_imgd762c319a8954cb18ee96d4c340894db">
        <div class="anim-controls">
-         <input id="_anim_slider94ead852953c4c6dbabeb26610c99242" type="range" class="anim-slider"
+         <input id="_anim_sliderd762c319a8954cb18ee96d4c340894db" type="range" class="anim-slider"
                 name="points" min="0" max="1" step="1" value="0"
-                oninput="anim94ead852953c4c6dbabeb26610c99242.set_frame(parseInt(this.value));">
+                oninput="animd762c319a8954cb18ee96d4c340894db.set_frame(parseInt(this.value));">
          <div class="anim-buttons">
-           <button title="Decrease speed" aria-label="Decrease speed" onclick="anim94ead852953c4c6dbabeb26610c99242.slower()">
+           <button title="Decrease speed" aria-label="Decrease speed" onclick="animd762c319a8954cb18ee96d4c340894db.slower()">
                <i class="fa fa-minus"></i></button>
-           <button title="First frame" aria-label="First frame" onclick="anim94ead852953c4c6dbabeb26610c99242.first_frame()">
+           <button title="First frame" aria-label="First frame" onclick="animd762c319a8954cb18ee96d4c340894db.first_frame()">
              <i class="fa fa-fast-backward"></i></button>
-           <button title="Previous frame" aria-label="Previous frame" onclick="anim94ead852953c4c6dbabeb26610c99242.previous_frame()">
+           <button title="Previous frame" aria-label="Previous frame" onclick="animd762c319a8954cb18ee96d4c340894db.previous_frame()">
                <i class="fa fa-step-backward"></i></button>
-           <button title="Play backwards" aria-label="Play backwards" onclick="anim94ead852953c4c6dbabeb26610c99242.reverse_animation()">
+           <button title="Play backwards" aria-label="Play backwards" onclick="animd762c319a8954cb18ee96d4c340894db.reverse_animation()">
                <i class="fa fa-play fa-flip-horizontal"></i></button>
-           <button title="Pause" aria-label="Pause" onclick="anim94ead852953c4c6dbabeb26610c99242.pause_animation()">
+           <button title="Pause" aria-label="Pause" onclick="animd762c319a8954cb18ee96d4c340894db.pause_animation()">
                <i class="fa fa-pause"></i></button>
-           <button title="Play" aria-label="Play" onclick="anim94ead852953c4c6dbabeb26610c99242.play_animation()">
+           <button title="Play" aria-label="Play" onclick="animd762c319a8954cb18ee96d4c340894db.play_animation()">
                <i class="fa fa-play"></i></button>
-           <button title="Next frame" aria-label="Next frame" onclick="anim94ead852953c4c6dbabeb26610c99242.next_frame()">
+           <button title="Next frame" aria-label="Next frame" onclick="animd762c319a8954cb18ee96d4c340894db.next_frame()">
                <i class="fa fa-step-forward"></i></button>
-           <button title="Last frame" aria-label="Last frame" onclick="anim94ead852953c4c6dbabeb26610c99242.last_frame()">
+           <button title="Last frame" aria-label="Last frame" onclick="animd762c319a8954cb18ee96d4c340894db.last_frame()">
                <i class="fa fa-fast-forward"></i></button>
-           <button title="Increase speed" aria-label="Increase speed" onclick="anim94ead852953c4c6dbabeb26610c99242.faster()">
+           <button title="Increase speed" aria-label="Increase speed" onclick="animd762c319a8954cb18ee96d4c340894db.faster()">
                <i class="fa fa-plus"></i></button>
          </div>
-         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select94ead852953c4c6dbabeb26610c99242"
+         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd762c319a8954cb18ee96d4c340894db"
                class="anim-state">
-           <input type="radio" name="state" value="once" id="_anim_radio1_94ead852953c4c6dbabeb26610c99242"
+           <input type="radio" name="state" value="once" id="_anim_radio1_d762c319a8954cb18ee96d4c340894db"
                   >
-           <label for="_anim_radio1_94ead852953c4c6dbabeb26610c99242">Once</label>
-           <input type="radio" name="state" value="loop" id="_anim_radio2_94ead852953c4c6dbabeb26610c99242"
+           <label for="_anim_radio1_d762c319a8954cb18ee96d4c340894db">Once</label>
+           <input type="radio" name="state" value="loop" id="_anim_radio2_d762c319a8954cb18ee96d4c340894db"
                   checked>
-           <label for="_anim_radio2_94ead852953c4c6dbabeb26610c99242">Loop</label>
-           <input type="radio" name="state" value="reflect" id="_anim_radio3_94ead852953c4c6dbabeb26610c99242"
+           <label for="_anim_radio2_d762c319a8954cb18ee96d4c340894db">Loop</label>
+           <input type="radio" name="state" value="reflect" id="_anim_radio3_d762c319a8954cb18ee96d4c340894db"
                   >
-           <label for="_anim_radio3_94ead852953c4c6dbabeb26610c99242">Reflect</label>
+           <label for="_anim_radio3_d762c319a8954cb18ee96d4c340894db">Reflect</label>
          </form>
        </div>
      </div>
@@ -278,9 +278,9 @@ I encourage you to play with this, though matplotlib as a backend is not very pe
        /* Instantiate the Animation class. */
        /* The IDs given should match those used in the template above. */
        (function() {
-         var img_id = "_anim_img94ead852953c4c6dbabeb26610c99242";
-         var slider_id = "_anim_slider94ead852953c4c6dbabeb26610c99242";
-         var loop_select_id = "_anim_loop_select94ead852953c4c6dbabeb26610c99242";
+         var img_id = "_anim_imgd762c319a8954cb18ee96d4c340894db";
+         var slider_id = "_anim_sliderd762c319a8954cb18ee96d4c340894db";
+         var loop_select_id = "_anim_loop_selectd762c319a8954cb18ee96d4c340894db";
          var frames = new Array(16);
     
        frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -5134,7 +5134,7 @@ I encourage you to play with this, though matplotlib as a backend is not very pe
          /* set a timeout to make sure all the above elements are created before
             the object is initialized. */
          setTimeout(function() {
-             anim94ead852953c4c6dbabeb26610c99242 = new Animation(frames, img_id, slider_id, 299.0,
+             animd762c319a8954cb18ee96d4c340894db = new Animation(frames, img_id, slider_id, 299.0,
                                       loop_select_id);
          }, 0);
        })()
@@ -5201,7 +5201,7 @@ I encourage you to play with this, though matplotlib as a backend is not very pe
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.154 seconds)
+   **Total running time of the script:** (0 minutes 5.296 seconds)
 
 
 .. _sphx_glr_download_example_gallery_patterns_hexagonal_automata.py:
