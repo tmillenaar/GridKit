@@ -137,15 +137,25 @@ jobs:
     if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, windows, macos, sdist]
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
         with:
-          path: dist
-          working-directory: gridkit-py
+          path: dist  # All artifacts will be downloaded into subfolders inside this
+
+      - name: Move wheels to dist/
+        run: |
+          mkdir -p gridkit-py/dist
+          find dist -name '*.whl' -exec mv {} gridkit-py/dist/ \;
+          find dist -name '*.tar.gz' -exec mv {} gridkit-py/dist/ \;
+
       - name: Publish to PyPI
         uses: PyO3/maturin-action@v1
-        env:
-          MATURIN_PYPI_TOKEN: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
         with:
           command: upload
           args: --non-interactive --skip-existing dist/*
           working-directory: gridkit-py
+        env:
+          MATURIN_PYPI_TOKEN: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
