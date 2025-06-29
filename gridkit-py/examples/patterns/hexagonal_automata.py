@@ -1,5 +1,5 @@
 """
-.. _hexagonal automata:
+.. _example hexagonal automata:
 
 Cellular automata: Hexagonal automata
 =====================================

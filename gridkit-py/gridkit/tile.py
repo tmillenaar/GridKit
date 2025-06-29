@@ -556,7 +556,7 @@ class DataTile(Tile):
         --------
         :py:meth:`.BoundedGrid.resample`
         :py:meth:`.BoundedGrid.interpolate`
-        :py:meth:`.Grid.interp_from_points`
+        :py:meth:`.interp_from_points`
         """
         points = numpy.array(points)
         values = numpy.array(values)

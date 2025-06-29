@@ -576,10 +576,11 @@ class RectGrid(BaseGrid):
 
                 The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.
 
-        adjust_rotation: bool (default: False)
+        adjust_rotation: bool
             If False, the grid in the new crs has the same rotation as the original grid.
             Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
             If True, set the new rotation to match the orientation of the grid at ``location`` after coordinate transformation.
+            Default: False
 
         Returns
         -------
@@ -962,9 +963,9 @@ class BoundedRectGrid(BoundedGrid, RectGrid):
                 new_bounds[2] + buffer_cells * self.dx,
                 new_bounds[3] + buffer_cells * self.dy,
             )
-        # cropped_data = numpy.flipud(numpy.flipud(self._data)[slice_y, slice_x]) # TODO: fix this blasted flipping. The raster should not be stored upside down maybe
-        cropped_data = self._data[slice_y, slice_x]  # Fixme: seems to be flipped?
-        # cropped_data = self._data[slice_x, slice_y]
+        cropped_data = self._data[
+            slice_y, slice_x
+        ]  # Note: slicing numpy arrays is in order (y,x)
         return self.update(cropped_data, bounds=new_bounds)
 
     def cell_corners(self, index: numpy.ndarray = None) -> numpy.ndarray:
