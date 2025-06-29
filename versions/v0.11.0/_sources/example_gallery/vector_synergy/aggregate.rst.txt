@@ -189,7 +189,7 @@ we will have to convert that back into a GridIndex using :meth:`.GridIndex.from_
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.342 seconds)
+   **Total running time of the script:** (0 minutes 0.291 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate.py:
