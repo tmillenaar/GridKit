@@ -237,7 +237,7 @@ such that they do not cross the outer border.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.343 seconds)
+   **Total running time of the script:** (0 minutes 0.342 seconds)
 
 
 .. _sphx_glr_download_example_gallery_patterns_flower_of_life.py:

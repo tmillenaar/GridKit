@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:06.425** total execution time for 3 files **from example_gallery/patterns**:
+**00:06.360** total execution time for 3 files **from example_gallery/patterns**:
 
 .. container::
 
@@ -33,11 +33,11 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_patterns_hexagonal_automata.py` (``hexagonal_automata.py``)
-     - 00:05.266
+     - 00:05.173
      - 0.0
    * - :ref:`sphx_glr_example_gallery_patterns_game_of_life.py` (``game_of_life.py``)
-     - 00:00.817
+     - 00:00.848
      - 0.0
    * - :ref:`sphx_glr_example_gallery_patterns_flower_of_life.py` (``flower_of_life.py``)
-     - 00:00.342
+     - 00:00.339
      - 0.0
