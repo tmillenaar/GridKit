@@ -230,7 +230,7 @@ See :ref:`example selecting cells` for a example where this is done.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.486 seconds)
+   **Total running time of the script:** (0 minutes 0.485 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_hex_grids.py:

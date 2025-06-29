@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.828** total execution time for 2 files **from example_gallery/grid_definitions**:
+**00:01.843** total execution time for 2 files **from example_gallery/grid_definitions**:
 
 .. container::
 
@@ -33,8 +33,8 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py` (``triangles_in_hexes.py``)
-     - 00:01.330
+     - 00:01.338
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``)
-     - 00:00.498
+     - 00:00.505
      - 0.0
