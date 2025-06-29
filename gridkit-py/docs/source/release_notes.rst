@@ -21,6 +21,9 @@ Features
  - Provide a flat and pointy version of TriGrid
  - Fix offset having to be specified in (y,x) if for 'flat' HexGrids, now (x,y)
  - Add set_zoom_to_bounds option to :func:`.doc_utils.plot_polygons` to allow to turn it off
+ - Add :func:`.io.raster_to_data_tile` for reading raster files as DataTiles
+ - Allow :func:`.io.write_raster` to write both :class:`.BoundedRectGrid` as well as :class:`.DataTile`,
+   as long as the Data Tile is on a :class:`.RectGrid`
 
 Fixes
  - adjust example :ref:`flower_of_life.py <example flower of life>` to work with shapely 2.1.0
