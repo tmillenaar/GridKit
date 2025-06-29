@@ -1,0 +1,984 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cellular automata: Conway’s game of life &mdash; GridKit v1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+    <link rel="canonical" href="https://tmillenaar.github.io/GridKit/versions/v1.0.0/example_gallery/patterns/game_of_life.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=76e2d817"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NDVI" href="../raster_operations/ndvi.html" />
+    <link rel="prev" title="Flower of life" href="flower_of_life.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            GridKit
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Example Gallery</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#cell-centric">Cell centric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#grid-definitions">Grid definitions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#patterns-created-from-regular-grid-interactions">Patterns created from regular grid interactions</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="hexagonal_automata.html">Cellular automata: Hexagonal automata</a></li>
+<li class="toctree-l3"><a class="reference internal" href="flower_of_life.html">Flower of life</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Cellular automata: Conway’s game of life</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#initial-conditions">Initial conditions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-naive-method">The naive method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-performant-method">The performant method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#animation">Animation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#raster-operations">Raster operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#vector-data-interactions">Vector data interactions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_reference.html">API reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../roadmap.html">Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release_notes.html">Release notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">GridKit</a>
+      </nav>
+
+      <div class="wy-nav-content">
+  
+  
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Example Gallery</a></li>
+      <li class="breadcrumb-item active">Cellular automata: Conway’s game of life</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/example_gallery/patterns/game_of_life.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-example-gallery-patterns-game-of-life-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="cellular-automata-conway-s-game-of-life">
+<span id="example-game-of-life"></span><span id="sphx-glr-example-gallery-patterns-game-of-life-py"></span><h1>Cellular automata: Conway’s game of life<a class="headerlink" href="#cellular-automata-conway-s-game-of-life" title="Link to this heading"></a></h1>
+<p>Cellular automata are a small set of rules relating to cells on a grid that can create complex patterns when applied repeatedly.
+There is a near infinite veriety of rules, but far and away the most well known set of rules is that of the so called Conway’s game of life.
+The setup is as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>The board is a 2d rectangular grid</p></li>
+<li><p>The 8 neighbouring cells are considered, so this includes the diagonal neighbours</p></li>
+<li><p>A cell has two possbile states: alive or dead</p></li>
+</ul>
+</div></blockquote>
+<p>The rules as taken from <a class="reference external" href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life</a>:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Any live cell with fewer than two live neighbours dies, as if by underpopulation.</p></li>
+<li><p>Any live cell with two or three live neighbours lives on to the next generation.</p></li>
+<li><p>Any live cell with more than three live neighbours dies, as if by overpopulation.</p></li>
+<li><p>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</p></li>
+</ol>
+</div></blockquote>
+<section id="initial-conditions">
+<h2>Initial conditions<a class="headerlink" href="#initial-conditions" title="Link to this heading"></a></h2>
+<p>All cellular automata simulations are highly dependent on the initial conditions. We have to start with some dead cells and some live cells.
+After all, according to these rules, if all cells are live, the cells will die in the next generation and if all cells are dead, they stey dead
+for they would need three live neighbours to become a live cell. Therefore we need to start with something that is at least halfway interesting.
+Let’s set up a starting scenario. Feel free to download this script as a notebook and start fiddeling yourself.
+The particular starting scenario I chose will replicate itself in three generations, which makes it convenient for creating
+a looping animation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundedRectGrid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span>
+
+<span class="c1"># Initialize</span>
+<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">grid</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">neighbours</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">neighbours</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+<span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Starting configuration&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_game_of_life_001.png" srcset="../../_images/sphx_glr_game_of_life_001.png" alt="Starting configuration" class = "sphx-glr-single-img"/></section>
+<section id="the-naive-method">
+<h2>The naive method<a class="headerlink" href="#the-naive-method" title="Link to this heading"></a></h2>
+<p>We can convert the rules into code. The naive but intuitive way would look something like:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data_second_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># live cell</span>
+            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Dead cell</span>
+            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_second_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Second generation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_game_of_life_002.png" srcset="../../_images/sphx_glr_game_of_life_002.png" alt="Second generation" class = "sphx-glr-single-img"/></section>
+<section id="the-performant-method">
+<h2>The performant method<a class="headerlink" href="#the-performant-method" title="Link to this heading"></a></h2>
+<p>The unfortunate thing about this method is that it loops over all cells in python, which is slow.
+As a first optimization we can get rid of the conditionals by adding all the contributions.
+This can looks something like:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data_third_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data_second_gen</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">data_third_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span>
+            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_third_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Third generation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_game_of_life_003.png" srcset="../../_images/sphx_glr_game_of_life_003.png" alt="Third generation" class = "sphx-glr-single-img"/><p>With the code written like this, it is clear that we can also remove the double python loop by utilizing numpy slices:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">nb</span> <span class="o">=</span> <span class="n">data_third_gen</span><span class="p">[</span>
+    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+<span class="n">data_fourth_gen</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="mi">0</span> <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">((</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_fourth_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Fourth generation&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_game_of_life_004.png" srcset="../../_images/sphx_glr_game_of_life_004.png" alt="Fourth generation" class = "sphx-glr-single-img"/><p>Note how this fourth generation looks the same as the starting conditions. The pattern loops every three frames/generations.</p>
+<p>Written this way, you could even run this logic on a GPU using PyTorch or wgpu,
+but since most time is now spent plotting using matplotlib you might also want to consider
+a different visualization method (for example py-gfx) if a speedup for larger grids is desired.</p>
+</section>
+<section id="animation">
+<h2>Animation<a class="headerlink" href="#animation" title="Link to this heading"></a></h2>
+<p>Since we are iterating over time, cellular automata lend itself well for an animation.
+Given the logic above, the animation code can look like so:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">update_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+    <span class="n">nb</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
+        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
+    <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">0</span>
+        <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">((</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+
+<span class="c1"># Create animation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncAnimation</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
+<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">update_frame</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-animation docutils container">
+<link rel="stylesheet"
+href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+<script language="javascript">
+  function isInternetExplorer() {
+    ua = navigator.userAgent;
+    /* MSIE used to detect old browsers and Trident used to newer ones*/
+    return ua.indexOf("MSIE ") > -1 || ua.indexOf("Trident/") > -1;
+  }
+
+  /* Define the Animation class */
+  function Animation(frames, img_id, slider_id, interval, loop_select_id){
+    this.img_id = img_id;
+    this.slider_id = slider_id;
+    this.loop_select_id = loop_select_id;
+    this.interval = interval;
+    this.current_frame = 0;
+    this.direction = 0;
+    this.timer = null;
+    this.frames = new Array(frames.length);
+
+    for (var i=0; i<frames.length; i++)
+    {
+     this.frames[i] = new Image();
+     this.frames[i].src = frames[i];
+    }
+    var slider = document.getElementById(this.slider_id);
+    slider.max = this.frames.length - 1;
+    if (isInternetExplorer()) {
+        // switch from oninput to onchange because IE <= 11 does not conform
+        // with W3C specification. It ignores oninput and onchange behaves
+        // like oninput. In contrast, Microsoft Edge behaves correctly.
+        slider.setAttribute('onchange', slider.getAttribute('oninput'));
+        slider.setAttribute('oninput', null);
+    }
+    this.set_frame(this.current_frame);
+  }
+
+  Animation.prototype.get_loop_state = function(){
+    var button_group = document[this.loop_select_id].state;
+    for (var i = 0; i < button_group.length; i++) {
+        var button = button_group[i];
+        if (button.checked) {
+            return button.value;
+        }
+    }
+    return undefined;
+  }
+
+  Animation.prototype.set_frame = function(frame){
+    this.current_frame = frame;
+    document.getElementById(this.img_id).src =
+            this.frames[this.current_frame].src;
+    document.getElementById(this.slider_id).value = this.current_frame;
+  }
+
+  Animation.prototype.next_frame = function()
+  {
+    this.set_frame(Math.min(this.frames.length - 1, this.current_frame + 1));
+  }
+
+  Animation.prototype.previous_frame = function()
+  {
+    this.set_frame(Math.max(0, this.current_frame - 1));
+  }
+
+  Animation.prototype.first_frame = function()
+  {
+    this.set_frame(0);
+  }
+
+  Animation.prototype.last_frame = function()
+  {
+    this.set_frame(this.frames.length - 1);
+  }
+
+  Animation.prototype.slower = function()
+  {
+    this.interval /= 0.7;
+    if(this.direction > 0){this.play_animation();}
+    else if(this.direction < 0){this.reverse_animation();}
+  }
+
+  Animation.prototype.faster = function()
+  {
+    this.interval *= 0.7;
+    if(this.direction > 0){this.play_animation();}
+    else if(this.direction < 0){this.reverse_animation();}
+  }
+
+  Animation.prototype.anim_step_forward = function()
+  {
+    this.current_frame += 1;
+    if(this.current_frame < this.frames.length){
+      this.set_frame(this.current_frame);
+    }else{
+      var loop_state = this.get_loop_state();
+      if(loop_state == "loop"){
+        this.first_frame();
+      }else if(loop_state == "reflect"){
+        this.last_frame();
+        this.reverse_animation();
+      }else{
+        this.pause_animation();
+        this.last_frame();
+      }
+    }
+  }
+
+  Animation.prototype.anim_step_reverse = function()
+  {
+    this.current_frame -= 1;
+    if(this.current_frame >= 0){
+      this.set_frame(this.current_frame);
+    }else{
+      var loop_state = this.get_loop_state();
+      if(loop_state == "loop"){
+        this.last_frame();
+      }else if(loop_state == "reflect"){
+        this.first_frame();
+        this.play_animation();
+      }else{
+        this.pause_animation();
+        this.first_frame();
+      }
+    }
+  }
+
+  Animation.prototype.pause_animation = function()
+  {
+    this.direction = 0;
+    if (this.timer){
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+  }
+
+  Animation.prototype.play_animation = function()
+  {
+    this.pause_animation();
+    this.direction = 1;
+    var t = this;
+    if (!this.timer) this.timer = setInterval(function() {
+        t.anim_step_forward();
+    }, this.interval);
+  }
+
+  Animation.prototype.reverse_animation = function()
+  {
+    this.pause_animation();
+    this.direction = -1;
+    var t = this;
+    if (!this.timer) this.timer = setInterval(function() {
+        t.anim_step_reverse();
+    }, this.interval);
+  }
+</script>
+
+<style>
+.animation {
+    display: inline-block;
+    text-align: center;
+}
+input[type=range].anim-slider {
+    width: 374px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.anim-buttons {
+    margin: 8px 0px;
+}
+.anim-buttons button {
+    padding: 0;
+    width: 36px;
+}
+.anim-state label {
+    margin-right: 8px;
+}
+.anim-state input {
+    margin: 0;
+    vertical-align: middle;
+}
+</style>
+
+<div class="animation">
+  <img id="_anim_img2c28313f4a4948aea23608e51789831c">
+  <div class="anim-controls">
+    <input id="_anim_slider2c28313f4a4948aea23608e51789831c" type="range" class="anim-slider"
+           name="points" min="0" max="1" step="1" value="0"
+           oninput="anim2c28313f4a4948aea23608e51789831c.set_frame(parseInt(this.value));">
+    <div class="anim-buttons">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim2c28313f4a4948aea23608e51789831c.slower()">
+          <i class="fa fa-minus"></i></button>
+      <button title="First frame" aria-label="First frame" onclick="anim2c28313f4a4948aea23608e51789831c.first_frame()">
+        <i class="fa fa-fast-backward"></i></button>
+      <button title="Previous frame" aria-label="Previous frame" onclick="anim2c28313f4a4948aea23608e51789831c.previous_frame()">
+          <i class="fa fa-step-backward"></i></button>
+      <button title="Play backwards" aria-label="Play backwards" onclick="anim2c28313f4a4948aea23608e51789831c.reverse_animation()">
+          <i class="fa fa-play fa-flip-horizontal"></i></button>
+      <button title="Pause" aria-label="Pause" onclick="anim2c28313f4a4948aea23608e51789831c.pause_animation()">
+          <i class="fa fa-pause"></i></button>
+      <button title="Play" aria-label="Play" onclick="anim2c28313f4a4948aea23608e51789831c.play_animation()">
+          <i class="fa fa-play"></i></button>
+      <button title="Next frame" aria-label="Next frame" onclick="anim2c28313f4a4948aea23608e51789831c.next_frame()">
+          <i class="fa fa-step-forward"></i></button>
+      <button title="Last frame" aria-label="Last frame" onclick="anim2c28313f4a4948aea23608e51789831c.last_frame()">
+          <i class="fa fa-fast-forward"></i></button>
+      <button title="Increase speed" aria-label="Increase speed" onclick="anim2c28313f4a4948aea23608e51789831c.faster()">
+          <i class="fa fa-plus"></i></button>
+    </div>
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select2c28313f4a4948aea23608e51789831c"
+          class="anim-state">
+      <input type="radio" name="state" value="once" id="_anim_radio1_2c28313f4a4948aea23608e51789831c"
+             >
+      <label for="_anim_radio1_2c28313f4a4948aea23608e51789831c">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_2c28313f4a4948aea23608e51789831c"
+             checked>
+      <label for="_anim_radio2_2c28313f4a4948aea23608e51789831c">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_2c28313f4a4948aea23608e51789831c"
+             >
+      <label for="_anim_radio3_2c28313f4a4948aea23608e51789831c">Reflect</label>
+    </form>
+  </div>
+</div>
+
+
+<script language="javascript">
+  /* Instantiate the Animation class. */
+  /* The IDs given should match those used in the template above. */
+  (function() {
+    var img_id = "_anim_img2c28313f4a4948aea23608e51789831c";
+    var slider_id = "_anim_slider2c28313f4a4948aea23608e51789831c";
+    var loop_select_id = "_anim_loop_select2c28313f4a4948aea23608e51789831c";
+    var frames = new Array(6);
+
+  frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
+bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+YQAAD2EBqD+naQAACwNJREFUeJzt3bFqFlsDhtE9fwKaxlJIwE5OJWLldwmCtVY2guAVCGJhZSkI\
+toKIYOkd2IqijdZWgmDARrAxKWRO8eeIkjbJGJ+1yv3B8MIM4WEjOM3zPA8AADL+t/QAAACOlgAE\
+AIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACA\
+GAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgR\
+gAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEOAXu7u74/bt22Nra2ts\
+bGyM1Wo1Xrx4sfQsgAMlAAF+cf369fHgwYNx7dq18fDhw7G2tjYuX748Xr58ufQ0gAMzzfM8Lz0C\
+4E/w9u3bsVqtxv3798etW7fGGGPs7OyMc+fOjdOnT49Xr14tvBDgYLgBBNjz/Pnzsba2Nm7evPnz\
+7OTJk+PGjRvj9evX49OnTwuuAzg4AhBgz7t378Y///wzTp069dv5xYsXxxhjvH//foFVAAdPAALs\
+2d7eHpubm/vO/zv7/PnzUU8COBQCEGDP9+/fx4kTJ/adnzx58ufvAH8DAQiwZ2NjY+zu7u4739nZ\
++fk7wN9AAALs2dzcHNvb2/vO/zvb2to66kkAh0IAAuy5cOHC+PDhw/j27dtv52/evPn5O8DfQAAC\
+7Lly5cr48ePHePTo0c+z3d3d8eTJk7FarcaZM2cWXAdwcNaXHgDwp1itVuPq1avjzp0748uXL+Ps\
+2bPj6dOn4+PHj+Px48dLzwM4MP4nEIBf7OzsjLt3745nz56Nr1+/jvPnz4979+6NS5cuLT0N4MAI\
+QACAGP8GEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
+CAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
+EAAgRgACAMSsLz0A2G+apqUnLG6e56Un/BF8C74FOAxuAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYA\
+AgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAA\
+QIwABACIEYAAADECEAAgZprneV56BAAAR8cNIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAx\
+AhAAIEYAAgDErC89AI7CNE2H8tx5ng/luRy/d3bc9nI478z74rhwAwgAECMAAQBiBCAAQIwABACI\
+EYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
+CAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
+EAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgJhpnud56RHA\
+76ZpWnrC4vxp+j/fgm8BDoMbQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACI\
+meZ5npceAQDA0XEDCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+BCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAx60sPAPab\
+pmnpCYub53npCX8E34JvAQ6DG0AAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhA\
+AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iFlfegAchWmaDuW58zwfq+ceJ8ftnR23vRzOO/O+OC7cAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwA\
+BACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACI\
+EYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
+CAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIGaa53leegQAAEfHDSAA\
+QIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDE\
+CEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxKwvPQDYb5qmpScsbp7npSf8EXwL\
+vgU4DG4AAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMdM8z/PSIwAAODpuAAEAYgQg\
+AECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIA\
+xAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECM\
+AAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhA\
+AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABDzL65dy317iEeUAAAAAElFTkSu\
+QmCC\
+"
+  frames[1] = "data:image/png;base64,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\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+LrsHwF1zzt0T/rfWWoc81zs7zhFne9Tn4GzO9Ln1znhobgABAGIEIABAjAAEAIgRgAAAMQIQACBG\
+AAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQg\
+AECMAAQAiBGAAAAxAhAAIGautdbuEQAAXI8bQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAA\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+BCAAQIwABACIueweAFzPnHP3hHtba+2e8Ch4Z8AR3AACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQMxl9wDg/NZauyf8bx1xtnPOB38mcC5uAAEAYgQgAECMAAQAiBGAAAAxAhAA\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+BCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYA\
+AgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAA\
+QMxca63dIwAAuB43gAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIE\
+IABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABA\
+jAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAE\
+AIgRgAAAMQIQACDmb7YcoHRUXLq1AAAAAElFTkSuQmCC\
+"
+  frames[2] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
+bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+YQAAD2EBqD+naQAAC1dJREFUeJzt3LuqFVsChtFZ7cbE1MjAB/CWKIiYmBqYeUl8BDNfxUfQB9DY\
+RMQLiLloLGgiCgaCyOxAafpgn9NH2GuXdb4xQjcUP7XK4mPqXsuccw4AADL+tfYAAAAOlgAEAIgR\
+gAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEI\
+ABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAA\
+MQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEOCHFy9ejFu3bo2TJ0+OI0eO\
+jOPHj4/r16+P169frz0NYF8tc8659giA38HVq1fHkydPxrVr18aZM2fGu3fvxp07d8bnz5/H8+fP\
+x6lTp9aeCLAvBCDAD0+fPh3nzp0bhw8f/s+fvXnzZpw+fXpcvXp13L17d8V1APtHAAL8H2fPnh1j\
+jPHy5cuVlwDsD/8HEOAvzDnH+/fvx9GjR9eeArBvBCDAX7h37954+/btuHHjxtpTAPaNfwIG+BOv\
+Xr0a58+fHydPnhyPHz8ehw4dWnsSwL4QgAD/w7t378bFixfH169fx/Pnz8exY8fWngSwb/bWHgDw\
+u/n06dO4fPny+Pjx43j8+LH4A/5xBCDAf/ny5cu4cuXKeP369Xj48OE4ceLE2pMA9p0ABPjh27dv\
+48aNG+PZs2fj/v3748KFC2tPAtgJAQjww+3bt8eDBw/GlStXxocPH3764uebN2+utAxgf/klEIAf\
+Ll26NB49evSnP/e6BP4pBCAAQIwvggYAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABA\
+jAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAE\
+AIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACA\
+GAEIABAjAAEAYgQgAECMAAQAiBGAAAAxe2sPAH62LMvaE37JnHPtCfwCzxfgBBAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACI\
+EYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYpY551x7BHAwlmVZe8Lf5tX0nc8M2AUngAAAMQIQ\
+ACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEA\
+YgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQs7f2ADgIy7Ls5Lpzzp1cd2t2cR+29plt\
+ae+utm7NLu6DdwJb4QQQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGL21h4A\
+W7Ysy9oTfsmccyfX3dp92JJd3FvPAeAEEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ECMAAQBi9tYeAAdhzrmT6y7LspPr2ru7rVuzpXvruYXtcAIIABAjAAEAYgQgAECMAAQAiBGAAAAx\
+AhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMA\
+AQBiBCAAQIwABACIWeacc+0RwB8ty7L2hNV5NX3nWfAswC44AQQAiBGAAAAxAhAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACI\
+EYAAADECEAAgRgACAMQIQACAmGXOOdceAQDAwXECCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBG\
+AAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQg\
+AECMAAQAiBGAAAAxe2sPAH62LMvaE1Y351x7wm/Bs+BZgF1wAggAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMXtrD4AtW5ZlJ9edc+7kulvau6WtY2xr75a2jrG9vbAFTgABAGIE\
+IABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxe2sPgIOwLMvaE37JrvbOOXdy3a3d3y3Zxb31\
+HHy3pXsL+80JIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDE7K09ALZszrn2\
+hF+yLMtOrruL+7CrrVuzpXvr7wNshxNAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABA\
+jAAEAIhZ5pxz7RHAwViWZe0Jf5tX03c+M2AXnAACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ECMAAQBiBCAAQMwy55xrjwD+aFmWtSf8Eq+RbfF8AU4AAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABA\
+jAAEAIgRgAAAMcucc649AgCAg+MEEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAx\
+AhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMA\
+AQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAA\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+BCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYA\
+AgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAA\
+QIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDE\
+CEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwA\
+BACIEYAAADH/BrwoFsms9uuoAAAAAElFTkSuQmCC\
+"
+  frames[3] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
+bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+YQAAD2EBqD+naQAACvxJREFUeJzt2zFrFd0ChtE9GoRPtBMExcbSNn1KyxSiWNppZeXvsBMkhY0g\
+iGCjhb9BLEUIdoKICEKiaASR+YprcxWuxT3JGJ61yhTDC7MJD/ucM83zPA8AADKOLD0AAICDJQAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIE\
+IABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABPjp1atX48qVK+P8+fPj\
++PHj49SpU2NjY2M8ffp06WkAK7W29ACAv8WbN2/G58+fx7Vr18aZM2fG169fx+PHj8fm5ubY2toa\
+169fX3oiwEpM8zzPS48A+Fv9+PFjrK+vj2/fvo3t7e2l5wCshI+AAf6Ho0ePjnPnzo2dnZ2lpwCs\
+jI+AAX7x5cuXsbe3N3Z3d8eTJ0/Gs2fPxtWrV5eeBbAyAhDgF7du3RpbW1tjjDGOHDkyLl26NO7c\
+ubPwKoDV8R1AgF9sb2+Pt2/fjnfv3o1Hjx6NY8eOjbt3747Tp08vPQ1gJQQgwB9cvHhx7OzsjOfP\
+n49pmpaeA/B/8yMQgD+4fPnyePHixXj9+vXSUwBWQgAC/MHe3t4YY4zd3d2FlwCshgAE+OnDhw+/\
+/e379+/j/v37459//hkXLlxYYBXA6vkVMMBPN27cGJ8+fRobGxvj7Nmz4/379+PBgwdje3t73L59\
+e5w4cWLpiQAr4UcgAD89fPhw3Lt3b7x8+XJ8/PhxnDx5cqyvr4+bN2+Ozc3NpecBrIwABACI8R1A\
+AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ELO29ADgd9M0LT1hcfM8Lz3hr+AsOAuwH9wAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAA\
+MQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAj\
+AAEAYgQgAEDMNM/zvPQIAAAOjhtAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAE\
+AIhZW3oAHIRpmvblufM878tzOXzv7LDtZX/emffFYeEGEAAgRgACAMQIQACAGAEIABAjAAEAYgQg\
+AECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIA\
+xAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECM\
+AAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhA\
+AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMdM8z/PSI4D/Nk3T0hMW\
+51/TfzgLzgLsBzeAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBG\
+AAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAzzfM8Lz0C\
+AICD4wYQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEI\
+ABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGLWlh4A/G6apqUnLG6e\
+56Un/BWcBWcB9oMbQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIWVt6AByE\
+aZr25bnzPB+q5x4mh+2dHba97M878744LNwAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAA\
+MQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAj\
+AAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQ\
+ACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEA\
+YgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBG\
+AAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgZprneV56BAAAB8cNIABAjAAEAIgR\
+gAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEI\
+ABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDErC09APjdNE1LT1jcPM9LT/grOAvOAuwHN4AA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAICYaZ7neekRAAAcHDeAAAAxAhAAIEYAAgDE\
+CEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwA\
+BACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACI\
+EYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
+CAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
+EAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiPkXYsnZJcZPNjcAAAAASUVORK5CYII=\
+"
+  frames[4] = "data:image/png;base64,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\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAzG7r\
+AXDMxhirPHfOucpz17LG3mM722Pau9bWtRzT2cKxcAMIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAA\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBi\
+BCAAQIwABACI2W09AH42xth6wm9rzrnKc72z9axxtmt9Do7NMX1uvTP2zQ0gAECMAAQAiBGAAAAx\
+AhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMA\
+AQBiBCAAQIwABACIEYAAADECEAAgRgACAMSMOefcegQAAIfjBhAAIEYAAgDECEAAgBgBCAAQIwAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMQIQACAGAEIABAjAAEAYnZbDwAOZ4yx9YRfNufcesKV4J0Ba3ADCAAQIwABAGIEIABAjAAE\
+AIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACA\
+GAEIABAjAAEAYgQgAECMAAQAiBGAAAAxu60HAMdvzrn1hN/WGmc7xtj7M4Hj4gYQACBGAAIAxAhA\
+AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDEjDnn3HoEAACH4wYQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAA\
+ADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
+EAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIE\
+IABAjAAEAIgRgAAAMQIQACBGAAIAxPwBUzLZvmDXurkAAAAASUVORK5CYII=\
+"
+  frames[5] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
+bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+YQAAD2EBqD+naQAAC0hJREFUeJzt3bGODusDx/EZWbISUaHTbaORKDQSEiQKjYIbcANuwQ2olHo3\
+oNJRodBoVBs3oCMaIc+/oHGc/M/ZZGfHnO/nk2i2mPwy75h887xk5zHGmAAAyDi29gAAAI6WAAQA\
+iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQ4KeXL19O8zz/7Z83b96s\
+PQ/g0OysPQDgT/PgwYPp8uXLv/xsb29vpTUAh08AAvzF1atXp3v37q09A2AxvgIG+BufP3+evn37\
+tvYMgEUIQIC/uH///nT69Olpd3d3un79+vT27du1JwEcKl8BA/x04sSJ6e7du9Pt27enM2fOTO/f\
+v58ePXo0Xb16dXr16tV06dKltScCHIp5jDHWHgHwp9rf358uXrw4Xbt2bXr+/PnacwAOha+AAf6P\
+vb296c6dO9OLFy+m79+/rz0H4FAIQIB/cP78+enr16/Tly9f1p4CcCgEIMA/+PDhw7S7uzudOnVq\
+7SkAh0IAAvz08ePH33727t276dmzZ9OtW7emY8e8MoH/Bv8JBOCnGzduTCdPnpyuXLkynTt3bnr/\
+/v305MmT6fjx49Pr16+nCxcurD0R4FAIQICfHj9+PD19+nTa39+fPn36NJ09e3a6efPm9PDhQ78K\
+DvhPEYAAADH+QQsAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgA\
+ECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAx\
+AhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMA\
+AQBiBCAAQIwABACI2Vl7APC7eZ7XnnAgY4y1J3AAni/ACSAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAE\
+AIgRgAAAMQIQACBGAAIAxMxjjLH2COBozPO89oR/zavpB58ZsAQngAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGA\
+AAAxAhAAIEYAAgDECEAAgBgBCAAQs7P2ADgK8zwvct0xxiLX3Zol7sPWPrMt7V1q69YscR+8E9gK\
+J4AAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
+CAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAELOz9gDYsnme155wIGOMRa67\
+tfuwJUvcW88B4AQQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGJ21h4AR2GM\
+sch153le5Lr2Lrd1a7Z0bz23sB1OAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
+IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADHz\
+GGOsPQL41TzPa09YnVfTD54FzwIswQkgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMTMY4yx9ggAAI6OE0AAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
+AQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiNlZ\
+ewDwu3me156wujHG2hP+CJ4FzwIswQkgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMTsrD0Atmye50WuO8ZY5Lpb2rulrdO0rb1b2jpN29sLW+AEEAAgRgACAMQIQACAGAEIABAj\
+AAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQ\
+ACBGAAIAxAhAAIAYAQgAELOz9gA4CvM8rz3hQJbaO8ZY5Lpbu79bssS99Rz8sKV7C4fNCSAAQIwA\
+BACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAA\
+gBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxOysPQC2bIyx9oQDmed5kesucR+W2ro1\
+W7q3/j7AdjgBBACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAA\
+IEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAICYeYwx1h4BHI15\
+ntee8K95Nf3gMwOW4AQQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGLmMcZY\
+ewTwq3me155wIF4j2+L5ApwAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIA\
+xAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYuYxxlh7\
+BAAAR8cJIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
+EAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwAB\
+AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
+RgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIE\
+IABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgAC\
+AMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABA\
+jAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQI\
+QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGL+B2Uc8Ufp\
+bfUXAAAAAElFTkSuQmCC\
+"
+
+
+    /* set a timeout to make sure all the above elements are created before
+       the object is initialized. */
+    setTimeout(function() {
+        anim2c28313f4a4948aea23608e51789831c = new Animation(frames, img_id, slider_id, 299.0,
+                                 loop_select_id);
+    }, 0);
+  })()
+</script></div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.813 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-game-of-life-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/db59fcf48fc31c66c74814d2cc0f0459/game_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">game_of_life.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/038f3761ec5e1d0f49a2c5977b354337/game_of_life.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">game_of_life.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/bb002c212421780ad9f0983672446d2e/game_of_life.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">game_of_life.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="flower_of_life.html" class="btn btn-neutral float-left" title="Flower of life" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../raster_operations/ndvi.html" class="btn btn-neutral float-right" title="NDVI" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Timo Millenaar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <style>
+    .rst-other-versions li.current a {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: v1.0.0
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    <dl>
+      <dt>Versions</dt>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/dev/index.html">dev</a> 
+        </li>
+      
+        <li class="current">
+          <a href="https://tmillenaar.github.io/GridKit/versions/v1.0.0/index.html">v1.0.0</a>   <--
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.14.1/index.html">v0.14.1</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.14.0/index.html">v0.14.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.13.0/index.html">v0.13.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.12.1/index.html">v0.12.1</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.12.0/index.html">v0.12.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.11.1/index.html">v0.11.1</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.11.0/index.html">v0.11.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.10.0/index.html">v0.10.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.2/index.html">v0.9.2</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.1/index.html">v0.9.1</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.9.0/index.html">v0.9.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.8.0/index.html">v0.8.0</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.3/index.html">v0.7.3</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.2/index.html">v0.7.2</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.1/index.html">v0.7.1</a> 
+        </li>
+      
+        <li >
+          <a href="https://tmillenaar.github.io/GridKit/versions/v0.7.0/index.html">v0.7.0</a> 
+        </li>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
