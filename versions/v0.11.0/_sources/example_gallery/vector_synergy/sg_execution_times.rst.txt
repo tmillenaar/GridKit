@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:06.358** total execution time for 4 files **from example_gallery/vector_synergy**:
+**00:06.332** total execution time for 4 files **from example_gallery/vector_synergy**:
 
 .. container::
 
@@ -33,14 +33,14 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py` (``intersect_geometries.py``)
-     - 00:05.065
+     - 00:05.067
      - 0.0
    * - :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py` (``interpolate_from_points.py``)
-     - 00:00.597
-     - 0.0
-   * - :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py` (``aggregate_dask.py``)
-     - 00:00.352
+     - 00:00.592
      - 0.0
    * - :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py` (``aggregate.py``)
-     - 00:00.344
+     - 00:00.343
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py` (``aggregate_dask.py``)
+     - 00:00.329
      - 0.0
