@@ -3,18 +3,27 @@
 Release notes
 =============
 
-This is the changelog listing the changes of GridKit over time.
+This is the changelog, showing the evolution of GridKit over time.
 
-Version 1.0.0 (nocheckin, add date)
------------------------------------
+Version 1.0.0 (June 29, 2025)
+-----------------------------
+
+This is the first major release of GridKit!
+It contains several breaking changes, one of the most notable is the re-definition of the origin and cell size of the TriGrid.
+If you are having trouble migrating, maybe you can take some inspiration from comparing
+`v0.14.1 examples <https://tmillenaar.github.io/GridKit/versions/v0.14.1/example_gallery/index.html>`_ to
+`v1.0.0 examples <https://tmillenaar.github.io/GridKit/versions/v1.0.0/example_gallery/index.html>`_.
+
 Features
  - Introduce DataTile class to replace BoundedGrid because of their ability to represent rotated Tiles
- - Replace usages to bounded grids in examples with data tiles
  - :func:`.count`, :func:`.sum` and :func:`.mean` now also apply to data tiles
  - TriGrid orign moved and size definition halved to better match the RectGrid and HexGrid, see https://github.com/tmillenaar/GridKit/issues/94
  - Provide a flat and pointy version of TriGrid
  - Fix offset having to be specified in (y,x) if for 'flat' HexGrids, now (x,y)
  - Add set_zoom_to_bounds option to :func:`.doc_utils.plot_polygons` to allow to turn it off
+ - Add :func:`.io.raster_to_data_tile` for reading raster files as DataTiles
+ - Allow :func:`.io.write_raster` to write both :class:`.BoundedRectGrid` as well as :class:`.DataTile`,
+   as long as the Data Tile is on a :class:`.RectGrid`
 
 Fixes
  - adjust example :ref:`flower_of_life.py <example flower of life>` to work with shapely 2.1.0
@@ -22,6 +31,17 @@ Fixes
    Before this just gave unreliable results.
 
 Deprecations
+ - Drop support for python 3.9
+ - Remove 'filled' keyword argument from :func:`gridkit.doc_utils.plot_polygons` in favor of 'fill'
+
+Future Deprecations
+ - All bounded grids (i.e. :class:`.BoundedTriGrid`, :class:`.BoundedRectGrid` and :class:`.BoundedHexGrid`) will be deprecated
+   in a future update. Defining an area by it's bounds becomes very ambiguous when the grid is rotated.
+   DataTiles will fill this same role and do allow for rotation because they are defined by an origin and a width and a heigt.
+   This turns out to work in more scenarios. Since the DataTile uses composition over inheritence whereas the bounded grids
+   used inheritence it can take some getting used to. To get a feel for the difference, compare examples in the
+   [Example Gallery](https://tmillenaar.github.io/GridKit/example_gallery/index.html) from v1.0.0 or greater
+   (using DataTiles) with the same examples from v0.14.1 or before using bounded grids.
  - Remove as_multipolygon argument from :meth:`.BaseGrid.to_shapely()` and always return a Shapely object.
    The user can call `.geoms` on the Shapely object to get an iterable.
    Reason: the to_shapely() function always created a Shapely object and then called .geoms on
@@ -29,10 +49,16 @@ Deprecations
    this saves the creation of a Shapely object hence being more performant. This was removed
    to make this more explicit since now the user has to call .geoms for themselves if they want
    an iterable.
- - Remove 'filled' keyword argument from :func:`gridkit.doc_utils.plot_polygons` in favor of 'fill'
+
+Documentation
+ - The documentation is now published for historical versions, as well as the nightly 'dev' version.
+   There is a drop-down in the bottom left where a version can be selected.
+ - Updated the :ref:`contributing guide <contributing>` to reflect the changes in building the documentation
+ - Replace usages to bounded grids in examples with data tiles
+ - Add example :ref:`game_of_life.py <example game of life>` which shows the famous Conway's game of life.
+ - Add example :ref:`hexagonal_automata.py <example hexagonal automata>` which shows cellular automata on an hexahonal grid.
 
 Misc
- - Drop support for python 3.9
  - Moved :meth:`.BaseGrid.anchor` to Rust
  - Remove DeprecationWarning for flat HexGrids, turns out they are useful in data tiles and bounded grid contexts
 

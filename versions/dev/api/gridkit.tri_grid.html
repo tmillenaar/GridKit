@@ -467,9 +467,10 @@ If you are unsure what location to use, pich the center of the area you are inte
 <p>The location is defined in the original CRS, not in the CRS supplied as the argument to this function call.</p>
 </div>
 </dd>
-<dt>adjust_rotation: bool (default: False)</dt><dd><p>If False, the grid in the new crs has the same rotation as the original grid.
+<dt>adjust_rotation: bool</dt><dd><p>If False, the grid in the new crs has the same rotation as the original grid.
 Since coordinate transformations often warp and rotate the grid, the original rotation is often not a good fit anymore.
-If True, set the new rotation to match the orientation of the grid at <code class="docutils literal notranslate"><span class="pre">location</span></code> after coordinate transformation.</p>
+If True, set the new rotation to match the orientation of the grid at <code class="docutils literal notranslate"><span class="pre">location</span></code> after coordinate transformation.
+Default: False</p>
 </dd>
 </dl>
 <dl class="field-list simple">

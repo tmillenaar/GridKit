@@ -54,7 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-nocheckin-add-date">Version 1.0.0 (nocheckin, add date)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-june-29-2025">Version 1.0.0 (June 29, 2025)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-14-1-december-25-2024">Version 0.14.1 (December 25, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-14-0-august-11-2024">Version 0.14.0 (August 11, 2024)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-13-0-july-10-2024">Version 0.13.0 (July 10, 2024)</a></li>
@@ -132,18 +132,25 @@
              
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
-<p>This is the changelog listing the changes of GridKit over time.</p>
-<section id="version-1-0-0-nocheckin-add-date">
-<h2>Version 1.0.0 (nocheckin, add date)<a class="headerlink" href="#version-1-0-0-nocheckin-add-date" title="Link to this heading"></a></h2>
+<p>This is the changelog, showing the evolution of GridKit over time.</p>
+<section id="version-1-0-0-june-29-2025">
+<h2>Version 1.0.0 (June 29, 2025)<a class="headerlink" href="#version-1-0-0-june-29-2025" title="Link to this heading"></a></h2>
+<p>This is the first major release of GridKit!
+It contains several breaking changes, one of the most notable is the re-definition of the origin and cell size of the TriGrid.
+If you are having trouble migrating, maybe you can take some inspiration from comparing
+<a class="reference external" href="https://tmillenaar.github.io/GridKit/versions/v0.14.1/example_gallery/index.html">v0.14.1 examples</a> to
+<a class="reference external" href="https://tmillenaar.github.io/GridKit/versions/v1.0.0/example_gallery/index.html">v1.0.0 examples</a>.</p>
 <dl class="simple">
 <dt>Features</dt><dd><ul class="simple">
 <li><p>Introduce DataTile class to replace BoundedGrid because of their ability to represent rotated Tiles</p></li>
-<li><p>Replace usages to bounded grids in examples with data tiles</p></li>
 <li><p><a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.count" title="gridkit._statistical_functions.count"><code class="xref py py-func docutils literal notranslate"><span class="pre">count()</span></code></a>, <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.sum" title="gridkit._statistical_functions.sum"><code class="xref py py-func docutils literal notranslate"><span class="pre">sum()</span></code></a> and <a class="reference internal" href="api/gridkit._statistical_functions.html#gridkit._statistical_functions.mean" title="gridkit._statistical_functions.mean"><code class="xref py py-func docutils literal notranslate"><span class="pre">mean()</span></code></a> now also apply to data tiles</p></li>
 <li><p>TriGrid orign moved and size definition halved to better match the RectGrid and HexGrid, see <a class="reference external" href="https://github.com/tmillenaar/GridKit/issues/94">https://github.com/tmillenaar/GridKit/issues/94</a></p></li>
 <li><p>Provide a flat and pointy version of TriGrid</p></li>
 <li><p>Fix offset having to be specified in (y,x) if for ‘flat’ HexGrids, now (x,y)</p></li>
 <li><p>Add set_zoom_to_bounds option to <a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">doc_utils.plot_polygons()</span></code></a> to allow to turn it off</p></li>
+<li><p>Add <a class="reference internal" href="api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.io.raster_to_data_tile"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.raster_to_data_tile()</span></code></a> for reading raster files as DataTiles</p></li>
+<li><p>Allow <a class="reference internal" href="api/gridkit.io.html#gridkit.io.write_raster" title="gridkit.io.write_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">io.write_raster()</span></code></a> to write both <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a> as well as <a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.tile.DataTile"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataTile</span></code></a>,
+as long as the Data Tile is on a <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.rect_grid.RectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">RectGrid</span></code></a></p></li>
 </ul>
 </dd>
 <dt>Fixes</dt><dd><ul class="simple">
@@ -153,6 +160,18 @@ Before this just gave unreliable results.</p></li>
 </ul>
 </dd>
 <dt>Deprecations</dt><dd><ul class="simple">
+<li><p>Drop support for python 3.9</p></li>
+<li><p>Remove ‘filled’ keyword argument from <a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">gridkit.doc_utils.plot_polygons()</span></code></a> in favor of ‘fill’</p></li>
+</ul>
+</dd>
+<dt>Future Deprecations</dt><dd><ul class="simple">
+<li><p>All bounded grids (i.e. <a class="reference internal" href="api/gridkit.tri_grid.html#gridkit.tri_grid.BoundedTriGrid" title="gridkit.tri_grid.BoundedTriGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedTriGrid</span></code></a>, <a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.rect_grid.BoundedRectGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedRectGrid</span></code></a> and <a class="reference internal" href="api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid" title="gridkit.hex_grid.BoundedHexGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundedHexGrid</span></code></a>) will be deprecated
+in a future update. Defining an area by it’s bounds becomes very ambiguous when the grid is rotated.
+DataTiles will fill this same role and do allow for rotation because they are defined by an origin and a width and a heigt.
+This turns out to work in more scenarios. Since the DataTile uses composition over inheritence whereas the bounded grids
+used inheritence it can take some getting used to. To get a feel for the difference, compare examples in the
+[Example Gallery](<a class="reference external" href="https://tmillenaar.github.io/GridKit/example_gallery/index.html">https://tmillenaar.github.io/GridKit/example_gallery/index.html</a>) from v1.0.0 or greater
+(using DataTiles) with the same examples from v0.14.1 or before using bounded grids.</p></li>
 <li><p>Remove as_multipolygon argument from <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a> and always return a Shapely object.
 The user can call <cite>.geoms</cite> on the Shapely object to get an iterable.
 Reason: the to_shapely() function always created a Shapely object and then called .geoms on
@@ -160,11 +179,18 @@ it if as_multipolygon was set to False. This was implicit and one might assume t
 this saves the creation of a Shapely object hence being more performant. This was removed
 to make this more explicit since now the user has to call .geoms for themselves if they want
 an iterable.</p></li>
-<li><p>Remove ‘filled’ keyword argument from <a class="reference internal" href="api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">gridkit.doc_utils.plot_polygons()</span></code></a> in favor of ‘fill’</p></li>
+</ul>
+</dd>
+<dt>Documentation</dt><dd><ul class="simple">
+<li><p>The documentation is now published for historical versions, as well as the nightly ‘dev’ version.
+There is a drop-down in the bottom left where a version can be selected.</p></li>
+<li><p>Updated the <a class="reference internal" href="contributing.html#contributing"><span class="std std-ref">contributing guide</span></a> to reflect the changes in building the documentation</p></li>
+<li><p>Replace usages to bounded grids in examples with data tiles</p></li>
+<li><p>Add example <a class="reference internal" href="example_gallery/patterns/game_of_life.html#example-game-of-life"><span class="std std-ref">game_of_life.py</span></a> which shows the famous Conway’s game of life.</p></li>
+<li><p>Add example <a class="reference internal" href="example_gallery/patterns/hexagonal_automata.html#example-hexagonal-automata"><span class="std std-ref">hexagonal_automata.py</span></a> which shows cellular automata on an hexahonal grid.</p></li>
 </ul>
 </dd>
 <dt>Misc</dt><dd><ul class="simple">
-<li><p>Drop support for python 3.9</p></li>
 <li><p>Moved <a class="reference internal" href="api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.base_grid.BaseGrid.anchor"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.anchor()</span></code></a> to Rust</p></li>
 <li><p>Remove DeprecationWarning for flat HexGrids, turns out they are useful in data tiles and bounded grid contexts</p></li>
 </ul>
