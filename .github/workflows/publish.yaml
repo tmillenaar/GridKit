@@ -27,9 +27,10 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: -m ./gridkit-py --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: "true"
           manylinux: auto
+          working-directory: gridkit-py
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Upload wheels
@@ -59,8 +60,9 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: -m ./gridkit-py --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: "true"
+          working-directory: gridkit-py
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Upload wheels
@@ -89,8 +91,9 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: -m ./gridkit-py --release --out dist --find-interpreter
+          args: --release --out dist --find-interpreter
           sccache: "true"
+          working-directory: gridkit-py
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Upload wheels
@@ -113,7 +116,8 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
-          args: -m ./gridkit-py --out dist
+          args: --out dist
+          working-directory: gridkit-py
         env:
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
       - name: Test installing dist
