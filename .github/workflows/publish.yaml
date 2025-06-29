@@ -142,4 +142,5 @@ jobs:
           MATURIN_PYPI_TOKEN: ${{ secrets.GRIDKIT_PYPI_TOKEN }}
         with:
           command: upload
-          args: -m gridkit-py/pyproject.toml --non-interactive --skip-existing gridkit-py/dist/*
+          args: --non-interactive --skip-existing dist/*
+          working-directory: gridkit-py
