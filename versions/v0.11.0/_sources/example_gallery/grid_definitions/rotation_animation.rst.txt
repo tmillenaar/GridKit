@@ -232,42 +232,42 @@ two degrees more than the previous frame.
      </style>
 
      <div class="animation">
-       <img id="_anim_img30577b526f8a4e7ab5a303ad9b03ed9a">
+       <img id="_anim_imgb75f1a84e62c4a8c8e48c73c7be49a6d">
        <div class="anim-controls">
-         <input id="_anim_slider30577b526f8a4e7ab5a303ad9b03ed9a" type="range" class="anim-slider"
+         <input id="_anim_sliderb75f1a84e62c4a8c8e48c73c7be49a6d" type="range" class="anim-slider"
                 name="points" min="0" max="1" step="1" value="0"
-                oninput="anim30577b526f8a4e7ab5a303ad9b03ed9a.set_frame(parseInt(this.value));">
+                oninput="animb75f1a84e62c4a8c8e48c73c7be49a6d.set_frame(parseInt(this.value));">
          <div class="anim-buttons">
-           <button title="Decrease speed" aria-label="Decrease speed" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.slower()">
+           <button title="Decrease speed" aria-label="Decrease speed" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.slower()">
                <i class="fa fa-minus"></i></button>
-           <button title="First frame" aria-label="First frame" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.first_frame()">
+           <button title="First frame" aria-label="First frame" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.first_frame()">
              <i class="fa fa-fast-backward"></i></button>
-           <button title="Previous frame" aria-label="Previous frame" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.previous_frame()">
+           <button title="Previous frame" aria-label="Previous frame" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.previous_frame()">
                <i class="fa fa-step-backward"></i></button>
-           <button title="Play backwards" aria-label="Play backwards" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.reverse_animation()">
+           <button title="Play backwards" aria-label="Play backwards" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.reverse_animation()">
                <i class="fa fa-play fa-flip-horizontal"></i></button>
-           <button title="Pause" aria-label="Pause" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.pause_animation()">
+           <button title="Pause" aria-label="Pause" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.pause_animation()">
                <i class="fa fa-pause"></i></button>
-           <button title="Play" aria-label="Play" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.play_animation()">
+           <button title="Play" aria-label="Play" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.play_animation()">
                <i class="fa fa-play"></i></button>
-           <button title="Next frame" aria-label="Next frame" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.next_frame()">
+           <button title="Next frame" aria-label="Next frame" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.next_frame()">
                <i class="fa fa-step-forward"></i></button>
-           <button title="Last frame" aria-label="Last frame" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.last_frame()">
+           <button title="Last frame" aria-label="Last frame" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.last_frame()">
                <i class="fa fa-fast-forward"></i></button>
-           <button title="Increase speed" aria-label="Increase speed" onclick="anim30577b526f8a4e7ab5a303ad9b03ed9a.faster()">
+           <button title="Increase speed" aria-label="Increase speed" onclick="animb75f1a84e62c4a8c8e48c73c7be49a6d.faster()">
                <i class="fa fa-plus"></i></button>
          </div>
-         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select30577b526f8a4e7ab5a303ad9b03ed9a"
+         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectb75f1a84e62c4a8c8e48c73c7be49a6d"
                class="anim-state">
-           <input type="radio" name="state" value="once" id="_anim_radio1_30577b526f8a4e7ab5a303ad9b03ed9a"
+           <input type="radio" name="state" value="once" id="_anim_radio1_b75f1a84e62c4a8c8e48c73c7be49a6d"
                   >
-           <label for="_anim_radio1_30577b526f8a4e7ab5a303ad9b03ed9a">Once</label>
-           <input type="radio" name="state" value="loop" id="_anim_radio2_30577b526f8a4e7ab5a303ad9b03ed9a"
+           <label for="_anim_radio1_b75f1a84e62c4a8c8e48c73c7be49a6d">Once</label>
+           <input type="radio" name="state" value="loop" id="_anim_radio2_b75f1a84e62c4a8c8e48c73c7be49a6d"
                   checked>
-           <label for="_anim_radio2_30577b526f8a4e7ab5a303ad9b03ed9a">Loop</label>
-           <input type="radio" name="state" value="reflect" id="_anim_radio3_30577b526f8a4e7ab5a303ad9b03ed9a"
+           <label for="_anim_radio2_b75f1a84e62c4a8c8e48c73c7be49a6d">Loop</label>
+           <input type="radio" name="state" value="reflect" id="_anim_radio3_b75f1a84e62c4a8c8e48c73c7be49a6d"
                   >
-           <label for="_anim_radio3_30577b526f8a4e7ab5a303ad9b03ed9a">Reflect</label>
+           <label for="_anim_radio3_b75f1a84e62c4a8c8e48c73c7be49a6d">Reflect</label>
          </form>
        </div>
      </div>
@@ -277,9 +277,9 @@ two degrees more than the previous frame.
        /* Instantiate the Animation class. */
        /* The IDs given should match those used in the template above. */
        (function() {
-         var img_id = "_anim_img30577b526f8a4e7ab5a303ad9b03ed9a";
-         var slider_id = "_anim_slider30577b526f8a4e7ab5a303ad9b03ed9a";
-         var loop_select_id = "_anim_loop_select30577b526f8a4e7ab5a303ad9b03ed9a";
+         var img_id = "_anim_imgb75f1a84e62c4a8c8e48c73c7be49a6d";
+         var slider_id = "_anim_sliderb75f1a84e62c4a8c8e48c73c7be49a6d";
+         var loop_select_id = "_anim_loop_selectb75f1a84e62c4a8c8e48c73c7be49a6d";
          var frames = new Array(30);
     
        frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -19123,7 +19123,7 @@ two degrees more than the previous frame.
          /* set a timeout to make sure all the above elements are created before
             the object is initialized. */
          setTimeout(function() {
-             anim30577b526f8a4e7ab5a303ad9b03ed9a = new Animation(frames, img_id, slider_id, 50.0,
+             animb75f1a84e62c4a8c8e48c73c7be49a6d = new Animation(frames, img_id, slider_id, 50.0,
                                       loop_select_id);
          }, 0);
        })()
@@ -19175,7 +19175,7 @@ two degrees more than the previous frame.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.700 seconds)
+   **Total running time of the script:** (0 minutes 3.760 seconds)
 
 
 .. _sphx_glr_download_example_gallery_grid_definitions_rotation_animation.py:

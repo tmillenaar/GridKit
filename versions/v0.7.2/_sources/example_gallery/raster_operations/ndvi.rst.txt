@@ -124,7 +124,7 @@ This is remedied in the script by replacing each NaN-value with 0 afterwards.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.002 seconds)
+   **Total running time of the script:** (0 minutes 3.868 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_ndvi.py:
