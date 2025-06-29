@@ -155,7 +155,7 @@ A zoom-in of a section of the plot allows us to see more clearly what cells are 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.976 seconds)
+   **Total running time of the script:** (0 minutes 4.961 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_intersect_geometries.py:
