@@ -277,7 +277,7 @@ In that scenario the resulting product will have the nodata_value of the first g
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.653 seconds)
+   **Total running time of the script:** (0 minutes 0.659 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_parial_overlap.py:

@@ -124,7 +124,7 @@ This means none of the bands have to be resampled before we combine them.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.717 seconds)
+   **Total running time of the script:** (0 minutes 0.707 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_ndvi.py:

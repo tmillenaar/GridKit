@@ -240,7 +240,7 @@ Plotting the histogram distribution of the various land covers gives the followi
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.218 seconds)
+   **Total running time of the script:** (0 minutes 2.371 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_elevation_distribution_per_land_cover.py:
