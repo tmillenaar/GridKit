@@ -5,6 +5,12 @@ Release notes
 
 This is the changelog, showing the evolution of GridKit over time.
 
+Version 1.0.1 (July 9, 2025)
+----------------------------
+Fixes
+ -  Fix :meth:`.Tile.intersects` not properly evaluating the bottom of the tile
+
+
 Version 1.0.0 (June 29, 2025)
 -----------------------------
 
