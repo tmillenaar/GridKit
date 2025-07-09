@@ -1,0 +1,9 @@
+
+index
+=============
+
+.. automodule:: gridkit.index
+    :members:
+    :undoc-members:
+    :special-members:
+    :show-inheritance:
