@@ -207,10 +207,12 @@ impl TileTraits for Tile {
     }
 
     fn intersects(&self, other: &Tile) -> bool {
-        return !(self.start_id.0 >= (other.start_id.0 + other.nx as i64)
+        return !(
+                self.start_id.0 >= (other.start_id.0 + other.nx as i64)
             || (self.start_id.0 + self.nx as i64) <= other.start_id.0
-            || self.start_id.1 >= (other.start_id.1 + other.ny as i64)
-            || (self.start_id.1 + other.ny as i64) <= other.start_id.1);
+            ||  self.start_id.1 >= (other.start_id.1 + other.ny as i64)
+            || (self.start_id.1 + self.ny as i64) <= other.start_id.1
+        );
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
