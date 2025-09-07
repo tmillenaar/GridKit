@@ -164,6 +164,12 @@ impl TileTraits for Tile {
     }
 
     fn corners(&self) -> Array2<f64> {
+        // Returns corners in order:
+        // top-left, top-right, bottom-right, bottom-left
+        // 0 > 1
+        //     v
+        // 3 < 2
+        //
         let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset()[0];
         let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset()[1];
         let side_length_x = self.nx as f64 * self.grid.dx();
@@ -207,15 +213,28 @@ impl TileTraits for Tile {
     }
 
     fn intersects(&self, other: &Tile) -> bool {
+        let corners_self = self.corners();
+        let corners_other = other.corners();
+
+        let left_self = corners_self[Ix2(3,0)];
+        let bottom_self = corners_self[Ix2(3,1)];
+        let right_self = corners_self[Ix2(1,0)];
+        let top_self = corners_self[Ix2(1,1)];
+
+        let left_other = corners_other[Ix2(3,0)];
+        let bottom_other = corners_other[Ix2(3,1)];
+        let right_other = corners_other[Ix2(1,0)];
+        let top_other = corners_other[Ix2(1,1)];
         return !(
-                self.start_id.0 >= (other.start_id.0 + other.nx as i64)
-            || (self.start_id.0 + self.nx as i64) <= other.start_id.0
-            ||  self.start_id.1 >= (other.start_id.1 + other.ny as i64)
-            || (self.start_id.1 + self.ny as i64) <= other.start_id.1
+               left_self   >= right_other
+            || right_self  <= left_other
+            || bottom_self >= top_other
+            || top_self    <= bottom_other
         );
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
+        // TODO: check whether grids align
         if !self.intersects(&other) {
             return Err("Tiles do not overlap".to_string());
         }
