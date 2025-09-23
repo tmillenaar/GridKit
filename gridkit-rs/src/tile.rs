@@ -213,20 +213,35 @@ impl TileTraits for Tile {
     }
 
     fn intersects(&self, other: &Tile) -> bool {
+
+        // Note: It is easier to match tiles on their ids. This seems elegant
+        //       because we don't need to care about rotation. This was how it
+        //       was first implemented but it required self and other to be on
+        //       the same grid. This was not enforced so you would get weird
+        //       results if this was not upheld. Rather than forcing the grids
+        //       to be aligned we use the tile corner coordinates. This way
+        //       any tile can be checked for intersection with any other tile
+        //       purely based on location, regardless of the host grid. This
+        //       does have the downside that we need to account for rotated
+        //       grids where the corner that was originally the on the left
+        //       side might now be the rightmost corner.
         let corners_self = self.corners();
         let corners_other = other.corners();
 
-        let left_self = corners_self[Ix2(3,0)];
-        let bottom_self = corners_self[Ix2(3,1)];
-        let right_self = corners_self[Ix2(1,0)];
-        let top_self = corners_self[Ix2(1,1)];
+        // Get min and max values.
+        // Note: This is a thorn in the eye as .min() does not work
+        //       on ndarrays of dtype float because of nan and inf values.
+        let left_self = corners_self.slice(s![..,0]).iter().cloned().reduce(f64::min).unwrap();
+        let bottom_self = corners_self.slice(s![..,1]).iter().cloned().reduce(f64::min).unwrap();
+        let right_self = corners_self.slice(s![..,0]).iter().cloned().reduce(f64::max).unwrap();
+        let top_self = corners_self.slice(s![..,1]).iter().cloned().reduce(f64::max).unwrap();
 
-        let left_other = corners_other[Ix2(3,0)];
-        let bottom_other = corners_other[Ix2(3,1)];
-        let right_other = corners_other[Ix2(1,0)];
-        let top_other = corners_other[Ix2(1,1)];
-        return !(
-               left_self   >= right_other
+        let left_other = corners_other.slice(s![..,0]).iter().cloned().reduce(f64::min).unwrap();
+        let bottom_other = corners_other.slice(s![..,1]).iter().cloned().reduce(f64::min).unwrap();
+        let right_other = corners_other.slice(s![..,0]).iter().cloned().reduce(f64::max).unwrap();
+        let top_other = corners_other.slice(s![..,1]).iter().cloned().reduce(f64::max).unwrap();
+
+        return !(left_self   >= right_other
             || right_self  <= left_other
             || bottom_self >= top_other
             || top_self    <= bottom_other

@@ -954,7 +954,7 @@ impl PyO3TriGrid {
     ) -> PyO3TriGrid {
         let target_loc: [f64; 2] = target_loc.into();
         let cell_element =
-            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
         let mut new_grid = self.clone();
         new_grid._grid.anchor_inplace(&target_loc, cell_element);
         new_grid
@@ -968,7 +968,7 @@ impl PyO3TriGrid {
     ) {
         let target_loc: [f64; 2] = target_loc.into();
         let cell_element =
-            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
         self._grid.anchor_inplace(&target_loc, cell_element);
     }
 
@@ -1145,7 +1145,7 @@ impl PyO3RectGrid {
     ) -> PyO3RectGrid {
         let target_loc: [f64; 2] = target_loc.into();
         let cell_element =
-            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
         let mut new_grid = self.clone();
         new_grid._grid.anchor_inplace(&target_loc, cell_element);
         new_grid
@@ -1159,7 +1159,7 @@ impl PyO3RectGrid {
     ) {
         let target_loc: [f64; 2] = target_loc.into();
         let cell_element =
-            CellElement::from_string(&cell_element).expect("Unsupported cell_element {}");
+            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
         self._grid.anchor_inplace(&target_loc, cell_element);
     }
 
