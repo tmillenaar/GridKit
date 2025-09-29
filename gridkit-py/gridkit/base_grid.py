@@ -751,3 +751,11 @@ class BaseGrid(metaclass=abc.ABCMeta):
         **kwargs,
     ):
         pass
+
+    def __eq__(self, other):
+        if isinstance(other, BaseGrid):
+            return self._grid == other._grid
+        return False
+
+    def __ne__(self, other):
+        return not self == other
