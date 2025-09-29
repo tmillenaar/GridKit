@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
 
 use crate::grid::{GridTraits, Orientation};
 use crate::interpolate;
@@ -13,6 +14,31 @@ pub struct TriGrid {
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
+}
+
+impl PartialEq for TriGrid {
+    // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
+    fn eq(&self, other: &Self) -> bool {
+        println!("COWBANGA!!!!");
+        self.cellsize.to_bits() == other.cellsize.to_bits() &&
+        self.offset[0].to_bits() == other.offset[0].to_bits() &&
+        self.offset[1].to_bits() == other.offset[1].to_bits() &&
+        self.orientation == other.orientation &&
+        self._rotation.to_bits() == other._rotation.to_bits()
+    }
+}
+
+impl Eq for TriGrid {}
+
+impl Hash for TriGrid {
+    // Needs manual implementation, derive Hash does not work on floats because of NaN etc.
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.cellsize.to_bits().hash(state);
+        self.offset[0].to_bits().hash(state);
+        self.offset[1].to_bits().hash(state);
+        self.orientation.hash(state);
+        self._rotation.to_bits().hash(state);
+    }
 }
 
 impl GridTraits for TriGrid {

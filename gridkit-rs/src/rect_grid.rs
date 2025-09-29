@@ -1,3 +1,5 @@
+use std::hash::{Hash, Hasher};
+
 use crate::grid::GridTraits;
 use crate::tile::*;
 use crate::utils::*;
@@ -11,6 +13,30 @@ pub struct RectGrid {
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
+}
+
+impl PartialEq for RectGrid {
+    // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
+    fn eq(&self, other: &Self) -> bool {
+        self._dx.to_bits() == other._dx.to_bits() &&
+        self._dy.to_bits() == other._dy.to_bits() &&
+        self.offset[0].to_bits() == other.offset[0].to_bits() &&
+        self.offset[1].to_bits() == other.offset[1].to_bits() &&
+        self._rotation.to_bits() == other._rotation.to_bits()
+    }
+}
+
+impl Eq for RectGrid {}
+
+impl Hash for RectGrid {
+    // Needs manual implementation, derive Hash does not work on floats because of NaN etc.
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self._dx.to_bits().hash(state);
+        self._dy.to_bits().hash(state);
+        self.offset[0].to_bits().hash(state);
+        self.offset[1].to_bits().hash(state);
+        self._rotation.to_bits().hash(state);
+    }
 }
 
 impl GridTraits for RectGrid {

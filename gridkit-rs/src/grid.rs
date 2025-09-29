@@ -135,7 +135,7 @@ pub trait GridTraits {
     // ) -> Array1<f64>;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Hash)]
 #[enum_delegate::implement(GridTraits)]
 pub enum Grid {
     TriGrid(TriGrid),
@@ -168,7 +168,7 @@ impl CellElement {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash, PartialEq)]
 pub enum Orientation {
     Flat,
     Pointy,
