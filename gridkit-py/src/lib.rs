@@ -474,7 +474,7 @@ impl PyO3DataTile {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Hash)]
 // #[enum_delegate::implement(GridTraits)]
 pub enum PyO3Grid {
     PyO3TriGrid(PyO3TriGrid),
@@ -483,7 +483,7 @@ pub enum PyO3Grid {
 }
 
 #[pyclass]
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Hash)]
 struct PyO3Tile {
     // #[pyo3(get, set)]
     _grid: PyO3Grid,
@@ -803,6 +803,10 @@ impl PyO3Tile {
         }
     }
 
+    fn equal_to_tile<'py>(&self, _py: Python<'py>, other: &PyO3Tile) -> bool {
+        self._tile == other._tile
+    }
+
     fn corner_ids<'py>(&self, py: Python<'py>) -> &'py PyArray2<i64> {
         self._tile.corner_ids().into_pyarray(py)
     }
@@ -877,13 +881,19 @@ impl PyO3Tile {
             .grid_id_to_tile_id(&index, oob_value)
             .into_pyarray(py)
     }
+
+    fn __eq__<'py>(&self, py: Python<'py>, other: PyO3Tile) -> bool {
+        self._tile == other._tile
+    }
+
+    fn __ne__<'py>(&self, py: Python<'py>, other: PyO3Tile) -> bool {
+        self._tile != other._tile
+    }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Hash)]
 #[pyclass]
 struct PyO3TriGrid {
-    cellsize: f64,
-    rotation: f64,
     _grid: tri_grid::TriGrid,
 }
 
@@ -902,8 +912,6 @@ impl PyO3TriGrid {
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
                 Ok(PyO3TriGrid {
-                    cellsize,
-                    rotation,
                     _grid,
                 })
             }
@@ -916,6 +924,10 @@ impl PyO3TriGrid {
 
     fn offset(&self) -> (f64, f64) {
         self._grid.offset.into()
+    }
+
+    fn rotation(&self) -> f64 {
+        self._grid._rotation
     }
 
     fn cell_height(&self) -> f64 {
@@ -936,6 +948,10 @@ impl PyO3TriGrid {
 
     fn dy(&self) -> f64 {
         self._grid.dy()
+    }
+
+    fn cellsize(&self) -> f64 {
+        self._grid.cellsize
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
@@ -1085,12 +1101,9 @@ impl PyO3TriGrid {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Hash)]
 #[pyclass]
 struct PyO3RectGrid {
-    dx: f64,
-    dy: f64,
-    rotation: f64,
     _grid: rect_grid::RectGrid,
 }
 
@@ -1102,9 +1115,6 @@ impl PyO3RectGrid {
         _grid.set_offset(offset.into());
         _grid.set_rotation(rotation);
         PyO3RectGrid {
-            dx,
-            dy,
-            rotation,
             _grid,
         }
     }
@@ -1127,6 +1137,10 @@ impl PyO3RectGrid {
 
     fn offset(&self) -> (f64, f64) {
         self._grid.offset.into()
+    }
+
+    fn rotation(&self) -> f64 {
+        self._grid.rotation()
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
@@ -1201,11 +1215,9 @@ impl PyO3RectGrid {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Hash)]
 #[pyclass]
 struct PyO3HexGrid {
-    cellsize: f64,
-    rotation: f64,
     _grid: hex_grid::HexGrid,
 }
 
@@ -1224,8 +1236,6 @@ impl PyO3HexGrid {
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
                 Ok(PyO3HexGrid {
-                    cellsize,
-                    rotation,
                     _grid,
                 })
             }
@@ -1272,6 +1282,14 @@ impl PyO3HexGrid {
 
     fn dy(&self) -> f64 {
         self._grid.dy()
+    }
+
+    fn rotation(&self) -> f64 {
+        self._grid.rotation()
+    }
+
+    fn cellsize(&self) -> f64 {
+        self._grid.cellsize
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
