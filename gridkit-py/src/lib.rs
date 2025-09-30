@@ -1099,6 +1099,10 @@ impl PyO3TriGrid {
             )
             .into_pyarray(py)
     }
+
+    fn equals<'py>(&self, py: Python<'py>, other: PyO3TriGrid) -> bool {
+        self._grid == other._grid
+    }
 }
 
 #[derive(Clone, PartialEq, Hash)]
@@ -1212,6 +1216,10 @@ impl PyO3RectGrid {
         self._grid
             .cells_near_point(&point.as_array())
             .into_pyarray(py)
+    }
+
+    fn equals<'py>(&self, py: Python<'py>, other: PyO3RectGrid) -> bool {
+        self._grid == other._grid
     }
 }
 
@@ -1360,6 +1368,10 @@ impl PyO3HexGrid {
         self._grid
             .cells_near_point(&point.as_array())
             .into_pyarray(py)
+    }
+
+    fn equals<'py>(&self, py: Python<'py>, other: PyO3HexGrid) -> bool {
+        self._grid == other._grid
     }
 }
 

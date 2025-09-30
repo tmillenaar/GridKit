@@ -61,6 +61,10 @@ class Tile:
         nx: int,
         ny: int,
     ):
+        if not isinstance(grid, BaseGrid):
+            raise TypeError(
+                f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
+            )
 
         if not numpy.isclose(nx % 1, 0):
             raise ValueError(f"Expected an integer for 'nx', got: {nx}")
@@ -74,23 +78,15 @@ class Tile:
             raise ValueError(
                 "'start_id' must be a single pair of indices in the form (x,y), got: {start_id}"
             )
-        start_id = (
+        self.start_id = (
             tuple(start_id.index)
             if isinstance(start_id, GridIndex)
             else tuple(start_id)
         )
+        self.nx = int(nx)
+        self.ny = int(ny)
 
-        if isinstance(grid, TriGrid):
-            self._tile = PyO3Tile.from_tri_grid(grid._grid, start_id, nx, ny)
-        elif isinstance(grid, RectGrid):
-            self._tile = PyO3Tile.from_rect_grid(grid._grid, start_id, nx, ny)
-        elif isinstance(grid, HexGrid):
-            self._tile = PyO3Tile.from_hex_grid(grid._grid, start_id, nx, ny)
-        else:
-            raise TypeError(
-                f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
-            )
-        self.grid = grid.update()
+        self._grid = grid.update()
 
     @staticmethod
     def from_pyo3_tile(grid, pyo3_tile):
@@ -155,24 +151,48 @@ class Tile:
             raise AttributeError(f"Method {method_name} not found on tile")
 
         py03_data_tile = method(fill_value, nodata_value)
-        return DataTile.from_pyo3_data_tile(self.grid.update(), py03_data_tile)
+        return DataTile.from_pyo3_data_tile(self.get_grid().update(), py03_data_tile)
 
     @property
-    def start_id(self):
-        """The starting cell of the Tile.
-        The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.
+    def grid(self):
+        """ """
+        return self._grid
+
+    @grid.setter
+    def grid(self, value):
+        self.update(grid=value)
+
+    def get_grid(self):
+        """Obtain a copy of the grid associated to this Tile"""
+        return self._grid.update()
+
+    @property
+    def _tile(self):
+        """The PyO3Tile object.
+        Only meant for use internal to this class, access at risk of side-effects.
+
+        We create a new PyP3Tile every time. This is to avoid synchronisation issues.
+        Before we had a PyO3Tile created at Tile initialization which served as the
+        source of truth. This meant that parameters like 'nx' for example were properties
+        that returned the value of the PyO3Tile. There was however a problem when someone
+        modified a value on the grid property, because this was not reflected in the grid
+        on the PyO3Tile. This caused a divergence where tile.grid no longer reflected
+        the values used by the rust internals. Calling a function like 'corners' for
+        would then return unexpected values. To remedy this we use the properties on the
+        python object as the source of truth and create a new PyO3Tile whenever it is
+        requested.
         """
-        return GridIndex(self._tile.start_id)
+        grid = self.get_grid()
+        if isinstance(grid, TriGrid):
+            return PyO3Tile.from_tri_grid(grid._grid, self.start_id, self.nx, self.ny)
+        elif isinstance(grid, RectGrid):
+            return PyO3Tile.from_rect_grid(grid._grid, self.start_id, self.nx, self.ny)
+        elif isinstance(grid, HexGrid):
+            return PyO3Tile.from_hex_grid(grid._grid, self.start_id, self.nx, self.ny)
 
-    @property
-    def nx(self):
-        """The number of cells in x direction, starting from the ``start_id``"""
-        return self._tile.nx
-
-    @property
-    def ny(self):
-        """The number of cells in y direction, starting from the ``start_id``"""
-        return self._tile.ny
+        raise TypeError(
+            f"Unexpected type for 'grid', expected a TriGrid, RectGrid or HexGrid, got a: {type(grid)}"
+        )
 
     def corner_ids(self):
         """The ids at the corners of the Tile
@@ -243,16 +263,16 @@ class Tile:
     def centroid(self, index=None):
         if index is None:
             index = self.indices
-        return self.grid.centroid(index)
+        return self.get_grid().centroid(index)
 
     def overlap(self, other):
-        is_aligned, reason = self.grid.is_aligned_with(other.grid)
+        is_aligned, reason = self.get_grid().is_aligned_with(other.get_grid())
         if not is_aligned:
             raise AlignmentError(
                 f"Cannot find overlap of grids that are not aligned. Reason for misalignemnt: {reason}"
             )
         _tile = self._tile.overlap(other._tile)
-        return Tile.from_pyo3_tile(self.grid, _tile)
+        return Tile.from_pyo3_tile(self.get_grid(), _tile)
 
     @validate_index
     def to_shapely(self, index=None, as_multipolygon=None):
@@ -269,7 +289,7 @@ class Tile:
 
         if index is None:
             index = self.indices
-        return self.grid.to_shapely(index, as_multipolygon=as_multipolygon)
+        return self.get_grid().to_shapely(index, as_multipolygon=as_multipolygon)
 
     def tile_id_to_grid_id(self, tile_id=None, oob_value=numpy.iinfo(numpy.int64).max):
         """Convert the index referring to a cell from the tile reference frame to that of the grid.
@@ -425,6 +445,57 @@ class Tile:
         #       is different when using arrays of integers compared to tuples.
         return tuple(self._tile.grid_id_to_tile_id(index, oob_value=oob_value).T)
 
+    def __eq__(self, other):
+        if isinstance(other, Tile):
+            return self._tile == other._tile
+        return False
+
+    def __ne__(self, other):
+        return not self == other
+
+    def update(
+        self,
+        grid=None,
+        start_id=None,
+        nx=None,
+        ny=None,
+    ):
+        """Return a modified copy of the original Tile.
+        The original Tile remains un-mutated.
+
+        Parameters
+        ----------
+        grid: :class:`.BaseGrid`
+            The :class:`.TriGrid`, :class:`.RectGrid` or :class:`.HexGrid` the Tile is associated with
+        start_id: Union[Tuple[int, int], GridIndex]
+            The starting cell of the Tile.
+            The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.
+        nx: int
+            The number of cells in x direction, starting from the ``start_id``
+        ny: int
+            The number of cells in y direction, starting from the ``start_id``
+
+        Returns
+        -------
+        :class:`.Tile`
+            A modified copy of the current Tile
+        """
+        if grid is None:
+            grid = self.get_grid().update()
+        else:
+            if not isinstance(grid, BaseGrid):
+                raise TypeError(
+                    f"Expected a TriGrid, RectGrid or HexGrid, got a {type(value)}"
+                )
+        if start_id is None:
+            start_id = self.start_id
+        if nx is None:
+            nx = self.nx
+        if ny is None:
+            ny = self.ny
+
+        return Tile(grid, start_id, nx, ny)
+
 
 class DataTile(Tile):
 
@@ -450,7 +521,6 @@ class DataTile(Tile):
                     raise TypeError(
                         f"Data type of the supplied array in argument 'data' (dtype: '{data.dtype}') did not match the supplied nodata value '{nodata_value}' of type '{type(nodata_value)}'"
                     ) from e
-        self.grid = tile.grid
 
         # Map numpy dtypes to method suffixes
         dtype_method_map = {
@@ -476,8 +546,10 @@ class DataTile(Tile):
             raise AttributeError(f"Method {method_name} not found on tile")
         self._data_tile = method(data, nodata_value)
 
+        super(DataTile, self).__init__(tile.get_grid(), tile.start_id, tile.nx, tile.ny)
+
         # _tile is used by the Tile parent class
-        self._tile = self._data_tile.get_tile()
+        # self._tile = self._data_tile.get_tile()
 
     def from_bounds_as_rect(
         data,
@@ -700,29 +772,44 @@ class DataTile(Tile):
 
         new_data = self.to_numpy()
         new_data[item] = value
-        if isinstance(self.grid, TriGrid):
-            tile = PyO3Tile.from_tri_grid(
-                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
-            )
-        elif isinstance(self.grid, RectGrid):
-            tile = PyO3Tile.from_rect_grid(
-                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
-            )
-        elif isinstance(self.grid, HexGrid):
-            tile = PyO3Tile.from_hex_grid(
-                self.grid._grid, tuple(self.start_id.index), self.nx, self.ny
-            )
+        grid = self.get_grid()
+        if isinstance(grid, TriGrid):
+            tile = PyO3Tile.from_tri_grid(grid._grid, self.start_id, self.nx, self.ny)
+        elif isinstance(grid, RectGrid):
+            tile = PyO3Tile.from_rect_grid(grid._grid, self.start_id, self.nx, self.ny)
+        elif isinstance(grid, HexGrid):
+            tile = PyO3Tile.from_hex_grid(grid._grid, self.start_id, self.nx, self.ny)
         else:
-            raise TypeError(f"Unrecognized grid type: {self.grid}")
+            raise TypeError(f"Unrecognized grid type: {type(self.get_grid())}")
         new_data_tile = self.to_data_tile(new_data, self.nodata_value)
         self._data_tile = new_data_tile._data_tile
+
+    @property
+    def grid(self):
+        raise RuntimeError(
+            """The 'grid' attribute on a DataTile should not be modified directly in order to avoid synchronization issues.
+            You can obtain a copy of the grid through the .get_grid() method.
+            """
+        )
+
+    @grid.setter
+    def grid(self, value):
+        raise RuntimeError(
+            """The 'grid' attribute on a DataTile should not be modified directly in order to avoid synchronization issues.
+            Consider calling .resample() to interpolate the values onto a differnt grid.
+            """
+        )
+
+    # @property
+    # def _tile(self):
+    #     return PyO3Tile()
 
     def update(
         self, data=None, grid=None, start_id=None, nx=None, ny=None, nodata_value=None
     ):
         # TODO: Make clear that update copies the data
         if grid is None:
-            grid = self.grid
+            grid = self.get_grid()
         if data is None:
             data = self.to_numpy()
         if start_id is None:
@@ -745,7 +832,7 @@ class DataTile(Tile):
 
     def get_tile(self):
         """A Tile object with the same properties as this DataTile, but without the data attached."""
-        return Tile(self.grid, self.start_id, self.nx, self.ny)
+        return Tile(self.get_grid(), self.start_id, self.nx, self.ny)
 
     def corner_ids(self):
         """The ids at the corners of the Tile
@@ -839,7 +926,7 @@ class DataTile(Tile):
         :py:meth:`.BaseGrid.interp_from_points`
         """
         if method == "nearest":
-            new_ids = self.grid.cell_at_point(sample_points)
+            new_ids = self.get_grid().cell_at_point(sample_points)
             return self.value(new_ids, oob_value=self.nodata_value)
         elif method == "bilinear" or method == "linear":
             return_shape = sample_points.shape[:-1]
@@ -910,13 +997,13 @@ class DataTile(Tile):
             tile = alignment_grid
             alignment_grid = alignment_grid.grid
 
-        if self.grid.crs is None or alignment_grid.crs is None:
+        if self.get_grid().crs is None or alignment_grid.crs is None:
             warnings.warn(
                 "`crs` not set for one or both grids. Assuming both grids have an identical CRS."
             )
             different_crs = False
         else:
-            different_crs = not self.grid.crs.is_exact_same(alignment_grid.crs)
+            different_crs = not self.get_grid().crs.is_exact_same(alignment_grid.crs)
 
         if not tile_is_given:
             # make sure the bounds align with the grid
@@ -946,7 +1033,7 @@ class DataTile(Tile):
                 coords = numpy.hstack([top_xy, right_xy, bottom_xy, left_xy])
 
                 transformer = Transformer.from_crs(
-                    self.grid.crs, alignment_grid.crs, always_xy=True
+                    self.get_grid().crs, alignment_grid.crs, always_xy=True
                 )
                 corners_transformed = numpy.array(transformer.transform(*coords)).T
 
@@ -999,7 +1086,7 @@ class DataTile(Tile):
 
         if different_crs:
             transformer = Transformer.from_crs(
-                alignment_grid.crs, self.grid.crs, always_xy=True
+                alignment_grid.crs, self.get_grid().crs, always_xy=True
             )
             original_shape = new_points.shape
             raveled_new_points = new_points.reshape(-1, 2)
@@ -1051,7 +1138,7 @@ class DataTile(Tile):
         :ref:`Example: coordinate transformations <example coordinate transformations>`
 
         """
-        new_inf_grid = self.grid.to_crs(crs)
+        new_inf_grid = self.get_grid().to_crs(crs)
         return self.resample(new_inf_grid, method=resample_method)
 
     def __add__(self, other):
@@ -1076,7 +1163,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __radd__(self, other):
@@ -1100,7 +1187,7 @@ class DataTile(Tile):
             except:
                 raise TypeError(f"Cannot add DataTile and `{type(other)}`")
 
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __sub__(self, other):
@@ -1123,7 +1210,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._subtract_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __rsub__(self, other):
@@ -1146,7 +1233,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._subtract_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot subtract DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __mul__(self, other):
@@ -1169,7 +1256,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._multiply_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __rmul__(self, other):
@@ -1192,7 +1279,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._multiply_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot multiply DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __truediv__(self, other):
@@ -1215,7 +1302,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._divide_scalar(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __rtruediv__(self, other):
@@ -1238,7 +1325,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._divide_scalar_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __pow__(self, other):
@@ -1254,7 +1341,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._powf(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __rpow__(self, other):
@@ -1268,7 +1355,7 @@ class DataTile(Tile):
                 _data_tile = self._data_tile._powf_reverse(other_converted)
             except:
                 raise TypeError(f"Cannot divide DataTile and `{type(other)}`")
-        combined = DataTile.from_pyo3_data_tile(self.grid, _data_tile)
+        combined = DataTile.from_pyo3_data_tile(self.get_grid(), _data_tile)
         return combined
 
     def __eq__(self, other):
@@ -1390,7 +1477,7 @@ def combine_tiles(tiles):
                 f"Expected all Tile or DataTile objects but also got a: {type(tile)}"
             )
     pyo3_tile = tile_utils.combine_tiles(pyo3_tiles)
-    return Tile.from_pyo3_tile(tiles[0].grid, pyo3_tile)
+    return Tile.from_pyo3_tile(tiles[0].get_grid(), pyo3_tile)
 
 
 def count_tiles(tiles):
@@ -1426,11 +1513,13 @@ def count_tiles(tiles):
             )
     if pyo3_tiles:
         pyo3_data_tile = tile_utils.count_tiles(pyo3_tiles)
-        result_tiles_only = DataTile.from_pyo3_data_tile(tiles[0].grid, pyo3_data_tile)
+        result_tiles_only = DataTile.from_pyo3_data_tile(
+            tiles[0].get_grid(), pyo3_data_tile
+        )
     if pyo3_data_tiles:
         pyo3_data_tile = tile_utils.count_data_tiles(pyo3_data_tiles)
         result_data_tiles_only = DataTile.from_pyo3_data_tile(
-            tiles[0].grid, pyo3_data_tile
+            tiles[0].get_grid(), pyo3_data_tile
         )
 
     if pyo3_tiles and pyo3_data_tiles:
@@ -1467,8 +1556,8 @@ def sum_data_tiles(data_tiles: List):
     if len(data_tiles) == 0:
         raise ValueError("No data tiles were supplied")
 
-    grid = data_tiles[0].grid
-    if not all([t.grid.is_aligned_with(grid) for t in data_tiles]):
+    grid = data_tiles[0].get_grid()
+    if not all([t.get_grid().is_aligned_with(grid) for t in data_tiles]):
         raise AlignmentError(
             "Not all data tiles are on the same grid. Consider resampling them all to the same grid."
         )

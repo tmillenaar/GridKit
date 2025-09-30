@@ -204,3 +204,50 @@ def test_tile_id_conversion_back_and_forth():
     numpy.testing.assert_allclose(ids.ravel(), ids_reverted)
     numpy.testing.assert_allclose(data_tile.value(tile.indices), data)
     numpy.testing.assert_allclose(data_tile.value(data_tile.indices), data)
+
+
+@pytest.mark.parametrize(
+    "grid",
+    [
+        TriGrid(size=1, orientation="flat"),
+        TriGrid(size=1, orientation="pointy"),
+        RectGrid(size=1),
+        HexGrid(size=1, orientation="flat"),
+        HexGrid(size=1, orientation="pointy"),
+    ],
+)
+@pytest.mark.parametrize(
+    "other_grid",
+    [
+        TriGrid(size=1, orientation="flat"),
+        TriGrid(size=1, orientation="pointy"),
+        RectGrid(size=1),
+        HexGrid(size=1, orientation="flat"),
+        HexGrid(size=1, orientation="pointy"),
+    ],
+)
+def test_equality(grid, other_grid):
+    tile = Tile(grid, (-1, -2), 3, 5)
+    other_tile = Tile(other_grid, (-1, -2), 3, 5)
+    if isinstance(other_tile.grid, type(tile.grid)) and (
+        getattr(grid, "orientation", None) == getattr(other_grid, "orientation", None)
+    ):
+        assert tile == other_tile
+    else:
+        assert not tile == other_tile
+        assert tile != other_tile
+
+    different_tiles = (
+        # Now test for same grid but different tile parameters
+        Tile(grid.update(), (-1, -2), 5, 3),
+        Tile(grid.update(), (-1, -2), 4, 5),
+        Tile(grid.update(), (-1, -2), 3, 4),
+        Tile(grid.update(), (1, 2), 3, 4),
+        # Now test for same grid type but different grid parameters
+        tile.update(grid.update(offset=(-0.1, 0.3))),
+        tile.update(grid.update(rotation=-182)),
+        tile.update(grid.update(size=123)),
+    )
+    for different_tile in different_tiles:
+        assert not tile == different_tile
+        assert tile != different_tile

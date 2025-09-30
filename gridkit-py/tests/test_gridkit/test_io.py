@@ -31,10 +31,12 @@ def test_write_raster(tmp_path, basic_bounded_rect_grid):
 
     result = raster_to_data_tile(filepath)
     numpy.testing.assert_allclose(result, basic_bounded_rect_grid.data)
-    numpy.testing.assert_allclose(result.grid.offset, basic_bounded_rect_grid.offset)
-    assert result.grid.rotation == 0
-    numpy.testing.assert_allclose(result.grid.dx, basic_bounded_rect_grid.dx)
-    numpy.testing.assert_allclose(result.grid.dy, basic_bounded_rect_grid.dy)
+    numpy.testing.assert_allclose(
+        result.get_grid().offset, basic_bounded_rect_grid.offset
+    )
+    assert result.get_grid().rotation == 0
+    numpy.testing.assert_allclose(result.get_grid().dx, basic_bounded_rect_grid.dx)
+    numpy.testing.assert_allclose(result.get_grid().dy, basic_bounded_rect_grid.dy)
     b = basic_bounded_rect_grid.bounds
     corners = [
         [b[0], b[3]],
@@ -58,10 +60,10 @@ def test_write_raster_data_tile(tmp_path):
 
     result = raster_to_data_tile(filepath)
     numpy.testing.assert_allclose(result, data)
-    numpy.testing.assert_allclose(result.grid.offset, grid.offset)
-    assert result.grid.rotation == 0
-    numpy.testing.assert_allclose(result.grid.dx, grid.dx)
-    numpy.testing.assert_allclose(result.grid.dy, grid.dy)
+    numpy.testing.assert_allclose(result.get_grid().offset, grid.offset)
+    assert result.get_grid().rotation == 0
+    numpy.testing.assert_allclose(result.get_grid().dx, grid.dx)
+    numpy.testing.assert_allclose(result.get_grid().dy, grid.dy)
     numpy.testing.assert_allclose(result.start_id, tile.start_id)
 
 
@@ -76,6 +78,6 @@ def test_raster_to_data_tile():
         [4116200.0, 2575600.0],
     ]
     numpy.testing.assert_allclose(grid_tile.corners(), expected_corners)
-    assert grid_tile.grid.dx == 100.0
-    assert grid_tile.grid.dy == 100.0
-    assert grid_tile.grid.crs.to_epsg() == 3035
+    assert grid_tile.get_grid().dx == 100.0
+    assert grid_tile.get_grid().dy == 100.0
+    assert grid_tile.get_grid().crs.to_epsg() == 3035

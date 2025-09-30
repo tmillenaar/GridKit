@@ -98,7 +98,7 @@ def test_intersects(grid, tile_init, expected):
 
     with pytest.raises(TypeError):
         # Check if appropriate error is raised when non-tile is supplied
-        tile.intersects(tile.grid)
+        tile.intersects(tile.get_grid())
 
 
 @pytest.mark.parametrize(
@@ -588,7 +588,7 @@ def test_overlap(grid):
 
     def check(overlap_tile):
         assert isinstance(overlap_tile, Tile)
-        assert isinstance(overlap_tile.grid, type(grid))
+        assert isinstance(overlap_tile.get_grid(), type(grid))
         numpy.testing.assert_allclose(overlap_tile.start_id, tile2.start_id)
         assert overlap_tile.nx == 1
         assert overlap_tile.ny == 1
@@ -704,8 +704,8 @@ def test_resample(grid, interp_method):
     # For each nodata value make sure there is at least one neighbour that is outside of the original tile
     for id, value in zip(result.indices, result.to_numpy().ravel()):
         if result.is_nodata(value):
-            original_cells_near_nodata_cell = tile.grid.cells_near_point(
-                result.grid.centroid(id)
+            original_cells_near_nodata_cell = tile.get_grid().cells_near_point(
+                result.get_grid().centroid(id)
             )
             # check that at least one cell is outside the original tile to warrent the nodata value
             cells_otuside_orignal_tile = original_cells_near_nodata_cell.difference(
@@ -745,13 +745,13 @@ def test_from_bounds_as_rect(nodata_value):
     ]
     numpy.testing.assert_allclose(data_tile.nx, bounded_grid.width)
     numpy.testing.assert_allclose(data_tile.ny, bounded_grid.height)
-    numpy.testing.assert_allclose(data_tile.grid.dx, bounded_grid.dx)
-    numpy.testing.assert_allclose(data_tile.grid.dy, bounded_grid.dy)
-    numpy.testing.assert_allclose(data_tile.grid.offset, bounded_grid.offset)
+    numpy.testing.assert_allclose(data_tile.get_grid().dx, bounded_grid.dx)
+    numpy.testing.assert_allclose(data_tile.get_grid().dy, bounded_grid.dy)
+    numpy.testing.assert_allclose(data_tile.get_grid().offset, bounded_grid.offset)
     numpy.testing.assert_allclose(data_tile.to_numpy(), bounded_grid.data)
     numpy.testing.assert_allclose(bounded_grid.bounds, bounds)
     numpy.testing.assert_allclose(data_tile_bounds, bounds)
-    assert data_tile.grid.rotation == bounded_grid.rotation == 0
+    assert data_tile.get_grid().rotation == bounded_grid.rotation == 0
 
     if nodata_value is None:
         # Current nodata default for integer, likely to change in future

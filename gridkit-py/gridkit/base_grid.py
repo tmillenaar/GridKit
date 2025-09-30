@@ -753,8 +753,8 @@ class BaseGrid(metaclass=abc.ABCMeta):
         pass
 
     def __eq__(self, other):
-        if isinstance(other, BaseGrid):
-            return self._grid == other._grid
+        if type(self) == type(other):
+            return self._grid.equals(other._grid)
         return False
 
     def __ne__(self, other):

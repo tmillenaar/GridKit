@@ -96,7 +96,11 @@ class TriGrid(BaseGrid):
     @property
     def definition(self):
         return dict(
-            size=self.size, offset=self.offset, rotation=self.rotation, crs=self.crs
+            size=self.size,
+            orientation=self.orientation,
+            offset=self.offset,
+            rotation=self.rotation,
+            crs=self.crs,
         )
 
     @property
