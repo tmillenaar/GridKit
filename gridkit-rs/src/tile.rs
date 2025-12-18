@@ -4,7 +4,7 @@ use std::{f32::MAX, f64, i64, u64};
 use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
 use ndarray::*;
 
-#[derive(Clone, Debug, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Tile {
     pub grid: Grid,
     pub start_id: (i64, i64),
@@ -50,6 +50,14 @@ pub trait TileTraits {
 
     fn intersects(&self, other: &Tile) -> bool {
         self.get_tile().intersects(other)
+    }
+
+    fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
+        self.get_tile().intersection_bounds(other)
+    }
+
+    fn intersection_corners(&self, other: &Tile) -> Option<Array2<f64>> {
+        self.get_tile().intersection_corners(other)
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
@@ -246,6 +254,47 @@ impl TileTraits for Tile {
             || bottom_self >= top_other
             || top_self    <= bottom_other
         );
+    }
+
+    fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
+        let corners_self = self.corners();
+        let corners_other = other.corners();
+
+        let left_self = corners_self.slice(s![.., 0]).iter().cloned().reduce(f64::min).unwrap();
+        let bottom_self = corners_self.slice(s![.., 1]).iter().cloned().reduce(f64::min).unwrap();
+        let right_self = corners_self.slice(s![.., 0]).iter().cloned().reduce(f64::max).unwrap();
+        let top_self = corners_self.slice(s![.., 1]).iter().cloned().reduce(f64::max).unwrap();
+
+        let left_other = corners_other.slice(s![.., 0]).iter().cloned().reduce(f64::min).unwrap();
+        let bottom_other = corners_other.slice(s![.., 1]).iter().cloned().reduce(f64::min).unwrap();
+        let right_other = corners_other.slice(s![.., 0]).iter().cloned().reduce(f64::max).unwrap();
+        let top_other = corners_other.slice(s![.., 1]).iter().cloned().reduce(f64::max).unwrap();
+
+        // Compute intersection bounds
+        let minx = left_self.max(left_other);
+        let miny = bottom_self.max(bottom_other);
+        let maxx = right_self.min(right_other);
+        let maxy = top_self.min(top_other);
+
+        // Check if there is an intersection
+        if minx < maxx && miny < maxy {
+            Some((minx, miny, maxx, maxy))
+        } else {
+            None
+        }
+    }
+
+    fn intersection_corners(&self, other: &Tile) -> Option<Array2<f64>> {
+        if let Some((minx, miny, maxx, maxy)) = self.intersection_bounds(other) {
+            Some(arr2(&[
+                [minx, maxy],
+                [maxx, maxy],
+                [maxx, miny],
+                [minx, miny],
+            ]))
+        } else {
+            None
+        }
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {

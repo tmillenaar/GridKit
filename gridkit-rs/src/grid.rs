@@ -135,7 +135,7 @@ pub trait GridTraits {
     // ) -> Array1<f64>;
 }
 
-#[derive(Clone, Debug, PartialEq, Hash)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[enum_delegate::implement(GridTraits)]
 pub enum Grid {
     TriGrid(TriGrid),
