@@ -58,7 +58,7 @@ neighbour_values = []
 def downslope_path(cell_id):
     visited_cells.append(cell_id)
     # add new neigbours and their values to their respective lists
-    neighbours = dem.grid.neighbours(cell_id, connect_corners=True)
+    neighbours = dem.get_grid().neighbours(cell_id, connect_corners=True)
     for cell, value in zip(neighbours, dem.value(neighbours)):
         cell = tuple(cell.index)
         if not cell in visited_cells and not cell in all_neighbours:
@@ -80,7 +80,7 @@ def downslope_path(cell_id):
 
 # %%
 # Determine the starting cell and call the function
-start_cell_id = dem.grid.cell_at_point((29330, 167848))
+start_cell_id = dem.get_grid().cell_at_point((29330, 167848))
 downslope_path(tuple(start_cell_id.index))
 
 

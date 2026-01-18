@@ -995,7 +995,7 @@ class DataTile(Tile):
         tile_is_given = isinstance(alignment_grid, Tile)
         if tile_is_given:
             tile = alignment_grid
-            alignment_grid = alignment_grid.grid
+            alignment_grid = alignment_grid.get_grid()
 
         if self.get_grid().crs is None or alignment_grid.crs is None:
             warnings.warn(

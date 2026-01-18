@@ -56,7 +56,7 @@ from pyproj.transformer import CRS, Transformer
 
 utm_epsg = 32629
 transformer = Transformer.from_crs(
-    data_tile_wgs84.grid.crs, CRS.from_user_input(utm_epsg), always_xy=True
+    data_tile_wgs84.get_grid().crs, CRS.from_user_input(utm_epsg), always_xy=True
 )  # UTM zone 28N
 
 wgs84_centroids_utm = transformer.transform(

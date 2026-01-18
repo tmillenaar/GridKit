@@ -61,6 +61,6 @@ im_ndvi = ax.imshow(ndvi, cmap="RdYlGn", extent=band_4.mpl_extent, vmin=-1, vmax
 fig.colorbar(im_ndvi, ax=ax, fraction=0.022, pad=0.01)
 ax.set_xlabel("lon")
 ax.set_ylabel("lat")
-ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.grid.crs.to_epsg()}")
+ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.get_grid().crs.to_epsg()}")
 
 plt.show()
