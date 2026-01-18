@@ -386,16 +386,14 @@ class Tile:
         else:
             tile_id = numpy.array(tile_id, dtype=int)
         if not tile_id.shape[0] == 2:
-            raise ValueError(
-                f"""
+            raise ValueError(f"""
                 Expected the first dimension of tile_id to have a length of two (for x,y). Got indices in shape: {tile_id.shape}.
                 This is different than the grid ids where we expect xy to be the last dimesnion.
                 This is in an effort to make indexing the data as a numpy array using data[tuple(numpy_ids)] the same
                 as querying values from datatile.value using grid ids botained through tile_id_to_grid_id(numpy_ids).
                 Note that not only does this function need the first demension to be of size two,
                 but numpy starts with the y-coordinate, so we expect: [[y0,y1,y2], [x0,x1,x2]].
-            """
-            )
+            """)
         if tile_id.ndim == 1:
             tile_id = tile_id[numpy.newaxis]
         else:
