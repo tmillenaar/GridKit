@@ -88,14 +88,16 @@ from gridkit import GridIndex, HexGrid
 grid = HexGrid(size=1, shape="flat")
 
 
-def index_1d_at_point(df):
+def index_1d_at_point(df, **grid_params):
     """Find the cell for each point in the dataframe and return the 1D index.
     This operation is meant to map to each DataFrame partition
     """
+    # Note: Define 'grid' here based on primitives so Dask does not have to worry about serializing the Grid object.
+    grid = HexGrid(**grid_params)
     return grid.cell_at_point(df[["pnt_x", "pnt_y"]]).index_1d
 
 
-df["cell_id"] = df.map_partitions(index_1d_at_point)
+df["cell_id"] = df.map_partitions(index_1d_at_point, **grid.definition)
 df["nr_points"] = 1
 print(df)
 
@@ -121,14 +123,18 @@ occurrences = grouped.count()
 #     Also, for the sake of the example I will plot the data with matplotlib.
 
 
-def shapely_geom_from_index_1d(id_1d):
+def shapely_geom_from_index_1d(id_1d, **grid_params):
     """Generate the Shapely geometry for each 1D index.
     This operation is meant to map to each DataFrame partition
     """
+    # Note: Define 'grid' here based on primitives so Dask does not have to worry about serializing the Grid object.
+    grid = HexGrid(**grid_params)
     return numpy.array(grid.to_shapely(GridIndex.from_index_1d(id_1d)).geoms)
 
 
-polygons = occurrences.index.map_partitions(shapely_geom_from_index_1d)
+polygons = occurrences.index.map_partitions(
+    shapely_geom_from_index_1d, **grid.definition
+)
 geoms, points_per_cell = dask.compute(polygons, occurrences.nr_points)
 
 # %%

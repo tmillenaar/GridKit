@@ -7,9 +7,9 @@ Cellular automata: Conway's game of life
 Cellular automata are a small set of rules relating to cells on a grid that can create complex patterns when applied repeatedly.
 There is a near infinite veriety of rules, but far and away the most well known set of rules is that of the so called Conway's game of life.
 The setup is as follows:
- - The board is a 2d rectangular grid
- - The 8 neighbouring cells are considered, so this includes the diagonal neighbours
- - A cell has two possbile states: alive or dead
+- The board is a 2d rectangular grid
+- The 8 neighbouring cells are considered, so this includes the diagonal neighbours
+- A cell has two possbile states: alive or dead
 
 The rules as taken from https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life:
 
