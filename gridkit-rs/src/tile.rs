@@ -1,7 +1,9 @@
-use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive, NumCast};
-use std::{f32::MAX, f64, i64, u64};
+#![allow(unused_parens)]
 
-use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
+use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive, NumCast};
+use std::{f64, i64, u64};
+
+use crate::{data_tile::DataTile, grid::*};
 use ndarray::*;
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
@@ -76,7 +78,7 @@ pub trait TileTraits {
                     tile_ids[Ix2(cell_id, 0)] = col;
                     tile_ids[Ix2(cell_id, 1)] = row;
                 }
-                Err(e) => {
+                Err(_e) => {
                     tile_ids[Ix2(cell_id, 0)] = oob_value;
                     tile_ids[Ix2(cell_id, 1)] = oob_value;
                 }
@@ -87,7 +89,6 @@ pub trait TileTraits {
 
     fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
         let tile = self.get_tile();
-        let grid = self.get_grid();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
         let tile_id_y = (tile.start_id.1 + tile.ny as i64 - 1) - id_y;
@@ -117,7 +118,7 @@ pub trait TileTraits {
                     grid_ids[Ix2(cell_id, 0)] = x;
                     grid_ids[Ix2(cell_id, 1)] = y;
                 }
-                Err(e) => {
+                Err(_e) => {
                     grid_ids[Ix2(cell_id, 0)] = oob_value;
                     grid_ids[Ix2(cell_id, 1)] = oob_value;
                 }

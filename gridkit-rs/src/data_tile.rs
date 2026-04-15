@@ -1,12 +1,12 @@
+#![allow(unused_parens)]
+
 use crate::grid::*;
 use crate::tile::*;
 use crate::RectGrid;
 use core::f64;
 use ndarray::*;
 use num_traits::{AsPrimitive, Bounded, FromPrimitive, Num, NumCast, ToPrimitive};
-use std::any::Any;
 use std::f64::consts::E;
-use std::f64::NAN;
 use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
 #[derive(Clone)]
@@ -24,6 +24,7 @@ fn to_f64<
     val.to_f64().unwrap_or(f64::NAN)
 }
 
+#[allow(dead_code)]
 fn is_nodata_value_f64(val: f64, nodata_value: f64) -> bool {
     if nodata_value.is_nan() {
         return val.is_nan();
@@ -292,7 +293,7 @@ impl<
                 // Note: indexing into array is in order y,x
                 return self.data[Ix2(id_col as usize, id_row as usize)];
             }
-            Err(e) => {
+            Err(_e) => {
                 // If id is out of bounds, set value to nodata_value
                 return nodata_value;
             }
@@ -331,7 +332,7 @@ impl<
         let nodata_value = self.nodata_value.to_f64().unwrap_or(f64::NAN);
         match grid {
             // FIXME: I think the interpolation logic should not live on the grid, but it is used by BoundedGrid implementation
-            Grid::TriGrid(grid) => {
+            Grid::TriGrid(_grid) => {
                 Zip::from(&mut values)
                     .and(sample_points.axis_iter(Axis(0)))
                     .and(nearby_centroids.axis_iter(Axis(0)))
@@ -535,7 +536,7 @@ impl<
                 tile.start_id.1 + tile.ny as i64 - 1,
             )
             .unwrap();
-        let mut data_slice = self.data.slice_mut(s![
+        let data_slice = self.data.slice_mut(s![
             start_slice_col as usize..(end_slice_col + 1) as usize,
             start_slice_row as usize..(end_slice_row + 1) as usize
         ]);

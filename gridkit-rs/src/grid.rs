@@ -96,10 +96,10 @@ pub trait GridTraits {
                     }
                 }
             },
-            Grid::RectGrid(grid) => {
+            Grid::RectGrid(_grid) => {
                 // nothing to do here
             }
-            Grid::HexGrid(grid) => {
+            Grid::HexGrid(_grid) => {
                 // nothing to do here
             }
         }

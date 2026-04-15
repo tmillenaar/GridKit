@@ -2,7 +2,6 @@ use std::hash::{Hash, Hasher};
 
 use crate::grid::{GridTraits, Orientation};
 use crate::utils::*;
-use ndarray::Slice;
 use ndarray::*;
 
 #[derive(Clone, Debug)]

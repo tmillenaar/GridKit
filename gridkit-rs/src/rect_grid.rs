@@ -1,7 +1,6 @@
 use std::hash::{Hash, Hasher};
 
 use crate::grid::GridTraits;
-use crate::tile::*;
 use crate::utils::*;
 use ndarray::*;
 
@@ -173,8 +172,8 @@ impl GridTraits for RectGrid {
         }
 
         for cell_id in 0..points.shape()[0] {
-            let rel_loc_x: f64 = modulus((points[Ix2(cell_id, 0)] - self.offset[0]), self.dx());
-            let rel_loc_y: f64 = modulus((points[Ix2(cell_id, 1)] - self.offset[1]), self.dy());
+            let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
+            let rel_loc_y: f64 = modulus(points[Ix2(cell_id, 1)] - self.offset[1], self.dy());
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
             match (rel_loc_x, rel_loc_y) {
@@ -242,10 +241,12 @@ impl RectGrid {
         }
     }
 
+    #[allow(dead_code)]
     fn set_cellsize_x(&mut self, cellsize_x: f64) {
         self._dx = cellsize_x;
     }
 
+    #[allow(dead_code)]
     fn set_cellsize_y(&mut self, cellsize_y: f64) {
         self._dy = cellsize_y;
     }
