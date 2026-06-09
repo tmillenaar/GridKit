@@ -1,7 +1,6 @@
 #![allow(unused_parens)]
-
-use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive, NumCast};
-use std::{f64, i64, u64};
+use num_traits::{Bounded, FromPrimitive, Num, NumCast, ToPrimitive};
+use std::{f32::MAX, f64, i64, u64};
 
 use crate::{data_tile::DataTile, grid::*};
 use ndarray::*;
@@ -21,7 +20,15 @@ pub trait TileTraits {
     fn get_grid(&self) -> &Grid;
 
     fn to_data_tile_with_value<
-        T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast,
+        T: Num
+            + Clone
+            + Copy
+            + PartialEq
+            + Bounded
+            + ToPrimitive
+            + FromPrimitive
+            + PartialOrd
+            + NumCast,
     >(
         &self,
         fill_value: T,
@@ -173,12 +180,12 @@ impl TileTraits for Tile {
     }
 
     fn corners(&self) -> Array2<f64> {
-        // Returns corners in order:
-        // top-left, top-right, bottom-right, bottom-left
-        // 0 > 1
-        //     v
-        // 3 < 2
-        //
+        /// Returns corners in order:
+        /// top-left, top-right, bottom-right, bottom-left
+        /// 0 > 1
+        ///     v
+        /// 3 < 2
+        ///
         let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset()[0];
         let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset()[1];
         let side_length_x = self.nx as f64 * self.grid.dx();
@@ -222,7 +229,6 @@ impl TileTraits for Tile {
     }
 
     fn intersects(&self, other: &Tile) -> bool {
-
         // Note: It is easier to match tiles on their ids. This seems elegant
         //       because we don't need to care about rotation. This was how it
         //       was first implemented but it required self and other to be on
@@ -240,36 +246,115 @@ impl TileTraits for Tile {
         // Get min and max values.
         // Note: This is a thorn in the eye as .min() does not work
         //       on ndarrays of dtype float because of nan and inf values.
-        let left_self = corners_self.slice(s![..,0]).iter().cloned().reduce(f64::min).unwrap();
-        let bottom_self = corners_self.slice(s![..,1]).iter().cloned().reduce(f64::min).unwrap();
-        let right_self = corners_self.slice(s![..,0]).iter().cloned().reduce(f64::max).unwrap();
-        let top_self = corners_self.slice(s![..,1]).iter().cloned().reduce(f64::max).unwrap();
+        let left_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
 
-        let left_other = corners_other.slice(s![..,0]).iter().cloned().reduce(f64::min).unwrap();
-        let bottom_other = corners_other.slice(s![..,1]).iter().cloned().reduce(f64::min).unwrap();
-        let right_other = corners_other.slice(s![..,0]).iter().cloned().reduce(f64::max).unwrap();
-        let top_other = corners_other.slice(s![..,1]).iter().cloned().reduce(f64::max).unwrap();
+        let left_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
 
-        return !(left_self   >= right_other
-            || right_self  <= left_other
+        return !(left_self >= right_other
+            || right_self <= left_other
             || bottom_self >= top_other
-            || top_self    <= bottom_other
-        );
+            || top_self <= bottom_other);
     }
 
     fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
         let corners_self = self.corners();
         let corners_other = other.corners();
 
-        let left_self = corners_self.slice(s![.., 0]).iter().cloned().reduce(f64::min).unwrap();
-        let bottom_self = corners_self.slice(s![.., 1]).iter().cloned().reduce(f64::min).unwrap();
-        let right_self = corners_self.slice(s![.., 0]).iter().cloned().reduce(f64::max).unwrap();
-        let top_self = corners_self.slice(s![.., 1]).iter().cloned().reduce(f64::max).unwrap();
+        let left_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
 
-        let left_other = corners_other.slice(s![.., 0]).iter().cloned().reduce(f64::min).unwrap();
-        let bottom_other = corners_other.slice(s![.., 1]).iter().cloned().reduce(f64::min).unwrap();
-        let right_other = corners_other.slice(s![.., 0]).iter().cloned().reduce(f64::max).unwrap();
-        let top_other = corners_other.slice(s![.., 1]).iter().cloned().reduce(f64::max).unwrap();
+        let left_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
 
         // Compute intersection bounds
         let minx = left_self.max(left_other);
@@ -299,7 +384,15 @@ impl TileTraits for Tile {
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
-        // TODO: check whether grids align
+        /// Returns a tile that covers the intersection between the tiles `self` and `other`.
+        ///
+        /// ## Keywords
+        /// intersection, crop, overlap, clip
+        ///
+        if self.get_grid() != other.get_grid() {
+            return Err("Tiles do not live on the same grid.".to_string());
+        }
+
         if !self.intersects(&other) {
             return Err("Tiles do not overlap".to_string());
         }
