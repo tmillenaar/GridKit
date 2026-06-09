@@ -496,7 +496,6 @@ class Tile:
 
 
 class DataTile(Tile):
-
     def __init__(self, tile: Tile, data: numpy.ndarray, nodata_value=None):
         if data.ndim != 2:
             raise ValueError(f"Expected a 2D array, got {data.ndim} dimensions")
@@ -1560,7 +1559,7 @@ def sum_data_tiles(data_tiles: List):
             "Not all data tiles are on the same grid. Consider resampling them all to the same grid."
         )
 
-    result_dtype = numpy.result_type(*data_tiles)
+    result_dtype = numpy.result_type(*[t.dtype for t in data_tiles])
     pyo3_tiles = []
     for tile in data_tiles:
         if isinstance(tile, DataTile):
@@ -1612,5 +1611,5 @@ def average_data_tiles(data_tiles: List):
     # logic such that the rust and python logic are the same and don't have possible inconsistencies
     # like inf instead of nan or vice versa. I want just one place for the logic.
     summed = sum_data_tiles(data_tiles)
-    counted = count_tiles(data_tiles).astype(summed)
+    counted = count_tiles(data_tiles).astype(summed.dtype)
     return summed / counted
