@@ -90,7 +90,7 @@ def read_geotiff(*args, bands=1, **kwargs):
 
 def _write_data_tile_to_raster(data_tile, path):
     """Intended to be called only through :func:`.write_raster`"""
-    if data_tile.grid.rotation:
+    if data_tile.get_grid().rotation:
         raise ValueError(
             "Cannot write a data tile as raster if the grid has a rotaion."
         )
@@ -122,7 +122,7 @@ def _write_data_tile_to_raster(data_tile, path):
         width=data_tile.nx,
         count=1,  # nr bands
         dtype=data_tile.dtype,
-        crs=data_tile.grid.crs,
+        crs=data_tile.get_grid().crs,
         nodata=data_tile.nodata_value,
         transform=transform,
     ) as dst:

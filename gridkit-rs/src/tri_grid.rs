@@ -1,7 +1,9 @@
+#![allow(unused_parens)]
+
 use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
 
 use crate::grid::{GridTraits, Orientation};
-use crate::interpolate;
 use crate::utils::*;
 use ndarray::*;
 
@@ -13,6 +15,31 @@ pub struct TriGrid {
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
+}
+
+impl PartialEq for TriGrid {
+    // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
+    fn eq(&self, other: &Self) -> bool {
+        println!("COWBANGA!!!!");
+        self.cellsize.to_bits() == other.cellsize.to_bits() &&
+        self.offset[0].to_bits() == other.offset[0].to_bits() &&
+        self.offset[1].to_bits() == other.offset[1].to_bits() &&
+        self.orientation == other.orientation &&
+        self._rotation.to_bits() == other._rotation.to_bits()
+    }
+}
+
+impl Eq for TriGrid {}
+
+impl Hash for TriGrid {
+    // Needs manual implementation, derive Hash does not work on floats because of NaN etc.
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.cellsize.to_bits().hash(state);
+        self.offset[0].to_bits().hash(state);
+        self.offset[1].to_bits().hash(state);
+        self.orientation.hash(state);
+        self._rotation.to_bits().hash(state);
+    }
 }
 
 impl GridTraits for TriGrid {
@@ -169,11 +196,11 @@ impl GridTraits for TriGrid {
                 self._rotation_matrix_inv.dot(&cell_origin);
             let cell_origin_x = cell_origin[Ix1(id_x_axis)];
             let cell_origin_y = cell_origin[Ix1(id_y_axis)];
-            let mut rel_loc_x: f64 = point[Ix1(id_x_axis)] - cell_origin_x;
-            let mut rel_loc_y: f64 = point[Ix1(id_y_axis)] - cell_origin_y;
+            let rel_loc_x: f64 = point[Ix1(id_x_axis)] - cell_origin_x;
+            let rel_loc_y: f64 = point[Ix1(id_y_axis)] - cell_origin_y;
 
-            let mut y_threshold_left: f64;
-            let mut y_threshold_right: f64;
+            let y_threshold_left: f64;
+            let y_threshold_right: f64;
             let slope = dy / dx;
             // Descrtibes the equation that forms the left border of the triangle
             let left_eq = |x: f64| -> f64 { slope * x };
@@ -492,7 +519,7 @@ impl TriGrid {
     ) -> Array3<i64> {
         let add_cell_id = add_cell_id as i64;
         let mut total_nr_neighbours = include_selected as usize;
-        let mut nr_neighbours_factor: usize;
+        let nr_neighbours_factor: usize;
         let max_nr_cols: i64;
         let nr_rows: i64;
 
@@ -522,7 +549,7 @@ impl TriGrid {
                 nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
         }
 
-        let mut counter: usize = 0;
+        let mut counter: usize;
         let mut nr_cells_per_colum: &Array1<i64>;
         for cell_id in 0..relative_neighbours.shape()[0] {
             counter = 0;
@@ -597,15 +624,14 @@ impl TriGrid {
         let id_x_axis = self.consistent_axis();
         let id_y_axis = self.inconsistent_axis();
 
-        let mut counter: usize = 0;
+        let mut counter: usize;
         let mut y_offset: i64;
         let mut skip_cell: bool;
-        let mut nr_cells_per_colum: &Array1<i64>;
         for cell_id in 0..relative_neighbours.shape()[0] {
             counter = 0;
             let upright_cell =
                 self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            let mut flip_vertically: i64;
+            let flip_vertically: i64;
             if upright_cell {
                 flip_vertically = 1;
             } else {

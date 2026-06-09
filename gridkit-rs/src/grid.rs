@@ -96,10 +96,10 @@ pub trait GridTraits {
                     }
                 }
             },
-            Grid::RectGrid(grid) => {
+            Grid::RectGrid(_grid) => {
                 // nothing to do here
             }
-            Grid::HexGrid(grid) => {
+            Grid::HexGrid(_grid) => {
                 // nothing to do here
             }
         }
@@ -135,7 +135,7 @@ pub trait GridTraits {
     // ) -> Array1<f64>;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 #[enum_delegate::implement(GridTraits)]
 pub enum Grid {
     TriGrid(TriGrid),
@@ -168,7 +168,7 @@ impl CellElement {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Hash, PartialEq)]
 pub enum Orientation {
     Flat,
     Pointy,

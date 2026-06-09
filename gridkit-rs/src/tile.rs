@@ -1,10 +1,11 @@
-use num_traits::{Bounded, FromPrimitive, Num, ToPrimitive, NumCast};
+#![allow(unused_parens)]
+use num_traits::{Bounded, FromPrimitive, Num, NumCast, ToPrimitive};
 use std::{f32::MAX, f64, i64, u64};
 
-use crate::{data_tile::DataTile, grid::*, hex_grid::HexGrid};
+use crate::{data_tile::DataTile, grid::*};
 use ndarray::*;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Tile {
     pub grid: Grid,
     pub start_id: (i64, i64),
@@ -19,7 +20,15 @@ pub trait TileTraits {
     fn get_grid(&self) -> &Grid;
 
     fn to_data_tile_with_value<
-        T: Num + Clone + Copy + PartialEq + Bounded + ToPrimitive + FromPrimitive + PartialOrd + NumCast,
+        T: Num
+            + Clone
+            + Copy
+            + PartialEq
+            + Bounded
+            + ToPrimitive
+            + FromPrimitive
+            + PartialOrd
+            + NumCast,
     >(
         &self,
         fill_value: T,
@@ -52,6 +61,14 @@ pub trait TileTraits {
         self.get_tile().intersects(other)
     }
 
+    fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
+        self.get_tile().intersection_bounds(other)
+    }
+
+    fn intersection_corners(&self, other: &Tile) -> Option<Array2<f64>> {
+        self.get_tile().intersection_corners(other)
+    }
+
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
         self.get_tile().overlap(other)
     }
@@ -68,7 +85,7 @@ pub trait TileTraits {
                     tile_ids[Ix2(cell_id, 0)] = col;
                     tile_ids[Ix2(cell_id, 1)] = row;
                 }
-                Err(e) => {
+                Err(_e) => {
                     tile_ids[Ix2(cell_id, 0)] = oob_value;
                     tile_ids[Ix2(cell_id, 1)] = oob_value;
                 }
@@ -79,7 +96,6 @@ pub trait TileTraits {
 
     fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
         let tile = self.get_tile();
-        let grid = self.get_grid();
         let tile_id_x = id_x - tile.start_id.0;
         // Flip y, for grid start_id is bottom left and array origin is top left as per numpy convention
         let tile_id_y = (tile.start_id.1 + tile.ny as i64 - 1) - id_y;
@@ -109,7 +125,7 @@ pub trait TileTraits {
                     grid_ids[Ix2(cell_id, 0)] = x;
                     grid_ids[Ix2(cell_id, 1)] = y;
                 }
-                Err(e) => {
+                Err(_e) => {
                     grid_ids[Ix2(cell_id, 0)] = oob_value;
                     grid_ids[Ix2(cell_id, 1)] = oob_value;
                 }
@@ -164,6 +180,12 @@ impl TileTraits for Tile {
     }
 
     fn corners(&self) -> Array2<f64> {
+        /// Returns corners in order:
+        /// top-left, top-right, bottom-right, bottom-left
+        /// 0 > 1
+        ///     v
+        /// 3 < 2
+        ///
         let start_corner_x = self.start_id.0 as f64 * self.grid.dx() + self.grid.offset()[0];
         let start_corner_y = self.start_id.1 as f64 * self.grid.dy() + self.grid.offset()[1];
         let side_length_x = self.nx as f64 * self.grid.dx();
@@ -207,15 +229,170 @@ impl TileTraits for Tile {
     }
 
     fn intersects(&self, other: &Tile) -> bool {
-        return !(
-                self.start_id.0 >= (other.start_id.0 + other.nx as i64)
-            || (self.start_id.0 + self.nx as i64) <= other.start_id.0
-            ||  self.start_id.1 >= (other.start_id.1 + other.ny as i64)
-            || (self.start_id.1 + self.ny as i64) <= other.start_id.1
-        );
+        // Note: It is easier to match tiles on their ids. This seems elegant
+        //       because we don't need to care about rotation. This was how it
+        //       was first implemented but it required self and other to be on
+        //       the same grid. This was not enforced so you would get weird
+        //       results if this was not upheld. Rather than forcing the grids
+        //       to be aligned we use the tile corner coordinates. This way
+        //       any tile can be checked for intersection with any other tile
+        //       purely based on location, regardless of the host grid. This
+        //       does have the downside that we need to account for rotated
+        //       grids where the corner that was originally the on the left
+        //       side might now be the rightmost corner.
+        let corners_self = self.corners();
+        let corners_other = other.corners();
+
+        // Get min and max values.
+        // Note: This is a thorn in the eye as .min() does not work
+        //       on ndarrays of dtype float because of nan and inf values.
+        let left_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+
+        let left_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+
+        return !(left_self >= right_other
+            || right_self <= left_other
+            || bottom_self >= top_other
+            || top_self <= bottom_other);
+    }
+
+    fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
+        let corners_self = self.corners();
+        let corners_other = other.corners();
+
+        let left_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_self = corners_self
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_self = corners_self
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+
+        let left_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right_other = corners_other
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top_other = corners_other
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+
+        // Compute intersection bounds
+        let minx = left_self.max(left_other);
+        let miny = bottom_self.max(bottom_other);
+        let maxx = right_self.min(right_other);
+        let maxy = top_self.min(top_other);
+
+        // Check if there is an intersection
+        if minx < maxx && miny < maxy {
+            Some((minx, miny, maxx, maxy))
+        } else {
+            None
+        }
+    }
+
+    fn intersection_corners(&self, other: &Tile) -> Option<Array2<f64>> {
+        if let Some((minx, miny, maxx, maxy)) = self.intersection_bounds(other) {
+            Some(arr2(&[
+                [minx, maxy],
+                [maxx, maxy],
+                [maxx, miny],
+                [minx, miny],
+            ]))
+        } else {
+            None
+        }
     }
 
     fn overlap(&self, other: &Tile) -> Result<Tile, String> {
+        /// Returns a tile that covers the intersection between the tiles `self` and `other`.
+        ///
+        /// ## Keywords
+        /// intersection, crop, overlap, clip
+        ///
+        if self.get_grid() != other.get_grid() {
+            return Err("Tiles do not live on the same grid.".to_string());
+        }
+
         if !self.intersects(&other) {
             return Err("Tiles do not overlap".to_string());
         }

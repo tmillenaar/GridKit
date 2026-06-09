@@ -75,8 +75,9 @@ def test_combine_tiles(grid):
         HexGrid(size=1, shape="flat"),
     ],
 )
-def test_count_data_tile(grid):
-    grid.rotation = 12
+@pytest.mark.parametrize("rotation", [-12, 363, 186])
+def test_count_data_tile(grid, rotation):
+    grid.rotation = rotation
 
     tile1 = Tile(grid, (-2, -3), 5, 7)
     tile2 = Tile(grid, (1, 0), 7, 5).to_data_tile_with_value(3.2)

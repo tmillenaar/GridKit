@@ -1,5 +1,6 @@
+use std::hash::{Hash, Hasher};
+
 use crate::grid::GridTraits;
-use crate::tile::*;
 use crate::utils::*;
 use ndarray::*;
 
@@ -11,6 +12,30 @@ pub struct RectGrid {
     pub _rotation: f64,
     pub _rotation_matrix: Array2<f64>,
     pub _rotation_matrix_inv: Array2<f64>,
+}
+
+impl PartialEq for RectGrid {
+    // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
+    fn eq(&self, other: &Self) -> bool {
+        self._dx.to_bits() == other._dx.to_bits() &&
+        self._dy.to_bits() == other._dy.to_bits() &&
+        self.offset[0].to_bits() == other.offset[0].to_bits() &&
+        self.offset[1].to_bits() == other.offset[1].to_bits() &&
+        self._rotation.to_bits() == other._rotation.to_bits()
+    }
+}
+
+impl Eq for RectGrid {}
+
+impl Hash for RectGrid {
+    // Needs manual implementation, derive Hash does not work on floats because of NaN etc.
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self._dx.to_bits().hash(state);
+        self._dy.to_bits().hash(state);
+        self.offset[0].to_bits().hash(state);
+        self.offset[1].to_bits().hash(state);
+        self._rotation.to_bits().hash(state);
+    }
 }
 
 impl GridTraits for RectGrid {
@@ -147,8 +172,8 @@ impl GridTraits for RectGrid {
         }
 
         for cell_id in 0..points.shape()[0] {
-            let rel_loc_x: f64 = modulus((points[Ix2(cell_id, 0)] - self.offset[0]), self.dx());
-            let rel_loc_y: f64 = modulus((points[Ix2(cell_id, 1)] - self.offset[1]), self.dy());
+            let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
+            let rel_loc_y: f64 = modulus(points[Ix2(cell_id, 1)] - self.offset[1], self.dy());
             let id_x = index[Ix2(cell_id, 0)];
             let id_y = index[Ix2(cell_id, 1)];
             match (rel_loc_x, rel_loc_y) {
@@ -216,10 +241,12 @@ impl RectGrid {
         }
     }
 
+    #[allow(dead_code)]
     fn set_cellsize_x(&mut self, cellsize_x: f64) {
         self._dx = cellsize_x;
     }
 
+    #[allow(dead_code)]
     fn set_cellsize_y(&mut self, cellsize_y: f64) {
         self._dy = cellsize_y;
     }
