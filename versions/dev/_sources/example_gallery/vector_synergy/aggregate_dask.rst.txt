@@ -119,7 +119,7 @@ The column 'nr_points' will contain the nr of points per cell once '.count()' is
    DataFrame will need to be ignored for this operation.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-102
+.. GENERATED FROM PYTHON SOURCE LINES 86-104
 
 .. code-block:: Python
 
@@ -128,14 +128,16 @@ The column 'nr_points' will contain the nr of points per cell once '.count()' is
     grid = HexGrid(size=1, shape="flat")
 
 
-    def index_1d_at_point(df):
+    def index_1d_at_point(df, **grid_params):
         """Find the cell for each point in the dataframe and return the 1D index.
         This operation is meant to map to each DataFrame partition
         """
+        # Note: Define 'grid' here based on primitives so Dask does not have to worry about serializing the Grid object.
+        grid = HexGrid(**grid_params)
         return grid.cell_at_point(df[["pnt_x", "pnt_y"]]).index_1d
 
 
-    df["cell_id"] = df.map_partitions(index_1d_at_point)
+    df["cell_id"] = df.map_partitions(index_1d_at_point, **grid.definition)
     df["nr_points"] = 1
     print(df)
 
@@ -161,13 +163,13 @@ The column 'nr_points' will contain the nr of points per cell once '.count()' is
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-106
+.. GENERATED FROM PYTHON SOURCE LINES 105-108
 
 We can group by the 'cell_id'. That means points with the same 'cell_id' will be combined.
 'count()' then gets the number of points for every 'cell_id'.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 109-113
 
 .. code-block:: Python
 
@@ -182,7 +184,7 @@ We can group by the 'cell_id'. That means points with the same 'cell_id' will be
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-121
+.. GENERATED FROM PYTHON SOURCE LINES 114-123
 
 Now we have the number of points per cell.
 In order to get the Polygon of each corresponding cell,
@@ -194,20 +196,24 @@ it first needs to be converted to a normal index using :meth:`.GridIndex.from_in
     suffice it to say that the size of the data is significantly reduced after the groupby.
     Also, for the sake of the example I will plot the data with matplotlib.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-134
+.. GENERATED FROM PYTHON SOURCE LINES 124-140
 
 .. code-block:: Python
 
 
 
-    def shapely_geom_from_index_1d(id_1d):
+    def shapely_geom_from_index_1d(id_1d, **grid_params):
         """Generate the Shapely geometry for each 1D index.
         This operation is meant to map to each DataFrame partition
         """
+        # Note: Define 'grid' here based on primitives so Dask does not have to worry about serializing the Grid object.
+        grid = HexGrid(**grid_params)
         return numpy.array(grid.to_shapely(GridIndex.from_index_1d(id_1d)).geoms)
 
 
-    polygons = occurrences.index.map_partitions(shapely_geom_from_index_1d)
+    polygons = occurrences.index.map_partitions(
+        shapely_geom_from_index_1d, **grid.definition
+    )
     geoms, points_per_cell = dask.compute(polygons, occurrences.nr_points)
 
 
@@ -218,13 +224,13 @@ it first needs to be converted to a normal index using :meth:`.GridIndex.from_in
 
  .. code-block:: none
 
-    /tmp/gridkit_docs/dev/gridkit-py/venv/lib/python3.10/site-packages/dask/_expr.py:1260: UserWarning: Computing mixed collections that are backed by HighlevelGraphs/dicts and Expressions. This forces Expressions to be materialized. It is recommended to use only one type and separate the dask.compute calls if necessary.
+    /tmp/gridkit_docs/dev/gridkit-py/venv/lib/python3.10/site-packages/dask/_expr.py:1262: UserWarning: Computing mixed collections that are backed by HighlevelGraphs/dicts and Expressions. This forces Expressions to be materialized. It is recommended to use only one type and separate the dask.compute calls if necessary.
       warnings.warn(
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-141
+.. GENERATED FROM PYTHON SOURCE LINES 141-147
 
 Visualize the results
 ---------------------
@@ -233,7 +239,7 @@ Note how the results are identical to the pandas version.
 The input data was the same so this should indeed be the case.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-148
+.. GENERATED FROM PYTHON SOURCE LINES 148-154
 
 .. code-block:: Python
 
@@ -258,7 +264,7 @@ The input data was the same so this should indeed be the case.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.506 seconds)
+   **Total running time of the script:** (0 minutes 0.537 seconds)
 
 
 .. _sphx_glr_download_example_gallery_vector_synergy_aggregate_dask.py:

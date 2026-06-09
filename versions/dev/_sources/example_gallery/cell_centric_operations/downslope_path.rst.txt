@@ -98,7 +98,7 @@ Next, set up the recursive function and the required empty lists.
     def downslope_path(cell_id):
         visited_cells.append(cell_id)
         # add new neigbours and their values to their respective lists
-        neighbours = dem.grid.neighbours(cell_id, connect_corners=True)
+        neighbours = dem.get_grid().neighbours(cell_id, connect_corners=True)
         for cell, value in zip(neighbours, dem.value(neighbours)):
             cell = tuple(cell.index)
             if not cell in visited_cells and not cell in all_neighbours:
@@ -133,7 +133,7 @@ Determine the starting cell and call the function
 
 .. code-block:: Python
 
-    start_cell_id = dem.grid.cell_at_point((29330, 167848))
+    start_cell_id = dem.get_grid().cell_at_point((29330, 167848))
     downslope_path(tuple(start_cell_id.index))
 
 
@@ -197,7 +197,7 @@ or intersected with a polygon to determine if the path crosses a particular zone
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.066 seconds)
+   **Total running time of the script:** (0 minutes 1.104 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_downslope_path.py:

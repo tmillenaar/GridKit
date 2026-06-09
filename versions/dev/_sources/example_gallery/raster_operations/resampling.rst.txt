@@ -47,7 +47,7 @@ Several grids with different cell shapes are then defined on which the DEM data 
     dem = raster_to_data_tile(
         "../../tests/data/alps_dem.tiff", bounds=(28300, 167300, 28700, 167700)
     )
-    print(f"Original resolution in (dx, dy): ({dem.grid.dx}, {dem.grid.dy})")
+    print(f"Original resolution in (dx, dy): ({dem.get_grid().dx}, {dem.get_grid().dy})")
 
 
 
@@ -87,12 +87,14 @@ Let's define a rectangular grid with a cell size of 10x10 degrees.
 I am calling it rectdem for later on I will define hexagonal ones as well.
 To make sure it worked we can print out the cellsize after resampling
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-55
+.. GENERATED FROM PYTHON SOURCE LINES 52-57
 
 .. code-block:: Python
 
-    rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.grid.crs), method="linear")
-    print(f"Downsampled resolution in (dx, dy): ({rectdem.grid.dx}, {rectdem.grid.dy})")
+    rectdem = dem.resample(RectGrid(dx=10, dy=10, crs=dem.get_grid().crs), method="linear")
+    print(
+        f"Downsampled resolution in (dx, dy): ({rectdem.get_grid().dx}, {rectdem.get_grid().dy})"
+    )
 
 
 
@@ -107,11 +109,11 @@ To make sure it worked we can print out the cellsize after resampling
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-57
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Let's plot the data to see what it looks like after downsampling
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-65
+.. GENERATED FROM PYTHON SOURCE LINES 60-67
 
 .. code-block:: Python
 
@@ -134,7 +136,7 @@ Let's plot the data to see what it looks like after downsampling
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-72
+.. GENERATED FROM PYTHON SOURCE LINES 68-74
 
 Now let's do the same, but on hexagonal grids.
 There are two flavours, "pointy" and "flat" hexagonal grids.
@@ -143,15 +145,17 @@ We can define the hexagon cell size to have the same area as the downsampled rec
 for a fair visual comparison.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-87
 
 .. code-block:: Python
 
     hexdem_flat = dem.resample(
-        HexGrid(area=rectdem.grid.area, shape="flat", crs=dem.grid.crs), method="linear"
+        HexGrid(area=rectdem.get_grid().area, shape="flat", crs=dem.get_grid().crs),
+        method="linear",
     )
     hexdem_pointy = dem.resample(
-        HexGrid(area=rectdem.grid.area, shape="pointy", crs=dem.grid.crs), method="linear"
+        HexGrid(area=rectdem.get_grid().area, shape="pointy", crs=dem.get_grid().crs),
+        method="linear",
     )
 
 
@@ -164,14 +168,14 @@ for a fair visual comparison.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 88-92
 
 Now let's create two new figures and populate these with the colored shapes of the two downsampled hexagon grids.
 Since there is no 'imshow' equivalent for hexagons in matplotlib, we use our own :func:`gridkit.doc_utils.plot_polygons`
 function, which is less performant but works on generalized shapes.
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-131
+.. GENERATED FROM PYTHON SOURCE LINES 93-135
 
 .. code-block:: Python
 
@@ -248,7 +252,7 @@ function, which is less performant but works on generalized shapes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-149
+.. GENERATED FROM PYTHON SOURCE LINES 136-153
 
 When observing these plots it is obvious that one of them has something weird going on at the edge of the tile.
 Triangluar and hexagonal grids both have one of the axes that is irregular. Sometimes it works out such that
@@ -268,7 +272,7 @@ occurences of a nodata value in our tile with the new nodata value.
 ..
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-157
+.. GENERATED FROM PYTHON SOURCE LINES 154-161
 
 .. code-block:: Python
 
@@ -303,7 +307,7 @@ occurences of a nodata value in our tile with the new nodata value.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-167
+.. GENERATED FROM PYTHON SOURCE LINES 162-171
 
 This concludes the example. Naturally, this example can also be used to upsample your data.
 
@@ -318,7 +322,7 @@ This concludes the example. Naturally, this example can also be used to upsample
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.150 seconds)
+   **Total running time of the script:** (0 minutes 1.192 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_resampling.py:

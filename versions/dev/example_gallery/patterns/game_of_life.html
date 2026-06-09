@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cellular automata: Conway’s game of life &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -21,6 +21,7 @@
       <script src="../../_static/documentation_options.js?v=3ce10a4d"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -123,23 +124,17 @@ to download the full example code.</p>
 <span id="example-game-of-life"></span><span id="sphx-glr-example-gallery-patterns-game-of-life-py"></span><h1>Cellular automata: Conway’s game of life<a class="headerlink" href="#cellular-automata-conway-s-game-of-life" title="Link to this heading"></a></h1>
 <p>Cellular automata are a small set of rules relating to cells on a grid that can create complex patterns when applied repeatedly.
 There is a near infinite veriety of rules, but far and away the most well known set of rules is that of the so called Conway’s game of life.
-The setup is as follows:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>The board is a 2d rectangular grid</p></li>
-<li><p>The 8 neighbouring cells are considered, so this includes the diagonal neighbours</p></li>
-<li><p>A cell has two possbile states: alive or dead</p></li>
-</ul>
-</div></blockquote>
+The setup is as follows:
+- The board is a 2d rectangular grid
+- The 8 neighbouring cells are considered, so this includes the diagonal neighbours
+- A cell has two possbile states: alive or dead</p>
 <p>The rules as taken from <a class="reference external" href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life">https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life</a>:</p>
-<blockquote>
-<div><ol class="arabic simple">
+<ol class="arabic simple">
 <li><p>Any live cell with fewer than two live neighbours dies, as if by underpopulation.</p></li>
 <li><p>Any live cell with two or three live neighbours lives on to the next generation.</p></li>
 <li><p>Any live cell with more than three live neighbours dies, as if by overpopulation.</p></li>
 <li><p>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</p></li>
 </ol>
-</div></blockquote>
 <section id="initial-conditions">
 <h2>Initial conditions<a class="headerlink" href="#initial-conditions" title="Link to this heading"></a></h2>
 <p>All cellular automata simulations are highly dependent on the initial conditions. We have to start with some dead cells and some live cells.
@@ -471,42 +466,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_img8712b58ab5e94486b98b89b970da533f">
+  <img id="_anim_imgd5056648ed8b42959de5759812d79f12">
   <div class="anim-controls">
-    <input id="_anim_slider8712b58ab5e94486b98b89b970da533f" type="range" class="anim-slider"
+    <input id="_anim_sliderd5056648ed8b42959de5759812d79f12" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="anim8712b58ab5e94486b98b89b970da533f.set_frame(parseInt(this.value));">
+           oninput="animd5056648ed8b42959de5759812d79f12.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim8712b58ab5e94486b98b89b970da533f.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animd5056648ed8b42959de5759812d79f12.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="anim8712b58ab5e94486b98b89b970da533f.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animd5056648ed8b42959de5759812d79f12.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="anim8712b58ab5e94486b98b89b970da533f.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animd5056648ed8b42959de5759812d79f12.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="anim8712b58ab5e94486b98b89b970da533f.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animd5056648ed8b42959de5759812d79f12.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="anim8712b58ab5e94486b98b89b970da533f.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animd5056648ed8b42959de5759812d79f12.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="anim8712b58ab5e94486b98b89b970da533f.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animd5056648ed8b42959de5759812d79f12.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="anim8712b58ab5e94486b98b89b970da533f.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animd5056648ed8b42959de5759812d79f12.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="anim8712b58ab5e94486b98b89b970da533f.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animd5056648ed8b42959de5759812d79f12.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="anim8712b58ab5e94486b98b89b970da533f.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animd5056648ed8b42959de5759812d79f12.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select8712b58ab5e94486b98b89b970da533f"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd5056648ed8b42959de5759812d79f12"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_8712b58ab5e94486b98b89b970da533f"
+      <input type="radio" name="state" value="once" id="_anim_radio1_d5056648ed8b42959de5759812d79f12"
              >
-      <label for="_anim_radio1_8712b58ab5e94486b98b89b970da533f">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_8712b58ab5e94486b98b89b970da533f"
+      <label for="_anim_radio1_d5056648ed8b42959de5759812d79f12">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_d5056648ed8b42959de5759812d79f12"
              checked>
-      <label for="_anim_radio2_8712b58ab5e94486b98b89b970da533f">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_8712b58ab5e94486b98b89b970da533f"
+      <label for="_anim_radio2_d5056648ed8b42959de5759812d79f12">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_d5056648ed8b42959de5759812d79f12"
              >
-      <label for="_anim_radio3_8712b58ab5e94486b98b89b970da533f">Reflect</label>
+      <label for="_anim_radio3_d5056648ed8b42959de5759812d79f12">Reflect</label>
     </form>
   </div>
 </div>
@@ -516,13 +511,13 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_img8712b58ab5e94486b98b89b970da533f";
-    var slider_id = "_anim_slider8712b58ab5e94486b98b89b970da533f";
-    var loop_select_id = "_anim_loop_select8712b58ab5e94486b98b89b970da533f";
+    var img_id = "_anim_imgd5056648ed8b42959de5759812d79f12";
+    var slider_id = "_anim_sliderd5056648ed8b42959de5759812d79f12";
+    var loop_select_id = "_anim_loop_selectd5056648ed8b42959de5759812d79f12";
     var frames = new Array(6);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAACwNJREFUeJzt3bFqFlsDhtE9fwKaxlJIwE5OJWLldwmCtVY2guAVCGJhZSkI\
 toKIYOkd2IqijdZWgmDARrAxKWRO8eeIkjbJGJ+1yv3B8MIM4WEjOM3zPA8AADL+t/QAAACOlgAE\
 AIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACA\
@@ -576,7 +571,7 @@ ECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABDzL65dy317iEeUAAAAAElFTkSu\
 QmCC\
 "
   frames[1] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAACnZJREFUeJzt3DGKVUkAhtGq4YGhYNRmvQMj9+BmXIPgGlyAe3Ab5oYiiCYG\
 BuY1wSTSTNAyfV/1ne+ctOHyU/e95qNoeq611gAAIOOv3QMAALguAQgAECMAAQBiBCAAQIwABACI\
 EYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgB\
@@ -627,7 +622,7 @@ QACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAE\
 AIgRgAAAMQIQACDmb7YcoHRUXLq1AAAAAElFTkSuQmCC\
 "
   frames[2] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAC1dJREFUeJzt3LuqFVsChtFZ7cbE1MjAB/CWKIiYmBqYeUl8BDNfxUfQB9DY\
 RMQLiLloLGgiCgaCyOxAafpgn9NH2GuXdb4xQjcUP7XK4mPqXsuccw4AADL+tfYAAAAOlgAEAIgR\
 gAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEI\
@@ -682,7 +677,7 @@ CEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwA\
 BACIEYAAADH/BrwoFsms9uuoAAAAAElFTkSuQmCC\
 "
   frames[3] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAACvxJREFUeJzt2zFrFd0ChtE9GoRPtBMExcbSNn1KyxSiWNppZeXvsBMkhY0g\
 iGCjhb9BLEUIdoKICEKiaASR+YprcxWuxT3JGJ61yhTDC7MJD/ucM83zPA8AADKOLD0AAICDJQAB\
 AGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAg\
@@ -735,7 +730,7 @@ IwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAAQIwABACIEYAAADEC\
 EAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiPkXYsnZJcZPNjcAAAAASUVORK5CYII=\
 "
   frames[4] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAACvNJREFUeJzt3DGKVVsChtGzmxsbFJgLBiblHHQWDsC0cAKlmXmZiWMQnICB\
 OAYzEwUxUSMTQYr9gpbmYXe/9tH33FPXb62wkMPPPrfkYxdVY845FwAAMv6x9QAAAA5LAAIAxAhA\
 AIAYAQgAECMAAQBiBCAAQIwABACIEYAAADECEAAgRgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQA\
@@ -788,7 +783,7 @@ RgACAMQIQACAGAEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIE\
 IABAjAAEAIgRgAAAMQIQACBGAAIAxPwBUzLZvmDXurkAAAAASUVORK5CYII=\
 "
   frames[5] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAC0hJREFUeJzt3bGODusDx/EZWbISUaHTbaORKDQSEiQKjYIbcANuwQ2olHo3\
 oNJRodBoVBs3oCMaIc+/oHGc/M/ZZGfHnO/nk2i2mPwy75h887xk5zHGmAAAyDi29gAAAI6WAAQA\
 iBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAY\
@@ -847,12 +842,12 @@ bfUXAAAAAElFTkSuQmCC\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        anim8712b58ab5e94486b98b89b970da533f = new Animation(frames, img_id, slider_id, 299.0,
+        animd5056648ed8b42959de5759812d79f12 = new Animation(frames, img_id, slider_id, 299.0,
                                  loop_select_id);
     }, 0);
   })()
 </script></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.815 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.847 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-game-of-life-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/db59fcf48fc31c66c74814d2cc0f0459/game_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">game_of_life.ipynb</span></code></a></p>

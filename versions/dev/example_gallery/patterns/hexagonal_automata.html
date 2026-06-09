@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cellular automata: Hexagonal automata &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -21,6 +21,7 @@
       <script src="../../_static/documentation_options.js?v=3ce10a4d"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -315,42 +316,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_imgcc04831cc22e4691a6a0127c1bdc6b7a">
+  <img id="_anim_imgd4ab54ee6b0a4ff7a17ba15a7b83a818">
   <div class="anim-controls">
-    <input id="_anim_slidercc04831cc22e4691a6a0127c1bdc6b7a" type="range" class="anim-slider"
+    <input id="_anim_sliderd4ab54ee6b0a4ff7a17ba15a7b83a818" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="animcc04831cc22e4691a6a0127c1bdc6b7a.set_frame(parseInt(this.value));">
+           oninput="animd4ab54ee6b0a4ff7a17ba15a7b83a818.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.play_animation()">
+      <button title="Play" aria-label="Play" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="animcc04831cc22e4691a6a0127c1bdc6b7a.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="animd4ab54ee6b0a4ff7a17ba15a7b83a818.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectcc04831cc22e4691a6a0127c1bdc6b7a"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd4ab54ee6b0a4ff7a17ba15a7b83a818"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_cc04831cc22e4691a6a0127c1bdc6b7a"
+      <input type="radio" name="state" value="once" id="_anim_radio1_d4ab54ee6b0a4ff7a17ba15a7b83a818"
              >
-      <label for="_anim_radio1_cc04831cc22e4691a6a0127c1bdc6b7a">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_cc04831cc22e4691a6a0127c1bdc6b7a"
+      <label for="_anim_radio1_d4ab54ee6b0a4ff7a17ba15a7b83a818">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_d4ab54ee6b0a4ff7a17ba15a7b83a818"
              checked>
-      <label for="_anim_radio2_cc04831cc22e4691a6a0127c1bdc6b7a">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_cc04831cc22e4691a6a0127c1bdc6b7a"
+      <label for="_anim_radio2_d4ab54ee6b0a4ff7a17ba15a7b83a818">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_d4ab54ee6b0a4ff7a17ba15a7b83a818"
              >
-      <label for="_anim_radio3_cc04831cc22e4691a6a0127c1bdc6b7a">Reflect</label>
+      <label for="_anim_radio3_d4ab54ee6b0a4ff7a17ba15a7b83a818">Reflect</label>
     </form>
   </div>
 </div>
@@ -360,13 +361,13 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_imgcc04831cc22e4691a6a0127c1bdc6b7a";
-    var slider_id = "_anim_slidercc04831cc22e4691a6a0127c1bdc6b7a";
-    var loop_select_id = "_anim_loop_selectcc04831cc22e4691a6a0127c1bdc6b7a";
+    var img_id = "_anim_imgd4ab54ee6b0a4ff7a17ba15a7b83a818";
+    var slider_id = "_anim_sliderd4ab54ee6b0a4ff7a17ba15a7b83a818";
+    var loop_select_id = "_anim_loop_selectd4ab54ee6b0a4ff7a17ba15a7b83a818";
     var frames = new Array(16);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAC/xJREFUeJzt3c+L7nMfx/H3zJyaGcWCojN1dpKFZGVKKTvFwgYbG6WUlCyc\
 TkeRshFFs5BSJyk7/gNW0hEWLJTYIGXK5pTITM7M3Jtx8uu+O7nnuDjPx2P5+X4Xr9XVs+v6Xte1\
 dHBwcDAAAGQsL3oAAAB/LwEIABAjAAEAYgQgAECMAAQAiBGAAAAxAhAAIEYAAgDECEAAgBgBCAAQ\
@@ -424,7 +425,7 @@ AgDECEAAgBgBCAAQIwABAGIEIABAjAAEAIgRgAAAMQIQACBGAAIAxAhAAIAYAQgAECMAAQBiBCAA\
 QMx/AMgkGaRvwUWFAAAAAElFTkSuQmCC\
 "
   frames[1] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAADt9JREFUeJzt3V2I1GX/x/Hv7K4kUhiBZQplFhmF7IEPSRAlFBR0FBXRA5bQ\
 w4GVuFBBRTWSBmKsZqQEEdhJEFgYRQeV1EEElSSEZtES5XYioWFLws7MfdC93vX/d+ts9+oufl6v\
 w925Zr9zsrzn95u5rkan0+kUAAAxeiZ7AAAATi0BCAAQRgACAIQRgAAAYQQgAEAYAQgAEEYAAgCE\
@@ -495,7 +496,7 @@ RgACAIQRgAAAYQQgAEAYAQgAEEYAAgCEEYAAAGEEIABAGAEIABBGAAIAhBGAAABhBCAAQBgBCAAQ\
 5l/+Qibyn2/x5wAAAABJRU5ErkJggg==\
 "
   frames[2] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAFBtJREFUeJzt3WuM3FX5wPFnZ6Y3LVi1qbZiUVCqViBNL2qReAkhIUhIBG0T\
 GzeAjZd0C3SDlWBFSty2gLDRbXghb0QalGhAQpAqRpRIKw2YEEVoXcXExgJaW2jLQmfm/F/I7p8K\
 287ULdvu8/kkmzQ7vzPnTF9MvjuXczpKKSUAAEijMtoLAADg9SUAAQCSEYAAAMkIQACAZAQgAEAy\
@@ -589,7 +590,7 @@ AEAyAhAAIBkBCACQjAAEAEhGAAIAJCMAAQCSEYAAAMkIQACAZAQgAEAyAhAAIBkBCACQjAAEAEhG\
 AAIAJCMAAQCSEYAAAMkIQACAZAQgAEAyAhAAIJn/A+yBoLtiRhBAAAAAAElFTkSuQmCC\
 "
   frames[3] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAGSRJREFUeJzt3XuQ1XX9+PHXnrOgMkvIxbwwNImCoQ5ppEk6XmgmMxlKR4ax\
 i5csLYHANJtJbbzMIHhnFnSocBwn01KzqJTImWbUyNSs0BwupukgeEMWFIHdc87n+8fP3V+Gsmd1\
 l114PR4z+w98Xnveu3+cee7nnPN+NxRFUQQAAGmUensBAADsWAIQACAZAQgAkIwABABIRgACACQj\
@@ -706,7 +707,7 @@ RgACACQjAAEAkhGAAADJCEAAgGQEIABAMgIQACAZAQgAkIwABABIRgACACQjAAEAkhGAAADJCEAA\
 gGQEIABAMv8HJtKohlrM5BMAAAAASUVORK5CYII=\
 "
   frames[4] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAHYFJREFUeJzt3Xuw1OV5wPFndw8I9BDkZjAGJ0ISSjSoNRcSM5VoEmPLpKYj\
 SUOtppr0xsVLsM0oUI2tlyQtMIAVE2mniaGdXGidabTq9KLG2sSk9ZIMhCRIqxAVBBUE2cvbP5Jz\
 qlE4e5DDOYfn85k5Mwz+3t1315mdL7tn36dSSikBAEAa1f7eAAAAh5YABABIRgACACQjAAEAkhGA\
@@ -843,7 +844,7 @@ AJIRgAAAyQhAAIBkBCAAQDICEAAgGQEIAJCMAAQASEYAAgAkIwABAJL5PxF8iqo3//TaAAAAAElF\
 TkSuQmCC\
 "
   frames[5] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAJa1JREFUeJzt3XmQ1OWd+PFPdw8yXAKCluB9xFsIJngT73NTEbwS0ZRlNJpE\
 I2aTNRpTq4nBNfFaw+p6rKvRNWbVMupqqaks6OKRVeIt3scKsmq4HASEPp7fH2bmtwgy3TAXPK9X\
 VVeM9tPf5xmqpt5DT38/hZRSCgAAslHs7g0AANC1BCAAQGYEIABAZgQgAEBmBCAAQGYEIABAZgQg\
@@ -1016,7 +1017,7 @@ zAhAAIDMCEAAgMwIQACAzAhAAIDMCEAAgMwIQACAzAhAAIDMCEAAgMwIQACAzAhAAIDMCEAAgMwI\
 QACAzAhAAIDMCEAAgMwIQACAzAhAAIDM/D+athMydjDkDAAAAABJRU5ErkJggg==\
 "
   frames[6] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAKoZJREFUeJzt3Xt4VPWZwPF3zkxISCCJCeGS5a4xLIi0wioirAgouKtAq4Kw\
 WMtFF1thU1fAgtXYFV0JoCUWcVWiWNlSoEiBeikGylLBB0RQLIgkFjFAuGogIcmcc979A2dKMJAz\
 ITfy+36eZ55anvPL+R0OJF+SmXl9qqoCAAAAY1j1vQEAAADULQIQAADAMAQgAACAYQhAAAAAwxCA\
@@ -1211,7 +1212,7 @@ YQhAAAAAwxCAAAAAhiEAAQAADEMAAgAAGIYABAAAMAwBCAAAYBgCEAAAwDAEIAAAgGEIQAAAAMMQ\
 gAAAAIYhAAEAAAzz/8o3eC13S2zWAAAAAElFTkSuQmCC\
 "
   frames[7] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAOgRJREFUeJzt3Xl0FHW6xvG3ujsJHQiQsIRdCITIrhAF5HJFYXBDRhwgM6iA\
 4y4cPSjgDtdxQ7kyoMeZKyCzCeg4I7iNKEwUZBQURODKEiGAEAIhkASy9vbeP7jdIxKSKkyTkN/3\
 c06fORPrTf2qCsljp6seS1VVAAAAYAxXbS8AAAAA5xYBEAAAwDAEQAAAAMMQAAEAAAxDAAQAADAM\
@@ -1476,7 +1477,7 @@ BEAAAADDEAABAAAMQwAEAAAwDAEQAADAMARAAAAAwxAAAQAADEMABAAAMMz/AUncARMqjJnLAAAA\
 AElFTkSuQmCC\
 "
   frames[8] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAARldJREFUeJzt3Xd01FX+//H3lFQIIYUSCAhIB0GKK2URUFZFkRVpdlTsYFuB\
 RUVQQSysLGXVn9hWVwUUAVHWAuKiWBAEhaUjIhBCCSShpE15//5wZ75EQuZ+QkngPh/nzNlz4ufO\
 vXcGzWuH+dyXS1VVAAAAYA13eS8AAAAApxYBEAAAwDIEQAAAAMsQAAEAACxDAAQAALAMARAAAMAy\
@@ -1796,7 +1797,7 @@ liEAAgAAWIYACAAAYBkCIAAAgGUIgAAAAJYhAAIAAFiGAAgAAGAZAiAAAIBlCIAAAACWIQACAABY\
 hgAIAABgmf8PDMi36EUC67AAAAAASUVORK5CYII=\
 "
   frames[9] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAARzJJREFUeJzt3Xd4VOXa/v1r1kwqCSEhgiH0KoqwRVQQERHEhmxRkW1FxQ4P\
 6k9AscC2owgW7ILYECsg6hYFQcRCR0DpBqWFElJIz8ys6/1DZ14jSWatkElC1vdzHHM8+8F1z7rv\
 mUnmzCTrPl2qqgIAAADHMGp6AgAAAKheBEAAAACHIQACAAA4DAEQAADAYQiAAAAADkMABAAAcBgC\
@@ -2120,7 +2121,7 @@ AACAwxAAAQAAHIYACAAA4DAEQAAAAIchAAIAADgMARAAAMBhCIAAAAAOQwAEAABwGAIgAACAw/x/\
 hwkXVwLxgkIAAAAASUVORK5CYII=\
 "
   frames[10] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAASD1JREFUeJzt3Xl4VOX9///3mZnsBJKw75ugKIvsgh/qwi7uiiiiaIsUxKUK\
 1FIRcanyFVCxtRVwQUFcqmJdCooFUXFhEYUKEiWACISwBRKyzZnz/v3Bb6YEQnJOSMhyPx/XNdfV\
 4rnnvs+ZM5lXJjPnZamqCgAAAIzhq+gFAAAA4PQiAAIAABiGAAgAAGAYAiAAAIBhCIAAAACGIQAC\
@@ -2449,7 +2450,7 @@ ARAAAMAwBEAAAADDEAABAAAMQwAEAAAwDAEQAADAMARAAAAAw/x/QBsBSXyfDZUAAAAASUVORK5C\
 YII=\
 "
   frames[11] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAYJRJREFUeJzt3Xd4FOXaBvBnS3oPgRAIvffqoQlIR0BQKSpSFZSiiBJUFEHp\
 FvgoAqKAooIgShGkF0GKdKSFXgMB0kPqTnm+Pzizh5D2Tsimzf27rr2OF2fenfedWTJ3lt25TczM\
 BAAAAACGYc7vCQAAAABA3kIABAAAADAYBEAAAAAAg0EABAAAADAYBEAAAAAAg0EABAAAADAYBEAA\
@@ -2887,7 +2888,7 @@ gMEgAAIAAAAYDAIgAAAAgMEgAAIAAAAYDAIgAAAAgMEgAAIAAAAYDAIgAAAAgMEgAAIAAAAYzP8D\
 Fa7xLKNQiPIAAAAASUVORK5CYII=\
 "
   frames[12] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAcWFJREFUeJzt3Xd4FNX6B/B3Zzc9pJBgCCH0XqUpCIgUKcKlKQiIIFIEKaKi\
 oiJIERGkKEVFpMgVEK6CAgLSkSpICxB6ICSEkt42yc7s+/uD36wJJNkzIZsszPfzPPNcLs6ZOWdm\
 dufdZed8DczMBAAAAAC6IRV3BwAAAACgaKEABAAAANAZFIAAAAAAOoMCEAAAAEBnUAACAAAA6AwK\
@@ -3400,7 +3401,7 @@ AAAAgM6gAAQAAADQGRSAAAAAADqDAhAAAABAZ1AAAgAAAOgMCkAAAAAAnUEBCAAAAKAzKAABAAAA\
 dAYFIAAAAIDOoAAEAAAA0BkUgAAAAAA683/VRWT4C/CksgAAAABJRU5ErkJggg==\
 "
   frames[13] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAcRRJREFUeJzt3Xd4FNX6B/B3S3qHkAKE3jsoXUSkCEhTRFCqhaKCiiIqoBQR\
 QUAEFBCujY5KhwsiHREFpLfQQgkBAiEhPTvl/f3hb+YmknImZJOF+X6eZ57LlTl7zpmd3Xl32Tlf\
 CzMzAQAAAIBpWIt6AAAAAABQuFAAAgAAAJgMCkAAAAAAk0EBCAAAAGAyKAABAAAATAYFIAAAAIDJ\
@@ -3912,7 +3913,7 @@ oAAEAAAAMBkUgAAAAAAmgwIQAAAAwGRQAAIAAACYDApAAAAAAJNBAQgAAABgMigAAQAAAEwGBSAA\
 AACAyfwfilyZAWRpbh0AAAAASUVORK5CYII=\
 "
   frames[14] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAe3xJREFUeJzt3Xd4FOXePvDvllTSQy/SiyBEBKQjICA2UEBUBBRU8CB4RA8o\
 xUaRQxEEUbGABQ+gIoqooKAiRVCRIh2RDoGQkELq7szevz/4zb6EtJkkk2wy9+e65rre1zPPzvNM\
 2flm2HluGwAIEREREVmGvbQ7QEREREQliwUgERERkcWwACQiIiKyGBaARERERBbDApCIiIjIYlgA\
@@ -4471,7 +4472,7 @@ hgUgERERkcWwACQiIiKyGBaARERERBbDApCIiIjIYlgAEhEREVkMC0AiIiIii/l/YTYZClmmysEA\
 AAAASUVORK5CYII=\
 "
   frames[15] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
 YQAAD2EBqD+naQAAo/tJREFUeJzs3Xd4FFXbBvBnS3ovlFATOtJBBKQJ0lSaqHRQqqKAIEUEld4R\
 kG4BBJSqoIACgjTp0nsvCUkgpPdsu78/+GbfhLRzlkwI7PO7rrleX52zc86c2Z0nm8y5NQBAjDHG\
 GGPMbmifdQcYY4wxxlj+4gKQMcYYY8zOcAHIGGOMMWZnuABkjDHGGLMzXAAyxhhjjNkZLgAZY4wx\
@@ -5216,7 +5217,7 @@ rkJggg==\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        animcc04831cc22e4691a6a0127c1bdc6b7a = new Animation(frames, img_id, slider_id, 299.0,
+        animd4ab54ee6b0a4ff7a17ba15a7b83a818 = new Animation(frames, img_id, slider_id, 299.0,
                                  loop_select_id);
     }, 0);
   })()
@@ -5271,7 +5272,7 @@ rkJggg==\
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.183 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.540 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-hexagonal-automata-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/dfd83ee964bd3495e9b56e33dfef46d9/hexagonal_automata.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hexagonal_automata.ipynb</span></code></a></p>

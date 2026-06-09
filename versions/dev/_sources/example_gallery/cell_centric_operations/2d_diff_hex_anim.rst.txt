@@ -722,42 +722,42 @@ Animation
      </style>
 
      <div class="animation">
-       <img id="_anim_img67b616622b2d4814b5557e39d57cc719">
+       <img id="_anim_img6ed8a7c727084734bab344d831f3d18d">
        <div class="anim-controls">
-         <input id="_anim_slider67b616622b2d4814b5557e39d57cc719" type="range" class="anim-slider"
+         <input id="_anim_slider6ed8a7c727084734bab344d831f3d18d" type="range" class="anim-slider"
                 name="points" min="0" max="1" step="1" value="0"
-                oninput="anim67b616622b2d4814b5557e39d57cc719.set_frame(parseInt(this.value));">
+                oninput="anim6ed8a7c727084734bab344d831f3d18d.set_frame(parseInt(this.value));">
          <div class="anim-buttons">
-           <button title="Decrease speed" aria-label="Decrease speed" onclick="anim67b616622b2d4814b5557e39d57cc719.slower()">
+           <button title="Decrease speed" aria-label="Decrease speed" onclick="anim6ed8a7c727084734bab344d831f3d18d.slower()">
                <i class="fa fa-minus"></i></button>
-           <button title="First frame" aria-label="First frame" onclick="anim67b616622b2d4814b5557e39d57cc719.first_frame()">
+           <button title="First frame" aria-label="First frame" onclick="anim6ed8a7c727084734bab344d831f3d18d.first_frame()">
              <i class="fa fa-fast-backward"></i></button>
-           <button title="Previous frame" aria-label="Previous frame" onclick="anim67b616622b2d4814b5557e39d57cc719.previous_frame()">
+           <button title="Previous frame" aria-label="Previous frame" onclick="anim6ed8a7c727084734bab344d831f3d18d.previous_frame()">
                <i class="fa fa-step-backward"></i></button>
-           <button title="Play backwards" aria-label="Play backwards" onclick="anim67b616622b2d4814b5557e39d57cc719.reverse_animation()">
+           <button title="Play backwards" aria-label="Play backwards" onclick="anim6ed8a7c727084734bab344d831f3d18d.reverse_animation()">
                <i class="fa fa-play fa-flip-horizontal"></i></button>
-           <button title="Pause" aria-label="Pause" onclick="anim67b616622b2d4814b5557e39d57cc719.pause_animation()">
+           <button title="Pause" aria-label="Pause" onclick="anim6ed8a7c727084734bab344d831f3d18d.pause_animation()">
                <i class="fa fa-pause"></i></button>
-           <button title="Play" aria-label="Play" onclick="anim67b616622b2d4814b5557e39d57cc719.play_animation()">
+           <button title="Play" aria-label="Play" onclick="anim6ed8a7c727084734bab344d831f3d18d.play_animation()">
                <i class="fa fa-play"></i></button>
-           <button title="Next frame" aria-label="Next frame" onclick="anim67b616622b2d4814b5557e39d57cc719.next_frame()">
+           <button title="Next frame" aria-label="Next frame" onclick="anim6ed8a7c727084734bab344d831f3d18d.next_frame()">
                <i class="fa fa-step-forward"></i></button>
-           <button title="Last frame" aria-label="Last frame" onclick="anim67b616622b2d4814b5557e39d57cc719.last_frame()">
+           <button title="Last frame" aria-label="Last frame" onclick="anim6ed8a7c727084734bab344d831f3d18d.last_frame()">
                <i class="fa fa-fast-forward"></i></button>
-           <button title="Increase speed" aria-label="Increase speed" onclick="anim67b616622b2d4814b5557e39d57cc719.faster()">
+           <button title="Increase speed" aria-label="Increase speed" onclick="anim6ed8a7c727084734bab344d831f3d18d.faster()">
                <i class="fa fa-plus"></i></button>
          </div>
-         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select67b616622b2d4814b5557e39d57cc719"
+         <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select6ed8a7c727084734bab344d831f3d18d"
                class="anim-state">
-           <input type="radio" name="state" value="once" id="_anim_radio1_67b616622b2d4814b5557e39d57cc719"
+           <input type="radio" name="state" value="once" id="_anim_radio1_6ed8a7c727084734bab344d831f3d18d"
                   >
-           <label for="_anim_radio1_67b616622b2d4814b5557e39d57cc719">Once</label>
-           <input type="radio" name="state" value="loop" id="_anim_radio2_67b616622b2d4814b5557e39d57cc719"
+           <label for="_anim_radio1_6ed8a7c727084734bab344d831f3d18d">Once</label>
+           <input type="radio" name="state" value="loop" id="_anim_radio2_6ed8a7c727084734bab344d831f3d18d"
                   checked>
-           <label for="_anim_radio2_67b616622b2d4814b5557e39d57cc719">Loop</label>
-           <input type="radio" name="state" value="reflect" id="_anim_radio3_67b616622b2d4814b5557e39d57cc719"
+           <label for="_anim_radio2_6ed8a7c727084734bab344d831f3d18d">Loop</label>
+           <input type="radio" name="state" value="reflect" id="_anim_radio3_6ed8a7c727084734bab344d831f3d18d"
                   >
-           <label for="_anim_radio3_67b616622b2d4814b5557e39d57cc719">Reflect</label>
+           <label for="_anim_radio3_6ed8a7c727084734bab344d831f3d18d">Reflect</label>
          </form>
        </div>
      </div>
@@ -767,13 +767,13 @@ Animation
        /* Instantiate the Animation class. */
        /* The IDs given should match those used in the template above. */
        (function() {
-         var img_id = "_anim_img67b616622b2d4814b5557e39d57cc719";
-         var slider_id = "_anim_slider67b616622b2d4814b5557e39d57cc719";
-         var loop_select_id = "_anim_loop_select67b616622b2d4814b5557e39d57cc719";
+         var img_id = "_anim_img6ed8a7c727084734bab344d831f3d18d";
+         var slider_id = "_anim_slider6ed8a7c727084734bab344d831f3d18d";
+         var loop_select_id = "_anim_loop_select6ed8a7c727084734bab344d831f3d18d";
          var frames = new Array(9);
     
        frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQAAaPNJREFUeJzt3Xd8U2X7BvDrOSfd0ELZe5UhWxQQFzgR9wBciAgIMjrYe+89\
      yhIQQXDC+1MQN8uF4kIUZUPZu4VCd855fn8kqR1pmxNS0uZc389Hfd+Wu7lp8uRc5yR5biGllCAi\
      IiIi01C83QARERER3VwMgEREREQmwwBIREREZDIMgEREREQmwwBIREREZDIMgEREREQmwwBIRERE\
@@ -1248,7 +1248,7 @@ Animation
      IpNhACQiIiIyGQZAIiIiIpNhACQiIiIyGQZAIiIiIpP5fwUfCuGrtuh1AAAAAElFTkSuQmCC\
      "
        frames[1] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/XeYLdlZ3g3/VoWdO+fTJ+fJSZpR1kgghEAIYQQWoFdgYTDI\
      YMtcGIfX/rC/y/bHCzZgYwTGWBLCL1gghEAJJKGAUJgZTZ45OYfOuXeq+Hx/VO2OO9XWJHWvn64z\
      Oqf3vnvV3rVWrbtWVT23EhFBo9FoNBqNRrNrMF7sDdBoNBqNRqPRvLBoA6jRaDQajUazy9AGUKPR\
@@ -2480,7 +2480,7 @@ Animation
      AEVERERiRgVQREREJGZUAEVERERi5v8BH0P6VTRapqEAAAAASUVORK5CYII=\
      "
        frames[2] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmQLdld3o3+1sphjzXXqTp15tPn9DyoB3VLCCE0YCNekGUb\
      IZCMbWFfcHgIB4SNIwjCH7AjXsAOf3Fwde0bfm0wCC4gA2KQZZBAAxpbrR7V45mnqjo1V+0xh/W/\
      HzJ3TXvM3a3u1qn1U+j0OXvvZ6/cmblWPrky8/8oEREsFovFYrFYLAcG/UYvgMVisVgsFovl9cUa\
@@ -3801,7 +3801,7 @@ Animation
      QCGEEEKIJiMFUAghhBCiyUgBFEIIIYRoMlIAhRBCCCGazP8HaUiYq+uzZ88AAAAASUVORK5CYII=\
      "
        frames[3] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmMLNd9341/zqmlt+me/c7dV16SIkWK2igp8SPLlq3HsSXF\
      iRQ7zgolgf0ucOI4QIDkD/iV4RhG4gCx4xcxkhgKDK+PF8mWEkeKHWunKErc774vs/f0XlXn939R\
      1T0zvVa1uOXO+RC8l+zp75zq6jqnvnVO1e+rRESwWCwWi8VisRwY9Ju9ARaLxWKxWCyWNxZrAC0W\
@@ -5117,7 +5117,7 @@ Animation
      5wAAAABJRU5ErkJggg==\
      "
        frames[4] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmsJVl61ov/1oppz/uMOWfWPHZ1V7vdg91uu+3bvp5AGGEb\
      +IAYJSMhY2EGgRHTB5BB2EZCf0tggxgMX7ClewXc62sM7sZtt3tyd1dVV9aclVk5Z548455iWu//\
      Q8Q+5+yzp4jdNTnP+pUqq3Lv/ewVOyJWxBNrRbyPEhHBYrFYLBaLxXJs0O/1AlgsFovFYrFY3l2s\
@@ -6414,7 +6414,7 @@ Animation
      0GH8f+FM8SL03p6/AAAAAElFTkSuQmCC\
      "
        frames[5] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/XmsLdl91g9/1qpxT2e88+2+PXe7u91ttx07JITEIVJ+guAg\
      krwmieAPB4TCEBQIAUVKhAJCEUQIiJRJQAahRCgOyS+IAMkLxG8go7Hbdrd7vmPf+Z57pj3XsL7v\
      H1V7n7Pnqt1j7lmfVt/bfc5+9qq9q9aqp9aq+j5KRASLxWKxWCwWy5FBv9cbYLFYLBaLxWJ5d7EG\
@@ -7681,7 +7681,7 @@ Animation
      iIhIm/n/ABwM+89hRHcAAAAASUVORK5CYII=\
      "
        frames[6] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmsLVma3oX/3hXTns50zx1zniuzKrOq3Li72sY2BUYqJoFQ\
      d1s0iEEgNcgyCNMGCwsjPjRYAoElpJaMbcRg2cJ2S8Z/kJBFyzR0u6vnmrJyujnevPN0pj3GsN7/\
      hxX7nLPniJ1DZd2zfqm8N3Of/ZwVO2KtiCfWiv0+oqqKx+PxeDwej+fMYH7UG+DxeDwej8fj+Xzx\
@@ -8913,7 +8913,7 @@ Animation
      yqgAioiIiKSMCqCIiIhIyqgAioiIiKTM/wNekxB6wDwQ9AAAAABJRU5ErkJggg==\
      "
        frames[7] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmsJFl63wf/nhNbbnervbqr92X2GcoUKYnvS4qEAAleRBkc\
      SpZtwYYtmR+EMQFZlg1JBiTItuwvogADpLXAgCGCWizDsCz5pQwYFG1q4Tacfaanu6u6u7qWru3u\
      ucVynvfDibw394zI7q7urnt+jbrVdTP/eSIjI875xzmRz19UVfF4PB6Px+PxnBnMR70BHo/H4/F4\
@@ -10116,7 +10116,7 @@ Animation
      QwEEAABIhgIIAACQDAUQAAAgmX8BiZsjTHMHE3MAAAAASUVORK5CYII=\
      "
        frames[8] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
-     bGliIHZlcnNpb24zLjEwLjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvZiW1igAAAAlwSFlzAAAP\
+     bGliIHZlcnNpb24zLjEwLjksIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvJkbTWQAAAAlwSFlzAAAP\
      YQAAD2EBqD+naQABAABJREFUeJzs/WmsLVma1wf/nhXDns5858ybU2VmjV2DoQG9fjFvG0ELJNNG\
      MpY8yLRsEC3awvABgcSgFgi1gPpkNQKbDwbZRrQMCBsbbNSybBl4eaGBnqorqyrHO8/nnmlPMazn\
      /bAi9jl7jojMvJV5zvqV7r2V5+z/XhE7YsX6x1qxn7+oquLxeDwej8fjuTCYH/YGeDwej8fj8Xhe\
@@ -11297,7 +11297,7 @@ Animation
          /* set a timeout to make sure all the above elements are created before
             the object is initialized. */
          setTimeout(function() {
-             anim67b616622b2d4814b5557e39d57cc719 = new Animation(frames, img_id, slider_id, 200.0,
+             anim6ed8a7c727084734bab344d831f3d18d = new Animation(frames, img_id, slider_id, 200.0,
                                       loop_select_id);
          }, 0);
        })()
@@ -11311,7 +11311,7 @@ Animation
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.026 seconds)
+   **Total running time of the script:** (0 minutes 3.140 seconds)
 
 
 .. _sphx_glr_download_example_gallery_cell_centric_operations_2d_diff_hex_anim.py:

@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Downslope path &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -21,6 +21,7 @@
       <script src="../../_static/documentation_options.js?v=3ce10a4d"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -172,7 +173,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <span class="k">def</span><span class="w"> </span><span class="nf">downslope_path</span><span class="p">(</span><span class="n">cell_id</span><span class="p">):</span>
     <span class="n">visited_cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span>
     <span class="c1"># add new neigbours and their values to their respective lists</span>
-    <span class="n">neighbours</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">neighbours</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)):</span>
         <span class="n">cell</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">visited_cells</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">all_neighbours</span><span class="p">:</span>
@@ -193,7 +194,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 </pre></div>
 </div>
 <p>Determine the starting cell and call the function</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
 <span class="n">downslope_path</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">start_cell_id</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -225,7 +226,7 @@ While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may
 <img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
 or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.066 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.104 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a495658098a2a10d0a6d919a5b81ba21/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>

@@ -8,8 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API reference &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=fd6457a4" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -21,11 +21,12 @@
       <script src="_static/documentation_options.js?v=3ce10a4d"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="gridkit" href="api/gridkit.html" />
-    <link rel="prev" title="Interpolate from points" href="example_gallery/vector_synergy/interpolate_from_points.html" /> 
+    <link rel="prev" title="Tiled aggregation from points with Dask" href="example_gallery/vector_synergy/aggregate_dask.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -337,9 +338,8 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.from_pyo3_tile"><code class="docutils literal notranslate"><span class="pre">Tile.from_pyo3_tile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.to_data_tile"><code class="docutils literal notranslate"><span class="pre">Tile.to_data_tile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.to_data_tile_with_value"><code class="docutils literal notranslate"><span class="pre">Tile.to_data_tile_with_value()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.start_id"><code class="docutils literal notranslate"><span class="pre">Tile.start_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.nx"><code class="docutils literal notranslate"><span class="pre">Tile.nx</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.ny"><code class="docutils literal notranslate"><span class="pre">Tile.ny</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.grid"><code class="docutils literal notranslate"><span class="pre">Tile.grid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.get_grid"><code class="docutils literal notranslate"><span class="pre">Tile.get_grid()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.corner_ids"><code class="docutils literal notranslate"><span class="pre">Tile.corner_ids()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.corners"><code class="docutils literal notranslate"><span class="pre">Tile.corners()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.indices"><code class="docutils literal notranslate"><span class="pre">Tile.indices</span></code></a></li>
@@ -350,6 +350,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.to_shapely"><code class="docutils literal notranslate"><span class="pre">Tile.to_shapely()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.tile_id_to_grid_id"><code class="docutils literal notranslate"><span class="pre">Tile.tile_id_to_grid_id()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.grid_id_to_tile_id"><code class="docutils literal notranslate"><span class="pre">Tile.grid_id_to_tile_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.Tile.update"><code class="docutils literal notranslate"><span class="pre">Tile.update()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile"><code class="docutils literal notranslate"><span class="pre">DataTile</span></code></a><ul>
@@ -362,6 +363,7 @@
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.nodata_cells"><code class="docutils literal notranslate"><span class="pre">DataTile.nodata_cells</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.from_pyo3_data_tile"><code class="docutils literal notranslate"><span class="pre">DataTile.from_pyo3_data_tile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.to_numpy"><code class="docutils literal notranslate"><span class="pre">DataTile.to_numpy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.grid"><code class="docutils literal notranslate"><span class="pre">DataTile.grid</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.update"><code class="docutils literal notranslate"><span class="pre">DataTile.update()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.get_tile"><code class="docutils literal notranslate"><span class="pre">DataTile.get_tile()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/gridkit.tile.html#gridkit.tile.DataTile.corner_ids"><code class="docutils literal notranslate"><span class="pre">DataTile.corner_ids()</span></code></a></li>
@@ -442,7 +444,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="example_gallery/vector_synergy/interpolate_from_points.html" class="btn btn-neutral float-left" title="Interpolate from points" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_gallery/vector_synergy/aggregate_dask.html" class="btn btn-neutral float-left" title="Tiled aggregation from points with Dask" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="api/gridkit.html" class="btn btn-neutral float-right" title="gridkit" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

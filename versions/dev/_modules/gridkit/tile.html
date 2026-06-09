@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>gridkit.tile &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -20,6 +20,7 @@
       <script src="../../_static/documentation_options.js?v=3ce10a4d"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -161,6 +162,10 @@
         <span class="n">nx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">ny</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected type for &#39;grid&#39;, expected a TriGrid, RectGrid or HexGrid, got a: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">nx</span> <span class="o">%</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected an integer for &#39;nx&#39;, got: </span><span class="si">{</span><span class="n">nx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -174,23 +179,15 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;&#39;start_id&#39; must be a single pair of indices in the form (x,y), got: </span><span class="si">{start_id}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="n">start_id</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">tuple</span><span class="p">(</span><span class="n">start_id</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">start_id</span><span class="p">,</span> <span class="n">GridIndex</span><span class="p">)</span>
             <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">start_id</span><span class="p">)</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ny</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ny</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">TriGrid</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_tri_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">start_id</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_rect_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">start_id</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_hex_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="n">start_id</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unexpected type for &#39;grid&#39;, expected a TriGrid, RectGrid or HexGrid, got a: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Tile.from_pyo3_tile">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.from_pyo3_tile">[docs]</a>
@@ -263,25 +260,52 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2"> not found on tile&quot;</span><span class="p">)</span>
 
         <span class="n">py03_data_tile</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">fill_value</span><span class="p">,</span> <span class="n">nodata_value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">update</span><span class="p">(),</span> <span class="n">py03_data_tile</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">(),</span> <span class="n">py03_data_tile</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">start_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The starting cell of the Tile.</span>
-<span class="sd">        The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span>
+
+    <span class="nd">@grid</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">grid</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Tile.get_grid">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Obtain a copy of the grid associated to this Tile&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The PyO3Tile object.</span>
+<span class="sd">        Only meant for use internal to this class, access at risk of side-effects.</span>
+
+<span class="sd">        We create a new PyP3Tile every time. This is to avoid synchronisation issues.</span>
+<span class="sd">        Before we had a PyO3Tile created at Tile initialization which served as the</span>
+<span class="sd">        source of truth. This meant that parameters like &#39;nx&#39; for example were properties</span>
+<span class="sd">        that returned the value of the PyO3Tile. There was however a problem when someone</span>
+<span class="sd">        modified a value on the grid property, because this was not reflected in the grid</span>
+<span class="sd">        on the PyO3Tile. This caused a divergence where tile.grid no longer reflected</span>
+<span class="sd">        the values used by the rust internals. Calling a function like &#39;corners&#39; for</span>
+<span class="sd">        would then return unexpected values. To remedy this we use the properties on the</span>
+<span class="sd">        python object as the source of truth and create a new PyO3Tile whenever it is</span>
+<span class="sd">        requested.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">start_id</span><span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">TriGrid</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_tri_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_rect_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_hex_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">nx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of cells in x direction, starting from the ``start_id``&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">nx</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ny</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of cells in y direction, starting from the ``start_id``&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">ny</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unexpected type for &#39;grid&#39;, expected a TriGrid, RectGrid or HexGrid, got a: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Tile.corner_ids">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.corner_ids">[docs]</a>
@@ -363,19 +387,19 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tile.overlap">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.overlap">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="n">is_aligned</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">grid</span><span class="p">)</span>
+        <span class="n">is_aligned</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">get_grid</span><span class="p">())</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_aligned</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Cannot find overlap of grids that are not aligned. Reason for misalignemnt: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="n">_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">_tile</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_tile</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_tile</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tile.to_shapely">
@@ -395,7 +419,7 @@
 
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="n">as_multipolygon</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="n">as_multipolygon</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Tile.tile_id_to_grid_id">
@@ -495,16 +519,14 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tile_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tile_id</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tile_id</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">                Expected the first dimension of tile_id to have a length of two (for x,y). Got indices in shape: </span><span class="si">{</span><span class="n">tile_id</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.</span>
 <span class="s2">                This is different than the grid ids where we expect xy to be the last dimesnion.</span>
 <span class="s2">                This is in an effort to make indexing the data as a numpy array using data[tuple(numpy_ids)] the same</span>
 <span class="s2">                as querying values from datatile.value using grid ids botained through tile_id_to_grid_id(numpy_ids).</span>
 <span class="s2">                Note that not only does this function need the first demension to be of size two,</span>
 <span class="s2">                but numpy starts with the y-coordinate, so we expect: [[y0,y1,y2], [x0,x1,x2]].</span>
-<span class="s2">            &quot;&quot;&quot;</span>
-            <span class="p">)</span>
+<span class="s2">            &quot;&quot;&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tile_id</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">tile_id</span> <span class="o">=</span> <span class="n">tile_id</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -556,6 +578,60 @@
         <span class="c1"># Note: return a tuple instead of numpy array becuase numpy indexing behaviour</span>
         <span class="c1">#       is different when using arrays of integers compared to tuples.</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">grid_id_to_tile_id</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="n">oob_value</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Tile</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_tile</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span>
+
+<div class="viewcode-block" id="Tile.update">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">start_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">nx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ny</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a modified copy of the original Tile.</span>
+<span class="sd">        The original Tile remains un-mutated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        grid: :class:`.BaseGrid`</span>
+<span class="sd">            The :class:`.TriGrid`, :class:`.RectGrid` or :class:`.HexGrid` the Tile is associated with</span>
+<span class="sd">        start_id: Union[Tuple[int, int], GridIndex]</span>
+<span class="sd">            The starting cell of the Tile.</span>
+<span class="sd">            The starting cell defines the bottom-left corner of the Tile if the associated grid is not rotated.</span>
+<span class="sd">        nx: int</span>
+<span class="sd">            The number of cells in x direction, starting from the ``start_id``</span>
+<span class="sd">        ny: int</span>
+<span class="sd">            The number of cells in y direction, starting from the ``start_id``</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.Tile`</span>
+<span class="sd">            A modified copy of the current Tile</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected a TriGrid, RectGrid or HexGrid, got a </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="n">start_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span>
+        <span class="k">if</span> <span class="n">nx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span>
+        <span class="k">if</span> <span class="n">ny</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span>
+
+        <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">start_id</span><span class="p">,</span> <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">)</span></div>
 </div>
 
 
@@ -563,7 +639,6 @@
 <div class="viewcode-block" id="DataTile">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DataTile</span><span class="p">(</span><span class="n">Tile</span><span class="p">):</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="n">Tile</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a 2D array, got </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> dimensions&quot;</span><span class="p">)</span>
@@ -586,7 +661,6 @@
                     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;Data type of the supplied array in argument &#39;data&#39; (dtype: &#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&#39;) did not match the supplied nodata value &#39;</span><span class="si">{</span><span class="n">nodata_value</span><span class="si">}</span><span class="s2">&#39; of type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nodata_value</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
                     <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">tile</span><span class="o">.</span><span class="n">grid</span>
 
         <span class="c1"># Map numpy dtypes to method suffixes</span>
         <span class="n">dtype_method_map</span> <span class="o">=</span> <span class="p">{</span>
@@ -612,8 +686,10 @@
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Method </span><span class="si">{</span><span class="n">method_name</span><span class="si">}</span><span class="s2"> not found on tile&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nodata_value</span><span class="p">)</span>
 
+        <span class="nb">super</span><span class="p">(</span><span class="n">DataTile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">tile</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">tile</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="n">tile</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">tile</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+
         <span class="c1"># _tile is used by the Tile parent class</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">get_tile</span><span class="p">()</span>
+        <span class="c1"># self._tile = self._data_tile.get_tile()</span>
 
 <div class="viewcode-block" id="DataTile.from_bounds_as_rect">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.from_bounds_as_rect">[docs]</a>
@@ -854,22 +930,37 @@
 
         <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="n">new_data</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">TriGrid</span><span class="p">):</span>
-            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_tri_grid</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
-            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_rect_grid</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
-            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_hex_grid</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span>
-            <span class="p">)</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">TriGrid</span><span class="p">):</span>
+            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_tri_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
+            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_rect_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
+            <span class="n">tile</span> <span class="o">=</span> <span class="n">PyO3Tile</span><span class="o">.</span><span class="n">from_hex_grid</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized grid type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized grid type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">new_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_data_tile</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span> <span class="o">=</span> <span class="n">new_data_tile</span><span class="o">.</span><span class="n">_data_tile</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;The &#39;grid&#39; attribute on a DataTile should not be modified directly in order to avoid synchronization issues.</span>
+<span class="sd">            You can obtain a copy of the grid through the .get_grid() method.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@grid</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;The &#39;grid&#39; attribute on a DataTile should not be modified directly in order to avoid synchronization issues.</span>
+<span class="sd">            Consider calling .resample() to interpolate the values onto a differnt grid.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def _tile(self):</span>
+    <span class="c1">#     return PyO3Tile()</span>
 
 <div class="viewcode-block" id="DataTile.update">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.update">[docs]</a>
@@ -878,7 +969,7 @@
     <span class="p">):</span>
         <span class="c1"># TODO: Make clear that update copies the data</span>
         <span class="k">if</span> <span class="n">grid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>
+            <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">start_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -904,7 +995,7 @@
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.get_tile">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A Tile object with the same properties as this DataTile, but without the data attached.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DataTile.corner_ids">
@@ -1013,7 +1104,7 @@
 <span class="sd">        :py:meth:`.BaseGrid.interp_from_points`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
-            <span class="n">new_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
+            <span class="n">new_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">new_ids</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;bilinear&quot;</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
             <span class="n">return_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
@@ -1085,15 +1176,15 @@
         <span class="n">tile_is_given</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="n">Tile</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">tile_is_given</span><span class="p">:</span>
             <span class="n">tile</span> <span class="o">=</span> <span class="n">alignment_grid</span>
-            <span class="n">alignment_grid</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">grid</span>
+            <span class="n">alignment_grid</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;`crs` not set for one or both grids. Assuming both grids have an identical CRS.&quot;</span>
             <span class="p">)</span>
             <span class="n">different_crs</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">different_crs</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">is_exact_same</span><span class="p">(</span><span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+            <span class="n">different_crs</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">is_exact_same</span><span class="p">(</span><span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tile_is_given</span><span class="p">:</span>
             <span class="c1"># make sure the bounds align with the grid</span>
@@ -1123,7 +1214,7 @@
                 <span class="n">coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">top_xy</span><span class="p">,</span> <span class="n">right_xy</span><span class="p">,</span> <span class="n">bottom_xy</span><span class="p">,</span> <span class="n">left_xy</span><span class="p">])</span>
 
                 <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
                 <span class="p">)</span>
                 <span class="n">corners_transformed</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="o">*</span><span class="n">coords</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
 
@@ -1176,7 +1267,7 @@
 
         <span class="k">if</span> <span class="n">different_crs</span><span class="p">:</span>
             <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span>
-                <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
+                <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span>
             <span class="p">)</span>
             <span class="n">original_shape</span> <span class="o">=</span> <span class="n">new_points</span><span class="o">.</span><span class="n">shape</span>
             <span class="n">raveled_new_points</span> <span class="o">=</span> <span class="n">new_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
@@ -1231,7 +1322,7 @@
 <span class="sd">        :ref:`Example: coordinate transformations &lt;example coordinate transformations&gt;`</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+        <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">new_inf_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">resample_method</span><span class="p">)</span></div>
 
 
@@ -1257,7 +1348,7 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot add DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1281,7 +1372,7 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot add DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
 
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1304,7 +1395,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_subtract_scalar</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot subtract DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1327,7 +1418,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_subtract_scalar_reverse</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot subtract DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1350,7 +1441,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_multiply_scalar</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot multiply DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1373,7 +1464,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_multiply_scalar_reverse</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot multiply DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1396,7 +1487,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_divide_scalar</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot divide DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1419,7 +1510,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_divide_scalar_reverse</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot divide DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__pow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1435,7 +1526,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_powf</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot divide DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__rpow__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1449,7 +1540,7 @@
                 <span class="n">_data_tile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_tile</span><span class="o">.</span><span class="n">_powf_reverse</span><span class="p">(</span><span class="n">other_converted</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot divide DataTile and `</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">_data_tile</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_data_tile</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">combined</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
@@ -1595,7 +1686,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Expected all Tile or DataTile objects but also got a: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">tile</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
     <span class="n">pyo3_tile</span> <span class="o">=</span> <span class="n">tile_utils</span><span class="o">.</span><span class="n">combine_tiles</span><span class="p">(</span><span class="n">pyo3_tiles</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">pyo3_tile</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">pyo3_tile</span><span class="p">)</span></div>
 
 
 
@@ -1634,11 +1725,13 @@
             <span class="p">)</span>
     <span class="k">if</span> <span class="n">pyo3_tiles</span><span class="p">:</span>
         <span class="n">pyo3_data_tile</span> <span class="o">=</span> <span class="n">tile_utils</span><span class="o">.</span><span class="n">count_tiles</span><span class="p">(</span><span class="n">pyo3_tiles</span><span class="p">)</span>
-        <span class="n">result_tiles_only</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">pyo3_data_tile</span><span class="p">)</span>
+        <span class="n">result_tiles_only</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span>
+            <span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">pyo3_data_tile</span>
+        <span class="p">)</span>
     <span class="k">if</span> <span class="n">pyo3_data_tiles</span><span class="p">:</span>
         <span class="n">pyo3_data_tile</span> <span class="o">=</span> <span class="n">tile_utils</span><span class="o">.</span><span class="n">count_data_tiles</span><span class="p">(</span><span class="n">pyo3_data_tiles</span><span class="p">)</span>
         <span class="n">result_data_tiles_only</span> <span class="o">=</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span>
-            <span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span> <span class="n">pyo3_data_tile</span>
+            <span class="n">tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">pyo3_data_tile</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">pyo3_tiles</span> <span class="ow">and</span> <span class="n">pyo3_data_tiles</span><span class="p">:</span>
@@ -1678,13 +1771,13 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_tiles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No data tiles were supplied&quot;</span><span class="p">)</span>
 
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">data_tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">t</span><span class="o">.</span><span class="n">grid</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">data_tiles</span><span class="p">]):</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">data_tiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="n">t</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">data_tiles</span><span class="p">]):</span>
         <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span>
             <span class="s2">&quot;Not all data tiles are on the same grid. Consider resampling them all to the same grid.&quot;</span>
         <span class="p">)</span>
 
-    <span class="n">result_dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="o">*</span><span class="n">data_tiles</span><span class="p">)</span>
+    <span class="n">result_dtype</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">dtype</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">data_tiles</span><span class="p">])</span>
     <span class="n">pyo3_tiles</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">tile</span> <span class="ow">in</span> <span class="n">data_tiles</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">DataTile</span><span class="p">):</span>
@@ -1739,7 +1832,7 @@
     <span class="c1"># logic such that the rust and python logic are the same and don&#39;t have possible inconsistencies</span>
     <span class="c1"># like inf instead of nan or vice versa. I want just one place for the logic.</span>
     <span class="n">summed</span> <span class="o">=</span> <span class="n">sum_data_tiles</span><span class="p">(</span><span class="n">data_tiles</span><span class="p">)</span>
-    <span class="n">counted</span> <span class="o">=</span> <span class="n">count_tiles</span><span class="p">(</span><span class="n">data_tiles</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">summed</span><span class="p">)</span>
+    <span class="n">counted</span> <span class="o">=</span> <span class="n">count_tiles</span><span class="p">(</span><span class="n">data_tiles</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">summed</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">summed</span> <span class="o">/</span> <span class="n">counted</span></div>
 
 </pre></div>

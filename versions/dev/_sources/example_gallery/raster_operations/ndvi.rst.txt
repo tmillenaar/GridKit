@@ -106,7 +106,7 @@ This means none of the bands have to be resampled before we combine them.
     fig.colorbar(im_ndvi, ax=ax, fraction=0.022, pad=0.01)
     ax.set_xlabel("lon")
     ax.set_ylabel("lat")
-    ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.grid.crs.to_epsg()}")
+    ax.set_title(f"NDVI of scene in the alps \n EPSG:{ndvi.get_grid().crs.to_epsg()}")
 
     plt.show()
 
@@ -124,7 +124,7 @@ This means none of the bands have to be resampled before we combine them.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.723 seconds)
+   **Total running time of the script:** (0 minutes 0.695 seconds)
 
 
 .. _sphx_glr_download_example_gallery_raster_operations_ndvi.py:
