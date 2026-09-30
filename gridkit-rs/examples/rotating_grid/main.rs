@@ -29,10 +29,13 @@ fn print_canvas(canvas: &[Vec<char>]) {
     }
 }
 fn main() {
-    let grid = gridkit::TriGrid::new(10., Orientation::Flat);
+    let mut grid = gridkit::TriGrid::new(10., Orientation::Flat);
+    grid.set_rotation(-13.);
 
-    let point: Array2<f64> = Array2::from_shape_vec((1, 2), vec![42., 25.]).unwrap();
-    let center_cell = grid.cell_at_point(&point.view()); // Fixme do a cell_at_point_xy
+    let point = [42., 25.];
+    let cell_id = grid.cell_at_point(&point); // Fixme consider a cell_at_point_xy
+    // direct_neighbours expects a 2D array view, so wrap the single id as (1, 2).
+    let center_cell = array![[cell_id[0], cell_id[1]]];
     let neighbours = grid.direct_neighbours(&center_cell.view(), 3, false, true);
     let neighbour_shape = neighbours.shape();
     let raveled_neighbours = neighbours
