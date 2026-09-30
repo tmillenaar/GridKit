@@ -3,7 +3,7 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use crate::grid::{GridTraits, Orientation};
+use crate::grid::{Grid, GridTraits, Orientation};
 use crate::utils::*;
 use ndarray::*;
 
@@ -20,7 +20,6 @@ pub struct TriGrid {
 impl PartialEq for TriGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        println!("COWBANGA!!!!");
         self.cellsize.to_bits() == other.cellsize.to_bits() &&
         self.offset[0].to_bits() == other.offset[0].to_bits() &&
         self.offset[1].to_bits() == other.offset[1].to_bits() &&
@@ -414,103 +413,8 @@ impl GridTraits for TriGrid {
 
         nearby_cells
     }
-}
 
-impl TriGrid {
-    pub fn new(cellsize: f64, orientation: Orientation) -> Self {
-        let _rotation_matrix = rotation_matrix_from_angle(0.);
-        let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
-        TriGrid {
-            cellsize,
-            offset: [0., 0.],
-            orientation: orientation,
-            _rotation: 0.,
-            _rotation_matrix,
-            _rotation_matrix_inv,
-        }
-    }
-
-    pub fn orientation(&self) -> &Orientation {
-        &self.orientation
-    }
-
-    pub fn set_orientation(&mut self, orientation: Orientation) {
-        self.orientation = orientation;
-    }
-
-    pub fn consistent_axis(&self) -> usize {
-        match self.orientation {
-            Orientation::Pointy => 1,
-            Orientation::Flat => 0,
-        }
-    }
-
-    pub fn inconsistent_axis(&self) -> usize {
-        match self.orientation {
-            Orientation::Pointy => 0,
-            Orientation::Flat => 1,
-        }
-    }
-
-    pub fn stepsize_consistent_axis(&self) -> f64 {
-        match self.orientation {
-            Orientation::Pointy => self.dy(),
-            Orientation::Flat => self.dx(),
-        }
-    }
-
-    pub fn stepsize_inconsistent_axis(&self) -> f64 {
-        match self.orientation {
-            Orientation::Pointy => self.dx(),
-            Orientation::Flat => self.dy(),
-        }
-    }
-
-    pub fn cells_in_bounds(&self, bounds: &(f64, f64, f64, f64)) -> (Array2<i64>, (usize, usize)) {
-        // Get ids of the cells at diagonally opposing corners of the bounds
-        // TODO: allow calling of cell_at_points with single point (tuple or 1d array)
-        let left_bottom: Array2<f64> =
-            array![[bounds.0 + self.dx() / 4., bounds.1 + self.dy() / 4.]];
-        let right_top: Array2<f64> =
-            array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
-
-        // translate the coordinates of the corner cells into indices
-        let left_bottom_id = self.cell_at_points(&left_bottom.view());
-        let right_top_id = self.cell_at_points(&right_top.view());
-
-        // use the cells at the corners to determine
-        // the ids in x an y direction as separate 1d arrays
-        let minx = left_bottom_id[Ix2(0, 0)] - 2;
-        let maxx = right_top_id[Ix2(0, 0)] + 2;
-
-        let miny = left_bottom_id[Ix2(0, 1)] - 2;
-        let maxy = right_top_id[Ix2(0, 1)] + 2;
-
-        // fill raveled meshgrid if the centroid is in the bounds, left bound is inclusive
-        let nr_cells_x: usize = ((bounds.2 - bounds.0) / self.dx()).round() as usize;
-        let nr_cells_y: usize = ((bounds.3 - bounds.1) / self.dy()).round() as usize;
-        let mut index = Array2::<i64>::zeros((nr_cells_x * nr_cells_y, 2));
-        let mut cell_id: usize = 0;
-        for y in (miny..=maxy).rev() {
-            for x in minx..=maxx {
-                let [centroid_x, centroid_y] = self.centroid_xy_no_rot(x, y);
-                if (centroid_x >= bounds.0) & // x > minx
-                   (centroid_x < bounds.2) & // x < maxx
-                   (centroid_y > bounds.1) & // y > miny
-                   (centroid_y < bounds.3)
-                // y < maxy
-                {
-                    index[Ix2(cell_id, 0)] = x;
-                    index[Ix2(cell_id, 1)] = y;
-                    cell_id += 1;
-                }
-            }
-        }
-
-        (index, (nr_cells_y, nr_cells_x))
-    }
-
-    pub fn all_neighbours(
+    fn all_neighbours(
         &self,
         index: &ArrayView2<i64>,
         depth: i64,
@@ -586,7 +490,7 @@ impl TriGrid {
         relative_neighbours
     }
 
-    pub fn direct_neighbours(
+    fn direct_neighbours(
         &self,
         index: &ArrayView2<i64>,
         depth: i64,
@@ -677,6 +581,112 @@ impl TriGrid {
         }
 
         relative_neighbours
+    }
+
+    fn is_aligned_with(&self, _other: &Grid) -> (bool, String) {
+        todo!(
+            "`is_aligned_with` is not ported to Rust for TriGrid yet; only RectGrid is implemented"
+        )
+    }
+
+    fn subdivide(&self, _factor: u64) -> Self {
+        todo!("`subdivide` is not ported to Rust for TriGrid yet; only RectGrid is implemented")
+    }
+}
+
+impl TriGrid {
+    pub fn new(cellsize: f64, orientation: Orientation) -> Self {
+        let _rotation_matrix = rotation_matrix_from_angle(0.);
+        let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
+        TriGrid {
+            cellsize,
+            offset: [0., 0.],
+            orientation: orientation,
+            _rotation: 0.,
+            _rotation_matrix,
+            _rotation_matrix_inv,
+        }
+    }
+
+    pub fn orientation(&self) -> &Orientation {
+        &self.orientation
+    }
+
+    pub fn set_orientation(&mut self, orientation: Orientation) {
+        self.orientation = orientation;
+    }
+
+    pub fn consistent_axis(&self) -> usize {
+        match self.orientation {
+            Orientation::Pointy => 1,
+            Orientation::Flat => 0,
+        }
+    }
+
+    pub fn inconsistent_axis(&self) -> usize {
+        match self.orientation {
+            Orientation::Pointy => 0,
+            Orientation::Flat => 1,
+        }
+    }
+
+    pub fn stepsize_consistent_axis(&self) -> f64 {
+        match self.orientation {
+            Orientation::Pointy => self.dy(),
+            Orientation::Flat => self.dx(),
+        }
+    }
+
+    pub fn stepsize_inconsistent_axis(&self) -> f64 {
+        match self.orientation {
+            Orientation::Pointy => self.dx(),
+            Orientation::Flat => self.dy(),
+        }
+    }
+
+    // TODO: remove, I don't think we want this functionality at all, but we are using it from python at the moment
+    pub fn cells_in_bounds(&self, bounds: &(f64, f64, f64, f64)) -> (Array2<i64>, (usize, usize)) {
+        // Get ids of the cells at diagonally opposing corners of the bounds
+        // TODO: allow calling of cell_at_points with single point (tuple or 1d array)
+        let left_bottom: Array2<f64> =
+            array![[bounds.0 + self.dx() / 4., bounds.1 + self.dy() / 4.]];
+        let right_top: Array2<f64> =
+            array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
+
+        // translate the coordinates of the corner cells into indices
+        let left_bottom_id = self.cell_at_points(&left_bottom.view());
+        let right_top_id = self.cell_at_points(&right_top.view());
+
+        // use the cells at the corners to determine
+        // the ids in x an y direction as separate 1d arrays
+        let minx = left_bottom_id[Ix2(0, 0)] - 2;
+        let maxx = right_top_id[Ix2(0, 0)] + 2;
+
+        let miny = left_bottom_id[Ix2(0, 1)] - 2;
+        let maxy = right_top_id[Ix2(0, 1)] + 2;
+
+        // fill raveled meshgrid if the centroid is in the bounds, left bound is inclusive
+        let nr_cells_x: usize = ((bounds.2 - bounds.0) / self.dx()).round() as usize;
+        let nr_cells_y: usize = ((bounds.3 - bounds.1) / self.dy()).round() as usize;
+        let mut index = Array2::<i64>::zeros((nr_cells_x * nr_cells_y, 2));
+        let mut cell_id: usize = 0;
+        for y in (miny..=maxy).rev() {
+            for x in minx..=maxx {
+                let [centroid_x, centroid_y] = self.centroid_xy_no_rot(x, y);
+                if (centroid_x >= bounds.0) & // x > minx
+                   (centroid_x < bounds.2) & // x < maxx
+                   (centroid_y > bounds.1) & // y > miny
+                   (centroid_y < bounds.3)
+                // y < maxy
+                {
+                    index[Ix2(cell_id, 0)] = x;
+                    index[Ix2(cell_id, 1)] = y;
+                    cell_id += 1;
+                }
+            }
+        }
+
+        (index, (nr_cells_y, nr_cells_x))
     }
 
     fn _is_cell_upright(&self, id_x: i64, id_y: i64) -> bool {

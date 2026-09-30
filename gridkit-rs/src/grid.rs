@@ -126,6 +126,71 @@ pub trait GridTraits {
     fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64>;
     fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64>;
     fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64>;
+
+    /// All cells within `depth` steps of `index`, as the full window of cells
+    /// around it that stepping along both axes can reach.
+    ///
+    /// Set `include_selected` to keep the cells of `index` themselves in the
+    /// result; they always sit in the middle of the window. Set `add_cell_id` to
+    /// offset the result by the ids in `index` (as `neighbours` does) rather than
+    /// returning the relative offsets (as `relative_neighbours` does).
+    ///
+    /// Mirrors `BaseGrid.neighbours(connect_corners=True)` and
+    /// `BaseGrid.relative_neighbours(connect_corners=True)` in Python. The shape
+    /// of the window is grid specific: a square for `RectGrid`, a hexagon for
+    /// `TriGrid`.
+    fn all_neighbours(
+        &self,
+        index: &ArrayView2<i64>,
+        depth: i64,
+        include_selected: bool,
+        add_cell_id: bool,
+    ) -> Array3<i64>;
+
+    /// The cells within `depth` steps of `index` that are also within `depth` steps
+    /// measured in the sense of the two axes of this grid type, so the diamond (for
+    /// `RectGrid`) or rhombus (for `TriGrid`) shaped window.
+    ///
+    /// The arguments are the same as for [`GridTraits::all_neighbours`]. Mirrors
+    /// `BaseGrid.neighbours(connect_corners=False)` and
+    /// `BaseGrid.relative_neighbours(connect_corners=False)` in Python.
+    fn direct_neighbours(
+        &self,
+        index: &ArrayView2<i64>,
+        depth: i64,
+        include_selected: bool,
+        add_cell_id: bool,
+    ) -> Array3<i64>;
+
+    /// Check whether this grid is aligned with `other` and, if it is not, why.
+    ///
+    /// Grids are considered aligned when they are the same type of grid and
+    /// their CRS, cellsize, offset and rotation are the same.
+    ///
+    /// Returns a tuple containing a boolean and a string. The boolean indicates
+    /// whether or not the grids are aligned, the string contains the reason for
+    /// the misalignment and is empty when the grids are aligned.
+    ///
+    /// Mirrors `BaseGrid.is_aligned_with` in `gridkit/base_grid.py`. Note that
+    /// the CRS is not part of the Rust grid, so the CRS is not compared here.
+    fn is_aligned_with(&self, other: &Grid) -> (bool, String);
+
+    /// Create a new grid that is `factor` times finer than this grid and that
+    /// aligns perfectly with it.
+    ///
+    /// The number of cells grows quadratically with `factor`: a `factor` of 2
+    /// results in 4 cells that fit in the original, a `factor` of 3 in 9.
+    ///
+    /// `factor` is unsigned, so there are no negative factors. A `factor` of 0
+    /// would divide the cellsize by zero, so it yields an unchanged copy of this
+    /// grid rather than a grid with infinitely small cells. Note that Python's
+    /// `RectGrid.subdivide` raises a `ValueError` for a `factor` below 1, so this
+    /// is a deliberate divergence.
+    ///
+    /// Mirrors `RectGrid.subdivide` in `gridkit/rect_grid.py`.
+    fn subdivide(&self, factor: u64) -> Self
+    where
+        Self: Sized;
     // fn linear_interpolation(
     //     &self,
     //     sample_points: &ArrayView2<f64>,
@@ -141,6 +206,18 @@ pub enum Grid {
     TriGrid(TriGrid),
     RectGrid(RectGrid),
     HexGrid(HexGrid),
+}
+
+/// The name of the concrete grid type, as used in the Python class names.
+///
+/// Used to report grid type mismatches, mirroring the `parent_grid_class`
+/// comparison in `BaseGrid.is_aligned_with`.
+pub fn grid_type_name(grid: &Grid) -> &'static str {
+    match grid {
+        Grid::TriGrid(_) => "TriGrid",
+        Grid::RectGrid(_) => "RectGrid",
+        Grid::HexGrid(_) => "HexGrid",
+    }
 }
 
 #[derive(Clone)]
