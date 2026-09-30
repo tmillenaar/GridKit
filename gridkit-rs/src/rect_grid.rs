@@ -79,7 +79,7 @@ impl GridTraits for RectGrid {
     }
 
     fn radius(&self) -> f64 {
-        ((self._dy / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
+        ((self._dx / 2.).powi(2) + (self._dy / 2.).powi(2)).powf(0.5)
     }
 
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2] {
@@ -249,5 +249,41 @@ impl RectGrid {
     #[allow(dead_code)]
     fn set_cellsize_y(&mut self, cellsize_y: f64) {
         self._dy = cellsize_y;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn radius_is_half_the_diagonal() {
+        // The radius of a cell is the distance from its center to one of its
+        // corners, so for a non-square cell it must depend on both dx and dy.
+        let grid = RectGrid::new(2., 3.);
+        assert!(
+            (grid.radius() - 1.802775637731995).abs() < 1e-12,
+            "expected 1.802775637731995, got {}",
+            grid.radius()
+        );
+
+        let grid = RectGrid::new(4., 2.);
+        assert!(
+            (grid.radius() - 2.23606797749979).abs() < 1e-12,
+            "expected 2.23606797749979, got {}",
+            grid.radius()
+        );
+    }
+
+    #[test]
+    fn radius_of_square_cell_is_unchanged() {
+        // Guard against regressing the square-cell case, which the old
+        // dy-typo implementation happened to get right.
+        let grid = RectGrid::new(1., 1.);
+        assert!(
+            (grid.radius() - 0.7071067811865476).abs() < 1e-12,
+            "expected 0.7071067811865476, got {}",
+            grid.radius()
+        );
     }
 }
