@@ -17,6 +17,16 @@ pub fn normalize_offset(offset: [f64; 2], dx: f64, dy: f64) -> [f64; 2] {
     [offset_x, offset_y]
 }
 
+/// Relative tolerance used by `numpy.isclose` by default.
+pub const NUMERIC_RTOL: f64 = 1e-5;
+/// Absolute tolerance used by `numpy.isclose` by default.
+pub const NUMERIC_ATOL: f64 = 1e-8;
+
+/// Compare two floats the way `numpy.isclose` does: `|a - b| <= atol + rtol * |b|`.
+pub fn isclose(a: f64, b: f64, rtol: f64, atol: f64) -> bool {
+    (a - b).abs() <= atol + rtol * b.abs()
+}
+
 pub fn rotation_matrix_from_angle(angle_deg: f64) -> Array2<f64> {
     let angle_rad = angle_deg.to_radians();
     let cos_angle = angle_rad.cos();

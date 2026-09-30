@@ -1,6 +1,6 @@
 use std::hash::{Hash, Hasher};
 
-use crate::grid::GridTraits;
+use crate::grid::{grid_type_name, CellElement, Grid, GridTraits};
 use crate::utils::*;
 use ndarray::*;
 
@@ -225,6 +225,93 @@ impl GridTraits for RectGrid {
         }
         nearby_cells
     }
+
+    fn all_neighbours(
+        &self,
+        index: &ArrayView2<i64>,
+        depth: i64,
+        include_selected: bool,
+        add_cell_id: bool,
+    ) -> Array3<i64> {
+        self._neighbours(index, depth, include_selected, add_cell_id, false)
+    }
+
+    fn direct_neighbours(
+        &self,
+        index: &ArrayView2<i64>,
+        depth: i64,
+        include_selected: bool,
+        add_cell_id: bool,
+    ) -> Array3<i64> {
+        self._neighbours(index, depth, include_selected, add_cell_id, true)
+    }
+
+    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
+        if !matches!(other, Grid::RectGrid(_)) {
+            return (
+                false,
+                format!(
+                    "Grid type is not the same. This is a RectGrid, the other is a {}",
+                    grid_type_name(other)
+                ),
+            );
+        }
+
+        let mut reasons: Vec<&str> = Vec::new();
+
+        // Python compares `size` when both grids have one and falls back to
+        // `dx`/`dy` otherwise. `size` is set exactly when `dx` and `dy` are
+        // equal, so comparing `dx` and `dy` covers both branches.
+        if !isclose(self.dx(), other.dx(), NUMERIC_RTOL, NUMERIC_ATOL)
+            || !isclose(self.dy(), other.dy(), NUMERIC_RTOL, NUMERIC_ATOL)
+        {
+            reasons.push("cellsize");
+        }
+
+        // FIXME: the 1e-7 tolerance is a bandaid, taken from Python. The offset
+        //        seems to depend slightly on the bounds after resampling.
+        if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
+            && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+        {
+            reasons.push("offset");
+        }
+
+        if self.rotation() != other.rotation() {
+            reasons.push("rotation");
+        }
+
+        if reasons.is_empty() {
+            return (true, String::new());
+        }
+        (
+            false,
+            format!("The following attributes are not the same: {reasons:?}"),
+        )
+    }
+
+    fn subdivide(&self, factor: u64) -> Self {
+        if factor == 0 {
+            return self.clone();
+        }
+        let factor = factor as f64;
+
+        let mut sub_grid = self.clone();
+        sub_grid
+            .set_cellsize_x(self.dx() / factor)
+            .expect("subdividing by a factor of at least one cannot zero the cellsize");
+        sub_grid
+            .set_cellsize_y(self.dy() / factor)
+            .expect("subdividing by a factor of at least one cannot zero the cellsize");
+
+        // Anchor the sub grid to the top left corner of the parent's cell (0, 0).
+        // The corner is taken from the *parent*, so it is unaffected by the cellsize
+        // change above.
+        let corners = self.cell_corners(&array![[0i64, 0i64]].view());
+        let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
+        sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
+
+        sub_grid
+    }
 }
 
 impl RectGrid {
@@ -268,12 +355,64 @@ impl RectGrid {
         self._dy = cellsize_y;
         Ok(())
     }
+
+    /// Shared implementation of the `GridTraits` neighbour methods.
+    ///
+    /// `direct_only` selects the diamond shaped window (`connect_corners=false`)
+    /// over the full square one.
+    fn _neighbours(
+        &self,
+        index: &ArrayView2<i64>,
+        depth: i64,
+        include_selected: bool,
+        add_cell_id: bool,
+        direct_only: bool,
+    ) -> Array3<i64> {
+        // Python raises `ValueError("'depth' cannot be lower than 1")`.
+        assert!(depth >= 1, "'depth' cannot be lower than 1");
+        let add_cell_id = add_cell_id as i64;
+
+        // Python builds the full `(2 * depth + 1)^2` window by raveling a meshgrid in
+        // C order, which means the rows run from y = +depth down to y = -depth and
+        // within a row x runs from -depth to +depth. `direct_only` then keeps the
+        // cells for which `|x * y| < depth`, the cells that are at most `depth` steps
+        // away when stepping along the axes.
+        let mut relative: Vec<[i64; 2]> = Vec::new();
+        for row in (0..=(2 * depth)).rev() {
+            let y = row - depth;
+            for column in 0..=(2 * depth) {
+                let x = column - depth;
+                if direct_only && (x * y).abs() >= depth {
+                    continue;
+                }
+                // The selected cell always sits exactly in the middle of the window,
+                // so skipping it here is the same as deleting the middle element.
+                if !include_selected && x == 0 && y == 0 {
+                    continue;
+                }
+                relative.push([x, y]);
+            }
+        }
+
+        let mut neighbours = Array3::<i64>::zeros((index.shape()[0], relative.len(), 2));
+        for cell_id in 0..neighbours.shape()[0] {
+            for (neighbour_id, [rel_x, rel_y]) in relative.iter().enumerate() {
+                neighbours[Ix3(cell_id, neighbour_id, 0)] =
+                    rel_x + add_cell_id * index[Ix2(cell_id, 0)];
+                neighbours[Ix3(cell_id, neighbour_id, 1)] =
+                    rel_y + add_cell_id * index[Ix2(cell_id, 1)];
+            }
+        }
+        neighbours
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::grid::CellElement;
+    use crate::hex_grid::HexGrid;
+    use crate::tri_grid::TriGrid;
+    use crate::Orientation;
 
     const TOL: f64 = 1e-9;
 
@@ -318,6 +457,21 @@ mod tests {
                 let base = (i * m + j) * 2;
                 assert_close(actual[[i, j, 0]], expected[base], tol);
                 assert_close(actual[[i, j, 1]], expected[base + 1], tol);
+            }
+        }
+    }
+
+    /// Compare an (n, m, 2) i64 array against a flat list of expected values.
+    fn assert_ids_3d(actual: &Array3<i64>, expected: &[i64]) {
+        let (n, m) = (actual.shape()[0], actual.shape()[1]);
+        assert_eq!(n * m * 2, expected.len(), "unexpected shape");
+        for i in 0..n {
+            for j in 0..m {
+                let base = (i * m + j) * 2;
+                assert_eq!(
+                    [[actual[[i, j, 0]], actual[[i, j, 1]]]],
+                    [[expected[base], expected[base + 1]]]
+                );
             }
         }
     }
@@ -682,5 +836,567 @@ mod tests {
         cells.sort_unstable();
         cells.dedup();
         assert_eq!(cells, vec![(1, 3), (1, 4), (2, 3), (2, 4)]);
+    }
+
+    // ---------------------------------------------------------------------
+    // all_neighbours / direct_neighbours
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn direct_neighbours_depth_one() {
+        // Mirrors the doctest of `RectGrid.relative_neighbours`: a diamond of
+        // 4 cells around (0, 0), y descending within each row.
+        let grid = RectGrid::new(1., 2.);
+        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        assert_eq!(neighbours.shape(), &[1, 4, 2]);
+        assert_ids_3d(&neighbours, &[0, 1, -1, 0, 1, 0, 0, -1]);
+    }
+
+    #[test]
+    fn all_neighbours_depth_one() {
+        // Mirrors `relative_neighbours(connect_corners=True)`: the full 3x3
+        // square without the selected cell.
+        let grid = RectGrid::new(1., 2.);
+        let neighbours = grid.all_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        assert_eq!(neighbours.shape(), &[1, 8, 2]);
+        assert_ids_3d(
+            &neighbours,
+            &[-1, 1, 0, 1, 1, 1, -1, 0, 1, 0, -1, -1, 0, -1, 1, -1],
+        );
+    }
+
+    #[test]
+    fn include_selected_places_the_cell_at_the_centre() {
+        // Python inserts the selected cell at index `floor(len / 2)`. The
+        // diamond and the square both have an odd number of cells when the
+        // selected cell is included, so that index is well defined.
+        let grid = RectGrid::new(1., 2.);
+
+        for depth in 1..=6 {
+            for direct_only in [true, false] {
+                for add_cell_id in [false, true] {
+                    let (with, without) = if direct_only {
+                        (
+                            grid.direct_neighbours(
+                                &array![[7i64, -3i64]].view(),
+                                depth,
+                                true,
+                                add_cell_id,
+                            ),
+                            grid.direct_neighbours(
+                                &array![[7i64, -3i64]].view(),
+                                depth,
+                                false,
+                                add_cell_id,
+                            ),
+                        )
+                    } else {
+                        (
+                            grid.all_neighbours(
+                                &array![[7i64, -3i64]].view(),
+                                depth,
+                                true,
+                                add_cell_id,
+                            ),
+                            grid.all_neighbours(
+                                &array![[7i64, -3i64]].view(),
+                                depth,
+                                false,
+                                add_cell_id,
+                            ),
+                        )
+                    };
+
+                    assert_eq!(with.shape()[1], without.shape()[1] + 1);
+                    let centre = with.shape()[1] / 2;
+                    let selected = if add_cell_id { [7, -3] } else { [0, 0] };
+                    assert_eq!([[with[[0, centre, 0]], with[[0, centre, 1]]]], [selected]);
+
+                    // Dropping the selected cell must give exactly the same
+                    // cells, in the same order, as the shorter array.
+                    for i in 0..without.shape()[1] {
+                        let j = if i < centre { i } else { i + 1 };
+                        assert_eq!(
+                            [[without[[0, i, 0]], without[[0, i, 1]]]],
+                            [[with[[0, j, 0]], with[[0, j, 1]]]]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /// Independently count the cells a neighbour query should return, by walking
+    /// the window rather than by raveling and filtering it.
+    fn expected_neighbour_count(
+        depth: i64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> usize {
+        let mut count = 0;
+        for y in -depth..=depth {
+            for x in -depth..=depth {
+                if !connect_corners && (x * y).abs() >= depth {
+                    continue;
+                }
+                if !include_selected && x == 0 && y == 0 {
+                    continue;
+                }
+                count += 1;
+            }
+        }
+        count
+    }
+
+    #[test]
+    fn neighbour_count_grows_with_depth() {
+        // The doctest of `RectGrid.relative_neighbours` pins the diamond counts
+        // at [4, 12, 24, 36] and the square counts at [8, 24, 48, 80] for depth
+        // 1 to 4. Note that neither shape grows by a constant factor per depth:
+        // the diamond holds `2 * depth * (depth + 1)` cells only for depth 1 to 3.
+        const DOCUMENTED_DIAMOND: [usize; 4] = [4, 12, 24, 36];
+        const DOCUMENTED_SQUARE: [usize; 4] = [8, 24, 48, 80];
+
+        let grid = RectGrid::new(1., 2.);
+        let index = array![[0i64, 0i64]];
+
+        for depth in 1..=6 {
+            for include_selected in [false, true] {
+                let diamond = grid
+                    .direct_neighbours(&index.view(), depth, include_selected, false)
+                    .shape()[1];
+                let square = grid
+                    .all_neighbours(&index.view(), depth, include_selected, false)
+                    .shape()[1];
+
+                assert_eq!(
+                    diamond,
+                    expected_neighbour_count(depth, false, include_selected),
+                    "diamond, depth {depth}, include_selected {include_selected}"
+                );
+                assert_eq!(
+                    square,
+                    expected_neighbour_count(depth, true, include_selected),
+                    "square, depth {depth}, include_selected {include_selected}"
+                );
+
+                // Including the selected cell adds exactly one cell.
+                if include_selected {
+                    let without = grid
+                        .direct_neighbours(&index.view(), depth, false, false)
+                        .shape()[1];
+                    assert_eq!(diamond, without + 1);
+                }
+
+                if depth <= 4 {
+                    if include_selected {
+                        continue;
+                    }
+                    assert_eq!(diamond, DOCUMENTED_DIAMOND[depth as usize - 1]);
+                    assert_eq!(square, DOCUMENTED_SQUARE[depth as usize - 1]);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn neighbours_multiple_indices() {
+        // The literal expected ids of `test_neighbours_multiple_indices`, on a
+        // dx=1, dy=2 grid.
+        let grid = RectGrid::new(1., 2.);
+        let index = array![[-1i64, 0i64], [2i64, 1i64]];
+
+        // connect_corners=False, include_selected=False
+        assert_ids_3d(
+            &grid.direct_neighbours(&index.view(), 1, false, true),
+            &[
+                -1, 1, -2, 0, 0, 0, -1, -1, //
+                2, 2, 1, 1, 3, 1, 2, 0,
+            ],
+        );
+
+        // connect_corners=True, include_selected=True
+        assert_ids_3d(
+            &grid.all_neighbours(&index.view(), 1, true, true),
+            &[
+                -2, 1, -1, 1, 0, 1, -2, 0, -1, 0, 0, 0, -2, -1, -1, -1, 0, -1, //
+                1, 2, 2, 2, 3, 2, 1, 1, 2, 1, 3, 1, 1, 0, 2, 0, 3, 0,
+            ],
+        );
+    }
+
+    #[test]
+    fn neighbours_single_and_multiple_indices_agree() {
+        // `relative_neighbours` only uses `index` for its repeat count on a
+        // rectangular lattice, so a single index must give the same ids as the
+        // matching row of the multi index call.
+        let grid = RectGrid::new(1., 2.);
+
+        for depth in 1..=4 {
+            for connect_corners in [false, true] {
+                for include_selected in [false, true] {
+                    let index = array![[-1i64, 0i64], [2i64, 1i64]];
+
+                    let many = if connect_corners {
+                        grid.all_neighbours(&index.view(), depth, include_selected, true)
+                    } else {
+                        grid.direct_neighbours(&index.view(), depth, include_selected, true)
+                    };
+
+                    for (row, expected) in [(-1i64, 0i64), (2i64, 1i64)].iter().enumerate() {
+                        let one = array![[expected.0, expected.1]];
+                        let single = if connect_corners {
+                            grid.all_neighbours(&one.view(), depth, include_selected, true)
+                        } else {
+                            grid.direct_neighbours(&one.view(), depth, include_selected, true)
+                        };
+
+                        assert_eq!(single.shape(), &[1, many.shape()[1], 2]);
+                        for i in 0..single.shape()[1] {
+                            assert_eq!(
+                                [[single[[0, i, 0]], single[[0, i, 1]]]],
+                                [[many[[row, i, 0]], many[[row, i, 1]]]]
+                            );
+                        }
+
+                        // The relative ids plus the cell id are the absolute ids.
+                        let relative = if connect_corners {
+                            grid.all_neighbours(&one.view(), depth, include_selected, false)
+                        } else {
+                            grid.direct_neighbours(&one.view(), depth, include_selected, false)
+                        };
+                        for i in 0..single.shape()[1] {
+                            assert_eq!(
+                                [[single[[0, i, 0]], single[[0, i, 1]]]],
+                                [[
+                                    relative[[0, i, 0]] + expected.0,
+                                    relative[[0, i, 1]] + expected.1
+                                ]]
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn neighbours_respect_depth_and_connect_corners() {
+        // The invariants `test_neighbours` asserts, on a square dx=dy=3 grid.
+        let grid = RectGrid::new(3., 3.);
+
+        for depth in 1..=6 {
+            for connect_corners in [false, true] {
+                for include_selected in [false, true] {
+                    let index = array![[2i64, 1i64]];
+                    let neighbours = if connect_corners {
+                        grid.all_neighbours(&index.view(), depth, include_selected, true)
+                    } else {
+                        grid.direct_neighbours(&index.view(), depth, include_selected, true)
+                    };
+
+                    let centroids = grid.centroid(&neighbours.slice(s![0, .., ..]));
+                    let center = grid.centroid(&index.view());
+                    let offsets = centroids - &center;
+
+                    // `test_neighbours` deletes the selected cell from the array
+                    // before measuring, because it sits at distance zero on its
+                    // own and would form a group of one.
+                    let distances: Vec<f64> = offsets
+                        .axis_iter(Axis(0))
+                        .enumerate()
+                        .filter(|(i, _)| !include_selected || *i != neighbours.shape()[1] / 2)
+                        .map(|(_, xy)| (xy[Ix1(0)].powi(2) + xy[Ix1(1)].powi(2)).sqrt())
+                        .collect();
+
+                    // Cells at the same distance from the center always come in
+                    // multiples of four.
+                    let mut sorted = distances.clone();
+                    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap());
+                    let mut counts = vec![1usize];
+                    for window in sorted.windows(2) {
+                        if (window[0] - window[1]).abs() < 1e-9 {
+                            *counts.last_mut().unwrap() += 1;
+                        } else {
+                            counts.push(1);
+                        }
+                    }
+                    for count in &counts {
+                        assert_eq!(
+                            count % 4,
+                            0,
+                            "depth {depth}, connect_corners {connect_corners}, \
+                             include_selected {include_selected}: {counts:?}"
+                        );
+                    }
+
+                    if connect_corners {
+                        // No cell can be further away than `depth` diagonals.
+                        let limit =
+                            (grid.dx().powi(2) + grid.dy().powi(2)).sqrt() * depth as f64 + 1e-14;
+                        assert!(distances.iter().all(|d| *d <= limit));
+                    } else {
+                        // No cell can be further away than `depth` cell sizes.
+                        let limit = grid.dx() * depth as f64;
+                        assert!(distances.iter().all(|d| *d <= limit));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "'depth' cannot be lower than 1")]
+    fn depth_below_one_is_rejected() {
+        let grid = RectGrid::new(1., 2.);
+        grid.direct_neighbours(&array![[0i64, 0i64]].view(), 0, false, false);
+    }
+
+    // ---------------------------------------------------------------------
+    // subdivide
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn subdivide_scales_the_cells() {
+        let mut grid = RectGrid::new(1., 0.7);
+        grid.set_rotation(-23.);
+
+        for factor in [1u64, 2, 3, 9] {
+            let sub_grid = grid.subdivide(factor);
+            assert_close(sub_grid.dx(), 1. / factor as f64, TOL);
+            assert_close(sub_grid.dy(), 0.7 / factor as f64, TOL);
+        }
+    }
+
+    #[test]
+    fn subdivide_keeps_parent_corners_on_a_corner() {
+        for rotation in [-23., 0., 456.] {
+            for offset in [[-2., 3.], [0., 0.], [0.1, -0.2]] {
+                let mut grid = RectGrid::new(1., 0.7);
+                grid.set_rotation(rotation);
+                grid.set_offset(offset);
+
+                for factor in [2u64, 9] {
+                    let sub_grid = grid.subdivide(factor);
+
+                    // Take the last corner of a cell and check that it coincides
+                    // with one of the corners of the sub cell containing it.
+                    let corners = grid.cell_corners(&array![[-4i64, 23i64]].view());
+                    let corner = [corners[[0, 3, 0]], corners[[0, 3, 1]]];
+
+                    let id = sub_grid.cell_at_point(&corner);
+                    let sub_corners = sub_grid.cell_corners(&array![[id[0], id[1]]].view());
+                    let on_corner = (0..4).any(|i| {
+                        let dx = sub_corners[[0, i, 0]] - corner[0];
+                        let dy = sub_corners[[0, i, 1]] - corner[1];
+                        (dx * dx + dy * dy).sqrt() <= 1e-9
+                    });
+                    assert!(
+                        on_corner,
+                        "corner {corner:?} is not a corner of the sub cell containing it \
+                         (rotation {rotation}, offset {offset:?}, factor {factor})"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn subdivide_yields_factor_squared_subcells_per_parent_cell() {
+        for factor in [2u64, 9] {
+            for rotation in [-23., 0., 456.] {
+                for offset in [[-2., 3.], [0., 0.], [0.1, -0.2]] {
+                    let mut grid = RectGrid::new(1., 0.7);
+                    grid.set_rotation(rotation);
+                    grid.set_offset(offset);
+
+                    let sub_grid = grid.subdivide(factor);
+
+                    // The sub cells that could possibly be inside the parent cell
+                    // (3, -2) are the (2 * factor + 1)^2 sub cells around the one
+                    // holding the parent centroid.
+                    let target = grid.centroid(&array![[3i64, -2i64]].view());
+                    let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
+                    let candidates = sub_grid.all_neighbours(
+                        &array![[start[0], start[1]]].view(),
+                        factor as i64,
+                        true,
+                        true,
+                    );
+
+                    let sub_centroids = sub_grid.centroid(&candidates.slice(s![0, .., ..]));
+                    let in_cell = grid.cell_at_points(&sub_centroids.view());
+                    let nr_in_cell = (0..in_cell.shape()[0])
+                        .filter(|i| in_cell[[*i, 0]] == 3 && in_cell[[*i, 1]] == -2)
+                        .count();
+
+                    assert_eq!(
+                        nr_in_cell,
+                        (factor * factor) as usize,
+                        "rotation {rotation}, offset {offset:?}, factor {factor}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn subdivide_by_one_is_the_same_grid() {
+        let mut grid = RectGrid::new(1.23, 4.56);
+        grid.set_rotation(15.5);
+        grid.set_offset([0.1, 0.2]);
+
+        assert_eq!(grid.subdivide(1), grid);
+    }
+
+    #[test]
+    fn subdivide_by_zero_is_the_same_grid() {
+        // `factor` is unsigned, so a `factor` of 0 is the only invalid input left.
+        // Dividing the cellsize by zero is not meaningful, so this yields an
+        // unchanged copy instead. Note this diverges from Python, which raises a
+        // `ValueError` for any `factor` below 1.
+        let mut grid = RectGrid::new(1.23, 4.56);
+        grid.set_rotation(15.5);
+        grid.set_offset([0.1, 0.2]);
+
+        assert_eq!(grid.subdivide(0), grid);
+    }
+
+    // ---------------------------------------------------------------------
+    // is_aligned_with
+    //
+    // The CRS is deliberately not part of the Rust grid, so the two CRS cases of
+    // `test_is_aligned_with` are not covered here.
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn is_aligned_with_an_identical_grid() {
+        let grid = RectGrid::new(1.2, 1.2);
+        let other = RectGrid::new(1.2, 1.2);
+
+        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
+        assert!(aligned);
+        assert_eq!(reason, "");
+    }
+
+    #[test]
+    fn is_aligned_with_reports_a_differing_cellsize() {
+        let grid = RectGrid::new(1.2, 1.2);
+
+        for other in [RectGrid::new(1.2, 1.3), RectGrid::new(1.3, 1.2)] {
+            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
+            assert!(!aligned);
+            assert!(reason.contains("cellsize"), "{reason}");
+        }
+    }
+
+    #[test]
+    fn is_aligned_with_reports_a_differing_offset() {
+        let grid = RectGrid::new(1.2, 1.2);
+
+        for offset in [[0., 1.], [1., 0.]] {
+            let mut other = RectGrid::new(1.2, 1.2);
+            other.set_offset(offset);
+            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
+            assert!(!aligned);
+            assert!(reason.contains("offset"), "{reason}");
+        }
+    }
+
+    #[test]
+    fn is_aligned_with_reports_a_differing_rotation() {
+        let grid = RectGrid::new(1.2, 1.2);
+        let mut other = RectGrid::new(1.2, 1.2);
+        other.set_rotation(15.5);
+
+        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
+        assert!(!aligned);
+        assert!(reason.contains("rotation"), "{reason}");
+    }
+
+    #[test]
+    fn is_aligned_with_reports_a_differing_grid_type() {
+        let grid = RectGrid::new(1.2, 1.2);
+
+        let others = vec![
+            Grid::HexGrid(HexGrid::new(1., Orientation::Flat)),
+            Grid::TriGrid(TriGrid::new(1., Orientation::Flat)),
+        ];
+        for other in others {
+            let (aligned, reason) = grid.is_aligned_with(&other);
+            assert!(!aligned);
+            assert!(reason.contains("Grid type is not the same"), "{reason}");
+            assert!(reason.contains("RectGrid"), "{reason}");
+            assert!(reason.contains(grid_type_name(&other)), "{reason}");
+        }
+    }
+
+    #[test]
+    fn is_aligned_with_reports_multiple_reasons() {
+        // The cellsize and offset case of `test_is_aligned_with`. The CRS is
+        // left out because the Rust grid has none.
+        let grid = RectGrid::new(1.2, 1.2);
+        let mut other = RectGrid::new(1.2, 1.1);
+        other.set_offset([1., 1.]);
+
+        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
+        assert!(!aligned);
+        assert!(reason.contains("cellsize"), "{reason}");
+        assert!(reason.contains("offset"), "{reason}");
+    }
+
+    #[test]
+    fn is_aligned_with_leaves_both_grids_intact() {
+        let mut grid = RectGrid::new(1.2, 1.2);
+        grid.set_offset([0.3, 0.4]);
+        let mut other = RectGrid::new(1.2, 1.1);
+        other.set_offset([1., 1.]);
+
+        let before_grid = (grid.dx(), grid.dy(), grid.offset(), grid.rotation());
+        let before_other = (other.dx(), other.dy(), other.offset(), other.rotation());
+
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other.clone())).0);
+        assert!(!other.is_aligned_with(&Grid::RectGrid(grid.clone())).0);
+
+        assert_eq!(
+            before_grid,
+            (grid.dx(), grid.dy(), grid.offset(), grid.rotation())
+        );
+        assert_eq!(
+            before_other,
+            (other.dx(), other.dy(), other.offset(), other.rotation())
+        );
+    }
+
+    #[test]
+    fn is_aligned_with_is_reachable_through_the_grid_enum() {
+        // The `GridTraits` implementation should behave the same whether it is
+        // reached through the concrete type or through the enum.
+        let grid = Grid::RectGrid(RectGrid::new(1.2, 1.2));
+        let other = Grid::RectGrid(RectGrid::new(1.2, 1.3));
+
+        assert_eq!(
+            grid.is_aligned_with(&other),
+            RectGrid::new(1.2, 1.2).is_aligned_with(&other)
+        );
+        assert!(!grid.is_aligned_with(&other).0);
+    }
+
+    #[test]
+    fn neighbours_are_reachable_through_the_grid_enum() {
+        // `all_neighbours`/`direct_neighbours` are `GridTraits` methods, so
+        // `enum_delegate` has to forward them for `Grid` to be usable with them.
+        let grid = Grid::RectGrid(RectGrid::new(1.2, 1.2));
+        let concrete = RectGrid::new(1.2, 1.2);
+        let index = array![[3i64, -2i64]];
+
+        assert_eq!(
+            grid.all_neighbours(&index.view(), 2, true, true),
+            concrete.all_neighbours(&index.view(), 2, true, true)
+        );
+        assert_eq!(
+            grid.direct_neighbours(&index.view(), 2, false, false),
+            concrete.direct_neighbours(&index.view(), 2, false, false)
+        );
     }
 }

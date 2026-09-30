@@ -1,6 +1,6 @@
 use std::hash::{Hash, Hasher};
 
-use crate::grid::{GridTraits, Orientation};
+use crate::grid::{Grid, GridTraits, Orientation};
 use crate::utils::*;
 use ndarray::*;
 
@@ -400,6 +400,36 @@ impl GridTraits for HexGrid {
             }
         }
         nearby_cells
+    }
+
+    fn all_neighbours(
+        &self,
+        _index: &ArrayView2<i64>,
+        _depth: i64,
+        _include_selected: bool,
+        _add_cell_id: bool,
+    ) -> Array3<i64> {
+        todo!("`all_neighbours` is not ported to Rust for HexGrid yet; HexGrid.relative_neighbours is still numpy")
+    }
+
+    fn direct_neighbours(
+        &self,
+        _index: &ArrayView2<i64>,
+        _depth: i64,
+        _include_selected: bool,
+        _add_cell_id: bool,
+    ) -> Array3<i64> {
+        todo!("`direct_neighbours` is not ported to Rust for HexGrid yet; HexGrid.relative_neighbours is still numpy")
+    }
+
+    fn is_aligned_with(&self, _other: &Grid) -> (bool, String) {
+        todo!(
+            "`is_aligned_with` is not ported to Rust for HexGrid yet; only RectGrid is implemented"
+        )
+    }
+
+    fn subdivide(&self, _factor: u64) -> Self {
+        todo!("`subdivide` is not ported to Rust for HexGrid yet; only RectGrid is implemented")
     }
 }
 
