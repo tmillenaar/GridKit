@@ -8,7 +8,7 @@
   <title>gridkit.base_grid &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -112,7 +112,7 @@
 <div class="viewcode-block" id="BaseGrid">
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseGrid</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstraction base class that represents an infinite grid.</span>
+<span class="w">    </span><span class="sd">"""Abstraction base class that represents an infinite grid.</span>
 
 <span class="sd">    Initialization parameters</span>
 <span class="sd">    -------------------------</span>
@@ -129,7 +129,7 @@
 <span class="sd">        such as an epsg integer (eg 4326), an authority string (eg “EPSG:4326”) or a WKT string.</span>
 <span class="sd">        If None, no CRS is set.</span>
 <span class="sd">        Default: None</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># set the CRS using crs.setter</span>
@@ -138,7 +138,7 @@
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractproperty</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameters that define the infinite grid.</span>
+<span class="w">        </span><span class="sd">"""The parameters that define the infinite grid.</span>
 <span class="sd">        Passing these parameters into a new object instance will create a perfectly aligned grid.</span>
 <span class="sd">        Note that Bounded Grids are defined by the bounds and data.</span>
 <span class="sd">        Therefore, the properties returned by this property do describe the grid but cannot be used</span>
@@ -148,12 +148,12 @@
 <span class="sd">        -------</span>
 <span class="sd">        `dict`</span>
 <span class="sd">            A dictionary outlying the parameters that define the grid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.</span>
+<span class="w">        </span><span class="sd">"""The Coordinate Reference System (CRS) represented as a ``pyproj.CRS`` object.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -162,26 +162,26 @@
 <span class="sd">            :getter: Returns a ``pyproj.CRS`` or None. When setting, the value</span>
 <span class="sd">            Coordinate Reference System of the geometry objects. Can be anything accepted by</span>
 <span class="sd">            :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            such as an authority string (eg "EPSG:4326") or a WKT string.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crs</span>
 
     <span class="nd">@crs</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the value of the crs&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sets the value of the crs"""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_crs</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="k">else</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The size of the cell as supplied when initiating the class&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The size of the cell as supplied when initiating the class"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_size</span>
 
     <span class="nd">@size</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the size of the grid to a new value&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set the size of the grid to a new value"""</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Size of cell cannot be set to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;, must be larger than zero&quot;</span>
+                <span class="sa">f</span><span class="s2">"Size of cell cannot be set to '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">', must be larger than zero"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
@@ -190,7 +190,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dx">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The distance in x-direction between two adjacent cell centers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The distance in x-direction between two adjacent cell centers."""</span>
         <span class="k">pass</span></div>
 
 
@@ -198,71 +198,71 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.dy">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The distance in y-direction between two adjacent cell centers.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The distance in y-direction between two adjacent cell centers."""</span>
         <span class="k">pass</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_height</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The height of a cell&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The height of a cell"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">cell_height</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_width</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The width of a cell&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The width of a cell"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">cell_width</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The offset off the grid in dx and dy.</span>
+<span class="w">        </span><span class="sd">"""The offset off the grid in dx and dy.</span>
 <span class="sd">        The offset is never larger than the size of a single grid cell.</span>
-<span class="sd">        The offset represents the shift from the origin (0,0).&quot;&quot;&quot;</span>
+<span class="sd">        The offset represents the shift from the origin (0,0)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">offset</span><span class="p">()</span>
 
     <span class="nd">@offset</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the x and y value of the offset&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sets the x and y value of the offset"""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">new_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_width</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_height</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_offset</span> <span class="o">=</span> <span class="n">new_offset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">offset</span><span class="o">=</span><span class="n">new_offset</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The counter-clockwise rotation of the grid around the origin in degrees.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The counter-clockwise rotation of the grid around the origin in degrees."""</span>
         <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span>
         <span class="k">return</span> <span class="n">rotation</span>
 
     <span class="nd">@rotation</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The counter-clockwise rotation of the grid around the origin in degrees.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The counter-clockwise rotation of the grid around the origin in degrees."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.</span>
-<span class="sd">        Note: makes a copy every time this is called.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The matrix performing the counter-clockwise rotation of the grid around the origin in degrees.</span>
+<span class="sd">        Note: makes a copy every time this is called."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">rotation_matrix</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix_inv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.</span>
-<span class="sd">        Note: makes a copy every time this is called.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The matrix performing the inverse (clockwise) rotation of the grid around the origin in degrees.</span>
+<span class="sd">        Note: makes a copy every time this is called."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">rotation_matrix_inv</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The area of a cell. The unit is the unit used for the cell&#39;s :meth:`.BaseGrid.size`, squared.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
 
     <span class="nd">@area</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the size of the grid to a new value&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set the size of the grid to a new value"""</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Size of cell cannot be set to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;, must be larger than zero&quot;</span>
+                <span class="sa">f</span><span class="s2">"Size of cell cannot be set to '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">', must be larger than zero"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_to_size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)</span>
@@ -273,9 +273,9 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.centroid">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by ``index``.</span>
+<span class="w">        </span><span class="sd">"""Coordinates at the center of the cell(s) specified by ``index``.</span>
 
-<span class="sd">        If this method is called on a &#39;Bounded&#39; class, the ``index`` argument is optional.</span>
+<span class="sd">        If this method is called on a 'Bounded' class, the ``index`` argument is optional.</span>
 <span class="sd">        In such a case the cell IDs of the cells contained in the Bounded product are returned.</span>
 
 <span class="sd">        Parameters</span>
@@ -293,7 +293,7 @@
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            No `index` parameter was supplied to a grid that does not contain data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -301,11 +301,11 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_near_point">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cells_near_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The cells nearest to a point, often used in interpolation at the location of the point.</span>
+<span class="w">        </span><span class="sd">"""The cells nearest to a point, often used in interpolation at the location of the point.</span>
 <span class="sd">        For a TriGrid there are 6 nearby points.</span>
 <span class="sd">        For a HexGrid there are 3 nearby points.</span>
 <span class="sd">        For a RectGrid there are 4 nearby points.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -313,7 +313,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_bounded">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_bounded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a bounded version of this grid where the data in the bounds is filled with the supplied `fill_value`</span>
+<span class="w">        </span><span class="sd">"""Create a bounded version of this grid where the data in the bounds is filled with the supplied `fill_value`</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -335,7 +335,7 @@
 <span class="sd">        :meth:`.BaseGrid.to_bounded`</span>
 <span class="sd">        :meth:`.RectGrid.to_bounded`</span>
 <span class="sd">        :meth:`.HexGrid.to_bounded`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -352,8 +352,8 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours">[docs]</a>
     <span class="nd">@validate_index</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">neighbours</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The indices of the neighbouring cells.</span>
-<span class="sd">        The argument &#39;depth&#39; can be used to include cells from further away.</span>
+<span class="w">        </span><span class="sd">"""The indices of the neighbouring cells.</span>
+<span class="sd">        The argument 'depth' can be used to include cells from further away.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -397,7 +397,7 @@
 <span class="sd">        :py:meth:`.RectGrid.relative_neighbours`</span>
 <span class="sd">        :py:meth:`.HexGrid.relative_neighbours`</span>
 <span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
@@ -425,7 +425,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_at_point">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the ID of the cell in which `point` falls.</span>
+<span class="w">        </span><span class="sd">"""Determine the ID of the cell in which `point` falls.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -436,7 +436,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`tuple`</span>
 <span class="sd">            The ID of the cell in (x,y)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -444,7 +444,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cell_corners">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates of the cell corners as specified by ``index``.</span>
+<span class="w">        </span><span class="sd">"""Coordinates of the cell corners as specified by ``index``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -460,14 +460,14 @@
 <span class="sd">            The last axis is always of size 2 (x,y).</span>
 <span class="sd">            The second to last axis is the length of the corners.</span>
 <span class="sd">            The other axis are in the shape of the supplied index.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="BaseGrid.is_aligned_with">
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.is_aligned_with">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_aligned_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Returns True if grids are algined and False if they are not.</span>
 <span class="sd">        Grids are considered to be aligned when:</span>
 <span class="sd">        - they are the same type of grid</span>
@@ -482,54 +482,54 @@
 <span class="sd">            A tuple containing a boolean and a string.</span>
 <span class="sd">            The boolean indicates whether or not the grids are aligned.</span>
 <span class="sd">            The string contains the reason for the misalignment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a (child of) BaseGrid, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a (child of) BaseGrid, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">aligned</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">reasons</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">:</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">return</span> <span class="p">(</span>
                 <span class="kc">False</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;Grid type is not the same. This is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">, the other is a </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"Grid type is not the same. This is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">, the other is a </span><span class="si">{</span><span class="n">other</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CRS&quot;</span><span class="p">)</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"CRS"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">is_exact_same</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">crs</span><span class="p">):</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CRS&quot;</span><span class="p">)</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"CRS"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
                 <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;cellsize&quot;</span><span class="p">)</span>
+                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"cellsize"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">dy</span>
             <span class="p">):</span>
                 <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;cellsize&quot;</span><span class="p">)</span>
+                <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"cellsize"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">)</span>
         <span class="p">):</span>  <span class="c1"># FIXME: atol if 1e-7 is a bandaid. It seems the offset depends slightly depending on the bounds after resampling on grid</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;offset&quot;</span><span class="p">)</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"offset"</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;orientation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;orientation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"orientation"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">"orientation"</span><span class="p">,</span> <span class="s2">""</span><span class="p">):</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;orientation&quot;</span><span class="p">)</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"orientation"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">rotation</span><span class="p">:</span>
             <span class="n">aligned</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">)</span>
+            <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"rotation"</span><span class="p">)</span>
 
         <span class="n">reason</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The following attributes are not the same: </span><span class="si">{</span><span class="n">reasons</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">reasons</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="sa">f</span><span class="s2">"The following attributes are not the same: </span><span class="si">{</span><span class="n">reasons</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">reasons</span> <span class="k">else</span> <span class="s2">""</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">aligned</span><span class="p">,</span> <span class="n">reason</span></div>
 
@@ -538,7 +538,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_crs">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
+<span class="w">        </span><span class="sd">"""Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
 <span class="sd">        This will update the cell size and the origin offset.</span>
 
 <span class="sd">        The ``crs`` attribute on the current grid must be set.</span>
@@ -548,7 +548,7 @@
 <span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.</span>
 
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
@@ -562,7 +562,7 @@
 <span class="sd">        :meth:`.HexGrid.to_crs`</span>
 <span class="sd">        :meth:`.BoundedRectGrid.to_crs`</span>
 <span class="sd">        :meth:`.BoundedHexGrid.to_crs`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -575,10 +575,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">anchor</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target_loc</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-        <span class="n">cell_element</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;centroid&quot;</span><span class="p">,</span> <span class="s2">&quot;corner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;centroid&quot;</span><span class="p">,</span>
+        <span class="n">cell_element</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"centroid"</span><span class="p">,</span> <span class="s2">"corner"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"centroid"</span><span class="p">,</span>
         <span class="n">in_place</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Position a specified part of a grid cell at a specified location.</span>
+<span class="w">        </span><span class="sd">"""Position a specified part of a grid cell at a specified location.</span>
 <span class="sd">        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.</span>
 <span class="sd">        This is useful for example to align two grids by anchoring them to the same location.</span>
 
@@ -586,11 +586,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        target_loc: Tuple[float, float]</span>
 <span class="sd">            The coordinates of the point at which to anchor the grid in (x,y)</span>
-<span class="sd">        cell_element: Literal[&quot;centroid&quot;, &quot;corner&quot;] - Default: &quot;centroid&quot;</span>
+<span class="sd">        cell_element: Literal["centroid", "corner"] - Default: "centroid"</span>
 <span class="sd">            The part of the cell that is to be positioned at the specified ``target_loc``.</span>
-<span class="sd">            Currently only &quot;centroid&quot; and &quot;corner&quot; are supported.</span>
-<span class="sd">            When &quot;centroid&quot; is specified, the cell is centered around the ``target_loc``.</span>
-<span class="sd">            When &quot;corner&quot; is specified, a nearby cell_corner is placed onto the ``target_loc``.</span>
+<span class="sd">            Currently only "centroid" and "corner" are supported.</span>
+<span class="sd">            When "centroid" is specified, the cell is centered around the ``target_loc``.</span>
+<span class="sd">            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.</span>
 <span class="sd">        in_place: `bool` (Default: False)</span>
 <span class="sd">            The original grid instance is modified if ``in_place`` is ``True`` and no return argument is specified.</span>
 <span class="sd">            If ``in_place`` is ``False``, the original grid instance remains unchanged and a modified copy is returned.</span>
@@ -614,11 +614,11 @@
 <span class="sd">        :meth:`.BoundedRectGrid.anchor`</span>
 <span class="sd">        :meth:`.BoundedHexGrid.anchor`</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">target_loc</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected target_loc to be of type (x,y) but it has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements instead of 2.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected target_loc to be of type (x,y) but it has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span><span class="si">}</span><span class="s2"> elements instead of 2."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">in_place</span><span class="p">:</span>
             <span class="bp">self</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
@@ -635,7 +635,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.cells_in_bounds">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
+<span class="w">        </span><span class="sd">"""Cells contained within a bounding box.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -648,7 +648,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`.GridIndex`</span>
 <span class="sd">            The indices of the cells contained in the bounds</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
+<span class="sd">        """</span></div>
 
 
 <div class="viewcode-block" id="BaseGrid.are_bounds_aligned">
@@ -657,7 +657,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;are_bounds_aligned is not supported for rotated grids&quot;</span>
+                <span class="s2">"are_bounds_aligned is not supported for rotated grids"</span>
             <span class="p">)</span>
 
         <span class="n">is_aligned</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">val</span><span class="p">,</span> <span class="n">cellsize</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
@@ -674,32 +674,32 @@
 
 <div class="viewcode-block" id="BaseGrid.align_bounds">
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.align_bounds">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">align_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">align_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"expand"</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;align_bounds is not supported for rotated grids&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"align_bounds is not supported for rotated grids"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">bounds</span>
 
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;expand&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"expand"</span><span class="p">:</span>
             <span class="n">left_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
             <span class="n">right_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">top_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;contract&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"contract"</span><span class="p">:</span>
             <span class="n">left_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
             <span class="n">right_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">top_rounded</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"nearest"</span><span class="p">:</span>
             <span class="n">left_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">bottom_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
             <span class="n">right_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
             <span class="n">top_rounded</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;mode = &#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported modes: (&#39;expand&#39;, &#39;contract&#39;, &#39;nearest&#39;)&quot;</span>
+                <span class="sa">f</span><span class="s2">"mode = '</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">' is not supported. Supported modes: ('expand', 'contract', 'nearest')"</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span>
@@ -718,7 +718,7 @@
         <span class="n">intersecting_cells</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_geom_iterator</span><span class="p">():</span>
-<span class="w">            </span><span class="sd">&quot;&quot;&quot;Unpack `Multi` geometries, improving performance if the geometries are far apart.&quot;&quot;&quot;</span>
+<span class="w">            </span><span class="sd">"""Unpack `Multi` geometries, improving performance if the geometries are far apart."""</span>
             <span class="k">for</span> <span class="n">geometry</span> <span class="ow">in</span> <span class="n">geometries</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geometry</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
@@ -730,10 +730,10 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">suppress_point_warning</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="s2">&quot;Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points&quot;</span>
+                        <span class="s2">"Point type geometry detected. It is more efficient to use `cell_at_point` than to use `intersect_geometries` when dealing with points"</span>
                     <span class="p">)</span>
                     <span class="n">suppress_point_warning</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Only warn once per function call</span>
-            <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+            <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"expand"</span><span class="p">)</span>
             <span class="n">geom_bounds</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># buffer bounds to be on the safe side</span>
                 <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
                 <span class="n">geom_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">,</span>
@@ -747,7 +747,7 @@
                 <span class="n">geom</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span>
                     <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span>
                 <span class="p">)</span>  <span class="c1"># buffer may never reach further then a single cell size</span>
-                <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+                <span class="n">geom_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"expand"</span><span class="p">)</span>
                 <span class="n">cells_in_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">geom_bounds</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
 
             <span class="n">cell_shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">cells_in_bounds</span><span class="p">)</span>
@@ -760,7 +760,7 @@
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely">[docs]</a>
     <span class="nd">@validate_index</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Represent the cells as Shapely Polygons.</span>
+<span class="w">        </span><span class="sd">"""Represent the cells as Shapely Polygons.</span>
 <span class="sd">        If `index` contains one cell, a single Polygon is returned.</span>
 <span class="sd">        If `index` contains multiple cells, a MultoPolygon is returned.</span>
 
@@ -776,19 +776,19 @@
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
 <span class="sd">        :meth:`.Tile.to_shapely`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">as_multipolygon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">as_multipolygon</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-<span class="w">                    </span><span class="sd">&quot;&quot;&quot;The argument &#39;as_multipolygon&#39; of method &#39;to_shapely()&#39; is deprecated.</span>
+<span class="w">                    </span><span class="sd">"""The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.</span>
 <span class="sd">                    The function now always returns a Shapely object. If you have multiple shapes and want an iterable,</span>
-<span class="sd">                    call &#39;.geoms&#39; on the MultiPolygon.&quot;&quot;&quot;</span><span class="p">,</span>
+<span class="sd">                    call '.geoms' on the MultiPolygon."""</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-<span class="w">                    </span><span class="sd">&quot;&quot;&quot;The argument &#39;as_multipolygon&#39; of method &#39;to_shapely()&#39; is deprecated.</span>
+<span class="w">                    </span><span class="sd">"""The argument 'as_multipolygon' of method 'to_shapely()' is deprecated.</span>
 <span class="sd">                The function now always returns a Shapely object. If you have multiple shapes and want an iterable,</span>
-<span class="sd">                call &#39;.geoms&#39; on the MultiPolygon.&quot;&quot;&quot;</span>
+<span class="sd">                call '.geoms' on the MultiPolygon."""</span>
                 <span class="p">)</span>
 
         <span class="n">vertices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
@@ -803,9 +803,9 @@
 <div class="viewcode-block" id="BaseGrid.interp_from_points">
 <a class="viewcode-back" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.interp_from_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">interp_from_points</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
+<span class="w">        </span><span class="sd">"""Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
 
 <span class="sd">        This function turns any set of points at arbitrary location into a regularly spaced :class:`.BoundedGrid`</span>
 <span class="sd">        that has the properties of the current :class:`.BaseGrid` (``self``).</span>
@@ -822,7 +822,7 @@
 <span class="sd">        values: `numpy.ndarray`</span>
 <span class="sd">            The values corresponding to the supplied `points`, used as input for interpolation</span>
 <span class="sd">        method: :class:`str`</span>
-<span class="sd">            The interpolation method to be used. Options are (&quot;nearest&quot;, &quot;linear&quot;, &quot;cubic&quot;). Default: &quot;linear&quot;.</span>
+<span class="sd">            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -834,7 +834,7 @@
 <span class="sd">        :py:meth:`.BoundedGrid.resample`</span>
 <span class="sd">        :py:meth:`.BoundedGrid.interpolate`</span>
 <span class="sd">        :py:meth:`.DataTile.from_interpolated_points`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
@@ -850,7 +850,7 @@
 
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method_lut</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Method '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">' is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">coords</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">T</span>
@@ -860,7 +860,7 @@
             <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
             <span class="nb">max</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
         <span class="p">)</span>
-        <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;expand&quot;</span><span class="p">)</span>
+        <span class="n">aligned_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"expand"</span><span class="p">)</span>
         <span class="n">ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="n">aligned_bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">interp_values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
             <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">values</span><span class="o">.</span><span class="n">dtype</span>
@@ -882,8 +882,8 @@
             <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
             <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_orientation&quot;</span><span class="p">):</span>
-            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">&quot;orientation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"_orientation"</span><span class="p">):</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">"orientation"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span><span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span></div>
 
 
@@ -898,7 +898,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated in favor of &#39;orientation&#39;</span>
+        <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated in favor of 'orientation'</span>
         <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>

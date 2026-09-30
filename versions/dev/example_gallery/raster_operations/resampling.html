@@ -9,7 +9,7 @@
   <title>Resampling &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -131,15 +131,14 @@ This new dataset can have a different resolution, cell shape or Coordinate Refer
 In this example a DEM is read from a geotiff file.
 The read function returns a BoundedRectGrid object that will serve as the initial state.
 Several grids with different cell shapes are then defined on which the DEM data can be resampled.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">HexGrid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">,</span> <span class="n">raster_to_data_tile</span>
-
-<span class="n">dem</span> <span class="o">=</span> <span class="n">raster_to_data_tile</span><span class="p">(</span>
-    <span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">28300</span><span class="p">,</span> <span class="mi">167300</span><span class="p">,</span> <span class="mi">28700</span><span class="p">,</span> <span class="mi">167700</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Original resolution in (dx, dy): (</span><span class="si">{</span><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">dx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">dy</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/tmp/gridkit_docs/dev/gridkit-py/gridkit/io.py:301: UserWarning: The data type &#39;0.0&#39; cannot be safely converted into &#39;int16&#39; for file ../../tests/data/alps_dem.tiff. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file.
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.RectGrid"><span class="n">RectGrid</span></a><span class="p">,</span> <span class="n">raster_to_data_tile</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">dem</span></a> <span class="o">=</span> <span class="n">raster_to_data_tile</span><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">../../tests/data/alps_dem.tiff</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">28300</span><span class="p">,</span> <span class="mi">167300</span><span class="p">,</span> <span class="mi">28700</span><span class="p">,</span> <span class="mi">167700</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Original resolution in (dx, dy): (</span><span class="si">{</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">dx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">dy</span><span class="si">}</span><span class="s2">)</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/tmp/gridkit_docs/dev/gridkit-py/gridkit/io.py:301: UserWarning: The data type '0.0' cannot be safely converted into 'int16' for file ../../tests/data/alps_dem.tiff. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file.
   warnings.warn(
 Original resolution in (dx, dy): (2.0, 2.0)
 </pre></div>
@@ -162,86 +161,82 @@ The reason for this is that we can better compare grids if we can actually disti
 Let’s define a rectangular grid with a cell size of 10x10 degrees.
 I am calling it rectdem for later on I will define hexagonal ones as well.
 To make sure it worked we can print out the cellsize after resampling</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">rectdem</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span>
-    <span class="sa">f</span><span class="s2">&quot;Downsampled resolution in (dx, dy): (</span><span class="si">{</span><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">dx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">dy</span><span class="si">}</span><span class="s2">)&quot;</span>
-<span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">rectdem</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.resample" title="gridkit.DataTile.resample"><span class="n">dem</span><span class="o">.</span><span class="n">resample</span></a><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid" title="gridkit.RectGrid"><span class="n">RectGrid</span></a><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">linear</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="nb">print</span><span class="p">(</span><span class="w">
+</span>    <span class="sa">f</span><span class="s2">&quot;</span><span class="s2">Downsampled resolution in (dx, dy): (</span><span class="si">{</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">dx</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">dy</span><span class="si">}</span><span class="s2">)</span><span class="s2">&quot;</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Downsampled resolution in (dx, dy): (10, 10)
 </pre></div>
 </div>
 <p>Let’s plot the data to see what it looks like after downsampling</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rectdem</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">rectdem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">rectdem</span></a><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.mpl_extent" title="gridkit.Tile.mpl_extent"><span class="n">rectdem</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">terrain</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_resampling_001.png" srcset="../../_images/sphx_glr_resampling_001.png" alt="resampling" class = "sphx-glr-single-img"/><p>Now let’s do the same, but on hexagonal grids.
 There are two flavours, “pointy” and “flat” hexagonal grids.
 Let’s show both so we can compare them both to each other and to the downsampled rectangular grid.
 We can define the hexagon cell size to have the same area as the downsampled rectangular dem cell size
 for a fair visual comparison.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">hexdem_flat</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span>
-    <span class="n">HexGrid</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">area</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;flat&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
-    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">hexdem_pointy</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span>
-    <span class="n">HexGrid</span><span class="p">(</span><span class="n">area</span><span class="o">=</span><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">area</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
-    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polygon</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_flat</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.resample" title="gridkit.DataTile.resample"><span class="n">dem</span><span class="o">.</span><span class="n">resample</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">(</span><span class="n">area</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">area</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">flat</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">linear</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_pointy</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.resample" title="gridkit.DataTile.resample"><span class="n">dem</span><span class="o">.</span><span class="n">resample</span></a><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">(</span><span class="n">area</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">rectdem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">area</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">pointy</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">linear</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polygon</span><span class="w">
+</span></pre></div></div>
 <p>Now let’s create two new figures and populate these with the colored shapes of the two downsampled hexagon grids.
 Since there is no ‘imshow’ equivalent for hexagons in matplotlib, we use our own <a class="reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><code class="xref py py-func docutils literal notranslate"><span class="pre">gridkit.doc_utils.plot_polygons()</span></code></a>
 function, which is less performant but works on generalized shapes.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span>
-
-
-<span class="c1"># define two new figures</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_flat_and_pointy</span><span class="p">(</span><span class="n">flat_tile</span><span class="p">,</span> <span class="n">pointy_tile</span><span class="p">):</span>
-    <span class="n">fig_flat</span><span class="p">,</span> <span class="n">ax_flat</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-    <span class="n">fig_pointy</span><span class="p">,</span> <span class="n">ax_pointy</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-
-    <span class="n">plot_polygons</span><span class="p">(</span>  <span class="c1"># Plot 1, show data</span>
-        <span class="n">flat_tile</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(),</span>
-        <span class="n">colors</span><span class="o">=</span><span class="n">hexdem_flat</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span>
-        <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax_flat</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_polygons</span><span class="p">(</span>  <span class="c1"># Plot 1, show tile bounds</span>
-        <span class="n">Polygon</span><span class="p">(</span><span class="n">flat_tile</span><span class="o">.</span><span class="n">corners</span><span class="p">()),</span>
-        <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
-        <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax_flat</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">plot_polygons</span><span class="p">(</span>  <span class="c1"># Plot 2, show data</span>
-        <span class="n">pointy_tile</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(),</span>
-        <span class="n">colors</span><span class="o">=</span><span class="n">hexdem_pointy</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
-        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;terrain&quot;</span><span class="p">,</span>
-        <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax_pointy</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">plot_polygons</span><span class="p">(</span>  <span class="c1"># Plot 2, show tile bounds</span>
-        <span class="n">Polygon</span><span class="p">(</span><span class="n">pointy_tile</span><span class="o">.</span><span class="n">corners</span><span class="p">()),</span>
-        <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
-        <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="n">ax_pointy</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">ax_flat</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-    <span class="n">ax_pointy</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-
-<span class="n">plot_flat_and_pointy</span><span class="p">(</span><span class="n">hexdem_flat</span><span class="p">,</span> <span class="n">hexdem_pointy</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">doc_utils</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># define two new figures</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">plot_flat_and_pointy</span><span class="p">(</span><span class="n">flat_tile</span><span class="p">,</span> <span class="n">pointy_tile</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="n">fig_flat</span><span class="p">,</span> <span class="n">ax_flat</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <span class="n">fig_pointy</span><span class="p">,</span> <span class="n">ax_pointy</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span>  <span class="c1"># Plot 1, show data</span><span class="w">
+</span>        <span class="n">flat_tile</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">colors</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.to_numpy" title="gridkit.DataTile.to_numpy"><span class="n">hexdem_flat</span><span class="o">.</span><span class="n">to_numpy</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">terrain</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="w">
+</span>        <span class="n">ax</span><span class="o">=</span><span class="n">ax_flat</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span>  <span class="c1"># Plot 1, show tile bounds</span><span class="w">
+</span>        <span class="n">Polygon</span><span class="p">(</span><span class="n">flat_tile</span><span class="o">.</span><span class="n">corners</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="w">
+</span>        <span class="n">ax</span><span class="o">=</span><span class="n">ax_flat</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span>  <span class="c1"># Plot 2, show data</span><span class="w">
+</span>        <span class="n">pointy_tile</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">colors</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.to_numpy" title="gridkit.DataTile.to_numpy"><span class="n">hexdem_pointy</span><span class="o">.</span><span class="n">to_numpy</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">terrain</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="w">
+</span>        <span class="n">ax</span><span class="o">=</span><span class="n">ax_pointy</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span>  <span class="c1"># Plot 2, show tile bounds</span><span class="w">
+</span>        <span class="n">Polygon</span><span class="p">(</span><span class="n">pointy_tile</span><span class="o">.</span><span class="n">corners</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>        <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">,</span><span class="w">
+</span>        <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="w">
+</span>        <span class="n">ax</span><span class="o">=</span><span class="n">ax_pointy</span><span class="p">,</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <span class="n">ax_flat</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ax_pointy</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="n">plot_flat_and_pointy</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_flat</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_pointy</span></a><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <ul class="sphx-glr-horizontal">
 <li><img src="../../_images/sphx_glr_resampling_002.png" srcset="../../_images/sphx_glr_resampling_002.png" alt="resampling" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_resampling_003.png" srcset="../../_images/sphx_glr_resampling_003.png" alt="resampling" class = "sphx-glr-multi-img"/></li>
@@ -264,13 +259,12 @@ occurences of a nodata value in our tile with the new nodata value.</p>
 such as with bilinear resampling. If one of the neighbours of a cell is outside of the tile,
 the interpolation result will also be a nodata_value, even if the cell itself is inside of the tile.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># numpy.nan also works but since that is not imported in this example, I use python&#39;s buildin nan float</span>
-<span class="n">hexdem_flat</span><span class="o">.</span><span class="n">nodata_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
-<span class="n">hexdem_pointy</span><span class="o">.</span><span class="n">nodata_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
-
-<span class="n">plot_flat_and_pointy</span><span class="p">(</span><span class="n">hexdem_flat</span><span class="p">,</span> <span class="n">hexdem_pointy</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># numpy.nan also works but since that is not imported in this example, I use python's buildin nan float</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.nodata_value" title="gridkit.DataTile.nodata_value"><span class="n">hexdem_flat</span><span class="o">.</span><span class="n">nodata_value</span></a> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">nan</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.nodata_value" title="gridkit.DataTile.nodata_value"><span class="n">hexdem_pointy</span><span class="o">.</span><span class="n">nodata_value</span></a> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">nan</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plot_flat_and_pointy</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_flat</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">hexdem_pointy</span></a><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <ul class="sphx-glr-horizontal">
 <li><img src="../../_images/sphx_glr_resampling_004.png" srcset="../../_images/sphx_glr_resampling_004.png" alt="resampling" class = "sphx-glr-multi-img"/></li>
 <li><img src="../../_images/sphx_glr_resampling_005.png" srcset="../../_images/sphx_glr_resampling_005.png" alt="resampling" class = "sphx-glr-multi-img"/></li>
@@ -283,7 +277,7 @@ The visual difference results from the difference in positioning of the cells.
 Generally hexagon grids better represent rounded features,
 whereas rectangular grids are generally easier to work with and are more widespread.</p>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.192 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.175 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-resampling-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8257f21b83038543fbccd29c885d0293/resampling.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">resampling.ipynb</span></code></a></p>

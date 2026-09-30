@@ -9,7 +9,7 @@
   <title>Flower of life &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -124,27 +124,26 @@ construct the desired pattern.</p>
 <p>First I will create an hexagonal grid and plot the cells as circles
 where the radius will be the distance from the center to a corner.</p>
 <p>I will anchor a corner to a chosen center such that it is easier to reason about.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">HexGrid</span>
-
-<span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="n">depth</span> <span class="o">=</span> <span class="mi">3</span>
-
-<span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">get_centroids</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the centroids of a collection of cells around the specified &#39;center&#39;</span>
-<span class="sd">    at a specified depth&quot;&quot;&quot;</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span>
-        <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">center</span><span class="p">),</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-
-
-<span class="n">grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span><span class="p">)</span>
-<span class="n">centroids</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="w">
+</span><span class="w">
+</span><span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="w">
+</span><span class="n">depth</span> <span class="o">=</span> <span class="mi">3</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">center</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_centroids</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a><span class="p">)</span><span class="p">:</span><span class="w">
+</span><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the centroids of a collection of cells around the specified 'center'
+    at a specified depth&quot;&quot;&quot;</span><span class="w">
+</span>    <span class="n">ids</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.BaseGrid.neighbours"><span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span></a><span class="p">(</span><span class="w">
+</span>        <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.HexGrid.cell_at_point"><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span></a><span class="p">(</span><span class="n">center</span><span class="p">)</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <span class="k">return</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid" title="gridkit.HexGrid.centroid"><span class="n">grid</span><span class="o">.</span><span class="n">centroid</span></a><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.BaseGrid.anchor"><span class="n">grid</span><span class="o">.</span><span class="n">anchor</span></a><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">corner</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">centroids</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Now I will plot the circles at the obtained centroids.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -152,67 +151,64 @@ where the radius will be the distance from the center to a corner.</p>
 In this script I represent them as shapely Polygons for convenience and reusability,
 but they can also be represented using a <code class="docutils literal notranslate"><span class="pre">matplotlib.circle(centroid,</span> <span class="pre">radius)</span></code></p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiPolygon</span><span class="p">,</span> <span class="n">Point</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">plot_circles</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
-    <span class="n">plot_polygons</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
-    <span class="n">plot_polygons</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-
-
-<span class="n">radius</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">r</span>
-<span class="n">centroids_to_polygons</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">centroids</span><span class="p">:</span> <span class="n">MultiPolygon</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">centroids</span><span class="p">]</span>
-<span class="p">)</span>
-<span class="n">circles</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span>
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">shapely</span><span class="nn">.</span><span class="nn">geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiPolygon</span><span class="p">,</span> <span class="n">Point</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">doc_utils</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">plot_circles</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="n">radius</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.r" title="gridkit.HexGrid.r"><span class="n">grid</span><span class="o">.</span><span class="n">r</span></a><span class="w">
+</span><span class="n">centroids_to_polygons</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">centroids</span><span class="p">:</span> <span class="n">MultiPolygon</span><span class="p">(</span><span class="w">
+</span>    <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">centroids</span><span class="p">]</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">circles</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">cyan</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">x</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_flower_of_life_001.png" srcset="../../_images/sphx_glr_flower_of_life_001.png" alt="flower of life" class = "sphx-glr-single-img"/><p>If you are familiar with the flower of life pattern,
 you might find that we are already nicely underway, but we are missing some circles.
 The first set of circles we might want to add, is basically the same set,
 but rotated by 60 degrees around the chosen center.
 This looks like so:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span><span class="o">.</span><span class="n">rotation</span> <span class="o">=</span> <span class="mi">60</span>
-<span class="n">grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span>
-    <span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span>
-<span class="p">)</span>  <span class="c1"># re-anchor a corner at the chosen center after rotation</span>
-<span class="n">centroids1</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-<span class="n">circles1</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids1</span><span class="p">)</span>
-
-<span class="c1"># Plot the two sets of circles</span>
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span>
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles1</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.rotation" title="gridkit.BaseGrid.rotation"><span class="n">grid</span><span class="o">.</span><span class="n">rotation</span></a> <span class="o">=</span> <span class="mi">60</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.BaseGrid.anchor"><span class="n">grid</span><span class="o">.</span><span class="n">anchor</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">corner</span><span class="s2">&quot;</span><span class="w">
+</span><span class="p">)</span>  <span class="c1"># re-anchor a corner at the chosen center after rotation</span><span class="w">
+</span><span class="n">centroids1</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a><span class="p">)</span><span class="w">
+</span><span class="n">circles1</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids1</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Plot the two sets of circles</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">cyan</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">x</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_flower_of_life_002.png" srcset="../../_images/sphx_glr_flower_of_life_002.png" alt="flower of life" class = "sphx-glr-single-img"/><p>Now we are very close, but still missing some circles.
 The last set will need to circle the chosen center and not cross it.
 Let’s add the last set of circles:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;centroid&quot;</span><span class="p">)</span>
-<span class="n">centroids2</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-<span class="n">circles2</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids2</span><span class="p">)</span>
-
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span>
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles1</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">)</span>
-<span class="n">plot_circles</span><span class="p">(</span><span class="n">circles2</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.anchor" title="gridkit.BaseGrid.anchor"><span class="n">grid</span><span class="o">.</span><span class="n">anchor</span></a><span class="p">(</span><span class="n">center</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">centroid</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">centroids2</span> <span class="o">=</span> <span class="n">get_centroids</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a><span class="p">)</span><span class="w">
+</span><span class="n">circles2</span> <span class="o">=</span> <span class="n">centroids_to_polygons</span><span class="p">(</span><span class="n">centroids2</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles1</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">cyan</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plot_circles</span><span class="p">(</span><span class="n">circles2</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">yellow</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">center</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">x</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_flower_of_life_003.png" srcset="../../_images/sphx_glr_flower_of_life_003.png" alt="flower of life" class = "sphx-glr-single-img"/><p>This is it! To visualize it nicely we can add a border around it and clip the polygons
 such that they do not cross the outer border.</p>
 <div class="admonition note">
@@ -221,21 +217,20 @@ such that they do not cross the outer border.</p>
 but since Shapely 2.1.0 <cite>intersection</cite> can return a point. We cannot create a MultiPolygon
 from a list that includes points, hence we have to filter those out manually.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">outer_poly</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">center</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">grid</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
-
-<span class="n">all_circles</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">circles</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="o">*</span><span class="n">circles1</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="o">*</span><span class="n">circles2</span><span class="o">.</span><span class="n">geoms</span><span class="p">]</span>
-
-<span class="n">intersected_circles</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">outer_poly</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_circles</span><span class="p">]</span>
-<span class="n">all_circles</span> <span class="o">=</span> <span class="n">MultiPolygon</span><span class="p">([</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">intersected_circles</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Point</span><span class="p">)])</span>
-
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">all_circles</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">outer_poly</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">outer_poly</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mf">0.05</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../../_images/sphx_glr_flower_of_life_004.png" srcset="../../_images/sphx_glr_flower_of_life_004.png" alt="flower of life" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.356 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">outer_poly</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">center</span><span class="p">)</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.r" title="gridkit.HexGrid.r"><span class="n">grid</span><span class="o">.</span><span class="n">r</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">all_circles</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">circles</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="o">*</span><span class="n">circles1</span><span class="o">.</span><span class="n">geoms</span><span class="p">,</span> <span class="o">*</span><span class="n">circles2</span><span class="o">.</span><span class="n">geoms</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="n">intersected_circles</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">outer_poly</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_circles</span><span class="p">]</span><span class="w">
+</span><span class="n">all_circles</span> <span class="o">=</span> <span class="n">MultiPolygon</span><span class="p">(</span><span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">intersected_circles</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Point</span><span class="p">)</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">all_circles</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">outer_poly</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">outer_poly</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">black</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_flower_of_life_004.png" srcset="../../_images/sphx_glr_flower_of_life_004.png" alt="flower of life" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.346 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-flower-of-life-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/71e07d1723540bb5ce7248536fcecb98/flower_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">flower_of_life.ipynb</span></code></a></p>

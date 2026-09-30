@@ -9,7 +9,7 @@
   <title>Cellular automata: Conway’s game of life &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -143,107 +143,103 @@ for they would need three live neighbours to become a live cell. Therefore we ne
 Let’s set up a starting scenario. Feel free to download this script as a notebook and start fiddeling yourself.
 The particular starting scenario I chose will replicate itself in three generations, which makes it convenient for creating
 a looping animation.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoundedRectGrid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span>
-
-<span class="c1"># Initialize</span>
-<span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-
-<span class="n">grid</span> <span class="o">=</span> <span class="n">BoundedRectGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-
-<span class="n">neighbours</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">indices</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
-    <span class="n">grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span><span class="p">(</span><span class="n">neighbours</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-<span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Starting configuration&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.BoundedRectGrid"><span class="n">BoundedRectGrid</span></a><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Initialize</span><span class="w">
+</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="mi">17</span><span class="p">)</span><span class="w">
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.BoundedRectGrid"><span class="n">grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.BoundedRectGrid"><span class="n">BoundedRectGrid</span></a><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">neighbours</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.neighbours" title="gridkit.BaseGrid.neighbours"><span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span></a><span class="p">(</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.indices" title="gridkit.bounded_grid.BoundedGrid.indices"><span class="n">grid</span><span class="o">.</span><span class="n">indices</span></a><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span><span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid.grid_id_to_numpy_id" title="gridkit.BoundedRectGrid.grid_id_to_numpy_id"><span class="n">grid</span><span class="o">.</span><span class="n">grid_id_to_numpy_id</span></a><span class="p">(</span><span class="n">neighbours</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="p">(</span><span class="o">*</span><span class="n">shape</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.BoundedRectGrid" title="gridkit.BoundedRectGrid"><span class="n">grid</span></a><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Starting configuration</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_game_of_life_001.png" srcset="../../_images/sphx_glr_game_of_life_001.png" alt="Starting configuration" class = "sphx-glr-single-img"/></section>
 <section id="the-naive-method">
 <h2>The naive method<a class="headerlink" href="#the-naive-method" title="Link to this heading"></a></h2>
 <p>We can convert the rules into code. The naive but intuitive way would look something like:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data_second_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
-        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># live cell</span>
-            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Dead cell</span>
-            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_second_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Second generation&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">data_second_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="w">
+</span>        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">,</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span>        <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># live cell</span><span class="w">
+</span>            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span><span class="w">
+</span>                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span>            <span class="k">else</span><span class="p">:</span><span class="w">
+</span>                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="w">
+</span>        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Dead cell</span><span class="w">
+</span>            <span class="k">if</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span><span class="w">
+</span>                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span>            <span class="k">else</span><span class="p">:</span><span class="w">
+</span>                <span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_second_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Second generation</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_game_of_life_002.png" srcset="../../_images/sphx_glr_game_of_life_002.png" alt="Second generation" class = "sphx-glr-single-img"/></section>
 <section id="the-performant-method">
 <h2>The performant method<a class="headerlink" href="#the-performant-method" title="Link to this heading"></a></h2>
 <p>The unfortunate thing about this method is that it loops over all cells in python, which is slow.
 As a first optimization we can get rid of the conditionals by adding all the contributions.
 This can looks something like:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data_third_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
-        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data_second_gen</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-        <span class="n">data_third_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="mi">0</span>
-            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
-            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
-        <span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_third_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Third generation&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">data_third_gen</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>        <span class="n">nb</span> <span class="o">=</span> <span class="n">neighbours</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="w">
+</span>        <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">data_second_gen</span><span class="p">[</span><span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">,</span> <span class="n">nb</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span>        <span class="n">data_third_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="w">
+</span>            <span class="mi">0</span><span class="w">
+</span>            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="w">
+</span>            <span class="o">+</span> <span class="p">(</span><span class="n">data_second_gen</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="w">
+</span>        <span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_third_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Third generation</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_game_of_life_003.png" srcset="../../_images/sphx_glr_game_of_life_003.png" alt="Third generation" class = "sphx-glr-single-img"/><p>With the code written like this, it is clear that we can also remove the double python loop by utilizing numpy slices:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">nb</span> <span class="o">=</span> <span class="n">data_third_gen</span><span class="p">[</span>
-    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
-<span class="p">]</span>
-<span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-<span class="n">data_fourth_gen</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="mi">0</span> <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">((</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_fourth_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Fourth generation&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">nb</span> <span class="o">=</span> <span class="n">data_third_gen</span><span class="p">[</span><span class="w">
+</span>    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span><span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="w">
+</span><span class="n">data_fourth_gen</span> <span class="o">=</span> <span class="p">(</span><span class="w">
+</span>    <span class="mi">0</span> <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data_fourth_gen</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Fourth generation</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_game_of_life_004.png" srcset="../../_images/sphx_glr_game_of_life_004.png" alt="Fourth generation" class = "sphx-glr-single-img"/><p>Note how this fourth generation looks the same as the starting conditions. The pattern loops every three frames/generations.</p>
 <p>Written this way, you could even run this logic on a GPU using PyTorch or wgpu,
 but since most time is now spent plotting using matplotlib you might also want to consider
@@ -253,34 +249,33 @@ a different visualization method (for example py-gfx) if a speedup for larger gr
 <h2>Animation<a class="headerlink" href="#animation" title="Link to this heading"></a></h2>
 <p>Since we are iterating over time, cellular automata lend itself well for an animation.
 Given the logic above, the animation code can look like so:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">update_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
-    <span class="n">nb</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span>
-        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
-    <span class="p">]</span>
-    <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
-    <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="mi">0</span>
-        <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">((</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">))</span>
-        <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-
-
-<span class="c1"># Create animation</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncAnimation</span>
-
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;gray_r&quot;</span><span class="p">)</span>
-<span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">update_frame</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="k">def</span><span class="w"> </span><span class="nf">update_frame</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="n">nb</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="w">
+</span>        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>        <span class="n">neighbours</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="p">,</span><span class="w">
+</span>    <span class="p">]</span><span class="w">
+</span>    <span class="n">nr_nb_live</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span>    <span class="n">is_live</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="w">
+</span>    <span class="n">data</span><span class="p">[</span><span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="w">
+</span>        <span class="mi">0</span><span class="w">
+</span>        <span class="o">+</span> <span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span>        <span class="o">+</span> <span class="o">~</span><span class="n">is_live</span> <span class="o">*</span> <span class="p">(</span><span class="n">nr_nb_live</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="w">
+</span>    <span class="p">)</span><span class="w">
+</span>    <span class="n">ax</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Create animation</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">FuncAnimation</span><span class="w">
+</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit-bounded_grid sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.mpl_extent" title="gridkit.bounded_grid.BoundedGrid.mpl_extent"><span class="n">grid</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">gray_r</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">anim</span> <span class="o">=</span> <span class="n">FuncAnimation</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">update_frame</span><span class="p">,</span> <span class="n">frames</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span><span class="p">,</span> <span class="n">repeat</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="sphx-glr-animation docutils container">
 <link rel="stylesheet"
 href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -466,42 +461,42 @@ input[type=range].anim-slider {
 </style>
 
 <div class="animation">
-  <img id="_anim_imgd5056648ed8b42959de5759812d79f12">
+  <img id="_anim_img12add9e0d9904836a1a4db36abd49075">
   <div class="anim-controls">
-    <input id="_anim_sliderd5056648ed8b42959de5759812d79f12" type="range" class="anim-slider"
+    <input id="_anim_slider12add9e0d9904836a1a4db36abd49075" type="range" class="anim-slider"
            name="points" min="0" max="1" step="1" value="0"
-           oninput="animd5056648ed8b42959de5759812d79f12.set_frame(parseInt(this.value));">
+           oninput="anim12add9e0d9904836a1a4db36abd49075.set_frame(parseInt(this.value));">
     <div class="anim-buttons">
-      <button title="Decrease speed" aria-label="Decrease speed" onclick="animd5056648ed8b42959de5759812d79f12.slower()">
+      <button title="Decrease speed" aria-label="Decrease speed" onclick="anim12add9e0d9904836a1a4db36abd49075.slower()">
           <i class="fa fa-minus"></i></button>
-      <button title="First frame" aria-label="First frame" onclick="animd5056648ed8b42959de5759812d79f12.first_frame()">
+      <button title="First frame" aria-label="First frame" onclick="anim12add9e0d9904836a1a4db36abd49075.first_frame()">
         <i class="fa fa-fast-backward"></i></button>
-      <button title="Previous frame" aria-label="Previous frame" onclick="animd5056648ed8b42959de5759812d79f12.previous_frame()">
+      <button title="Previous frame" aria-label="Previous frame" onclick="anim12add9e0d9904836a1a4db36abd49075.previous_frame()">
           <i class="fa fa-step-backward"></i></button>
-      <button title="Play backwards" aria-label="Play backwards" onclick="animd5056648ed8b42959de5759812d79f12.reverse_animation()">
+      <button title="Play backwards" aria-label="Play backwards" onclick="anim12add9e0d9904836a1a4db36abd49075.reverse_animation()">
           <i class="fa fa-play fa-flip-horizontal"></i></button>
-      <button title="Pause" aria-label="Pause" onclick="animd5056648ed8b42959de5759812d79f12.pause_animation()">
+      <button title="Pause" aria-label="Pause" onclick="anim12add9e0d9904836a1a4db36abd49075.pause_animation()">
           <i class="fa fa-pause"></i></button>
-      <button title="Play" aria-label="Play" onclick="animd5056648ed8b42959de5759812d79f12.play_animation()">
+      <button title="Play" aria-label="Play" onclick="anim12add9e0d9904836a1a4db36abd49075.play_animation()">
           <i class="fa fa-play"></i></button>
-      <button title="Next frame" aria-label="Next frame" onclick="animd5056648ed8b42959de5759812d79f12.next_frame()">
+      <button title="Next frame" aria-label="Next frame" onclick="anim12add9e0d9904836a1a4db36abd49075.next_frame()">
           <i class="fa fa-step-forward"></i></button>
-      <button title="Last frame" aria-label="Last frame" onclick="animd5056648ed8b42959de5759812d79f12.last_frame()">
+      <button title="Last frame" aria-label="Last frame" onclick="anim12add9e0d9904836a1a4db36abd49075.last_frame()">
           <i class="fa fa-fast-forward"></i></button>
-      <button title="Increase speed" aria-label="Increase speed" onclick="animd5056648ed8b42959de5759812d79f12.faster()">
+      <button title="Increase speed" aria-label="Increase speed" onclick="anim12add9e0d9904836a1a4db36abd49075.faster()">
           <i class="fa fa-plus"></i></button>
     </div>
-    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_selectd5056648ed8b42959de5759812d79f12"
+    <form title="Repetition mode" aria-label="Repetition mode" action="#n" name="_anim_loop_select12add9e0d9904836a1a4db36abd49075"
           class="anim-state">
-      <input type="radio" name="state" value="once" id="_anim_radio1_d5056648ed8b42959de5759812d79f12"
+      <input type="radio" name="state" value="once" id="_anim_radio1_12add9e0d9904836a1a4db36abd49075"
              >
-      <label for="_anim_radio1_d5056648ed8b42959de5759812d79f12">Once</label>
-      <input type="radio" name="state" value="loop" id="_anim_radio2_d5056648ed8b42959de5759812d79f12"
+      <label for="_anim_radio1_12add9e0d9904836a1a4db36abd49075">Once</label>
+      <input type="radio" name="state" value="loop" id="_anim_radio2_12add9e0d9904836a1a4db36abd49075"
              checked>
-      <label for="_anim_radio2_d5056648ed8b42959de5759812d79f12">Loop</label>
-      <input type="radio" name="state" value="reflect" id="_anim_radio3_d5056648ed8b42959de5759812d79f12"
+      <label for="_anim_radio2_12add9e0d9904836a1a4db36abd49075">Loop</label>
+      <input type="radio" name="state" value="reflect" id="_anim_radio3_12add9e0d9904836a1a4db36abd49075"
              >
-      <label for="_anim_radio3_d5056648ed8b42959de5759812d79f12">Reflect</label>
+      <label for="_anim_radio3_12add9e0d9904836a1a4db36abd49075">Reflect</label>
     </form>
   </div>
 </div>
@@ -511,9 +506,9 @@ input[type=range].anim-slider {
   /* Instantiate the Animation class. */
   /* The IDs given should match those used in the template above. */
   (function() {
-    var img_id = "_anim_imgd5056648ed8b42959de5759812d79f12";
-    var slider_id = "_anim_sliderd5056648ed8b42959de5759812d79f12";
-    var loop_select_id = "_anim_loop_selectd5056648ed8b42959de5759812d79f12";
+    var img_id = "_anim_img12add9e0d9904836a1a4db36abd49075";
+    var slider_id = "_anim_slider12add9e0d9904836a1a4db36abd49075";
+    var loop_select_id = "_anim_loop_select12add9e0d9904836a1a4db36abd49075";
     var frames = new Array(6);
 
   frames[0] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAoAAAAHgCAYAAAA10dzkAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90\
@@ -842,12 +837,12 @@ bfUXAAAAAElFTkSuQmCC\
     /* set a timeout to make sure all the above elements are created before
        the object is initialized. */
     setTimeout(function() {
-        animd5056648ed8b42959de5759812d79f12 = new Animation(frames, img_id, slider_id, 299.0,
+        anim12add9e0d9904836a1a4db36abd49075 = new Animation(frames, img_id, slider_id, 299.0,
                                  loop_select_id);
     }, 0);
   })()
 </script></div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.847 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.851 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-patterns-game-of-life-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/db59fcf48fc31c66c74814d2cc0f0459/game_of_life.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">game_of_life.ipynb</span></code></a></p>

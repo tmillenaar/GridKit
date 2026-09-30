@@ -9,7 +9,7 @@
   <title>Aggregate from points &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -151,31 +151,29 @@ If this is of interest to you, have a look at <a class="reference external" href
 The data will be a set of points scattered around a circle to create
 a dougnut-like shape.
 I’ll plot the input here to show what it looks like.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_2d_scatter_doughnut</span><span class="p">,</span> <span class="n">plot_polygons</span>
-
-<span class="n">points</span> <span class="o">=</span> <span class="n">generate_2d_scatter_doughnut</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-
-<span class="c1"># Create the scatter plot</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">points</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;X&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Doughnut with Gaussian Scattering&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">doc_utils</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.generate_2d_scatter_doughnut" title="gridkit.doc_utils.generate_2d_scatter_doughnut"><span class="n">generate_2d_scatter_doughnut</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="w">
+</span><span class="w">
+</span><span class="n">points</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.generate_2d_scatter_doughnut" title="gridkit.doc_utils.generate_2d_scatter_doughnut"><span class="n">generate_2d_scatter_doughnut</span></a><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># Create the scatter plot</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">points</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">X</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Y</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Doughnut with Gaussian Scattering</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">equal</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_aggregate_001.png" srcset="../../_images/sphx_glr_aggregate_001.png" alt="Doughnut with Gaussian Scattering" class = "sphx-glr-single-img"/></section>
 <section id="relate-points-to-grid-cells">
 <h2>Relate points to grid cells<a class="headerlink" href="#relate-points-to-grid-cells" title="Link to this heading"></a></h2>
 <p>Now we can create a grid and aggregate our points onto that grid.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">HexGrid</span>
-
-<span class="n">grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;flat&quot;</span><span class="p">)</span>
-<span class="n">cell_ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">flat</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">cell_ids</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point" title="gridkit.HexGrid.cell_at_point"><span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span></a><span class="p">(</span><span class="n">points</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 </section>
 <section id="count-the-points-per-cell">
 <h2>Count the points per cell<a class="headerlink" href="#count-the-points-per-cell" title="Link to this heading"></a></h2>
@@ -185,30 +183,28 @@ We can then do statistics on these bins. In our case we will count the number of
 For convenience, I will use a panda’s groupby functionality for this.
 Note that <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a> is used here, and not <cite>GridIndex.index</cite>.
 In the latter the x and y ids are split, which does not work well with DataFrames.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-    <span class="p">{</span><span class="s2">&quot;nr_points&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;cell_id&quot;</span><span class="p">:</span> <span class="n">cell_ids</span><span class="o">.</span><span class="n">index_1d</span><span class="p">}</span>
-<span class="p">)</span>  <span class="c1"># The &#39;nr_points&#39; will contain the result after `.count()` is called</span>
-<span class="n">occurrences</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;cell_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w">
+</span><span class="w">
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="w">
+</span>    <span class="p">{</span><span class="s2">&quot;</span><span class="s2">nr_points</span><span class="s2">&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;</span><span class="s2">cell_id</span><span class="s2">&quot;</span><span class="p">:</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.GridIndex.index_1d"><span class="n">cell_ids</span><span class="o">.</span><span class="n">index_1d</span></a><span class="p">}</span><span class="w">
+</span><span class="p">)</span>  <span class="c1"># The 'nr_points' will contain the result after `.count()` is called</span><span class="w">
+</span><span class="n">occurrences</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">cell_id</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 </section>
 <section id="visualize-the-results">
 <h2>Visualize the results<a class="headerlink" href="#visualize-the-results" title="Link to this heading"></a></h2>
 <p>Now we have the number of points per cell, let’s obtain the corresponding cell shapes from the grid object and plot them.
 Since we used <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.index_1d" title="gridkit.index.GridIndex.index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.index_1d()</span></code></a>,
 we will have to convert that back into a GridIndex using <a class="reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.from_index_1d" title="gridkit.index.GridIndex.from_index_1d"><code class="xref py py-meth docutils literal notranslate"><span class="pre">GridIndex.from_index_1d()</span></code></a>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridIndex</span>
-
-<span class="n">occurrences_ids</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="o">.</span><span class="n">from_index_1d</span><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="n">geoms</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">occurrences_ids</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">occurrences</span><span class="p">[</span><span class="s2">&quot;nr_points&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Oranges&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Number of points per cell&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.371 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridIndex</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">occurrences_ids</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex.from_index_1d" title="gridkit.GridIndex.from_index_1d"><span class="n">GridIndex</span><span class="o">.</span><span class="n">from_index_1d</span></a><span class="p">(</span><span class="n">occurrences</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="w">
+</span><span class="n">geoms</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.BaseGrid.to_shapely"><span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span></a><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">occurrences_ids</span></a><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">geoms</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">occurrences</span><span class="p">[</span><span class="s2">&quot;</span><span class="s2">nr_points</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Oranges</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Number of points per cell</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_aggregate_002.png" srcset="../../_images/sphx_glr_aggregate_002.png" alt="Number of points per cell" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.389 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-vector-synergy-aggregate-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/59a915f944b0f9e57a3c5fbf3640acb8/aggregate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">aggregate.ipynb</span></code></a></p>

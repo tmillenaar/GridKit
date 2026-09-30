@@ -8,7 +8,7 @@
   <title>gridkit.hex_grid &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -113,26 +113,26 @@
 <div class="viewcode-block" id="HexGrid">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HexGrid</span><span class="p">(</span><span class="n">BaseGrid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstraction that represents an infinite grid with hexagonal cell shape.</span>
+<span class="w">    </span><span class="sd">"""Abstraction that represents an infinite grid with hexagonal cell shape.</span>
 
 <span class="sd">    The size of each cell can be specified through the `size`, `area` of `side_length` arguments.</span>
 
 <span class="sd">    Initialization parameters</span>
 <span class="sd">    -------------------------</span>
 <span class="sd">    size: `float`, None</span>
-<span class="sd">        The spacing between two cell centroids in horizontal direction if ``shape`` is &quot;pointy&quot;,</span>
-<span class="sd">        or in vertical direction if ``shape`` is &quot;flat&quot;. Cannot be supplied together with `area` or &#39;side_length&#39;.</span>
+<span class="sd">        The spacing between two cell centroids in horizontal direction if ``shape`` is "pointy",</span>
+<span class="sd">        or in vertical direction if ``shape`` is "flat". Cannot be supplied together with `area` or 'side_length'.</span>
 <span class="sd">    area: `float`, None</span>
-<span class="sd">        The area of a cell. Cannot be supplied together with `size` or &#39;side_length&#39;.</span>
+<span class="sd">        The area of a cell. Cannot be supplied together with `size` or 'side_length'.</span>
 <span class="sd">    side_length: `float`, None</span>
-<span class="sd">        The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or &#39;area&#39;.</span>
-<span class="sd">    orientation: `Literal[&quot;pointy&quot;, &quot;flat&quot;]`, &quot;pointy&quot;</span>
-<span class="sd">        Formerly called &#39;shape&#39;.</span>
+<span class="sd">        The length of the sides of a cell, which is 1/6th the cell outline. Cannot be supplied together with `size` or 'area'.</span>
+<span class="sd">    orientation: `Literal["pointy", "flat"]`, "pointy"</span>
+<span class="sd">        Formerly called 'shape'.</span>
 <span class="sd">        The orientation of the cells in the grid.</span>
-<span class="sd">        If ``orientation`` is &quot;pointy&quot; the cells will be pointy side up and the regular axis will be in horizontal direction.</span>
-<span class="sd">        If ``orientation`` is &quot;flat&quot;, the cells will be flat side up and the regular axis will be in vertical direction.</span>
-<span class="sd">    shape: `Literal[&quot;pointy&quot;, &quot;flat&quot;]`, None</span>
-<span class="sd">        Renamed to &#39;orientation&#39;. Still a vible arguement for now for legacy reasons, will be removed in the future.</span>
+<span class="sd">        If ``orientation`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.</span>
+<span class="sd">        If ``orientation`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.</span>
+<span class="sd">    shape: `Literal["pointy", "flat"]`, None</span>
+<span class="sd">        Renamed to 'orientation'. Still a vible arguement for now for legacy reasons, will be removed in the future.</span>
 <span class="sd">    offset: `Tuple(float, float)`, (0,0)</span>
 <span class="sd">        The offset in dx and dy.</span>
 <span class="sd">        Shifts the whole grid by the specified amount.</span>
@@ -152,7 +152,7 @@
 <span class="sd">    :class:`.RectGrid`</span>
 <span class="sd">    :class:`.BoundedHexGrid`</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -160,7 +160,7 @@
         <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">side_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># default &quot;pointy&quot;</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># default "pointy"</span>
         <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated in favor of orientation</span>
         <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -169,32 +169,32 @@
         <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Both &#39;orientation&#39; and &#39;shape&#39; have been provided. &#39;shape&#39; is deprecated, please only use &#39;orientaiton&#39;.&quot;</span>
+                    <span class="s2">"Both 'orientation' and 'shape' have been provided. 'shape' is deprecated, please only use 'orientaiton'."</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">orientation</span> <span class="o">=</span> <span class="n">shape</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;&#39;shape&#39; has been renamed to &#39;orientation&#39; and will be deprecated in a future version&quot;</span><span class="p">,</span>
+                    <span class="s2">"'shape' has been renamed to 'orientation' and will be deprecated in a future version"</span><span class="p">,</span>
                     <span class="ne">DeprecationWarning</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Set default</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s2">&quot;pointy&quot;</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="s2">"pointy"</span>
 
         <span class="n">supplied_sizes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;area&quot;</span><span class="p">)</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"area"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;size&quot;</span><span class="p">)</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"size"</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">side_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;side_length&quot;</span><span class="p">)</span>
+            <span class="n">supplied_sizes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"side_length"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;No cell size can be determined. Please supply one of &#39;size&#39; or &#39;area&#39; or &#39;side_length&#39;.&quot;</span>
+                <span class="sa">f</span><span class="s2">"No cell size can be determined. Please supply one of 'size' or 'area' or 'side_length'."</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Argument conflict. Please supply either &#39;size&#39; or &#39;area&#39; or &#39;side_length&#39;. Got: </span><span class="si">{</span><span class="s1">&#39; AND &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Argument conflict. Please supply either 'size' or 'area' or 'side_length'. Got: </span><span class="si">{</span><span class="s1">' AND '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">supplied_sizes</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">area</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_to_size</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
@@ -207,22 +207,22 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="n">size</span>
 
-        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="n">size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
-        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="n">size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;A HexGrid&#39;s `orientation` can either be &#39;pointy&#39; or &#39;flat&#39;, got &#39;</span><span class="si">{</span><span class="n">orientation</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                <span class="sa">f</span><span class="s2">"A HexGrid's `orientation` can either be 'pointy' or 'flat', got '</span><span class="si">{</span><span class="n">orientation</span><span class="si">}</span><span class="s2">'"</span>
             <span class="p">)</span>
 
         <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span> <span class="o">=</span> <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">offset_y</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Row is odd</span>
                 <span class="n">offset_x</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">offset_x</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Row is odd</span>
                 <span class="n">offset_y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span>
 
@@ -251,55 +251,55 @@
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_area_to_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">area</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the ``size`` that corresponds to a specific area.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find the ``size`` that corresponds to a specific area."""</span>
         <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">area</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_side_length_to_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">side_length</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find the ``size`` that corresponds to the specified length of the side of a cell.</span>
-<span class="sd">        In the case of a HexGrid that is 1/6th the outline of the cell.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Find the ``size`` that corresponds to the specified length of the side of a cell.</span>
+<span class="sd">        In the case of a HexGrid that is 1/6th the outline of the cell."""</span>
         <span class="k">return</span> <span class="n">side_length</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The area of a cell. The unit is the unit used for the cell&#39;s :meth:`.BaseGrid.size`, squared.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The area of a cell. The unit is the unit used for the cell's :meth:`.BaseGrid.size`, squared."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">side_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The lenght of the side of a cell.</span>
+<span class="w">        </span><span class="sd">"""The lenght of the side of a cell.</span>
 <span class="sd">        The length is the same as that of :meth:`.HexGrid.r`.</span>
-<span class="sd">        The unit is the unit used for the cell&#39;s :meth:`.BaseGrid.size`.&quot;&quot;&quot;</span>
+<span class="sd">        The unit is the unit used for the cell's :meth:`.BaseGrid.size`."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
 
     <span class="nd">@area</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the size of the grid to a new value&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set the size of the grid to a new value"""</span>
         <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Size of cell cannot be set to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;, must be larger than zero&quot;</span>
+                <span class="sa">f</span><span class="s2">"Size of cell cannot be set to '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">', must be larger than zero"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area_to_size</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_inner_grid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">"pointy"</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">"pointy"</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">dx</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The offset off the grid in dx and dy.</span>
+<span class="w">        </span><span class="sd">"""The offset off the grid in dx and dy.</span>
 <span class="sd">        The offset is never larger than the size of a single grid cell.</span>
-<span class="sd">        The offset represents the shift from the origin (0,0).&quot;&quot;&quot;</span>
+<span class="sd">        The offset represents the shift from the origin (0,0)."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">offset</span><span class="p">()</span>
 
     <span class="nd">@offset</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the x and y value of the offset&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Sets the x and y value of the offset"""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a tuple of length 2. Got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">offset_x</span><span class="p">,</span> <span class="n">offset_y</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">offset_y</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Row is odd</span>
                 <span class="n">offset_x</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">((</span><span class="n">offset_x</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Row is odd</span>
                 <span class="n">offset_y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span>
         <span class="n">offset_x</span> <span class="o">=</span> <span class="n">offset_x</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span>
@@ -311,33 +311,33 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dx</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in x-direction&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The spacing between cell centers in x-direction"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dx</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The spacing between cell centers in y-direction&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The spacing between cell centers in y-direction"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dy</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The radius of the cell. The radius is defined to be the distance from the cell center to a cell corner."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The orientation of the cells as supplied when initiating the class.</span>
-<span class="sd">        This can be either &quot;flat&quot; or &quot;pointy&quot; referring to whether the cell is</span>
+<span class="w">        </span><span class="sd">"""The orientation of the cells as supplied when initiating the class.</span>
+<span class="sd">        This can be either "flat" or "pointy" referring to whether the cell is</span>
 <span class="sd">        lying down flat or standing on a point.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span>
 
     <span class="nd">@orientation</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">orientation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the orientation to a new value. Possible values: &#39;pointy&#39; or &#39;flat&#39;&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;pointy&quot;</span><span class="p">,</span> <span class="s2">&quot;flat&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Set the orientation to a new value. Possible values: 'pointy' or 'flat'"""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"pointy"</span><span class="p">,</span> <span class="s2">"flat"</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Orientation cannot be set to &#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39;, must be either &#39;pointy&#39; or &#39;flat&#39;&quot;</span>
+                <span class="sa">f</span><span class="s2">"Orientation cannot be set to '</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">', must be either 'pointy' or 'flat'"</span>
             <span class="p">)</span>
         <span class="n">rot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">=</span> <span class="n">value</span>
@@ -345,14 +345,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;See :meth:`.HexGrid.orientation`, depercated but kept for backwards compatibility, will be removed in the future.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""See :meth:`.HexGrid.orientation`, depercated but kept for backwards compatibility, will be removed in the future."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span>
 
     <span class="nd">@shape</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the orientation to a new value. Possible values: &#39;pointy&#39; or &#39;flat&#39;.</span>
+<span class="w">        </span><span class="sd">"""Set the orientation to a new value. Possible values: 'pointy' or 'flat'.</span>
 <span class="sd">        See :meth:`.HexGrid.orientation`, shape is depercated but kept for backwards compatibility, will be removed in the future.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">value</span>
 
 <div class="viewcode-block" id="HexGrid.to_bounded">
@@ -375,7 +375,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">relative_neighbours</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The relative indices of the neighbouring cells.</span>
+<span class="w">        </span><span class="sd">"""The relative indices of the neighbouring cells.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -404,8 +404,8 @@
 <span class="sd">        The direct neighbours of a cell can be returned by using depth=1, which is the default.</span>
 <span class="sd">        For hexagonal grids, the relative indices of the neighbours differs depending on the index.</span>
 <span class="sd">        There are two cases, neighbour indices for even colums and neighbour indices for odd columns,</span>
-<span class="sd">        in the case of a &#39;pointy&#39; orientation.</span>
-<span class="sd">        This works on rows if the cells have a &#39;flat&#39; orientation.</span>
+<span class="sd">        in the case of a 'pointy' orientation.</span>
+<span class="sd">        This works on rows if the cells have a 'flat' orientation.</span>
 
 <span class="sd">        .. code-block:: python</span>
 
@@ -459,10 +459,10 @@
 <span class="sd">        :py:meth:`.BaseGrid.neighbours`</span>
 <span class="sd">        :py:meth:`.RectGrid.relative_neighbours`</span>
 <span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">depth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;depth&#39; cannot be lower than 1&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"'depth' cannot be lower than 1"</span><span class="p">)</span>
 
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
@@ -482,10 +482,10 @@
             <span class="n">row_length</span> <span class="o">=</span> <span class="n">depth</span> <span class="o">+</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="n">row_slice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">start_slice</span><span class="p">,</span> <span class="n">start_slice</span> <span class="o">+</span> <span class="n">row_length</span><span class="p">)</span>
             <span class="n">max_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">row_length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
                 <span class="n">pointy_axis</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="n">flat_axis</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
                 <span class="n">pointy_axis</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">flat_axis</span> <span class="o">=</span> <span class="mi">1</span>
 
@@ -518,7 +518,7 @@
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.centroid">[docs]</a>
     <span class="nd">@validate_index</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Coordinates at the center of the cell(s) specified by `index`.</span>
+<span class="w">        </span><span class="sd">"""Coordinates at the center of the cell(s) specified by `index`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -567,7 +567,7 @@
 
 <span class="sd">        ..</span>
 
-<span class="sd">        Note that the center coordinate of the cell is also dependent on the grid&#39;s offset:</span>
+<span class="sd">        Note that the center coordinate of the cell is also dependent on the grid's offset:</span>
 
 <span class="sd">        .. code-block:: python</span>
 
@@ -578,10 +578,10 @@
 <span class="sd">        ..</span>
 
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+                <span class="s2">"For grids that do not contain data, argument `index` is to be supplied to method `centroid`."</span>
             <span class="p">)</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
@@ -594,7 +594,7 @@
 <div class="viewcode-block" id="HexGrid.cells_near_point">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_near_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cells_near_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nearest 3 cells around a point.</span>
+<span class="w">        </span><span class="sd">"""Nearest 3 cells around a point.</span>
 <span class="sd">        This includes the cell the point is contained within,</span>
 <span class="sd">        as well as two direct neighbours of this cell and one diagonal neighbor.</span>
 <span class="sd">        What neighbours of the containing are selected, depends on where in the cell the point is located.</span>
@@ -613,7 +613,7 @@
 <span class="sd">            If a single point is supplied, the four indices are returned as 1d arrays of length 2.</span>
 <span class="sd">            If multiple points are supplied, the four indices are returned as Nx2 ndarrays.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">point</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">point</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">point</span>
@@ -625,7 +625,7 @@
 <div class="viewcode-block" id="HexGrid.cell_at_point">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cell_at_point">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_at_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Index of the cell containing the supplied point(s).</span>
+<span class="w">        </span><span class="sd">"""Index of the cell containing the supplied point(s).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----</span>
@@ -641,7 +641,7 @@
 <span class="sd">            If a single point is supplied, the index is returned as a 1d array of length 2.</span>
 <span class="sd">            If multiple points are supplied, the indices are returned as Nx2 ndarrays.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">shape</span>
         <span class="n">point</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">point</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">point</span>
@@ -656,7 +656,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">cell_corners</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+                <span class="s2">"For grids that do not contain data, argument `index` is to be supplied to method `centroid`."</span>
             <span class="p">)</span>
         <span class="n">return_shape</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
@@ -669,7 +669,7 @@
 <div class="viewcode-block" id="HexGrid.to_crs">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.to_crs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">adjust_rotation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
+<span class="w">        </span><span class="sd">"""Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
 <span class="sd">        This will update the cell size and the origin offset.</span>
 
 <span class="sd">        The ``crs`` attribute on the current grid must be set.</span>
@@ -679,7 +679,7 @@
 <span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.</span>
 
 <span class="sd">        location: `Tuple[float, float]`, (0,0)</span>
 <span class="sd">            The location at which to perform the conversion.</span>
@@ -716,11 +716,11 @@
 <span class="sd">        :meth:`.BoundedRectGrid.to_crs`</span>
 <span class="sd">        :meth:`.BoundedHexGrid.to_crs`</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot transform naive grids.  &quot;</span>
-                <span class="s2">&quot;Please set a crs on the object first.&quot;</span>
+                <span class="s2">"Cannot transform naive grids.  "</span>
+                <span class="s2">"Please set a crs on the object first."</span>
             <span class="p">)</span>
 
         <span class="n">crs</span> <span class="o">=</span> <span class="n">CRS</span><span class="o">.</span><span class="n">from_user_input</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
@@ -768,14 +768,14 @@
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">adjust_rotation</span><span class="p">:</span>
-            <span class="n">new_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">trans_corners</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">new_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">trans_corners</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">"corner"</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">new_grid</span></div>
 
 
 <div class="viewcode-block" id="HexGrid.cells_in_bounds">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.cells_in_bounds">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cells contained within a bounding box.</span>
+<span class="w">        </span><span class="sd">"""Cells contained within a bounding box.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -788,16 +788,16 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`.GridIndex`</span>
 <span class="sd">            The indices of the cells contained in the bounds</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="c1"># TODO: Simplify function. Conceptually hard to follow and not very DRY</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;`cells_in_bounds` is not suppored for rotated grids. Roatation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="si">}</span><span class="s2"> degrees&quot;</span>
+                <span class="sa">f</span><span class="s2">"`cells_in_bounds` is not suppored for rotated grids. Roatation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="si">}</span><span class="s2"> degrees"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;supplied bounds &#39;</span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&#39; are not aligned with the grid lines. Consider calling &#39;align_bounds&#39; first.&quot;</span>
+                <span class="sa">f</span><span class="s2">"supplied bounds '</span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">' are not aligned with the grid lines. Consider calling 'align_bounds' first."</span>
             <span class="p">)</span>
 
         <span class="c1"># get coordinates of two diagonally opposing corner-cells</span>
@@ -811,18 +811,18 @@
             <span class="p">[</span><span class="n">left_top</span><span class="p">,</span> <span class="n">left_bottom</span><span class="p">,</span> <span class="n">right_top</span><span class="p">,</span> <span class="n">right_bottom</span><span class="p">]</span>
         <span class="p">)</span><span class="o">.</span><span class="n">index</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="n">nr_cells_flat</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="n">nr_cells_flat</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(((</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">))</span>
 
         <span class="n">ids_x</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">left_bottom_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">ids_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">left_bottom_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">right_top_id</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
-            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;ij&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
+            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">"ij"</span><span class="p">)</span>
             <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">ids_y_full</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
+            <span class="n">ids_x_full</span><span class="p">,</span> <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">ids_x</span><span class="p">,</span> <span class="n">ids_y</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">"xy"</span><span class="p">)</span>
             <span class="n">ids_y_full</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">ids_y_full</span><span class="p">)</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ids_x_full</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">ids_y_full</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span><span class="o">.</span><span class="n">T</span>
 
@@ -851,7 +851,7 @@
 <div class="viewcode-block" id="HexGrid.subdivide">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.subdivide">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subdivide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new grid that is ``factor`` times smaller than the existing grid and aligns perfectly</span>
+<span class="w">        </span><span class="sd">"""Create a new grid that is ``factor`` times smaller than the existing grid and aligns perfectly</span>
 <span class="sd">        with it.</span>
 
 <span class="sd">        Since a hexagonal grid that is divided into another hexagonal grid will always cut through</span>
@@ -864,7 +864,7 @@
 <span class="sd">        .. Note ::</span>
 
 <span class="sd">            In order to properly align the new TriGrid, it will be rotated by 30 degrees</span>
-<span class="sd">            if the ``orientation`` of the hexagonal grid cells is &#39;pointy&#39;.</span>
+<span class="sd">            if the ``orientation`` of the hexagonal grid cells is 'pointy'.</span>
 
 <span class="sd">        The number of cells scale with the supplied ``factor`` in the following way: ``6 * factor**2``.</span>
 <span class="sd">        So if ``factor`` is 1, there will be 6 times as many cells in the new grid.</span>
@@ -879,7 +879,7 @@
 <span class="sd">            &gt;&gt;&gt; grid = HexGrid(size=3)</span>
 <span class="sd">            &gt;&gt;&gt; new_grid = grid.update(size=grid.size/2)</span>
 <span class="sd">            &gt;&gt;&gt; anchor_point = grid.cell_corners([0,0])[0] # take an arbitrary corner of the original grid</span>
-<span class="sd">            &gt;&gt;&gt; new_grid.anchor(anchor_point, cell_element=&quot;corner&quot;, in_place=True) # put corner of new grid on that of the old one</span>
+<span class="sd">            &gt;&gt;&gt; new_grid.anchor(anchor_point, cell_element="corner", in_place=True) # put corner of new grid on that of the old one</span>
 <span class="sd">            &gt;&gt;&gt; print(new_grid.size)</span>
 <span class="sd">            1.5</span>
 <span class="sd">            &gt;&gt;&gt; print(grid.r / new_grid.r)</span>
@@ -900,22 +900,22 @@
 <span class="sd">        :class:`.TriGrid`</span>
 <span class="sd">            A new grid that is ``factor`` times smaller then the original grid.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">factor</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Got a &#39;factor&#39; that is not a whole number. Please supply an integer. Got: </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Got a 'factor' that is not a whole number. Please supply an integer. Got: </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="c1"># Turn Hex Grid into TriGrid, adjust definition appropriately</span>
         <span class="n">definition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span>
-        <span class="n">definition</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;orientation&quot;</span><span class="p">)</span>
-        <span class="n">extra_rot</span> <span class="o">=</span> <span class="mi">30</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span> <span class="k">else</span> <span class="mi">0</span>
-        <span class="n">definition</span><span class="p">[</span><span class="s2">&quot;rotation&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">extra_rot</span>
-        <span class="n">definition</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="n">factor</span>
+        <span class="n">definition</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"orientation"</span><span class="p">)</span>
+        <span class="n">extra_rot</span> <span class="o">=</span> <span class="mi">30</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="n">definition</span><span class="p">[</span><span class="s2">"rotation"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">extra_rot</span>
+        <span class="n">definition</span><span class="p">[</span><span class="s2">"size"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">/</span> <span class="n">factor</span>
         <span class="n">sub_grid</span> <span class="o">=</span> <span class="n">TriGrid</span><span class="p">(</span><span class="o">**</span><span class="n">definition</span><span class="p">)</span>
 
         <span class="n">anchor_loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_corners</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">sub_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">anchor_loc</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">&quot;corner&quot;</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sub_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">anchor_loc</span><span class="p">,</span> <span class="n">cell_element</span><span class="o">=</span><span class="s2">"corner"</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sub_grid</span></div>
 
 
@@ -943,14 +943,14 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated in favor of &#39;orientation&#39;</span>
+        <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># deprecated in favor of 'orientation'</span>
         <span class="n">area</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">offset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">rotation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">crs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Modify attributes of the existing grid and return a copy.</span>
+<span class="w">        </span><span class="sd">"""Modify attributes of the existing grid and return a copy.</span>
 <span class="sd">        The original grid remains un-mutated.</span>
 
 <span class="sd">        Parameters</span>
@@ -959,9 +959,9 @@
 <span class="sd">            The new spacing between cell centers in x-direction. Cannot be supplied together with ``area``.</span>
 <span class="sd">        area: float</span>
 <span class="sd">            The area of a cell. Cannot be supplied together with ``size``.</span>
-<span class="sd">        orientation: Literal[&quot;pointy&quot;, &quot;flat&quot;]</span>
+<span class="sd">        orientation: Literal["pointy", "flat"]</span>
 <span class="sd">            The new orientation of the grid cells</span>
-<span class="sd">        shape: Literal[&quot;pointy&quot;, &quot;flat&quot;]</span>
+<span class="sd">        shape: Literal["pointy", "flat"]</span>
 <span class="sd">            The new orientation of the grid cells. Note: only exposed for backwards compatibility, use orientation instead.</span>
 <span class="sd">        offset: Tuple[float, float]</span>
 <span class="sd">            The new offset of the origin of the grid</span>
@@ -971,25 +971,25 @@
 <span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`.RectGrid`</span>
 <span class="sd">            A modified copy of the current grid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">area</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
         <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">orientation</span> <span class="o">=</span> <span class="n">shape</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;&#39;Shape&#39; has been renamed to &#39;orientation&#39; and will be removed in a future version.&quot;</span><span class="p">,</span>
+                    <span class="s2">"'Shape' has been renamed to 'orientation' and will be removed in a future version."</span><span class="p">,</span>
                     <span class="ne">DeprecationWarning</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Both &#39;shape&#39; and &#39;orientation&#39; were supplied, please only use &#39;orientation&#39; and not use &#39;shape&#39;, which will be deprecated.&quot;</span>
+                    <span class="s2">"Both 'shape' and 'orientation' were supplied, please only use 'orientation' and not use 'shape', which will be deprecated."</span>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">orientation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span>
@@ -1015,7 +1015,7 @@
 <div class="viewcode-block" id="BoundedHexGrid">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">BoundedHexGrid</span><span class="p">(</span><span class="n">BoundedGrid</span><span class="p">,</span> <span class="n">HexGrid</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A HexGrid with data encapsulated within a bounding box.</span>
+<span class="w">    </span><span class="sd">"""A HexGrid with data encapsulated within a bounding box.</span>
 
 <span class="sd">    Initialization parameters</span>
 <span class="sd">    -------------------------</span>
@@ -1023,13 +1023,13 @@
 <span class="sd">        A 2D ndarray containing the data</span>
 <span class="sd">    bounds: `Tuple(float, float, float, float)`</span>
 <span class="sd">        The extend of the data in minx, miny, maxx, maxy.</span>
-<span class="sd">    orientation: `Literal[&quot;pointy&quot;, &quot;flat&quot;]`, &quot;pointy&quot;</span>
-<span class="sd">        Formerly called &#39;shape&#39;.</span>
+<span class="sd">    orientation: `Literal["pointy", "flat"]`, "pointy"</span>
+<span class="sd">        Formerly called 'shape'.</span>
 <span class="sd">        The orientation of the cells in the grid.</span>
-<span class="sd">        If ``orientation`` is &quot;pointy&quot; the cells will be pointy side up and the regular axis will be in horizontal direction.</span>
-<span class="sd">        If ``orientation`` is &quot;flat&quot;, the cells will be flat side up and the regular axis will be in vertical direction.</span>
-<span class="sd">    shape: `Literal[&quot;pointy&quot;, &quot;flat&quot;]`, None</span>
-<span class="sd">        Renamed to &#39;orientation&#39;. Still a vible arguement for now for legacy reasons, will be removed in the future.</span>
+<span class="sd">        If ``orientation`` is "pointy" the cells will be pointy side up and the regular axis will be in horizontal direction.</span>
+<span class="sd">        If ``orientation`` is "flat", the cells will be flat side up and the regular axis will be in vertical direction.</span>
+<span class="sd">    shape: `Literal["pointy", "flat"]`, None</span>
+<span class="sd">        Renamed to 'orientation'. Still a vible arguement for now for legacy reasons, will be removed in the future.</span>
 <span class="sd">    crs: `pyproj.CRS` (optional)</span>
 <span class="sd">        The coordinate reference system of the grid.</span>
 <span class="sd">        The value can be anything accepted by pyproj.CRS.from_user_input(),</span>
@@ -1042,7 +1042,7 @@
 <span class="sd">    :class:`.BoundedTriGrid`</span>
 <span class="sd">    :class:`.BoundedRectGrid`</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -1050,50 +1050,50 @@
         <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Both &#39;orientation&#39; and &#39;shape&#39; have been provided. &#39;shape&#39; is deprecated, please only use &#39;orientaiton&#39;.&quot;</span>
+                    <span class="s2">"Both 'orientation' and 'shape' have been provided. 'shape' is deprecated, please only use 'orientaiton'."</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">orientation</span> <span class="o">=</span> <span class="n">shape</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;&#39;shape&#39; has been renamed to &#39;orientation&#39; and will be deprecated in a future version&quot;</span><span class="p">,</span>
+                    <span class="s2">"'shape' has been renamed to 'orientation' and will be deprecated in a future version"</span><span class="p">,</span>
                     <span class="ne">DeprecationWarning</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">elif</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Set default</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s2">&quot;pointy&quot;</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="s2">"pointy"</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="k">else</span> <span class="n">data</span>
 
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected a 2D numpy array, got data with shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected a 2D numpy array, got data with shape </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">dx</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dy</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span>
+                    <span class="s2">"The supplied data cannot be covered by hexagons with sides of equal length."</span>
                 <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">dy</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">size</span> <span class="o">=</span> <span class="n">dy</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dx</span> <span class="o">/</span> <span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;The supplied data cannot be covered by hexagons with sides of equal length.&quot;</span>
+                    <span class="s2">"The supplied data cannot be covered by hexagons with sides of equal length."</span>
                 <span class="p">)</span>
 
         <span class="n">offset_x</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">%</span> <span class="n">dx</span>
@@ -1115,30 +1115,30 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span>
-                <span class="s2">&quot;Something went wrong, the supplied bounds are not aligned with the resulting grid.&quot;</span>
+                <span class="s2">"Something went wrong, the supplied bounds are not aligned with the resulting grid."</span>
             <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster height</span>
+<span class="w">        </span><span class="sd">"""Raster height</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`int`</span>
 <span class="sd">            The number of grid cells in y-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">"flat"</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster width</span>
+<span class="w">        </span><span class="sd">"""Raster width</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`int`</span>
 <span class="sd">            The number of grid cells in x-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="s2">"flat"</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nr_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1146,26 +1146,26 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">lon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Array of long values</span>
+<span class="w">        </span><span class="sd">"""Array of long values</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `width`, containing the longitudinal values from left to right</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">lat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Array of lat values</span>
+<span class="w">        </span><span class="sd">"""Array of lat values</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        `numpy.ndarray`</span>
 <span class="sd">            1D-Array of size `height`, containing the latitudinal values from top to bottom</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
         <span class="p">)</span>
@@ -1186,11 +1186,11 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">IntersectionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cannot crop grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_bounds</span><span class="si">}</span><span class="s2"> for they do not intersect.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cannot crop grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_bounds</span><span class="si">}</span><span class="s2"> for they do not intersect."</span>
             <span class="p">)</span>
         <span class="n">new_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shared_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">)</span>
 
-        <span class="n">new_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;contract&quot;</span><span class="p">)</span>
+        <span class="n">new_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"contract"</span><span class="p">)</span>
         <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_slice_from_bounds</span><span class="p">(</span><span class="n">new_bounds</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">buffer_cells</span><span class="p">:</span>
             <span class="n">slice_x</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">slice_x</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="n">buffer_cells</span><span class="p">,</span> <span class="n">slice_x</span><span class="o">.</span><span class="n">stop</span> <span class="o">+</span> <span class="n">buffer_cells</span><span class="p">)</span>
@@ -1210,7 +1210,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_data_slice_from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
         <span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_data_slice_from_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="n">bounds</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span> <span class="k">else</span> <span class="p">(</span><span class="n">slice_x</span><span class="p">,</span> <span class="n">slice_y</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">slice_y</span><span class="p">,</span> <span class="n">slice_x</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span> <span class="k">else</span> <span class="p">(</span><span class="n">slice_x</span><span class="p">,</span> <span class="n">slice_y</span><span class="p">)</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="BoundedHexGrid.cell_corners">
@@ -1224,7 +1224,7 @@
 <div class="viewcode-block" id="BoundedHexGrid.to_shapely">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_shapely">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_shapely</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refer to :meth:`.BaseGrid.to_shapely`</span>
+<span class="w">        </span><span class="sd">"""Refer to :meth:`.BaseGrid.to_shapely`</span>
 
 <span class="sd">        Difference with :meth:`.BaseGrid.to_shapely`:</span>
 <span class="sd">            `index` is optional.</span>
@@ -1234,14 +1234,14 @@
 <span class="sd">        --------</span>
 <span class="sd">        :meth:`.BaseGrid.to_shapely`</span>
 <span class="sd">        :meth:`.BoundedRectGrid.to_shapely`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">as_multipolygon</span><span class="o">=</span><span class="n">as_multipolygon</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_bilinear_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_points</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the value at the location of `sample_points` by doing a bilinear interpolation</span>
+<span class="w">        </span><span class="sd">"""Interpolate the value at the location of `sample_points` by doing a bilinear interpolation</span>
 <span class="sd">        using the 4 cells around the point.</span>
 
 <span class="sd">        Parameters</span>
@@ -1257,7 +1257,7 @@
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
 <span class="sd">        :py:meth:`.RectGrid.cell_at_point`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
             <span class="n">sample_points</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span>
@@ -1276,8 +1276,8 @@
 
 <div class="viewcode-block" id="BoundedHexGrid.to_crs">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.to_crs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_crs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">resample_method</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Transforms the Coordinate Reference System (CRS) from the current CRS to the desired CRS.</span>
 <span class="sd">        This will modify the cell size and the bounds accordingly.</span>
 
 <span class="sd">        The ``crs`` attribute on the current grid must be set.</span>
@@ -1287,7 +1287,7 @@
 <span class="sd">        crs: Union[int, str, pyproj.CRS]</span>
 <span class="sd">            The value can be anything accepted</span>
 <span class="sd">            by :meth:`pyproj.CRS.from_user_input() &lt;pyproj.crs.CRS.from_user_input&gt;`,</span>
-<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg &quot;EPSG:4326&quot;) or a WKT string.</span>
+<span class="sd">            such as an epsg integer (eg 4326), an authority string (eg "EPSG:4326") or a WKT string.</span>
 <span class="sd">        resample_method: :class:`str`</span>
 <span class="sd">            The resampling method to be used for :meth:`.BoundedGrid.resample`.</span>
 
@@ -1308,7 +1308,7 @@
 <span class="sd">        :meth:`.BoundedRectGrid.to_crs`</span>
 <span class="sd">        :meth:`.HexGrid.to_crs`</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">new_inf_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">resample_method</span><span class="p">)</span></div>
 
@@ -1316,7 +1316,7 @@
 <div class="viewcode-block" id="BoundedHexGrid.numpy_id_to_grid_id">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.numpy_id_to_grid_id">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">numpy_id_to_grid_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">np_index</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn numpy indices that select values from self.data into a GridIndex instance that represents those same cells and can be used on the Grid object.</span>
+<span class="w">        </span><span class="sd">"""Turn numpy indices that select values from self.data into a GridIndex instance that represents those same cells and can be used on the Grid object.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1327,11 +1327,11 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`~.index.GridIndex`</span>
 <span class="sd">            The GridIndex representation of the cells</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">centroid_topleft</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">index_topleft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">centroid_topleft</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="n">index_topleft</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">np_index</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
@@ -1343,7 +1343,7 @@
             <span class="p">)</span>
             <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">offset_rows</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
                 <span class="p">[</span>
                     <span class="n">index_topleft</span><span class="o">.</span><span class="n">x</span> <span class="o">+</span> <span class="n">np_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -1362,20 +1362,20 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">grid_id_to_numpy_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`&quot;</span>
+                <span class="s2">"Cannot convert nd-index to numpy index. Consider flattening the index using `index.ravel()`"</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">y</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="n">index</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="n">offset_rows</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span>
             <span class="n">index</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">offset_rows</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">centroid_topleft</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">index_topleft</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">centroid_topleft</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;pointy&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"pointy"</span><span class="p">:</span>
             <span class="n">np_id</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_topleft</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">index</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">index_topleft</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">"flat"</span><span class="p">:</span>
             <span class="n">np_id</span> <span class="o">=</span> <span class="p">((</span><span class="n">index</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">index_topleft</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">index_topleft</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">index</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">np_id</span></div>
 
@@ -1383,7 +1383,7 @@
 <div class="viewcode-block" id="BoundedHexGrid.interp_nodata">
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.interp_nodata">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">interp_nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Please refer to :func:`~gridkit.bounded_grid.BoundedGrid.interp_nodata`."""</span>
         <span class="c1"># Fixme: in the case of a rectangular grid, a performance improvement can be obtained by using scipy.interpolate.interpn</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">interp_nodata</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1392,9 +1392,9 @@
 <a class="viewcode-back" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.BoundedHexGrid.centroid">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">centroid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;indices&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"indices"</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;For grids that do not contain data, argument `index` is to be supplied to method `centroid`.&quot;</span>
+                    <span class="s2">"For grids that do not contain data, argument `index` is to be supplied to method `centroid`."</span>
                 <span class="p">)</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">BoundedHexGrid</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">index</span><span class="p">)</span></div>
@@ -1405,10 +1405,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">anchor</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target_loc</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
-        <span class="n">cell_element</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;centroid&quot;</span><span class="p">,</span> <span class="s2">&quot;corner&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;centroid&quot;</span><span class="p">,</span>
-        <span class="n">resample_method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+        <span class="n">cell_element</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"centroid"</span><span class="p">,</span> <span class="s2">"corner"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"centroid"</span><span class="p">,</span>
+        <span class="n">resample_method</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Position a specified part of a grid cell at a specified location.</span>
+<span class="w">        </span><span class="sd">"""Position a specified part of a grid cell at a specified location.</span>
 <span class="sd">        This shifts (the origin of) the grid such that the specified ``cell_element`` is positioned at the specified ``target_loc``.</span>
 <span class="sd">        This is useful for example to align two grids by anchoring them to the same location.</span>
 <span class="sd">        The data values for the new grid will need to be resampled since it has been shifted.</span>
@@ -1417,11 +1417,11 @@
 <span class="sd">        ----------</span>
 <span class="sd">        target_loc: Tuple[float, float]</span>
 <span class="sd">            The coordinates of the point at which to anchor the grid in (x,y)</span>
-<span class="sd">        cell_element: Literal[&quot;centroid&quot;, &quot;corner&quot;] - Default: &quot;centroid&quot;</span>
+<span class="sd">        cell_element: Literal["centroid", "corner"] - Default: "centroid"</span>
 <span class="sd">            The part of the cell that is to be positioned at the specified ``target_loc``.</span>
-<span class="sd">            Currently only &quot;centroid&quot; and &quot;corner&quot; are supported.</span>
-<span class="sd">            When &quot;centroid&quot; is specified, the cell is centered around the ``target_loc``.</span>
-<span class="sd">            When &quot;corner&quot; is specified, a nearby cell_corner is placed onto the ``target_loc``.</span>
+<span class="sd">            Currently only "centroid" and "corner" are supported.</span>
+<span class="sd">            When "centroid" is specified, the cell is centered around the ``target_loc``.</span>
+<span class="sd">            When "corner" is specified, a nearby cell_corner is placed onto the ``target_loc``.</span>
 <span class="sd">        resample_method: :class:`str`</span>
 <span class="sd">            The resampling method to be used for :meth:`.BoundedGrid.resample`.</span>
 
@@ -1434,7 +1434,7 @@
 <span class="sd">        --------</span>
 
 <span class="sd">        :meth:`.BaseGrid.anchor`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">new_inf_grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_grid</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">target_loc</span><span class="p">,</span> <span class="n">cell_element</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">resample</span><span class="p">(</span><span class="n">new_inf_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">resample_method</span><span class="p">)</span></div>
 
@@ -1455,12 +1455,12 @@
             <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">orientation</span> <span class="o">=</span> <span class="n">shape</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                    <span class="s2">&quot;&#39;Shape&#39; has been renamed to &#39;orientation&#39; and will be removed in a future version.&quot;</span><span class="p">,</span>
+                    <span class="s2">"'Shape' has been renamed to 'orientation' and will be removed in a future version."</span><span class="p">,</span>
                     <span class="ne">DeprecationWarning</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Both &#39;shape&#39; and &#39;orientation&#39; were supplied, please only use &#39;orientation&#39; and not use &#39;shape&#39;, which will be deprecated.&quot;</span>
+                    <span class="s2">"Both 'shape' and 'orientation' were supplied, please only use 'orientation' and not use 'shape', which will be deprecated."</span>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">orientation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span>

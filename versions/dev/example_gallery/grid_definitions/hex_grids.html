@@ -9,7 +9,7 @@
   <title>Hexagon grids &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -130,36 +130,34 @@ to download the full example code.</p>
 The goal of this exercise is to familiarize the reader with the various configurations of hexagonal grids
 and how they compare to one another.</p>
 <p>Let’s create a grid and obtain the polygons in some area of interest.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">HexGrid</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.doc_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygons</span>
-
-<span class="c1"># create a grid</span>
-<span class="n">main_grid</span> <span class="o">=</span> <span class="n">HexGrid</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;pointy&quot;</span><span class="p">)</span>
-
-<span class="n">target_loc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">get_cells_around_target</span><span class="p">(</span><span class="n">grid</span><span class="p">):</span>
-    <span class="n">target_cell</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">target_cell</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">/</span> <span class="n">grid</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-    <span class="n">shapes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">shapes</span>
-
-
-<span class="c1"># define a location around which we want to obtain some cells</span>
-
-<span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><span class="n">main_grid</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">doc_utils</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="w">
+</span><span class="w">
+</span><span class="c1"># create a grid</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">main_grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">HexGrid</span></a><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">pointy</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">target_loc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">get_cells_around_target</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="n">target_cell</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span><span class="w">
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">target_cell</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">/</span> <span class="n">grid</span><span class="o">.</span><span class="n">size</span><span class="p">)</span><span class="w">
+</span>    <span class="n">shapes</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">shapes</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># define a location around which we want to obtain some cells</span><span class="w">
+</span><span class="w">
+</span><span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">main_grid</span></a><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Now we have shapes representing some of the cells in the grid.
 Let’s plot the shapes to see what we are dealing with.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">orange</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_hex_grids_001.png" srcset="../../_images/sphx_glr_hex_grids_001.png" alt="hex grids" class = "sphx-glr-single-img"/><p>In this plot the gridlines are shown in the background to highlight how the grid is positioned in space
 We can modify this using the ‘offset’.</p>
 </section>
@@ -167,37 +165,35 @@ We can modify this using the ‘offset’.</p>
 <h2>Shifting grids<a class="headerlink" href="#shifting-grids" title="Link to this heading"></a></h2>
 <p>Let’s shift the whole grid vertically to center it around coordinate (0,0)
 Also, let’s zoom in a bit to the center</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">main_grid</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><span class="n">main_grid</span><span class="p">)</span>
-
-<span class="c1"># plot the cell outlines</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.offset" title="gridkit.HexGrid.offset"><span class="n">main_grid</span><span class="o">.</span><span class="n">offset</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.dy" title="gridkit.HexGrid.dy"><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span></a> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="w">
+</span><span class="n">main_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">main_grid</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># plot the cell outlines</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">orange</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_hex_grids_002.png" srcset="../../_images/sphx_glr_hex_grids_002.png" alt="hex grids" class = "sphx-glr-single-img"/><p>We can create a second grid and play with the size and offset
 If we shift the grid a deliberate amount so that it has a vertex on the center,
 it creates interesting patterns with respect to the grid we just created.
 For this we need to shift it half a ‘dx’ horizontally and half a radius (distance from center to corner) vertically,
 with respect to the main grid.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">shifted_grid</span> <span class="o">=</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-    <span class="n">offset</span><span class="o">=</span><span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span> <span class="o">+</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">shifted_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span>
-    <span class="n">shifted_grid</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="c1"># plot the cell outlines</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">shifted_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">shifted_grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.update" title="gridkit.HexGrid.update"><span class="n">main_grid</span><span class="o">.</span><span class="n">update</span></a><span class="p">(</span><span class="w">
+</span>    <span class="n">offset</span><span class="o">=</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.dx" title="gridkit.HexGrid.dx"><span class="n">main_grid</span><span class="o">.</span><span class="n">dx</span></a> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.dy" title="gridkit.HexGrid.dy"><span class="n">main_grid</span><span class="o">.</span><span class="n">dy</span></a> <span class="o">+</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.r" title="gridkit.HexGrid.r"><span class="n">main_grid</span><span class="o">.</span><span class="n">r</span></a><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">shifted_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">shifted_grid</span></a><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># plot the cell outlines</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">orange</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">shifted_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">purple</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_hex_grids_003.png" srcset="../../_images/sphx_glr_hex_grids_003.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Here we were able to use the dimensions of the already existing main_grid to determine the offset
 of the shifted grid. It is often more convenient to first create a grid and then shift it,
 than it is to calculate the desired shift beforehand. The advantage of determining the offset later
@@ -209,25 +205,24 @@ That way we don’t even have to get clever ourselves.</p>
 <h2>Grid sizes<a class="headerlink" href="#grid-sizes" title="Link to this heading"></a></h2>
 <p>Finally, let’s play with the size of the grid. If we keep the grids centered around zero but vary the size,
 we also obtain interesting patterns.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">half_size_grid</span> <span class="o">=</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span>
-<span class="n">third_size_grid</span> <span class="o">=</span> <span class="n">main_grid</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">main_grid</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span>
-
-<span class="n">half_size_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><span class="n">half_size_grid</span><span class="p">)</span>
-<span class="n">third_size_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><span class="n">third_size_grid</span><span class="p">)</span>
-
-<span class="c1"># plot the cell outlines</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">third_size_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">half_size_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
-<span class="n">plot_polygons</span><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">half_size_grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.update" title="gridkit.HexGrid.update"><span class="n">main_grid</span><span class="o">.</span><span class="n">update</span></a><span class="p">(</span><span class="n">size</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.size" title="gridkit.BaseGrid.size"><span class="n">main_grid</span><span class="o">.</span><span class="n">size</span></a> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">third_size_grid</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid.update" title="gridkit.HexGrid.update"><span class="n">main_grid</span><span class="o">.</span><span class="n">update</span></a><span class="p">(</span><span class="n">size</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.base_grid.html#gridkit.base_grid.BaseGrid.size" title="gridkit.BaseGrid.size"><span class="n">main_grid</span><span class="o">.</span><span class="n">size</span></a> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">anchor</span><span class="p">(</span><span class="n">target_loc</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">half_size_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">half_size_grid</span></a><span class="p">)</span><span class="w">
+</span><span class="n">third_size_shapes</span> <span class="o">=</span> <span class="n">get_cells_around_target</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.hex_grid.html#gridkit.hex_grid.HexGrid" title="gridkit.HexGrid"><span class="n">third_size_grid</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="c1"># plot the cell outlines</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">third_size_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">purple</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">half_size_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit-doc_utils sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.doc_utils.html#gridkit.doc_utils.plot_polygons" title="gridkit.doc_utils.plot_polygons"><span class="n">plot_polygons</span></a><span class="p">(</span><span class="n">main_shapes</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">orange</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_hex_grids_004.png" srcset="../../_images/sphx_glr_hex_grids_004.png" alt="hex grids" class = "sphx-glr-single-img"/><p>Grids that overlap and intersect in predictable ways can be utilized to select particular cells of interest.
 See <a class="reference internal" href="../cell_centric_operations/selecting_cells.html#example-selecting-cells"><span class="std std-ref">Cell selection using other grids</span></a> for a example where this is done.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.291 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.280 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-grid-definitions-hex-grids-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8a7ba0282faa773492ac8af4740356e0/hex_grids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">hex_grids.ipynb</span></code></a></p>

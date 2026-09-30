@@ -8,7 +8,7 @@
   <title>gridkit.io &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -113,7 +113,7 @@
     <span class="n">bounds_crs</span><span class="p">:</span> <span class="n">CRS</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">border_buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read data from a GeoTIFF</span>
+<span class="w">    </span><span class="sd">"""Read data from a GeoTIFF</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -136,9 +136,9 @@
 <span class="sd">    See also</span>
 <span class="sd">    --------</span>
 <span class="sd">    :func:`.write_raster`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;`read_raster` returns a BoudedRectGrid. This is now legacy but kept for backwards compatibility. In the future it will return a DataTile. For now it is recommended to use &#39;raster_to_data_tile()&#39;.&quot;</span><span class="p">,</span>
+        <span class="s2">"`read_raster` returns a BoudedRectGrid. This is now legacy but kept for backwards compatibility. In the future it will return a DataTile. For now it is recommended to use 'raster_to_data_tile()'."</span><span class="p">,</span>
         <span class="ne">DeprecationWarning</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -182,19 +182,19 @@
 <div class="viewcode-block" id="read_geotiff">
 <a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.read_geotiff">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_geotiff</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deprecated, please refer to :func:`read_raster`&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Deprecated, please refer to :func:`read_raster`"""</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-        <span class="s2">&quot;gridkit&#39;s &#39;read_geotiff&#39; has been replaced with &#39;read_raster&#39; and will be removed in a future update.&quot;</span>
+        <span class="s2">"gridkit's 'read_geotiff' has been replaced with 'read_raster' and will be removed in a future update."</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">read_raster</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_write_data_tile_to_raster</span><span class="p">(</span><span class="n">data_tile</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Intended to be called only through :func:`.write_raster`&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Intended to be called only through :func:`.write_raster`"""</span>
     <span class="k">if</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">rotation</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot write a data tile as raster if the grid has a rotaion.&quot;</span>
+            <span class="s2">"Cannot write a data tile as raster if the grid has a rotaion."</span>
         <span class="p">)</span>
     <span class="n">corners</span> <span class="o">=</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">corners</span><span class="p">()</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span>
@@ -205,21 +205,21 @@
     <span class="p">)</span>
     <span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">bounds</span><span class="p">,</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;float64&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"float64"</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;GDAL does not support rasters with a dtype of float64, downcasting to float32.&quot;</span>
+            <span class="s2">"GDAL does not support rasters with a dtype of float64, downcasting to float32."</span>
         <span class="p">)</span>
         <span class="n">data_tile</span> <span class="o">=</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">&quot;int64&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="s2">"int64"</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;GDAL does not support rasters with a dtype of int64, downcasting to int32.&quot;</span>
+            <span class="s2">"GDAL does not support rasters with a dtype of int64, downcasting to int32."</span>
         <span class="p">)</span>
         <span class="n">data_tile</span> <span class="o">=</span> <span class="n">data_tile</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
         <span class="n">path</span><span class="p">,</span>
-        <span class="s2">&quot;w&quot;</span><span class="p">,</span>
-        <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
+        <span class="s2">"w"</span><span class="p">,</span>
+        <span class="n">driver</span><span class="o">=</span><span class="s2">"GTiff"</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">data_tile</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">data_tile</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span>
         <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># nr bands</span>
@@ -234,25 +234,25 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_write_bounded_grid_to_raster</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Intended to be called only through :func:`.write_raster`&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Intended to be called only through :func:`.write_raster`"""</span>
     <span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">grid</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">Float64DType</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;GDAL does not support rasters with a dtype of float64, downcasting to float32.&quot;</span>
+            <span class="s2">"GDAL does not support rasters with a dtype of float64, downcasting to float32."</span>
         <span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">Int64DType</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;GDAL does not support rasters with a dtype of int64, downcasting to int32.&quot;</span>
+            <span class="s2">"GDAL does not support rasters with a dtype of int64, downcasting to int32."</span>
         <span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
         <span class="n">path</span><span class="p">,</span>
-        <span class="s2">&quot;w&quot;</span><span class="p">,</span>
-        <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GTiff&quot;</span><span class="p">,</span>
+        <span class="s2">"w"</span><span class="p">,</span>
+        <span class="n">driver</span><span class="o">=</span><span class="s2">"GTiff"</span><span class="p">,</span>
         <span class="n">height</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
         <span class="n">width</span><span class="o">=</span><span class="n">grid</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
         <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># nr bands</span>
@@ -268,7 +268,7 @@
 <div class="viewcode-block" id="write_raster">
 <a class="viewcode-back" href="../../api/gridkit.io.html#gridkit.io.write_raster">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">write_raster</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write a BoundedRectGrid to a raster file (eg .tiff).</span>
+<span class="w">    </span><span class="sd">"""Write a BoundedRectGrid to a raster file (eg .tiff).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -286,13 +286,13 @@
 <span class="sd">    See also</span>
 <span class="sd">    --------</span>
 <span class="sd">    :func:`read_raster`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">DataTile</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_write_data_tile_to_raster</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">BoundedRectGrid</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">_write_bounded_grid_to_raster</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
-    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected a DataTile or BoundedRectGrid, got: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a DataTile or BoundedRectGrid, got: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div>
 
 
 
@@ -305,12 +305,12 @@
     <span class="n">border_buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a raster as a DataTile. Only a single band can be read.</span>
+<span class="w">    </span><span class="sd">"""Read a raster as a DataTile. Only a single band can be read.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    path: `str`, `file object`, `PathLike object`, `FilePath`, or `MemoryFile`</span>
-<span class="sd">        A filename or URL, a file object opened in binary (&#39;rb&#39;) mode, a</span>
+<span class="sd">        A filename or URL, a file object opened in binary ('rb') mode, a</span>
 <span class="sd">        Path object, or one of the rasterio classes that provides the</span>
 <span class="sd">        dataset-opening interface.</span>
 <span class="sd">    bounds: `Tuple(float, float, float, float)`, None</span>
@@ -342,7 +342,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    class:`.DataTile`</span>
 <span class="sd">        A data tile with spatial properties based on the input raster</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">raster_file</span><span class="p">:</span>
         <span class="n">crs</span> <span class="o">=</span> <span class="n">raster_file</span><span class="o">.</span><span class="n">crs</span>
         <span class="k">if</span> <span class="n">crs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -384,7 +384,7 @@
 
     <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">"Incerrect bounds. Minimum value exceeds maximum value for bounds </span><span class="si">{</span><span class="n">bounds</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="n">dx</span> <span class="o">=</span> <span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -406,7 +406,7 @@
         <span class="n">data_tile</span> <span class="o">=</span> <span class="n">DataTile</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;The data type &#39;</span><span class="si">{</span><span class="n">nodata</span><span class="si">}</span><span class="s2">&#39; cannot be safely converted into &#39;</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">&#39; for file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file.&quot;</span>
+            <span class="sa">f</span><span class="s2">"The data type '</span><span class="si">{</span><span class="n">nodata</span><span class="si">}</span><span class="s2">' cannot be safely converted into '</span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">' for file </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file."</span>
         <span class="p">)</span>
         <span class="n">nodata</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">nodata</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
         <span class="n">data_tile</span> <span class="o">=</span> <span class="n">DataTile</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata</span><span class="p">)</span>

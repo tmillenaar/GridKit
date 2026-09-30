@@ -8,7 +8,7 @@
   <title>gridkit.bounded_grid &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -112,7 +112,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_BoundedGridMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;metaclass of the Raster class&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""metaclass of the Raster class"""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
         <span class="c1"># operators with a nan-base</span>
@@ -127,8 +127,8 @@
             <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
             <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
         <span class="p">):</span>
-            <span class="n">opname</span> <span class="o">=</span> <span class="s2">&quot;__</span><span class="si">{}</span><span class="s2">__&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-            <span class="n">opname_reversed</span> <span class="o">=</span> <span class="s2">&quot;__r</span><span class="si">{}</span><span class="s2">__&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">opname</span> <span class="o">=</span> <span class="s2">"__</span><span class="si">{}</span><span class="s2">__"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">opname_reversed</span> <span class="o">=</span> <span class="s2">"__r</span><span class="si">{}</span><span class="s2">__"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">normal_op</span><span class="p">,</span> <span class="n">reverse_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_operator</span><span class="p">(</span>
                 <span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">as_idx</span><span class="o">=</span><span class="n">as_idx</span>
             <span class="p">)</span>
@@ -138,47 +138,47 @@
         <span class="c1"># treat equals and not-equals as special cases to acommodate NaNs</span>
         <span class="n">op</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">,</span> <span class="n">equal_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">normal_op</span><span class="p">,</span> <span class="n">reverse_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_operator</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">as_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;__eq__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_op</span>
-        <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;__req__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_op</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s2">"__eq__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_op</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s2">"__req__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_op</span>
 
         <span class="n">op</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">equal_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">normal_op</span><span class="p">,</span> <span class="n">reverse_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_operator</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">as_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;__ne__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_op</span>
-        <span class="n">namespace</span><span class="p">[</span><span class="s2">&quot;__rne__&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_op</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s2">"__ne__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_op</span>
+        <span class="n">namespace</span><span class="p">[</span><span class="s2">"__rne__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_op</span>
 
         <span class="c1"># operators with a zero-base</span>
         <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="s2">&quot;sub&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="s2">"add"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="s2">"sub"</span><span class="p">),</span>
         <span class="p">):</span>
-            <span class="n">opname</span> <span class="o">=</span> <span class="s2">&quot;__</span><span class="si">{}</span><span class="s2">__&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">opname_reversed</span> <span class="o">=</span> <span class="s2">&quot;__r</span><span class="si">{}</span><span class="s2">__&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">opname</span> <span class="o">=</span> <span class="s2">"__</span><span class="si">{}</span><span class="s2">__"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">opname_reversed</span> <span class="o">=</span> <span class="s2">"__r</span><span class="si">{}</span><span class="s2">__"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
             <span class="n">normal_op</span><span class="p">,</span> <span class="n">reverse_op</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_operator</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">namespace</span><span class="p">[</span><span class="n">opname</span><span class="p">]</span> <span class="o">=</span> <span class="n">normal_op</span>
             <span class="n">namespace</span><span class="p">[</span><span class="n">opname_reversed</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_op</span>
 
         <span class="c1"># reduction operators</span>
         <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="s2">&quot;sum&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="s2">&quot;mean&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">median</span><span class="p">,</span> <span class="s2">&quot;median&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="s2">&quot;std&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span> <span class="s2">"sum"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="s2">"mean"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="s2">"max"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">median</span><span class="p">,</span> <span class="s2">"median"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="s2">"std"</span><span class="p">),</span>
         <span class="p">):</span>
             <span class="n">namespace</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_reduce_operator</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
 
         <span class="c1"># reduction operators (arg)</span>
         <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">argmax</span><span class="p">,</span> <span class="s2">&quot;argmax&quot;</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">argmin</span><span class="p">,</span> <span class="s2">&quot;argmin&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">argmax</span><span class="p">,</span> <span class="s2">"argmax"</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">argmin</span><span class="p">,</span> <span class="s2">"argmin"</span><span class="p">),</span>
         <span class="p">):</span>
             <span class="n">namespace</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_gen_reduce_operator</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">as_idx</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_gen_operator</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">as_idx</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate operators</span>
+<span class="w">        </span><span class="sd">"""Generate operators</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -194,7 +194,7 @@
 <span class="sd">        ------</span>
 <span class="sd">        NotImplementedError</span>
 <span class="sd">            For grids of different sizes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_grid_op</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">base_value</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">BoundedGrid</span><span class="p">):</span>
@@ -206,12 +206,12 @@
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">left</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">right</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span>
-                    <span class="s2">&quot;Operation not allowed on grids that do not overlap.&quot;</span>
+                    <span class="s2">"Operation not allowed on grids that do not overlap."</span>
                 <span class="p">)</span>  <span class="c1"># TODO rethink errors. Do we want an out of bounds error?</span>
 
             <span class="n">aligned</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">is_aligned_with</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">aligned</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Grids are not aligned. </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">AlignmentError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Grids are not aligned. </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
             <span class="c1"># determine the dtype and nodata_value for the new grid, based on numpy casting rules</span>
             <span class="k">def</span><span class="w"> </span><span class="nf">dominant_dtype_and_nodata_value</span><span class="p">(</span><span class="o">*</span><span class="n">grids</span><span class="p">):</span>
@@ -224,12 +224,12 @@
                 <span class="k">elif</span> <span class="nb">all</span><span class="p">([</span><span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">nodata_values</span><span class="p">]):</span>
                     <span class="n">nodata_value</span> <span class="o">=</span> <span class="n">nodata_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Two grids have different `nodata_value`s: </span><span class="si">{</span><span class="n">nodata_values</span><span class="si">}</span><span class="s2">. Using </span><span class="si">{</span><span class="n">nodata_value</span><span class="si">}</span><span class="s2"> for the resulting grid.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"Two grids have different `nodata_value`s: </span><span class="si">{</span><span class="n">nodata_values</span><span class="si">}</span><span class="s2">. Using </span><span class="si">{</span><span class="n">nodata_value</span><span class="si">}</span><span class="s2"> for the resulting grid."</span>
                     <span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">all</span><span class="p">([</span><span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">nodata_values</span><span class="p">]):</span>
                     <span class="n">nodata_value</span> <span class="o">=</span> <span class="kc">None</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;No `nodata_value` was set on any of the grids. Any potential nodata gaps are filled with `</span><span class="si">{</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">`. Set a nodata_value by assigning a value to grid.nodata_value.&quot;</span>
+                        <span class="sa">f</span><span class="s2">"No `nodata_value` was set on any of the grids. Any potential nodata gaps are filled with `</span><span class="si">{</span><span class="n">dtype</span><span class="o">.</span><span class="n">type</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">`. Set a nodata_value by assigning a value to grid.nodata_value."</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># one but not all grids have a nodata_value set</span>
                     <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">nodata_values</span><span class="p">:</span>
@@ -238,7 +238,7 @@
                             <span class="k">break</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                            <span class="s2">&quot;Oops, something unexpected went wrong when determining the new nodata_value. To resolve this you could try setting the `nodata_value` attribute of your grids.&quot;</span>
+                            <span class="s2">"Oops, something unexpected went wrong when determining the new nodata_value. To resolve this you could try setting the `nodata_value` attribute of your grids."</span>
                         <span class="p">)</span>
                 <span class="k">return</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">nodata_value</span>
 
@@ -362,7 +362,7 @@
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_AbstractBoundedGridMeta</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="n">_BoundedGridMeta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class that enables usage of the :class:`~gridkit.bounded_grid._BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Class that enables usage of the :class:`~gridkit.bounded_grid._BoundedGridMeta` metaclass despite using ABCMeta as metaclass for the parent class."""</span>
 
     <span class="k">pass</span>
 
@@ -381,11 +381,11 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;BoundedGrid is deprecated in favour of DataTile&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
+            <span class="s2">"BoundedGrid is deprecated in favour of DataTile"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="s2">&quot;rotation&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;&#39;rotation&#39; is not supported for Bounded grids&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"rotation"</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">"'rotation' is not supported for Bounded grids"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="n">prevent_copy</span> <span class="k">else</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bounds</span> <span class="o">=</span> <span class="n">bounds</span>
@@ -399,13 +399,13 @@
     <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="n">new_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">new_data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">new_data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"object"</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Data cannot be interpreted as a numpy.ndarray, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Data cannot be interpreted as a numpy.ndarray, got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">new_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cannot set data that is different in size. Expected a shape of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">new_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cannot set data that is different in size. Expected a shape of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">new_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">data</span>
 
@@ -447,24 +447,24 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster Bounds</span>
+<span class="w">        </span><span class="sd">"""Raster Bounds</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`tuple`</span>
 <span class="sd">            The bounds of the data in (left, bottom, right, top) or equivalently (min-x, min-y, max-x, max-y)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bounds</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">mpl_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster Bounds</span>
+<span class="w">        </span><span class="sd">"""Raster Bounds</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`tuple`</span>
 <span class="sd">            The extent of the data as defined expected by matplotlib in (left, right, bottom, top) or equivalently (min-x, max-x, min-y, max-y)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bounds</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 
@@ -482,40 +482,40 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">width</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster width</span>
+<span class="w">        </span><span class="sd">"""Raster width</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`int`</span>
 <span class="sd">            The number of grid cells in x-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Raster height</span>
+<span class="w">        </span><span class="sd">"""Raster height</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`int`</span>
 <span class="sd">            The number of grid cells in y-direction</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cellsize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the gridsize in (dx, dy)&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get the gridsize in (dx, dy)"""</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dy</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">nr_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of cells</span>
+<span class="w">        </span><span class="sd">"""Number of cells</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :class:`int`</span>
 <span class="sd">            The total number of cells in the grid</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
 
 <div class="viewcode-block" id="BoundedGrid.intersects">
@@ -535,7 +535,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_mask_to_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Mask shape </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match data shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Mask shape </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> does not match data shape </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
@@ -547,7 +547,7 @@
         <span class="n">other_bounds</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">bounds</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">BaseGrid</span><span class="p">)</span> <span class="k">else</span> <span class="n">other</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">IntersectionError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> does not intersect with grid with bounds </span><span class="si">{</span><span class="n">other_bounds</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Grid with bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="si">}</span><span class="s2"> does not intersect with grid with bounds </span><span class="si">{</span><span class="n">other_bounds</span><span class="si">}</span><span class="s2">."</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">other_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
@@ -573,7 +573,7 @@
 <a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.crop">[docs]</a>
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_bounds</span><span class="p">,</span> <span class="n">bounds_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cut out a slice of data contained within the supplied bounds.</span>
+<span class="w">        </span><span class="sd">"""Cut out a slice of data contained within the supplied bounds.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -588,7 +588,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class: `BoundedGrid`</span>
 <span class="sd">            A BoundedGrid containing the data included in the cropped area contained within the bounds.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">pass</span></div>
 
 
@@ -615,7 +615,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the indices within the bounds of the data&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Return the indices within the bounds of the data"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
 
 <div class="viewcode-block" id="BoundedGrid.assign">
@@ -625,7 +625,7 @@
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">([</span><span class="n">anchor</span><span class="p">,</span> <span class="n">bounds</span><span class="p">]):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Please supply either an &#39;anchor&#39; or &#39;bounds&#39; keyword to position the data in the grid.&quot;</span>
+                <span class="s2">"Please supply either an 'anchor' or 'bounds' keyword to position the data in the grid."</span>
             <span class="p">)</span>
         <span class="n">new_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="n">in_place</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -640,7 +640,7 @@
         <span class="k">elif</span> <span class="n">anchor</span><span class="p">:</span>  <span class="c1"># a corner or center</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please supply one of: {anchor, bounds}&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Please supply one of: {anchor, bounds}"</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span></div>
 
 
@@ -648,7 +648,7 @@
 <a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.value">[docs]</a>
     <span class="nd">@validate_index</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">oob_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the value at the given cell index.</span>
+<span class="w">        </span><span class="sd">"""Return the value at the given cell index.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -656,7 +656,7 @@
 <span class="sd">            The index of the cell(s) of which to return the value.</span>
 <span class="sd">            If not supplied, all values will be returned in a flattened array.</span>
 <span class="sd">        oob_value: :class:`float` (optional)</span>
-<span class="sd">            The value assigned to values that are &#39;out of bounds&#39;.</span>
+<span class="sd">            The value assigned to values that are 'out of bounds'.</span>
 <span class="sd">            I.e. the value assigned to ``index`` entries not covered by the data.</span>
 <span class="sd">            Default: numpy.nan</span>
 
@@ -664,7 +664,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`numpy.ndarray`</span>
 <span class="sd">            The values at the supplied `index` locations</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
@@ -686,7 +686,7 @@
         <span class="p">):</span>  <span class="c1"># make sure we know what nodata value to set if ids are out of bounds</span>
             <span class="k">if</span> <span class="n">oob_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Some indices do not have data. Please remove these ids, set a &#39;nodata_value&#39; or supply an &#39;oob_value&#39;.&quot;</span>
+                    <span class="s2">"Some indices do not have data. Please remove these ids, set a 'nodata_value' or supply an 'oob_value'."</span>
                 <span class="p">)</span>
             <span class="n">oob_value</span> <span class="o">=</span> <span class="n">oob_value</span> <span class="k">if</span> <span class="n">oob_value</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span>
         <span class="k">else</span><span class="p">:</span>
@@ -694,20 +694,20 @@
                 <span class="n">oob_value</span> <span class="k">if</span> <span class="n">oob_value</span> <span class="k">else</span> <span class="mi">0</span>
             <span class="p">)</span>  <span class="c1"># the oob_value does not matter if no ids are out of bounds</span>
 
-        <span class="c1"># Return array&#39;s `dtype` needs to be float instead of integer if an id falls outside of bounds</span>
-        <span class="c1"># For NaNs don&#39;t make sense as integer</span>
+        <span class="c1"># Return array's `dtype` needs to be float instead of integer if an id falls outside of bounds</span>
+        <span class="c1"># For NaNs don't make sense as integer</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">numpy</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">oob_mask</span><span class="p">)</span>
             <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">oob_value</span><span class="p">)</span>
             <span class="ow">and</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floating</span><span class="p">)</span>
         <span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Warning: dtype `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">` might not support an `oob_value` of `</span><span class="si">{</span><span class="n">oob_value</span><span class="si">}</span><span class="s2">`.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Warning: dtype `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">` might not support an `oob_value` of `</span><span class="si">{</span><span class="n">oob_value</span><span class="si">}</span><span class="s2">`."</span>
             <span class="p">)</span>
 
         <span class="n">values</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">np_id</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">oob_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
-        <span class="n">sample_mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+        <span class="n">sample_mask</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"bool"</span><span class="p">)</span>
         <span class="n">sample_mask</span><span class="p">[</span><span class="n">oob_mask</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">np_id</span> <span class="o">=</span> <span class="n">np_id</span><span class="p">[:,</span> <span class="n">sample_mask</span><span class="p">]</span>
@@ -733,7 +733,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_data_slice_from_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_bounds_aligned</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cannot create slice from unaligned bounds </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cannot create slice from unaligned bounds </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="n">difference_left</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">abs</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">))</span>
@@ -756,13 +756,13 @@
 
 <div class="viewcode-block" id="BoundedGrid.interp_nodata">
 <a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.interp_nodata">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">interp_nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">interp_nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Interpolate the cells containing nodata, if they are inside the convex hull of cells that do contain data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        method: :class:`str`</span>
-<span class="sd">            The interpolation method to be used. Options are (&quot;nearest&quot;, &quot;linear&quot;, &quot;cubic&quot;). Default: &quot;linear&quot;.</span>
+<span class="sd">            The interpolation method to be used. Options are ("nearest", "linear", "cubic"). Default: "linear".</span>
 <span class="sd">        in_place: :class:`bool`</span>
 <span class="sd">            Boolean flag determining whether to fill the nodata values in-place.</span>
 <span class="sd">            In-memory values are modified if in_place is Ture.</span>
@@ -772,7 +772,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :class:`tuple`</span>
 <span class="sd">            A copy of the grid with interpolated values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">method_lut</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">nearest</span><span class="o">=</span><span class="n">scipy</span><span class="o">.</span><span class="n">interpolate</span><span class="o">.</span><span class="n">NearestNDInterpolator</span><span class="p">,</span>
             <span class="n">linear</span><span class="o">=</span><span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span>
@@ -783,12 +783,12 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Cannot interpolate nodata values if attribute &#39;nodata_value&#39; is not set.&quot;</span>
+                <span class="sa">f</span><span class="s2">"Cannot interpolate nodata values if attribute 'nodata_value' is not set."</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">method_lut</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Method '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">' is not supported. Supported methods: </span><span class="si">{</span><span class="n">method_lut</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">in_place</span><span class="p">:</span>
@@ -812,24 +812,24 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">interpolate</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sample_points</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="s2">&quot;bilinear&quot;</span><span class="p">,</span> <span class="s2">&quot;inverse_distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"nearest"</span><span class="p">,</span> <span class="s2">"bilinear"</span><span class="p">,</span> <span class="s2">"inverse_distance"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"nearest"</span><span class="p">,</span>
         <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Interpolate the value at the location of ``sample_points``.</span>
+<span class="w">        </span><span class="sd">"""Interpolate the value at the location of ``sample_points``.</span>
 
-<span class="sd">        Points that are outside of the bounds of the data are assigned `self.nodata_value`, or &#39;NaN&#39; if no nodata value is set.</span>
+<span class="sd">        Points that are outside of the bounds of the data are assigned `self.nodata_value`, or 'NaN' if no nodata value is set.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        sample_points: :class:`numpy.ndarray`</span>
 <span class="sd">            The coordinates of the points at which to sample the data</span>
-<span class="sd">        method: :class:`str`, `&#39;nearest&#39;, &#39;bilinear&#39;`, optional</span>
+<span class="sd">        method: :class:`str`, `'nearest', 'bilinear'`, optional</span>
 <span class="sd">            The interpolation method used to determine the value at the supplied `sample_points`.</span>
 <span class="sd">            Supported methods:</span>
-<span class="sd">            - &quot;nearest&quot;, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
-<span class="sd">            - &quot;bilinear&quot;, linear interpolation using the four cells surrounding the point</span>
-<span class="sd">            - &quot;inverse_distance&quot;, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
-<span class="sd">            Default: &quot;nearest&quot;</span>
+<span class="sd">            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
+<span class="sd">            - "bilinear", linear interpolation using the four cells surrounding the point</span>
+<span class="sd">            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
+<span class="sd">            Default: "nearest"</span>
 <span class="sd">        **interp_kwargs: `dict`</span>
 <span class="sd">            The keyword argument passed to the interpolation function corresponding to the specified `method`</span>
 
@@ -842,17 +842,17 @@
 <span class="sd">        --------</span>
 <span class="sd">        :py:meth:`.BoundedGrid.resample`</span>
 <span class="sd">        :py:meth:`.BaseGrid.interp_from_points`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;nearest&quot;</span><span class="p">:</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"nearest"</span><span class="p">:</span>
             <span class="n">new_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="n">sample_points</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">new_ids</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;bilinear&quot;</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"bilinear"</span> <span class="ow">or</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"linear"</span><span class="p">:</span>
             <span class="n">return_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bilinear_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">return_shape</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;inverse_distance&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"inverse_distance"</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inverse_distance_interpolation</span><span class="p">(</span><span class="n">sample_points</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resampling method &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39; is not supported.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Resampling method '</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">' is not supported."</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_inverse_distance_interpolation</span><span class="p">(</span>
@@ -863,7 +863,7 @@
         <span class="n">original_shape</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">original_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Expected the last axis of sample_points to have two elements (x,y). Got </span><span class="si">{</span><span class="n">original_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> elements&quot;</span>
+                <span class="sa">f</span><span class="s2">"Expected the last axis of sample_points to have two elements (x,y). Got </span><span class="si">{</span><span class="n">original_shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> elements"</span>
             <span class="p">)</span>
         <span class="n">sample_points</span> <span class="o">=</span> <span class="n">sample_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 
@@ -887,7 +887,7 @@
             <span class="n">point_corner_vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span>
         <span class="p">)</span>  <span class="c1"># compute distance over xy vector</span>
 
-        <span class="c1"># TODO: allow for different weighting equations, sch as Shepard&#39;s interpolation with different power parameters</span>
+        <span class="c1"># TODO: allow for different weighting equations, sch as Shepard's interpolation with different power parameters</span>
         <span class="c1"># weights = ((2*self.r) / distances)</span>
 
         <span class="n">weights</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">distances</span> <span class="o">/</span> <span class="n">decay_constant</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
@@ -907,8 +907,8 @@
 
 <div class="viewcode-block" id="BoundedGrid.resample">
 <a class="viewcode-back" href="../../api/gridkit.bounded_grid.html#gridkit.bounded_grid.BoundedGrid.resample">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resample the grid onto another grid.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alignment_grid</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">,</span> <span class="o">**</span><span class="n">interp_kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Resample the grid onto another grid.</span>
 <span class="sd">        This will take the locations of the grid cells of the other grid (here called ``alignment_grid``)</span>
 <span class="sd">        and determine the value on these location based on the values of the original grid (``self``).</span>
 
@@ -926,13 +926,13 @@
 <span class="sd">        alignment_grid: :class:`.BaseGrid`</span>
 <span class="sd">            The grid with the desired attributes on which to resample.</span>
 
-<span class="sd">        method: :class:`str`, `&#39;nearest&#39;, &#39;bilinear&#39;, &#39;inverse_distance&#39;`, optional</span>
+<span class="sd">        method: :class:`str`, `'nearest', 'bilinear', 'inverse_distance'`, optional</span>
 <span class="sd">            The interpolation method used to determine the value at the supplied `sample_points`.</span>
 <span class="sd">            Supported methods:</span>
-<span class="sd">            - &quot;nearest&quot;, for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
-<span class="sd">            - &quot;bilinear&quot;, linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
-<span class="sd">            - &quot;inverse_distance&quot;, weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
-<span class="sd">            Default: &quot;nearest&quot;</span>
+<span class="sd">            - "nearest", for nearest neigbour interpolation, effectively sampling the value of the data cell containing the point</span>
+<span class="sd">            - "bilinear", linear interpolation using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
+<span class="sd">            - "inverse_distance", weighted inverse distance using the 4,3,6 nearby cells surrounding the point for Rect, Hex and Rect grid respectively.</span>
+<span class="sd">            Default: "nearest"</span>
 <span class="sd">        **interp_kwargs: `dict`</span>
 <span class="sd">            The keyword argument passed to the interpolation function corresponding to the specified `method`</span>
 
@@ -945,10 +945,10 @@
 <span class="sd">        --------</span>
 <span class="sd">        :py:meth:`.BoundedGrid.interpolate`</span>
 <span class="sd">        :py:meth:`.BaseGrid.interp_from_points`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;`crs` not set for one or both grids. Assuming both grids have an identical CRS.&quot;</span>
+                <span class="s2">"`crs` not set for one or both grids. Assuming both grids have an identical CRS."</span>
             <span class="p">)</span>
             <span class="n">different_crs</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
@@ -963,8 +963,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span>
 
-        <span class="c1"># Align using &quot;contract&quot; for we cannot sample outside of the original bounds</span>
-        <span class="n">new_bounds</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;contract&quot;</span><span class="p">)</span>
+        <span class="c1"># Align using "contract" for we cannot sample outside of the original bounds</span>
+        <span class="n">new_bounds</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">align_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"contract"</span><span class="p">)</span>
 
         <span class="n">new_ids</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">cells_in_bounds</span><span class="p">(</span>
             <span class="n">bounds</span><span class="o">=</span><span class="n">new_bounds</span><span class="p">,</span> <span class="n">return_cell_count</span><span class="o">=</span><span class="kc">True</span>
@@ -998,10 +998,10 @@
             <span class="n">nodata_value</span><span class="o">=</span><span class="n">nodata_value</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="s2">&quot;_shape&quot;</span><span class="p">):</span>
-            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">_shape</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="s2">&quot;_orientation&quot;</span><span class="p">):</span>
-            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">&quot;orientation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">_orientation</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="s2">"_shape"</span><span class="p">):</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">"shape"</span><span class="p">]</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">_shape</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">alignment_grid</span><span class="p">,</span> <span class="s2">"_orientation"</span><span class="p">):</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">"orientation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">_orientation</span>
 
         <span class="n">new_grid</span> <span class="o">=</span> <span class="n">alignment_grid</span><span class="o">.</span><span class="n">bounded_cls</span><span class="p">(</span><span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span>
 

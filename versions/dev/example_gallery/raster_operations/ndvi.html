@@ -9,7 +9,7 @@
   <title>NDVI &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -127,20 +127,19 @@ This means none of the bands have to be resampled before we combine them.</p>
 <p>If this example matches your use case, you may also be interested in the packages Rasterio or Rioxarray.
 This example is created to get the reader familiar with the synax of GridKit and to highlight some of the intricacies when working with this package.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">raster_to_data_tile</span>
-
-<span class="c1"># Read in the bands required to determine the NDVI</span>
-<span class="n">band_4</span> <span class="o">=</span> <span class="n">raster_to_data_tile</span><span class="p">(</span><span class="s2">&quot;../../tests/data/20220708_S2_L2A_B04_raw.tiff&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-    <span class="nb">float</span>
-<span class="p">)</span>
-<span class="n">band_8</span> <span class="o">=</span> <span class="n">raster_to_data_tile</span><span class="p">(</span><span class="s2">&quot;../../tests/data/20220708_S2_L2A_B08_raw.tiff&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-    <span class="nb">float</span>
-<span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.raster_to_data_tile"><span class="n">raster_to_data_tile</span></a><span class="w">
+</span><span class="w">
+</span><span class="c1"># Read in the bands required to determine the NDVI</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_4</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.raster_to_data_tile"><span class="n">raster_to_data_tile</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">../../tests/data/20220708_S2_L2A_B04_raw.tiff</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="w">
+</span>    <span class="nb">float</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_8</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.raster_to_data_tile"><span class="n">raster_to_data_tile</span></a><span class="p">(</span><span class="s2">&quot;</span><span class="s2">../../tests/data/20220708_S2_L2A_B08_raw.tiff</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="w">
+</span>    <span class="nb">float</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>The source data is defined in <cite>int16</cite>, which is consequently also the numpy dtype after reading.
@@ -149,11 +148,10 @@ Numpy does not upcast automatically, so we need to be aware of the dtypes oursel
 In this case the dtype is increased to <cite>int32</cite>, by calling <code class="docutils literal notranslate"><span class="pre">astype</span></code> directly after reading.
 If this is not done, the script will run, but the resulting values will be incorrect.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Determine the NDVI</span>
-<span class="n">ndvi</span> <span class="o">=</span> <span class="p">(</span><span class="n">band_8</span> <span class="o">-</span> <span class="n">band_4</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">band_8</span> <span class="o">+</span> <span class="n">band_4</span><span class="p">)</span>
-<span class="n">ndvi</span><span class="p">[</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ndvi</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># fill NaN values resulting from a division by 0</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># Determine the NDVI</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">ndvi</span></a> <span class="o">=</span> <span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_8</span></a> <span class="o">-</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_4</span></a><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_8</span></a> <span class="o">+</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">band_4</span></a><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">ndvi</span></a><span class="p">[</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">ndvi</span></a><span class="p">)</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># fill NaN values resulting from a division by 0</span><span class="w">
+</span></pre></div></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>If, for any cell, the denominator (band_8 + band_4) is zero, Numpy raises a warning.
@@ -162,18 +160,17 @@ They will show as white in the image.
 For a smoother looking visualization, these values are replaced with a zero in this example.
 This decision is of course use case dependent.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the result</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">im_ndvi</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ndvi</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdYlGn&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">band_4</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im_ndvi</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.022</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;lon&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;lat&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NDVI of scene in the alps </span><span class="se">\n</span><span class="s2"> EPSG:</span><span class="si">{</span><span class="n">ndvi</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-<img src="../../_images/sphx_glr_ndvi_001.png" srcset="../../_images/sphx_glr_ndvi_001.png" alt="NDVI of scene in the alps   EPSG:3857" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.695 seconds)</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="c1"># Plot the result</span><span class="w">
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="n">im_ndvi</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">ndvi</span></a><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">RdYlGn</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.mpl_extent" title="gridkit.Tile.mpl_extent"><span class="n">band_4</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span><span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im_ndvi</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.022</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">lon</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">lat</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="s2">NDVI of scene in the alps </span><span class="se">\n</span><span class="s2"> EPSG:</span><span class="si">{</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">ndvi</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_epsg</span><span class="p">(</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../../_images/sphx_glr_ndvi_001.png" srcset="../../_images/sphx_glr_ndvi_001.png" alt="NDVI of scene in the alps   EPSG:3857" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.704 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-raster-operations-ndvi-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/8f95a4d9d5c39fba50631182eb797488/ndvi.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">ndvi.ipynb</span></code></a></p>

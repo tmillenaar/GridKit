@@ -9,7 +9,7 @@
   <title>Downslope path &mdash; GridKit dev documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -145,17 +145,16 @@ The path can therefore be best conceptualized as a stram, possibly with small la
 <p>The loop stops when NaNs are encountered, which happens when the border of the DEM crop is reached.
 This is of course assuming there are no nodata_values in the DEM.</p>
 <p>First let’s import the dependencies and read in the DEM.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">raster_to_data_tile</span>
-
-<span class="n">dem</span> <span class="o">=</span> <span class="n">raster_to_data_tile</span><span class="p">(</span>
-    <span class="s2">&quot;../../tests/data/alps_dem.tiff&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">29200</span><span class="p">,</span> <span class="mi">167700</span><span class="p">,</span> <span class="mi">29800</span><span class="p">,</span> <span class="mi">168100</span><span class="p">)</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/tmp/gridkit_docs/dev/gridkit-py/gridkit/io.py:301: UserWarning: The data type &#39;0.0&#39; cannot be safely converted into &#39;int16&#39; for file ../../tests/data/alps_dem.tiff. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file.
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w">
+</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit</span><span class="nn">.</span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.raster_to_data_tile"><span class="n">raster_to_data_tile</span></a><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">dem</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-function reference internal" href="../../api/gridkit.io.html#gridkit.io.raster_to_data_tile" title="gridkit.raster_to_data_tile"><span class="n">raster_to_data_tile</span></a><span class="p">(</span><span class="w">
+</span>    <span class="s2">&quot;</span><span class="s2">../../tests/data/alps_dem.tiff</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">29200</span><span class="p">,</span> <span class="mi">167700</span><span class="p">,</span> <span class="mi">29800</span><span class="p">,</span> <span class="mi">168100</span><span class="p">)</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/tmp/gridkit_docs/dev/gridkit-py/gridkit/io.py:301: UserWarning: The data type '0.0' cannot be safely converted into 'int16' for file ../../tests/data/alps_dem.tiff. Falling back to unsafe cast. Consider fixing the nodata value in the metadata of the file.
   warnings.warn(
 </pre></div>
 </div>
@@ -165,68 +164,65 @@ This is of course assuming there are no nodata_values in the DEM.</p>
 <p>Python’s recursion limit can be reached with this approach for paths longer than shown here.
 While you can raise this limit using <cite>sys.setrecursionlimit</cite>, you may want to reconsider the approach and use a while-loop instead of recursion.</p>
 </div>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">visited_cells</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">all_neighbours</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">neighbour_values</span> <span class="o">=</span> <span class="p">[]</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">downslope_path</span><span class="p">(</span><span class="n">cell_id</span><span class="p">):</span>
-    <span class="n">visited_cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span>
-    <span class="c1"># add new neigbours and their values to their respective lists</span>
-    <span class="n">neighbours</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="n">dem</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)):</span>
-        <span class="n">cell</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">visited_cells</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">all_neighbours</span><span class="p">:</span>
-            <span class="n">all_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
-            <span class="n">neighbour_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-
-    <span class="c1"># stop when we encounter nodata values, assuming these only occur byound the bounds of the DEM crop</span>
-    <span class="k">if</span> <span class="n">dem</span><span class="o">.</span><span class="n">nodata_value</span> <span class="ow">in</span> <span class="n">neighbour_values</span><span class="p">:</span>
-        <span class="k">return</span>
-
-    <span class="c1"># determine the next cell and remove it from the neighbour-lists</span>
-    <span class="n">min_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">neighbour_values</span><span class="p">)</span>
-    <span class="n">next_cell</span> <span class="o">=</span> <span class="n">all_neighbours</span><span class="p">[</span><span class="n">min_id</span><span class="p">]</span>
-    <span class="n">all_neighbours</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span>
-    <span class="n">neighbour_values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">downslope_path</span><span class="p">(</span><span class="n">next_cell</span><span class="p">)</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">visited_cells</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="w">
+</span><span class="n">all_neighbours</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="w">
+</span><span class="n">neighbour_values</span> <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="w">
+</span><span class="w">
+</span><span class="w">
+</span><span class="k">def</span><span class="w"> </span><span class="nf">downslope_path</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>    <span class="n">visited_cells</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell_id</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># add new neigbours and their values to their respective lists</span><span class="w">
+</span>    <span class="n">neighbours</span> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span><span class="n">cell_id</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="w">
+</span>    <span class="k">for</span> <span class="n">cell</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.value" title="gridkit.DataTile.value"><span class="n">dem</span><span class="o">.</span><span class="n">value</span></a><span class="p">(</span><span class="n">neighbours</span><span class="p">)</span><span class="p">)</span><span class="p">:</span><span class="w">
+</span>        <span class="n">cell</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cell</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="w">
+</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">visited_cells</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cell</span> <span class="ow">in</span> <span class="n">all_neighbours</span><span class="p">:</span><span class="w">
+</span>            <span class="n">all_neighbours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span><span class="w">
+</span>            <span class="n">neighbour_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># stop when we encounter nodata values, assuming these only occur byound the bounds of the DEM crop</span><span class="w">
+</span>    <span class="k">if</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.nodata_value" title="gridkit.DataTile.nodata_value"><span class="n">dem</span><span class="o">.</span><span class="n">nodata_value</span></a> <span class="ow">in</span> <span class="n">neighbour_values</span><span class="p">:</span><span class="w">
+</span>        <span class="k">return</span><span class="w">
+</span><span class="w">
+</span>    <span class="c1"># determine the next cell and remove it from the neighbour-lists</span><span class="w">
+</span>    <span class="n">min_id</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">neighbour_values</span><span class="p">)</span><span class="w">
+</span>    <span class="n">next_cell</span> <span class="o">=</span> <span class="n">all_neighbours</span><span class="p">[</span><span class="n">min_id</span><span class="p">]</span><span class="w">
+</span>    <span class="n">all_neighbours</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span><span class="w">
+</span>    <span class="n">neighbour_values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">min_id</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <span class="k">return</span> <span class="n">downslope_path</span><span class="p">(</span><span class="n">next_cell</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <p>Determine the starting cell and call the function</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">start_cell_id</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">((</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">))</span>
-<span class="n">downslope_path</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">start_cell_id</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">start_cell_id</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.get_grid" title="gridkit.Tile.get_grid"><span class="n">dem</span><span class="o">.</span><span class="n">get_grid</span></a><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">cell_at_point</span><span class="p">(</span><span class="p">(</span><span class="mi">29330</span><span class="p">,</span> <span class="mi">167848</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span><span class="n">downslope_path</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">start_cell_id</span></a><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 </section>
 <section id="results">
 <h2>Results<a class="headerlink" href="#results" title="Link to this heading"></a></h2>
 <p>Let’s plot the path on the DEM</p>
 <p>For each cell along the path we plot the polygon as a square. This looks better than points at the centroids.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Elevation [m]&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;longitude&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;latitude&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Downslope path from a chosen starting point&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="n">path_label</span> <span class="o">=</span> <span class="s2">&quot;Downslope path&quot;</span>
-<span class="k">for</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">dem</span><span class="o">.</span><span class="n">to_shapely</span><span class="p">(</span><span class="n">visited_cells</span><span class="p">)</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">path_label</span><span class="p">)</span>
-    <span class="n">path_label</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Only show the label in the legend once</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
-    <span class="o">*</span><span class="n">dem</span><span class="o">.</span><span class="n">centroid</span><span class="p">(</span><span class="n">start_cell_id</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Starting point&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span>
-<span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.tile.html#gridkit.tile.DataTile" title="gridkit.DataTile"><span class="n">dem</span></a><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-property reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.mpl_extent" title="gridkit.Tile.mpl_extent"><span class="n">dem</span><span class="o">.</span><span class="n">mpl_extent</span></a><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">fraction</span><span class="o">=</span><span class="mf">0.032</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Elevation [m]</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">longitude</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">latitude</span><span class="s2">&quot;</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;</span><span class="s2">Downslope path from a chosen starting point</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">path_label</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="s2">Downslope path</span><span class="s2">&quot;</span><span class="w">
+</span><span class="k">for</span> <span class="n">poly</span> <span class="ow">in</span> <a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.to_shapely" title="gridkit.Tile.to_shapely"><span class="n">dem</span><span class="o">.</span><span class="n">to_shapely</span></a><span class="p">(</span><span class="n">visited_cells</span><span class="p">)</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span><span class="w">
+</span>    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span><span class="w">
+</span>    <span class="n">plt</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">red</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">path_label</span><span class="p">)</span><span class="w">
+</span>    <span class="n">path_label</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Only show the label in the legend once</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="w">
+</span>    <span class="o">*</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-method reference internal" href="../../api/gridkit.tile.html#gridkit.tile.Tile.centroid" title="gridkit.Tile.centroid"><span class="n">dem</span><span class="o">.</span><span class="n">centroid</span></a><span class="p">(</span><a class="sphx-glr-backref-module-gridkit sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../../api/gridkit.index.html#gridkit.index.GridIndex" title="gridkit.GridIndex"><span class="n">start_cell_id</span></a><span class="p">)</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">*</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">Starting point</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;</span><span class="s2">purple</span><span class="s2">&quot;</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
 <img src="../../_images/sphx_glr_downslope_path_001.png" srcset="../../_images/sphx_glr_downslope_path_001.png" alt="Downslope path from a chosen starting point" class = "sphx-glr-single-img"/><p>While the path is merely visualized in this example, the obtained cells can of course be used in different ways.
 They can for example be used to obtain values form a different dataset along the path,
 or intersected with a polygon to determine if the path crosses a particular zone of interest.</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.104 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.123 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-example-gallery-cell-centric-operations-downslope-path-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/a495658098a2a10d0a6d919a5b81ba21/downslope_path.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">downslope_path.ipynb</span></code></a></p>

@@ -254,7 +254,7 @@ The following examples showcase patterns that can be created using regular grids
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip=" This script is based on the example shown in example game of life, but here a Hexagonal grid is used with slightly differnt rules. Here the 6 neighbours around a cell are used. The rules are:">
+    <div class="sphx-glr-thumbcontainer" tooltip=" This script is based on the example shown in game_of_life.py, but here a Hexagonal grid is used with slightly differnt rules. Here the 6 neighbours around a cell are used. The rules are:">
 
 .. only:: html
 
