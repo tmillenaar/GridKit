@@ -3,7 +3,7 @@
 use std::fmt::Debug;
 use std::hash::{Hash, Hasher};
 
-use crate::grid::{Grid, GridTraits, Orientation};
+use crate::grid::{CellElement, Grid, GridTraits, Orientation};
 use crate::utils::*;
 use ndarray::*;
 
@@ -20,11 +20,11 @@ pub struct TriGrid {
 impl PartialEq for TriGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        self.cellsize.to_bits() == other.cellsize.to_bits() &&
-        self.offset[0].to_bits() == other.offset[0].to_bits() &&
-        self.offset[1].to_bits() == other.offset[1].to_bits() &&
-        self.orientation == other.orientation &&
-        self._rotation.to_bits() == other._rotation.to_bits()
+        self.cellsize.to_bits() == other.cellsize.to_bits()
+            && self.offset[0].to_bits() == other.offset[0].to_bits()
+            && self.offset[1].to_bits() == other.offset[1].to_bits()
+            && self.orientation == other.orientation
+            && self._rotation.to_bits() == other._rotation.to_bits()
     }
 }
 
@@ -583,14 +583,34 @@ impl GridTraits for TriGrid {
         relative_neighbours
     }
 
-    fn is_aligned_with(&self, _other: &Grid) -> (bool, String) {
-        todo!(
-            "`is_aligned_with` is not ported to Rust for TriGrid yet; only RectGrid is implemented"
+    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
+        crate::grid::is_aligned_with(
+            &self.get_grid(),
+            other,
+            self.cellsize,
+            self.offset(),
+            &self.orientation,
         )
     }
 
-    fn subdivide(&self, _factor: u64) -> Self {
-        todo!("`subdivide` is not ported to Rust for TriGrid yet; only RectGrid is implemented")
+    fn subdivide(&self, factor: u64) -> Grid {
+        if factor == 0 {
+            return Grid::TriGrid(self.clone());
+        }
+
+        // `factor` of at least one cannot drive the cellsize to zero, so no
+        // validation is needed here.
+        let mut sub_grid = self.clone();
+        sub_grid.set_cellsize(self.cellsize / factor as f64);
+
+        // Anchor the sub grid to the top corner of the parent's cell (0, 0), as
+        // Python's `TriGrid.subdivide` does. The corner is taken from the *parent*,
+        // so it is unaffected by the cellsize change above.
+        let corners = self.cell_corners(&array![[0i64, 0i64]].view());
+        let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
+        sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
+
+        Grid::TriGrid(sub_grid)
     }
 }
 
@@ -758,5 +778,471 @@ impl TriGrid {
                 *new_val = (&weights * &near_pnt_vals).sum();
             });
         values
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TOL: f64 = 1e-9;
+
+    fn assert_close(a: f64, b: f64, tol: f64) {
+        assert!(
+            (a - b).abs() <= tol,
+            "expected {b} to be within {tol} of {a} (difference {})",
+            (a - b).abs()
+        );
+    }
+
+    fn assert_ids_3d(result: &Array3<i64>, expected: &[i64]) {
+        assert_eq!(result.shape()[2], 2);
+        assert_eq!(result.len(), expected.len());
+        let mut flat = Vec::with_capacity(result.len());
+        for cell in 0..result.shape()[0] {
+            for neighbour in 0..result.shape()[1] {
+                flat.push(result[[cell, neighbour, 0]]);
+                flat.push(result[[cell, neighbour, 1]]);
+            }
+        }
+        assert_eq!(flat, expected);
+    }
+
+    // ---------------------------------------------------------------------
+    // all_neighbours / direct_neighbours
+    //
+    // These were already implemented; the tests below pin the behaviour that
+    // `test_neighbours` in `test_tri_grid.py` asserts.
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn direct_neighbours_depth_one() {
+        // A cell has 3 side-sharing neighbours when corners do not count.
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        assert_eq!(neighbours.shape(), &[1, 3, 2]);
+        assert_ids_3d(&neighbours, &[-1, 0, 1, 0, 0, -1]);
+    }
+
+    #[test]
+    fn all_neighbours_depth_one() {
+        // With corners connected, the window holds 12 cells: the 6 surrounding
+        // each of the 3 neighbours, plus the neighbours themselves.
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+        let neighbours = grid.all_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        assert_eq!(neighbours.shape(), &[1, 12, 2]);
+        assert_ids_3d(
+            &neighbours,
+            &[
+                -1, -1, 0, -1, 1, -1, //
+                -2, 0, -1, 0, 1, 0, 2, 0, //
+                -2, 1, -1, 1, 0, 1, 1, 1, 2, 1,
+            ],
+        );
+    }
+
+    #[test]
+    fn neighbour_count_matches_the_documented_formula() {
+        // `test_neighbours` in Python expects
+        // `include_selected + sum(factor * 3 * (i + 1) for i in range(depth))`,
+        // where `factor` is 4 with corners and 1 without.
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+        let index = array![[0i64, 0i64]];
+
+        for depth in 1..=6i64 {
+            for connect_corners in [false, true] {
+                let factor = if connect_corners { 4i64 } else { 1i64 };
+                let expected = ((0..depth).map(|i| factor * 3 * (i + 1)).sum::<i64>() + 1) as usize;
+
+                let with = if connect_corners {
+                    grid.all_neighbours(&index.view(), depth, true, false)
+                } else {
+                    grid.direct_neighbours(&index.view(), depth, true, false)
+                };
+                let without = if connect_corners {
+                    grid.all_neighbours(&index.view(), depth, false, false)
+                } else {
+                    grid.direct_neighbours(&index.view(), depth, false, false)
+                };
+
+                assert_eq!(with.shape()[1], expected);
+                assert_eq!(without.shape()[1], expected - 1);
+            }
+        }
+    }
+
+    #[test]
+    fn neighbours_are_unique_and_respect_the_expected_radius() {
+        // The two remaining assertions of the Python `test_neighbours`: no
+        // duplicate ids, and every cell within `1 + 2 * depth` (with corners) or
+        // `depth` (without) steps along the axes.
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+
+        // The Python test uses upright and downward cells alike, since the
+        // window is mirrored for downward cells.
+        for index in [
+            array![[0i64, 0i64]],
+            array![[-6i64, 3i64], [4i64, -1i64], [5i64, 4i64], [-5i64, -4i64]],
+            array![[-5i64, 3i64], [3i64, -3i64], [4i64, 4i64], [-6i64, -6i64]],
+        ] {
+            for depth in 1..=6i64 {
+                for connect_corners in [false, true] {
+                    let max_radius = if connect_corners {
+                        1 + 2 * depth
+                    } else {
+                        depth
+                    };
+
+                    let neighbours = if connect_corners {
+                        grid.all_neighbours(&index.view(), depth, false, false)
+                    } else {
+                        grid.direct_neighbours(&index.view(), depth, false, false)
+                    };
+
+                    for cell_id in 0..neighbours.shape()[0] {
+                        let mut ids: Vec<[i64; 2]> = (0..neighbours.shape()[1])
+                            .map(|i| [neighbours[[cell_id, i, 0]], neighbours[[cell_id, i, 1]]])
+                            .collect();
+                        let total = ids.len();
+                        ids.sort_unstable();
+                        ids.dedup();
+                        assert_eq!(ids.len(), total, "duplicate cell in the neighbours");
+
+                        for id in &ids {
+                            assert!(
+                                (id[0] + id[1]).abs() <= max_radius,
+                                "cell {id:?} is further than {max_radius} steps away"
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn include_selected_is_the_only_difference_including_the_centre() {
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+        let index = array![[-6i64, 3i64], [4i64, -1i64]];
+
+        for depth in 1..=6i64 {
+            for connect_corners in [false, true] {
+                let with = if connect_corners {
+                    grid.all_neighbours(&index.view(), depth, true, false)
+                } else {
+                    grid.direct_neighbours(&index.view(), depth, true, false)
+                };
+                let without = if connect_corners {
+                    grid.all_neighbours(&index.view(), depth, false, false)
+                } else {
+                    grid.direct_neighbours(&index.view(), depth, false, false)
+                };
+
+                assert_eq!(with.shape()[1], without.shape()[1] + 1);
+
+                for cell_id in 0..with.shape()[0] {
+                    // Exactly one [0, 0] entry with the selected cell included.
+                    let zeroes = (0..with.shape()[1])
+                        .filter(|i| with[[cell_id, *i, 0]] == 0 && with[[cell_id, *i, 1]] == 0)
+                        .count();
+                    assert_eq!(zeroes, 1);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn neighbours_single_and_multiple_indices_agree() {
+        let grid = TriGrid::new(0.7, Orientation::Flat);
+        let index = array![[-6i64, 3i64], [4i64, -1i64], [5i64, 4i64]];
+
+        for depth in 1..=6i64 {
+            for include_selected in [false, true] {
+                let many = grid.all_neighbours(&index.view(), depth, include_selected, true);
+
+                for (row, expected) in [(-6i64, 3i64), (4, -1), (5, 4)].iter().enumerate() {
+                    let one = array![[expected.0, expected.1]];
+                    let single = grid.all_neighbours(&one.view(), depth, include_selected, true);
+
+                    assert_eq!(single.shape(), &[1, many.shape()[1], 2]);
+                    for i in 0..single.shape()[1] {
+                        assert_eq!(
+                            [[single[[0, i, 0]], single[[0, i, 1]]]],
+                            [[many[[row, i, 0]], many[[row, i, 1]]]]
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------
+    // subdivide
+    // ---------------------------------------------------------------------
+
+    /// Unwrap the sub grid that `TriGrid::subdivide` returns.
+    fn as_tri_grid(sub_grid: Grid) -> TriGrid {
+        match sub_grid {
+            Grid::TriGrid(grid) => grid,
+            _ => panic!("subdivide on TriGrid should return TriGrid"),
+        }
+    }
+
+    #[test]
+    fn subdivide_scales_the_cells() {
+        let mut grid = TriGrid::new(1., Orientation::Flat);
+        grid.set_rotation(-23.);
+
+        for factor in [1u64, 2, 3, 9] {
+            let sub_grid = as_tri_grid(grid.subdivide(factor));
+            assert_close(sub_grid.cellsize, 1. / factor as f64, TOL);
+        }
+    }
+
+    #[test]
+    fn subdivide_keeps_the_orientation_and_rotation() {
+        // Python's `TriGrid.subdivide` passes `rotation=self.rotation` and leaves
+        // the orientation alone.
+        let mut grid = TriGrid::new(1.4, Orientation::Pointy);
+        grid.set_rotation(-23.);
+
+        let sub_grid = as_tri_grid(grid.subdivide(3));
+        assert_eq!(sub_grid.orientation, Orientation::Pointy);
+        assert_close(sub_grid.rotation(), -23., TOL);
+    }
+
+    #[test]
+    fn subdivide_keeps_parent_corners_on_a_corner() {
+        for rotation in [-23., 0., 456.] {
+            for offset in [[-2., 3.], [0., 0.], [0.1, -0.2]] {
+                let mut grid = TriGrid::new(1., Orientation::Flat);
+                grid.set_rotation(rotation);
+                grid.set_offset(offset);
+
+                for factor in [2u64, 9] {
+                    let sub_grid = as_tri_grid(grid.subdivide(factor));
+
+                    // Take a corner of a parent cell and check that it coincides
+                    // with one of the corners of the sub cell containing it.
+                    let corners = grid.cell_corners(&array![[-4i64, 23i64]].view());
+                    let corner = [corners[[0, 2, 0]], corners[[0, 2, 1]]];
+
+                    let id = sub_grid.cell_at_point(&corner);
+                    let sub_corners = sub_grid.cell_corners(&array![[id[0], id[1]]].view());
+                    let on_corner = (0..3).any(|i| {
+                        let dx = sub_corners[[0, i, 0]] - corner[0];
+                        let dy = sub_corners[[0, i, 1]] - corner[1];
+                        (dx * dx + dy * dy).sqrt() <= 1e-9
+                    });
+                    assert!(
+                        on_corner,
+                        "corner {corner:?} is not a corner of the sub cell containing it \
+                         (rotation {rotation}, offset {offset:?}, factor {factor})"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn subdivide_yields_factor_squared_subcells_per_parent_cell() {
+        for factor in [2u64, 9] {
+            for rotation in [-23., 0., 456.] {
+                for offset in [[-2., 3.], [0., 0.], [0.1, -0.2]] {
+                    let mut grid = TriGrid::new(1., Orientation::Flat);
+                    grid.set_rotation(rotation);
+                    grid.set_offset(offset);
+
+                    let sub_grid = as_tri_grid(grid.subdivide(factor));
+
+                    // The sub cells that could possibly be inside the parent cell
+                    // (3, -2) are the ones around the sub cell holding the parent
+                    // centroid. Python uses `depth=factor + 1`.
+                    let target = grid.centroid(&array![[3i64, -2i64]].view());
+                    let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
+                    let candidates = sub_grid.all_neighbours(
+                        &array![[start[0], start[1]]].view(),
+                        factor as i64 + 1,
+                        true,
+                        true,
+                    );
+
+                    let sub_centroids = sub_grid.centroid(&candidates.slice(s![0, .., ..]));
+                    let in_cell = grid.cell_at_points(&sub_centroids.view());
+                    let nr_in_cell = (0..in_cell.shape()[0])
+                        .filter(|i| in_cell[[*i, 0]] == 3 && in_cell[[*i, 1]] == -2)
+                        .count();
+
+                    assert_eq!(
+                        nr_in_cell,
+                        (factor * factor) as usize,
+                        "rotation {rotation}, offset {offset:?}, factor {factor}"
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn subdivide_by_one_is_the_same_grid() {
+        let mut grid = TriGrid::new(1.23, Orientation::Flat);
+        grid.set_rotation(15.5);
+        grid.set_offset([0.1, 0.2]);
+
+        let sub_grid = as_tri_grid(grid.subdivide(1));
+
+        // Compared with a tolerance rather than bit for bit: re-anchoring on the
+        // parent corner recomputes the offset, which can land one ULP away from
+        // the original. Python's `subdivide(1)` returns the same grid for the same
+        // reason, through the same re-anchoring.
+        assert_close(sub_grid.cellsize, grid.cellsize, TOL);
+        assert_close(sub_grid.rotation(), grid.rotation(), TOL);
+        assert_eq!(sub_grid.orientation, grid.orientation);
+        assert_close(sub_grid.offset()[0], grid.offset()[0], TOL);
+        assert_close(sub_grid.offset()[1], grid.offset()[1], TOL);
+    }
+
+    #[test]
+    fn subdivide_by_zero_is_the_same_grid() {
+        // `factor` is unsigned, so a `factor` of 0 is the only invalid input left.
+        // Dividing the cellsize by zero is not meaningful, so this yields an
+        // unchanged copy instead. Note this diverges from Python, which raises a
+        // `ValueError` for any `factor` below 1.
+        let mut grid = TriGrid::new(1.23, Orientation::Flat);
+        grid.set_rotation(15.5);
+        grid.set_offset([0.1, 0.2]);
+
+        assert_eq!(grid.subdivide(0), Grid::TriGrid(grid));
+    }
+}
+
+#[cfg(test)]
+mod is_aligned_with_tests {
+    use super::*;
+    use crate::grid::grid_type_name;
+    use crate::hex_grid::HexGrid;
+    use crate::rect_grid::RectGrid;
+
+    // Mirrors `test_is_aligned_with` in `test_tri_grid.py`, minus the CRS cases
+    // (the Rust grid has no CRS) and the TypeError case (the Rust signature
+    // takes a `&Grid`, so a non-grid cannot be passed). The Python test's
+    // orientation case is commented out as "other shapes not yet implemented",
+    // but `TriGrid` does expose an orientation and the Rust implementation
+    // compares it, so it is covered here.
+    fn flat() -> TriGrid {
+        TriGrid::new(1.2, Orientation::Flat)
+    }
+
+    #[test]
+    fn an_identical_grid_is_aligned() {
+        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(flat()));
+        assert!(aligned);
+        assert_eq!(reason, "");
+    }
+
+    #[test]
+    fn a_differing_cellsize_is_reported() {
+        let (aligned, reason) =
+            flat().is_aligned_with(&Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat)));
+        assert!(!aligned);
+        assert!(reason.contains("cellsize"), "{reason}");
+    }
+
+    #[test]
+    fn a_differing_offset_is_reported() {
+        for offset in [[0., 1.], [1., 0.]] {
+            let mut other = flat();
+            other.set_offset(offset);
+            let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
+            assert!(!aligned);
+            assert!(reason.contains("offset"), "{reason}");
+        }
+    }
+
+    #[test]
+    fn a_differing_orientation_is_reported() {
+        let (aligned, reason) =
+            flat().is_aligned_with(&Grid::TriGrid(TriGrid::new(1.2, Orientation::Pointy)));
+        assert!(!aligned);
+        assert!(reason.contains("orientation"), "{reason}");
+    }
+
+    #[test]
+    fn a_differing_rotation_is_reported() {
+        let mut other = flat();
+        other.set_rotation(15.5);
+
+        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
+        assert!(!aligned);
+        assert!(reason.contains("rotation"), "{reason}");
+    }
+
+    #[test]
+    fn a_differing_grid_type_is_reported() {
+        let grid = flat();
+
+        let others = vec![
+            Grid::RectGrid(RectGrid::new(1.2, 1.2)),
+            Grid::HexGrid(HexGrid::new(1.2, Orientation::Pointy)),
+        ];
+        for other in others {
+            let (aligned, reason) = grid.is_aligned_with(&other);
+            assert!(!aligned);
+            assert!(reason.contains("Grid type is not the same"), "{reason}");
+            assert!(reason.contains("TriGrid"), "{reason}");
+            assert!(reason.contains(grid_type_name(&other)), "{reason}");
+
+            // A type mismatch is reported on its own: Python returns early
+            // instead of accumulating the other reasons.
+            assert!(!reason.contains("cellsize"), "{reason}");
+            assert!(!reason.contains("offset"), "{reason}");
+        }
+    }
+
+    #[test]
+    fn multiple_reasons_are_reported_together() {
+        let mut other = TriGrid::new(1.1, Orientation::Flat);
+        other.set_offset([1., 1.]);
+
+        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
+        assert!(!aligned);
+        for attribute in ["cellsize", "offset"] {
+            assert!(reason.contains(attribute), "{reason}");
+        }
+    }
+
+    #[test]
+    fn both_grids_are_left_intact() {
+        let mut grid = flat();
+        grid.set_offset([0.3, 0.4]);
+        let mut other = TriGrid::new(1.1, Orientation::Flat);
+        other.set_offset([1., 1.]);
+        other.set_rotation(15.5);
+
+        let snapshot = |g: &TriGrid| (g.cellsize, g.offset(), g.rotation(), g.orientation.clone());
+        let before_grid = snapshot(&grid);
+        let before_other = snapshot(&other);
+
+        assert!(!grid.is_aligned_with(&Grid::TriGrid(other.clone())).0);
+        assert!(!other.is_aligned_with(&Grid::TriGrid(grid.clone())).0);
+
+        assert_eq!(before_grid, snapshot(&grid));
+        assert_eq!(before_other, snapshot(&other));
+    }
+
+    #[test]
+    fn it_is_reachable_through_the_grid_enum() {
+        // `is_aligned_with` is a `GridTraits` method, so `enum_delegate` has to
+        // forward it for `Grid` to be usable with it.
+        let grid = Grid::TriGrid(flat());
+        let other = Grid::TriGrid(flat());
+
+        assert_eq!(grid.is_aligned_with(&other), (true, String::new()));
+
+        let mismatched = Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat));
+        assert_eq!(
+            grid.is_aligned_with(&mismatched),
+            flat().is_aligned_with(&mismatched)
+        );
     }
 }

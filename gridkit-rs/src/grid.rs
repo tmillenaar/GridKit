@@ -1,6 +1,7 @@
 use crate::hex_grid::*;
 use crate::rect_grid::*;
 use crate::tri_grid::*;
+use crate::utils::{isclose, NUMERIC_ATOL, NUMERIC_RTOL};
 use enum_delegate;
 use ndarray::*;
 
@@ -181,16 +182,22 @@ pub trait GridTraits {
     /// The number of cells grows quadratically with `factor`: a `factor` of 2
     /// results in 4 cells that fit in the original, a `factor` of 3 in 9.
     ///
+    /// The return type is the `Grid` enum rather than `Self` because
+    /// `HexGrid.subdivide` returns a *triangular* grid: a hexagon cannot be
+    /// tiled by smaller hexagons, so the only way to keep every corner of the
+    /// parent cell on a corner of the sub grid is to fall back to triangles,
+    /// which divide a hexagon into 6 `factor`² cells.
+    ///
     /// `factor` is unsigned, so there are no negative factors. A `factor` of 0
     /// would divide the cellsize by zero, so it yields an unchanged copy of this
     /// grid rather than a grid with infinitely small cells. Note that Python's
     /// `RectGrid.subdivide` raises a `ValueError` for a `factor` below 1, so this
     /// is a deliberate divergence.
     ///
-    /// Mirrors `RectGrid.subdivide` in `gridkit/rect_grid.py`.
-    fn subdivide(&self, factor: u64) -> Self
-    where
-        Self: Sized;
+    /// Mirrors `RectGrid.subdivide` in `gridkit/rect_grid.py`,
+    /// `TriGrid.subdivide` in `gridkit/tri_grid.py` and `HexGrid.subdivide` in
+    /// `gridkit/hex_grid.py`.
+    fn subdivide(&self, factor: u64) -> Grid;
     // fn linear_interpolation(
     //     &self,
     //     sample_points: &ArrayView2<f64>,
@@ -218,6 +225,97 @@ pub fn grid_type_name(grid: &Grid) -> &'static str {
         Grid::RectGrid(_) => "RectGrid",
         Grid::HexGrid(_) => "HexGrid",
     }
+}
+
+/// The `cellsize` of a grid, which is the counterpart of Python's `size`.
+///
+/// `RectGrid` is included for exhaustiveness, even though it compares `dx`/`dy`
+/// in its own `is_aligned_with`.
+fn cellsize_of(grid: &Grid) -> f64 {
+    match grid {
+        Grid::TriGrid(grid) => grid.cellsize,
+        Grid::RectGrid(grid) => grid.dx(),
+        Grid::HexGrid(grid) => grid.cellsize,
+    }
+}
+
+/// The `orientation` of a grid, or `None` for a `RectGrid`.
+///
+/// Mirrors Python's `getattr(grid, "orientation", "")`, where `RectGrid` has no
+/// `orientation` and falls back to the empty string.
+fn orientation_of(grid: &Grid) -> Option<&Orientation> {
+    match grid {
+        Grid::TriGrid(grid) => Some(&grid.orientation),
+        Grid::RectGrid(_) => None,
+        Grid::HexGrid(grid) => Some(&grid.orientation),
+    }
+}
+
+/// Shared implementation of [`GridTraits::is_aligned_with`] for the grid types
+/// that have a `cellsize` and an `orientation`.
+///
+/// `RectGrid` compares `dx`/`dy` and has no orientation, so it implements its own
+/// version. Note that the CRS is not part of the Rust grid, so the CRS check of
+/// `BaseGrid.is_aligned_with` has no counterpart here.
+///
+/// Mirrors `BaseGrid.is_aligned_with` in `gridkit/base_grid.py`.
+pub(crate) fn is_aligned_with(
+    grid: &Grid,
+    other: &Grid,
+    cellsize: f64,
+    offset: [f64; 2],
+    orientation: &Orientation,
+) -> (bool, String) {
+    // Python returns early on a type mismatch rather than accumulating reasons,
+    // so only the grid type is reported in that case.
+    if std::mem::discriminant(grid) != std::mem::discriminant(other) {
+        return (
+            false,
+            format!(
+                "Grid type is not the same. This is a {}, the other is a {}",
+                grid_type_name(grid),
+                grid_type_name(other)
+            ),
+        );
+    }
+
+    let mut reasons: Vec<&str> = Vec::new();
+
+    // Hex and triangular grids always have a `size`, so Python takes the
+    // `numpy.isclose(self.size, other.size)` branch rather than the `dx`/`dy`
+    // fallback that `RectGrid` uses. `cellsize` is the Rust counterpart of that
+    // `size`.
+    if !isclose(cellsize, cellsize_of(other), NUMERIC_RTOL, NUMERIC_ATOL) {
+        reasons.push("cellsize");
+    }
+
+    // FIXME: the 1e-7 tolerance is a bandaid, taken from Python. The offset
+    //        seems to depend slightly on the bounds after resampling.
+    if !(isclose(offset[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
+        && isclose(offset[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+    {
+        reasons.push("offset");
+    }
+
+    // Unlike `RectGrid`, both grid types here expose an `orientation`, which
+    // Python compares via `getattr(self, "orientation", "")`. A `RectGrid` on
+    // either side has already been rejected by the type check above, so the
+    // orientations are always both present here.
+    if orientation_of(other).is_some_and(|other| orientation != other) {
+        reasons.push("orientation");
+    }
+
+    if grid.rotation() != other.rotation() {
+        reasons.push("rotation");
+    }
+
+    if reasons.is_empty() {
+        return (true, String::new());
+    }
+    (
+        false,
+        format!("The following attributes are not the same: {reasons:?}"),
+    )
 }
 
 #[derive(Clone)]

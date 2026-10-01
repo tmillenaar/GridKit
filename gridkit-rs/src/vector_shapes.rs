@@ -1,9 +1,7 @@
+use geo_types::{Coord, Geometry, LineString, MultiPolygon, Point, Polygon};
 use ndarray::*;
-use geo_types::{MultiPolygon, Polygon, LineString, Point, Coord, Geometry};
 
-pub fn coords_to_multipolygon_wkb(
-    coords: &ArrayView3<f64>,
-) -> Vec<u8> {
+pub fn coords_to_multipolygon_wkb(coords: &ArrayView3<f64>) -> Vec<u8> {
     // Note: consider apache arrow format for faster data transfer
     let polygons: Vec<Polygon<f64>> = (0..coords.shape()[0])
         .map(|poly_index| {
