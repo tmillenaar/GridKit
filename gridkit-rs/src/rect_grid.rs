@@ -119,7 +119,8 @@ impl GridTraits for RectGrid {
         let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
-            let point = self._rotation_matrix_inv.dot(&point);
+            //let point = self._rotation_matrix_inv.dot(&point); // nocheckin, this line causes
+            //slowdown. Consider a separate version of the function that does not do rotation
             let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
             let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
             index[Ix2(cell_id, 0)] = id_x;

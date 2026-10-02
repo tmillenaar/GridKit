@@ -61,6 +61,10 @@ pub trait TileTraits {
         self.get_tile().intersects(other)
     }
 
+    fn intersects_bounds(&self, bounds: &[f64; 4]) -> bool {
+        self.get_tile().intersects_bounds(bounds)
+    }
+
     fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
         self.get_tile().intersection_bounds(other)
     }
@@ -300,6 +304,43 @@ impl TileTraits for Tile {
             || right_self <= left_other
             || bottom_self >= top_other
             || top_self <= bottom_other);
+    }
+
+    fn intersects_bounds(&self, bounds: &[f64; 4]) -> bool {
+        let corners = self.corners();
+
+        // Get tile bounds.
+        let left = corners
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let bottom = corners
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::min)
+            .unwrap();
+        let right = corners
+            .slice(s![.., 0])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+        let top = corners
+            .slice(s![.., 1])
+            .iter()
+            .copied()
+            .reduce(f64::max)
+            .unwrap();
+
+        let [left_other, bottom_other, right_other, top_other] = bounds;
+
+        !(left >= *right_other
+            || right <= *left_other
+            || bottom >= *top_other
+            || top <= *bottom_other)
     }
 
     fn intersection_bounds(&self, other: &Tile) -> Option<(f64, f64, f64, f64)> {
