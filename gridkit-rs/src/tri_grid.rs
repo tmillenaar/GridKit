@@ -583,14 +583,26 @@ impl GridTraits for TriGrid {
         relative_neighbours
     }
 
-    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
-        crate::grid::is_aligned_with(
-            &self.get_grid(),
-            other,
-            self.cellsize,
-            self.offset(),
-            &self.orientation,
-        )
+    fn is_aligned_with(&self, other: &Grid) -> bool {
+        if let Grid::TriGrid(other) = other {
+            if !isclose(self.cellsize, other.cellsize, NUMERIC_RTOL, NUMERIC_ATOL) {
+                return false;
+            }
+            if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
+                && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+            {
+                return false;
+            }
+            if self.orientation != other.orientation {
+                return false;
+            }
+            if self.rotation() != other.rotation() {
+                return false;
+            }
+            true
+        } else {
+            false
+        }
     }
 
     fn subdivide(&self, factor: u64) -> Grid {
@@ -1119,7 +1131,6 @@ mod tests {
 #[cfg(test)]
 mod is_aligned_with_tests {
     use super::*;
-    use crate::grid::grid_type_name;
     use crate::hex_grid::HexGrid;
     use crate::rect_grid::RectGrid;
 
@@ -1135,17 +1146,12 @@ mod is_aligned_with_tests {
 
     #[test]
     fn an_identical_grid_is_aligned() {
-        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(flat()));
-        assert!(aligned);
-        assert_eq!(reason, "");
+        assert!(flat().is_aligned_with(&Grid::TriGrid(flat())));
     }
 
     #[test]
     fn a_differing_cellsize_is_reported() {
-        let (aligned, reason) =
-            flat().is_aligned_with(&Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat)));
-        assert!(!aligned);
-        assert!(reason.contains("cellsize"), "{reason}");
+        assert!(!flat().is_aligned_with(&Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat))));
     }
 
     #[test]
@@ -1153,28 +1159,21 @@ mod is_aligned_with_tests {
         for offset in [[0., 1.], [1., 0.]] {
             let mut other = flat();
             other.set_offset(offset);
-            let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("offset"), "{reason}");
+            assert!(!flat().is_aligned_with(&Grid::TriGrid(other)));
         }
     }
 
     #[test]
     fn a_differing_orientation_is_reported() {
-        let (aligned, reason) =
-            flat().is_aligned_with(&Grid::TriGrid(TriGrid::new(1.2, Orientation::Pointy)));
-        assert!(!aligned);
-        assert!(reason.contains("orientation"), "{reason}");
+        let other = TriGrid::new(1.2, Orientation::Pointy);
+        assert!(!flat().is_aligned_with(&Grid::TriGrid(other)));
     }
 
     #[test]
     fn a_differing_rotation_is_reported() {
         let mut other = flat();
         other.set_rotation(15.5);
-
-        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("rotation"), "{reason}");
+        assert!(!flat().is_aligned_with(&Grid::TriGrid(other)));
     }
 
     #[test]
@@ -1186,16 +1185,9 @@ mod is_aligned_with_tests {
             Grid::HexGrid(HexGrid::new(1.2, Orientation::Pointy)),
         ];
         for other in others {
-            let (aligned, reason) = grid.is_aligned_with(&other);
-            assert!(!aligned);
-            assert!(reason.contains("Grid type is not the same"), "{reason}");
-            assert!(reason.contains("TriGrid"), "{reason}");
-            assert!(reason.contains(grid_type_name(&other)), "{reason}");
-
-            // A type mismatch is reported on its own: Python returns early
-            // instead of accumulating the other reasons.
-            assert!(!reason.contains("cellsize"), "{reason}");
-            assert!(!reason.contains("offset"), "{reason}");
+            assert!(!grid.is_aligned_with(&other));
+            // The method is symmetric.
+            assert!(!other.is_aligned_with(&Grid::TriGrid(flat())));
         }
     }
 
@@ -1203,12 +1195,7 @@ mod is_aligned_with_tests {
     fn multiple_reasons_are_reported_together() {
         let mut other = TriGrid::new(1.1, Orientation::Flat);
         other.set_offset([1., 1.]);
-
-        let (aligned, reason) = flat().is_aligned_with(&Grid::TriGrid(other));
-        assert!(!aligned);
-        for attribute in ["cellsize", "offset"] {
-            assert!(reason.contains(attribute), "{reason}");
-        }
+        assert!(!flat().is_aligned_with(&Grid::TriGrid(other)));
     }
 
     #[test]
@@ -1223,8 +1210,8 @@ mod is_aligned_with_tests {
         let before_grid = snapshot(&grid);
         let before_other = snapshot(&other);
 
-        assert!(!grid.is_aligned_with(&Grid::TriGrid(other.clone())).0);
-        assert!(!other.is_aligned_with(&Grid::TriGrid(grid.clone())).0);
+        assert!(!grid.is_aligned_with(&Grid::TriGrid(other.clone())));
+        assert!(!other.is_aligned_with(&Grid::TriGrid(grid.clone())));
 
         assert_eq!(before_grid, snapshot(&grid));
         assert_eq!(before_other, snapshot(&other));
@@ -1237,12 +1224,9 @@ mod is_aligned_with_tests {
         let grid = Grid::TriGrid(flat());
         let other = Grid::TriGrid(flat());
 
-        assert_eq!(grid.is_aligned_with(&other), (true, String::new()));
+        assert!(grid.is_aligned_with(&other));
 
         let mismatched = Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat));
-        assert_eq!(
-            grid.is_aligned_with(&mismatched),
-            flat().is_aligned_with(&mismatched)
-        );
+        assert_eq!(grid.is_aligned_with(&mismatched), flat().is_aligned_with(&mismatched));
     }
 }

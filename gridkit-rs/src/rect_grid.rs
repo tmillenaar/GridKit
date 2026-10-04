@@ -247,47 +247,25 @@ impl GridTraits for RectGrid {
         self._neighbours(index, depth, include_selected, add_cell_id, true)
     }
 
-    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
-        if !matches!(other, Grid::RectGrid(_)) {
-            return (
-                false,
-                format!(
-                    "Grid type is not the same. This is a RectGrid, the other is a {}",
-                    grid_type_name(other)
-                ),
-            );
+    fn is_aligned_with(&self, other: &Grid) -> bool {
+        if let Grid::RectGrid(other) = other {
+            if !isclose(self.dx(), other.dx(), NUMERIC_RTOL, NUMERIC_ATOL)
+                || !isclose(self.dy(), other.dy(), NUMERIC_RTOL, NUMERIC_ATOL)
+            {
+                return false;
+            }
+            if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
+                && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+            {
+                return false;
+            }
+            if self.rotation() != other.rotation() {
+                return false;
+            }
+            true
+        } else {
+            false
         }
-
-        let mut reasons: Vec<&str> = Vec::new();
-
-        // Python compares `size` when both grids have one and falls back to
-        // `dx`/`dy` otherwise. `size` is set exactly when `dx` and `dy` are
-        // equal, so comparing `dx` and `dy` covers both branches.
-        if !isclose(self.dx(), other.dx(), NUMERIC_RTOL, NUMERIC_ATOL)
-            || !isclose(self.dy(), other.dy(), NUMERIC_RTOL, NUMERIC_ATOL)
-        {
-            reasons.push("cellsize");
-        }
-
-        // FIXME: the 1e-7 tolerance is a bandaid, taken from Python. The offset
-        //        seems to depend slightly on the bounds after resampling.
-        if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
-            && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
-        {
-            reasons.push("offset");
-        }
-
-        if self.rotation() != other.rotation() {
-            reasons.push("rotation");
-        }
-
-        if reasons.is_empty() {
-            return (true, String::new());
-        }
-        (
-            false,
-            format!("The following attributes are not the same: {reasons:?}"),
-        )
     }
 
     fn subdivide(&self, factor: u64) -> Grid {
@@ -1287,9 +1265,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
         let other = RectGrid::new(1.2, 1.2);
 
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(aligned);
-        assert_eq!(reason, "");
+        assert!(grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1297,9 +1273,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
 
         for other in [RectGrid::new(1.2, 1.3), RectGrid::new(1.3, 1.2)] {
-            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("cellsize"), "{reason}");
+            assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
         }
     }
 
@@ -1310,9 +1284,7 @@ mod tests {
         for offset in [[0., 1.], [1., 0.]] {
             let mut other = RectGrid::new(1.2, 1.2);
             other.set_offset(offset);
-            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("offset"), "{reason}");
+            assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
         }
     }
 
@@ -1321,10 +1293,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
         let mut other = RectGrid::new(1.2, 1.2);
         other.set_rotation(15.5);
-
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("rotation"), "{reason}");
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1336,26 +1305,16 @@ mod tests {
             Grid::TriGrid(TriGrid::new(1., Orientation::Flat)),
         ];
         for other in others {
-            let (aligned, reason) = grid.is_aligned_with(&other);
-            assert!(!aligned);
-            assert!(reason.contains("Grid type is not the same"), "{reason}");
-            assert!(reason.contains("RectGrid"), "{reason}");
-            assert!(reason.contains(grid_type_name(&other)), "{reason}");
+            assert!(!grid.is_aligned_with(&other));
         }
     }
 
     #[test]
     fn is_aligned_with_reports_multiple_reasons() {
-        // The cellsize and offset case of `test_is_aligned_with`. The CRS is
-        // left out because the Rust grid has none.
         let grid = RectGrid::new(1.2, 1.2);
         let mut other = RectGrid::new(1.2, 1.1);
         other.set_offset([1., 1.]);
-
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("cellsize"), "{reason}");
-        assert!(reason.contains("offset"), "{reason}");
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1368,8 +1327,8 @@ mod tests {
         let before_grid = (grid.dx(), grid.dy(), grid.offset(), grid.rotation());
         let before_other = (other.dx(), other.dy(), other.offset(), other.rotation());
 
-        assert!(!grid.is_aligned_with(&Grid::RectGrid(other.clone())).0);
-        assert!(!other.is_aligned_with(&Grid::RectGrid(grid.clone())).0);
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other.clone())));
+        assert!(!other.is_aligned_with(&Grid::RectGrid(grid.clone())));
 
         assert_eq!(
             before_grid,
@@ -1392,7 +1351,7 @@ mod tests {
             grid.is_aligned_with(&other),
             RectGrid::new(1.2, 1.2).is_aligned_with(&other)
         );
-        assert!(!grid.is_aligned_with(&other).0);
+        assert!(!grid.is_aligned_with(&other));
     }
 
     #[test]
