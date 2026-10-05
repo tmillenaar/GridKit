@@ -250,13 +250,13 @@ impl GridTraits for RectGrid {
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
         if let Grid::RectGrid(other) = other {
-            if !isclose(self.dx(), other.dx(), NUMERIC_RTOL, NUMERIC_ATOL)
-                || !isclose(self.dy(), other.dy(), NUMERIC_RTOL, NUMERIC_ATOL)
+            if !isclose(self.dx(), other.dx())
+                || !isclose(self.dy(), other.dy())
             {
                 return false;
             }
-            if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
-                && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+            if !(isclose(self.offset()[0], other.offset()[0])
+                && isclose(self.offset()[1], other.offset()[1]))
             {
                 return false;
             }

@@ -458,11 +458,11 @@ impl GridTraits for HexGrid {
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
         if let Grid::HexGrid(other) = other {
-            if !isclose(self.cellsize, other.cellsize, NUMERIC_RTOL, NUMERIC_ATOL) {
+            if !isclose(self.cellsize, other.cellsize) {
                 return false;
             }
-            if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
-                && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+            if !(isclose(self.offset()[0], other.offset()[0])
+                && isclose(self.offset()[1], other.offset()[1]))
             {
                 return false;
             }
