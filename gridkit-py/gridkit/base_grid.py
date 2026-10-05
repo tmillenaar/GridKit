@@ -285,7 +285,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
         )
         result = self._grid.neighbours(
             index,
-            depth=depth,
+            depth=int(depth),
             connect_corners=connect_corners,
             include_selected=include_selected,
         )

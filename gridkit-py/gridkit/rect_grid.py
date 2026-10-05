@@ -301,6 +301,9 @@ class RectGrid(BaseGrid):
         :py:meth:`.HexGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
+        if index is None:
+            index = GridIndex([0, 0])
+
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )

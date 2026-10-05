@@ -20,11 +20,11 @@ pub struct TriGrid {
 impl PartialEq for TriGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        self.cellsize.to_bits() == other.cellsize.to_bits()
-            && self.offset[0].to_bits() == other.offset[0].to_bits()
-            && self.offset[1].to_bits() == other.offset[1].to_bits()
+        is_close(self.cellsize, other.cellsize)
+            && is_close(self.offset[0], other.offset[0])
+            && is_close(self.offset[1], other.offset[1])
+            && is_close(self._rotation, other._rotation)
             && self.orientation == other.orientation
-            && self._rotation.to_bits() == other._rotation.to_bits()
     }
 }
 
@@ -588,11 +588,11 @@ impl GridTraits for TriGrid {
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
         if let Grid::TriGrid(other) = other {
-            if !isclose(self.cellsize, other.cellsize) {
+            if !is_close(self.cellsize, other.cellsize) {
                 return false;
             }
-            if !(isclose(self.offset()[0], other.offset()[0])
-                && isclose(self.offset()[1], other.offset()[1]))
+            if !(is_close(self.offset()[0], other.offset()[0])
+                && is_close(self.offset()[1], other.offset()[1]))
             {
                 return false;
             }
@@ -867,7 +867,10 @@ mod tests {
         for depth in 1..=6u64 {
             for connect_corners in [false, true] {
                 let factor = if connect_corners { 4i64 } else { 1i64 };
-                let expected = ((0..depth).map(|i| factor as i64 * 3 * (i as i64 + 1)).sum::<i64>() + 1) as usize;
+                let expected = ((0..depth)
+                    .map(|i| factor as i64 * 3 * (i as i64 + 1))
+                    .sum::<i64>()
+                    + 1) as usize;
 
                 let with = if connect_corners {
                     grid.all_neighbours(&index.view(), depth, true, false)
@@ -1230,6 +1233,9 @@ mod is_aligned_with_tests {
         assert!(grid.is_aligned_with(&other));
 
         let mismatched = Grid::TriGrid(TriGrid::new(1.3, Orientation::Flat));
-        assert_eq!(grid.is_aligned_with(&mismatched), flat().is_aligned_with(&mismatched));
+        assert_eq!(
+            grid.is_aligned_with(&mismatched),
+            flat().is_aligned_with(&mismatched)
+        );
     }
 }

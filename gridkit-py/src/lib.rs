@@ -25,7 +25,7 @@ use gridkit::utils;
 use gridkit::vector_shapes;
 
 use crate::data_tile::DataTile;
-use crate::grid::GridTraits;
+use crate::grid::{Grid, GridTraits};
 use crate::tile::TileTraits;
 
 macro_rules! impl_pydata_tile {
@@ -900,20 +900,13 @@ struct PyO3TriGrid {
 #[pymethods]
 impl PyO3TriGrid {
     #[new]
-    fn new(
-        cellsize: f64,
-        orientation: &str,
-        offset: (f64, f64),
-        rotation: f64,
-    ) -> PyResult<Self> {
+    fn new(cellsize: f64, orientation: &str, offset: (f64, f64), rotation: f64) -> PyResult<Self> {
         match Orientation::from_string(orientation) {
             Some(orientation) => {
                 let mut _grid = tri_grid::TriGrid::new(cellsize, orientation);
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
-                Ok(PyO3TriGrid {
-                    _grid,
-                })
+                Ok(PyO3TriGrid { _grid })
             }
             None => Err(PyException::new_err(format!(
                 "Unrecognized orientation. Use 'Flat' or 'Pointy'. Got {}",
@@ -962,6 +955,14 @@ impl PyO3TriGrid {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
+    fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3TriGrid {
+        let new_grid = self._grid.subdivide(factor);
+        let Grid::TriGrid(sub_grid) = new_grid else {
+            panic!("Expected a TriGrid, got {:?}", new_grid);
+        };
+        PyO3TriGrid { _grid: sub_grid }
+    }
+
     fn anchor<'py>(
         &self,
         _py: Python<'py>,
@@ -969,8 +970,8 @@ impl PyO3TriGrid {
         cell_element: String,
     ) -> PyO3TriGrid {
         let target_loc: [f64; 2] = target_loc.into();
-        let cell_element =
-            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element: '{}'", cell_element));
         let mut new_grid = self.clone();
         new_grid._grid.anchor_inplace(&target_loc, cell_element);
         new_grid
@@ -983,8 +984,8 @@ impl PyO3TriGrid {
         cell_element: String,
     ) {
         let target_loc: [f64; 2] = target_loc.into();
-        let cell_element =
-            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element: '{}'", cell_element));
         self._grid.anchor_inplace(&target_loc, cell_element);
     }
 
@@ -1118,9 +1119,7 @@ impl PyO3RectGrid {
         let mut _grid = rect_grid::RectGrid::new(dx, dy);
         _grid.set_offset(offset.into());
         _grid.set_rotation(rotation);
-        PyO3RectGrid {
-            _grid,
-        }
+        PyO3RectGrid { _grid }
     }
 
     fn cell_height(&self) -> f64 {
@@ -1155,6 +1154,14 @@ impl PyO3RectGrid {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
     }
 
+    fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3RectGrid {
+        let new_grid = self._grid.subdivide(factor);
+        let Grid::RectGrid(sub_grid) = new_grid else {
+            panic!("Expected a RectGrid, got {:?}", new_grid);
+        };
+        PyO3RectGrid { _grid: sub_grid }
+    }
+
     fn anchor<'py>(
         &self,
         _py: Python<'py>,
@@ -1162,8 +1169,8 @@ impl PyO3RectGrid {
         cell_element: String,
     ) -> PyO3RectGrid {
         let target_loc: [f64; 2] = target_loc.into();
-        let cell_element =
-            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element: '{}'", cell_element));
         let mut new_grid = self.clone();
         new_grid._grid.anchor_inplace(&target_loc, cell_element);
         new_grid
@@ -1176,8 +1183,8 @@ impl PyO3RectGrid {
         cell_element: String,
     ) {
         let target_loc: [f64; 2] = target_loc.into();
-        let cell_element =
-            CellElement::from_string(&cell_element).expect(&format!("Unsupported cell_element: '{}'", cell_element));
+        let cell_element = CellElement::from_string(&cell_element)
+            .expect(&format!("Unsupported cell_element: '{}'", cell_element));
         self._grid.anchor_inplace(&target_loc, cell_element);
     }
 
@@ -1272,20 +1279,13 @@ struct PyO3HexGrid {
 #[pymethods]
 impl PyO3HexGrid {
     #[new]
-    fn new(
-        cellsize: f64,
-        orientation: &str,
-        offset: (f64, f64),
-        rotation: f64,
-    ) -> PyResult<Self> {
+    fn new(cellsize: f64, orientation: &str, offset: (f64, f64), rotation: f64) -> PyResult<Self> {
         match Orientation::from_string(orientation) {
             Some(orientation) => {
                 let mut _grid = hex_grid::HexGrid::new(cellsize, orientation);
                 _grid.set_offset(offset.into());
                 _grid.set_rotation(rotation);
-                Ok(PyO3HexGrid {
-                    _grid,
-                })
+                Ok(PyO3HexGrid { _grid })
             }
             None => Err(PyException::new_err(format!(
                 "Unrecognized orientation. Use 'Flat' or 'Pointy'. Got {}",
@@ -1346,6 +1346,14 @@ impl PyO3HexGrid {
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
         &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
+    }
+
+    fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3TriGrid {
+        let new_grid = self._grid.subdivide(factor);
+        let Grid::TriGrid(sub_grid) = new_grid else {
+            panic!("Expected a TriGrid, got {:?}", new_grid);
+        };
+        PyO3TriGrid { _grid: sub_grid }
     }
 
     fn anchor<'py>(

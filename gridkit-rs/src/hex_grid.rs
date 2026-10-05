@@ -18,11 +18,11 @@ pub struct HexGrid {
 impl PartialEq for HexGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        self.cellsize.to_bits() == other.cellsize.to_bits()
-            && self.offset[0].to_bits() == other.offset[0].to_bits()
-            && self.offset[1].to_bits() == other.offset[1].to_bits()
+        is_close(self.cellsize, other.cellsize)
+            && is_close(self.offset[0], other.offset[0])
+            && is_close(self.offset[1], other.offset[1])
+            && is_close(self._rotation, other._rotation)
             && self.orientation == other.orientation
-            && self._rotation.to_bits() == other._rotation.to_bits()
     }
 }
 
@@ -457,11 +457,11 @@ impl GridTraits for HexGrid {
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
         if let Grid::HexGrid(other) = other {
-            if !isclose(self.cellsize, other.cellsize) {
+            if !is_close(self.cellsize, other.cellsize) {
                 return false;
             }
-            if !(isclose(self.offset()[0], other.offset()[0])
-                && isclose(self.offset()[1], other.offset()[1]))
+            if !(is_close(self.offset()[0], other.offset()[0])
+                && is_close(self.offset()[1], other.offset()[1]))
             {
                 return false;
             }

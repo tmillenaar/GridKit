@@ -842,6 +842,9 @@ def test_subdivide(factor, rotation, offset, crs):
     else:
         assert grid.crs.is_exact_same(subgrid.crs)
 
+    # Make sure the rust implementation is the same
+    assert subgrid._grid.equals(grid._grid.subdivide(factor))
+
 
 @pytest.mark.parametrize("side_length", [0.1, 123, 987.6])
 def test_init_side_length(side_length):
