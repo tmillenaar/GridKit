@@ -668,6 +668,9 @@ def test_subdivide(factor, rotation, offset, crs):
     else:
         assert grid.crs.is_exact_same(subgrid.crs)
 
+    # Make sure the rust implementation is the same
+    assert subgrid._grid.equals(grid._grid.subdivide(factor))
+
 
 @pytest.mark.parametrize("shape", [(3, 2), (3, 4), (5, 5)])
 @pytest.mark.parametrize("cell_shape", ["flat", "pointy"])

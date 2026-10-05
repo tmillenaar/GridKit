@@ -17,11 +17,11 @@ pub struct RectGrid {
 impl PartialEq for RectGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        self._dx.to_bits() == other._dx.to_bits()
-            && self._dy.to_bits() == other._dy.to_bits()
-            && self.offset[0].to_bits() == other.offset[0].to_bits()
-            && self.offset[1].to_bits() == other.offset[1].to_bits()
-            && self._rotation.to_bits() == other._rotation.to_bits()
+        is_close(self._dx, other._dx)
+            && is_close(self._dy, other._dy)
+            && is_close(self.offset[0], other.offset[0])
+            && is_close(self.offset[1], other.offset[1])
+            && is_close(self._rotation, other._rotation)
     }
 }
 
@@ -250,13 +250,11 @@ impl GridTraits for RectGrid {
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
         if let Grid::RectGrid(other) = other {
-            if !isclose(self.dx(), other.dx())
-                || !isclose(self.dy(), other.dy())
-            {
+            if !is_close(self.dx(), other.dx()) || !is_close(self.dy(), other.dy()) {
                 return false;
             }
-            if !(isclose(self.offset()[0], other.offset()[0])
-                && isclose(self.offset()[1], other.offset()[1]))
+            if !(is_close(self.offset()[0], other.offset()[0])
+                && is_close(self.offset()[1], other.offset()[1]))
             {
                 return false;
             }

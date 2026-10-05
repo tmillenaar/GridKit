@@ -1,7 +1,7 @@
 use crate::hex_grid::*;
 use crate::rect_grid::*;
 use crate::tri_grid::*;
-use crate::utils::{isclose, NUMERIC_ATOL, NUMERIC_RTOL};
+use crate::utils::{is_close, NUMERIC_ATOL, NUMERIC_RTOL};
 use enum_delegate;
 use ndarray::*;
 

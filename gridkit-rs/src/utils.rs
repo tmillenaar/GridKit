@@ -17,26 +17,26 @@ pub fn normalize_offset(offset: [f64; 2], dx: f64, dy: f64) -> [f64; 2] {
     [offset_x, offset_y]
 }
 
-/// Relative tolerance used as `numpy.isclose` default.
+/// Relative tolerance used as `numpy.is_close` default.
 pub const NUMERIC_RTOL: f64 = 1e-5;
-/// Absolute tolerance used as `numpy.isclose` default.
+/// Absolute tolerance used as `numpy.is_close` default.
 pub const NUMERIC_ATOL: f64 = 1e-8;
 
-/// Compare two floats the way `numpy.isclose` does: `|a - b| <= atol + rtol * |b|`.
-pub fn isclose_with_atol_and_rtol(a: f64, b: f64, rtol: f64, atol: f64) -> bool {
+/// Compare two floats the way `numpy.is_close` does: `|a - b| <= atol + rtol * |b|`.
+pub fn is_close_with_atol_and_rtol(a: f64, b: f64, rtol: f64, atol: f64) -> bool {
     (a - b).abs() <= atol + rtol * b.abs()
 }
 
-pub fn isclose_with_rtol(a: f64, b: f64, rtol: f64) -> bool {
-    isclose_with_atol_and_rtol(a, b, rtol, NUMERIC_ATOL)
+pub fn is_close_with_rtol(a: f64, b: f64, rtol: f64) -> bool {
+    is_close_with_atol_and_rtol(a, b, rtol, NUMERIC_ATOL)
 }
 
-pub fn isclose_with_atol(a: f64, b: f64, atol: f64) -> bool {
-    isclose_with_atol_and_rtol(a, b, NUMERIC_RTOL, atol)
+pub fn is_close_with_atol(a: f64, b: f64, atol: f64) -> bool {
+    is_close_with_atol_and_rtol(a, b, NUMERIC_RTOL, atol)
 }
 
-pub fn isclose(a: f64, b: f64) -> bool {
-    isclose_with_atol_and_rtol(a, b, NUMERIC_RTOL, NUMERIC_ATOL)
+pub fn is_close(a: f64, b: f64) -> bool {
+    is_close_with_atol_and_rtol(a, b, NUMERIC_RTOL, NUMERIC_ATOL)
 }
 
 pub fn rotation_matrix_from_angle(angle_deg: f64) -> Array2<f64> {
