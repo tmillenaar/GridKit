@@ -1199,6 +1199,46 @@ impl PyO3RectGrid {
         self._grid.cell_at_points(&points).into_pyarray(py)
     }
 
+    fn relative_neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: u64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        }
+    }
+
+    fn neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: u64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        }
+    }
+
     fn cell_corners<'py>(
         &self,
         py: Python<'py>,
@@ -1349,6 +1389,46 @@ impl PyO3HexGrid {
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
         self._grid.cell_at_points(&points).into_pyarray(py)
+    }
+
+    fn relative_neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: u64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, false)
+                .into_pyarray(py)
+        }
+    }
+
+    fn neighbours<'py>(
+        &self,
+        py: Python<'py>,
+        index: PyReadonlyArray2<'py, i64>,
+        depth: u64,
+        connect_corners: bool,
+        include_selected: bool,
+    ) -> &'py PyArray3<i64> {
+        let index = index.as_array();
+        if connect_corners {
+            self._grid
+                .all_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        } else {
+            self._grid
+                .direct_neighbours(&index, depth, include_selected, true)
+                .into_pyarray(py)
+        }
     }
 
     fn cell_corners<'py>(

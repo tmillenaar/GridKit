@@ -357,58 +357,16 @@ class HexGrid(BaseGrid):
         :py:meth:`.RectGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
-        depth = int(depth)
-        if depth < 1:
-            raise ValueError("'depth' cannot be lower than 1")
-
-        original_shape = index.shape
-        index = numpy.array(index.ravel())
-        if index.ndim == 1:
-            index = index[None]
-
-        nr_neighbours = (
-            sum(6 * numpy.arange(1, depth + 1)) + 1
-        )  # Add 1 for the first cell
-        nr_indices = len(index)
-        neighbours = numpy.empty((nr_indices, nr_neighbours, 2), dtype=int)
-        start_slice = 0
-        rows = range(depth, -1, -1)
-
-        # create top half of selection
-        for i, row in enumerate(rows):  # loop from top row to bottom row
-            row_length = depth + i + 1
-            row_slice = slice(start_slice, start_slice + row_length)
-            max_val = int(numpy.floor(row_length / 2))
-            if self._orientation == "pointy":
-                pointy_axis = 1
-                flat_axis = 0
-            elif self._orientation == "flat":
-                pointy_axis = 0
-                flat_axis = 1
-
-            if (i % 2 == 0) == (depth % 2 == 0):
-                neighbours[:, row_slice, flat_axis] = range(-max_val, max_val + 1)
-            else:
-                odd_mask = index[:, pointy_axis] % 2 != 0
-                neighbours[odd_mask, row_slice, flat_axis] = range(
-                    -max_val + 1, max_val + 1
-                )
-                neighbours[~odd_mask, row_slice, flat_axis] = range(-max_val, max_val)
-            neighbours[:, row_slice, pointy_axis] = row
-            start_slice += row_length
-
-        # mirror top half to bottom half (leaving the center row be)
-        neighbours[:, start_slice:] = neighbours[:, 0 : start_slice - row_length][
-            :, ::-1
-        ]
-        neighbours[:, start_slice:, pointy_axis] *= -1
-
-        if include_selected is False:
-            center_cell = int(numpy.floor(neighbours.shape[1] / 2))
-            neighbours = numpy.delete(neighbours, center_cell, 1)
-
-        neighbours = neighbours.reshape(*original_shape, *neighbours.shape[-2:])
-        return GridIndex(neighbours.squeeze())
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        result = self._grid.relative_neighbours(
+            index,
+            depth=int(depth),
+            connect_corners=connect_corners,
+            include_selected=include_selected,
+        )
+        return GridIndex(result)
 
     @validate_index
     def centroid(self, index=None):

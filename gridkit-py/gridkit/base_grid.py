@@ -280,27 +280,16 @@ class BaseGrid(metaclass=abc.ABCMeta):
         :py:meth:`.HexGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
-        original_shape = index.shape
-        index = index.ravel()
-
-        neighbours = self.relative_neighbours(
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
+        )
+        result = self._grid.neighbours(
+            index,
             depth=depth,
             connect_corners=connect_corners,
             include_selected=include_selected,
-            index=index,
         )
-
-        if len(index.index.shape) == 1:
-            return neighbours + index
-
-        # neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)
-        neighbours = numpy.swapaxes(neighbours, 0, 1)
-        neighbours = neighbours + index
-        neighbours = numpy.swapaxes(neighbours, 0, 1)
-
-        return GridIndex(
-            neighbours.reshape(*original_shape, *neighbours.shape[-2:]).squeeze()
-        )
+        return GridIndex(result)
 
     @abc.abstractmethod
     def cell_at_point(self, point: numpy.ndarray) -> tuple:

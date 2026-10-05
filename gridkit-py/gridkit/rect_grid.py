@@ -301,32 +301,16 @@ class RectGrid(BaseGrid):
         :py:meth:`.HexGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
-        depth = int(depth)
-        if depth < 1:
-            raise ValueError("'depth' cannot be lower than 1")
-
-        neighbours = numpy.empty(((2 * depth + 1) ** 2, 2), dtype=int)
-
-        relative_ids_1d = numpy.arange(-depth, depth + 1)
-        relative_x, relative_y = numpy.meshgrid(relative_ids_1d, relative_ids_1d[::-1])
-        neighbours[:, 0], neighbours[:, 1] = numpy.ravel(relative_x), numpy.ravel(
-            relative_y
+        index = (
+            index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )
-
-        if not connect_corners:
-            mask = abs(numpy.multiply(*neighbours.T)) < depth
-            neighbours = neighbours[mask]
-
-        if include_selected is False:
-            center_cell = int(numpy.floor(len(neighbours) / 2))
-            neighbours = numpy.delete(neighbours, center_cell, 0)
-
-        if index is not None:
-            index = numpy.array(index)
-            if len(index.shape) == 2:
-                neighbours = numpy.repeat(neighbours[numpy.newaxis], len(index), axis=0)
-
-        return GridIndex(neighbours)
+        result = self._grid.relative_neighbours(
+            index,
+            depth=int(depth),
+            connect_corners=connect_corners,
+            include_selected=include_selected,
+        )
+        return GridIndex(result)
 
     @validate_index
     def centroid(self, index=None):
