@@ -398,27 +398,16 @@
 <span class="sd">        :py:meth:`.HexGrid.relative_neighbours`</span>
 <span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
 <span class="sd">        """</span>
-        <span class="n">original_shape</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span>
-            <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
+        <span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_grid</span><span class="o">.</span><span class="n">neighbours</span><span class="p">(</span>
+            <span class="n">index</span><span class="p">,</span>
+            <span class="n">depth</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">depth</span><span class="p">),</span>
             <span class="n">connect_corners</span><span class="o">=</span><span class="n">connect_corners</span><span class="p">,</span>
             <span class="n">include_selected</span><span class="o">=</span><span class="n">include_selected</span><span class="p">,</span>
-            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">index</span>
-
-        <span class="c1"># neighbours = numpy.repeat(neighbours[:, numpy.newaxis], len(index), axis=1)</span>
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">neighbours</span> <span class="o">+</span> <span class="n">index</span>
-        <span class="n">neighbours</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">neighbours</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span>
-            <span class="n">neighbours</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="n">original_shape</span><span class="p">,</span> <span class="o">*</span><span class="n">neighbours</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">GridIndex</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BaseGrid.cell_at_point">
