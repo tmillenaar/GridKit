@@ -143,7 +143,7 @@ pub trait GridTraits {
     fn all_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64>;
@@ -158,7 +158,7 @@ pub trait GridTraits {
     fn direct_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64>;
@@ -197,27 +197,6 @@ pub fn grid_type_name(grid: &Grid) -> &'static str {
         Grid::TriGrid(_) => "TriGrid",
         Grid::RectGrid(_) => "RectGrid",
         Grid::HexGrid(_) => "HexGrid",
-    }
-}
-
-/// The `cellsize` of a grid.
-///
-/// `RectGrid` is included for exhaustiveness, even though it compares `dx`/`dy`
-/// in its own `is_aligned_with`.
-fn cellsize_of(grid: &Grid) -> f64 {
-    match grid {
-        Grid::TriGrid(grid) => grid.cellsize,
-        Grid::RectGrid(grid) => grid.dx(),
-        Grid::HexGrid(grid) => grid.cellsize,
-    }
-}
-
-/// The `orientation` of a grid, or `None` for a `RectGrid`.
-fn orientation_of(grid: &Grid) -> Option<&Orientation> {
-    match grid {
-        Grid::TriGrid(grid) => Some(&grid.orientation),
-        Grid::RectGrid(_) => None,
-        Grid::HexGrid(grid) => Some(&grid.orientation),
     }
 }
 

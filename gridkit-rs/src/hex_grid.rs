@@ -406,7 +406,7 @@ impl GridTraits for HexGrid {
     fn all_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
@@ -419,7 +419,7 @@ impl GridTraits for HexGrid {
     fn direct_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
@@ -427,15 +427,15 @@ impl GridTraits for HexGrid {
     }
 
     fn subdivide(&self, factor: u64) -> Grid {
-        // A hexagon cannot be tiled by smaller hexagons, so Python returns a
-        // *TriGrid* from `HexGrid.subdivide` to keep the alignment exact. The
+        // A hexagon cannot be tiled by smaller hexagons, so a *TriGrid* is
+        // returned from `HexGrid.subdivide` to keep the alignment exact. The
         // triangle edge length is the hexagon radius, so the sub grid's `size`
         // (which for a TriGrid is the side length) is `self.radius() / factor`.
         if factor == 0 {
             return Grid::HexGrid(self.clone());
         }
 
-        // Python adds 30 degrees for 'pointy' orientation and keeps the rotation
+        // Add 30 degrees for 'pointy' orientation and keep the rotation
         // for 'flat', so the triangular cells line up with the hexagon corners.
         let extra_rotation = match self.orientation {
             Orientation::Pointy => 30.,
@@ -446,9 +446,8 @@ impl GridTraits for HexGrid {
         sub_grid.set_rotation(self.rotation() + extra_rotation);
         sub_grid.set_offset(self.offset());
 
-        // Anchor the sub grid to the top corner of the parent's cell (0, 0), as
-        // Python's `HexGrid.subdivide` does. The corner is taken from the *parent*,
-        // so it is unaffected by the cellsize change above.
+        // Anchor the sub grid to the top corner of the parent's cell (0, 0). The corner
+        // is taken from the *parent*, so it is unaffected by the cellsize change above.
         let corners = self.cell_corners(&array![[0i64, 0i64]].view());
         let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
         sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
@@ -481,21 +480,13 @@ impl GridTraits for HexGrid {
 
 impl HexGrid {
     /// Shared implementation of the `GridTraits` neighbour methods.
-    ///
-    /// Port of `HexGrid.relative_neighbours` in `gridkit/hex_grid.py`. Python
-    /// builds the top half of the hexagonal window row by row, mirrors it to get
-    /// the bottom half, and deletes the centre cell unless `include_selected`.
-    /// Because the rows are offset for cells on an odd row, the result depends on
-    /// the parity of the requested cell's index on the `pointy` axis.
     fn _neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
-        // Python raises `ValueError("'depth' cannot be lower than 1")`.
-        assert!(depth >= 1, "'depth' cannot be lower than 1");
         let add_cell_id = add_cell_id as i64;
 
         // Python sizes the array as `sum(6 * arange(1, depth + 1)) + 1`, i.e.
@@ -541,7 +532,7 @@ impl HexGrid {
 
                 for flat_id in lo..hi {
                     cell_slice[start_slice][flat_axis] = flat_id;
-                    cell_slice[start_slice][pointy_axis] = row;
+                    cell_slice[start_slice][pointy_axis] = row as i64;
                     start_slice += 1;
                 }
             }
@@ -563,7 +554,7 @@ impl HexGrid {
             // remaining cells keep their order; the final slot is then unused.
             if !include_selected {
                 let centre = nr_neighbours / 2;
-                assert_eq!((cell_slice[centre][0], cell_slice[centre][1]), (0, 0));
+                debug_assert_eq!((cell_slice[centre][0], cell_slice[centre][1]), (0, 0));
                 for i in centre..nr_neighbours - 1 {
                     cell_slice[i] = cell_slice[i + 1];
                 }
@@ -653,7 +644,7 @@ mod tests {
     }
 
     fn assert_ids_3d(result: &Array3<i64>, expected: &[i64]) {
-        assert_eq!(result.shape()[2], 2);
+        assert_eq!(result.shape()[2], 2); // xy coordinates in last axis
         assert_eq!(result.len(), expected.len());
         let mut flat = Vec::with_capacity(result.len());
         for cell in 0..result.shape()[0] {
@@ -670,9 +661,34 @@ mod tests {
     // ---------------------------------------------------------------------
 
     #[test]
+    fn direct_neighbours_depth_zero() {
+        // No neighbours in case depth is set to 0
+        let grid = HexGrid::new(3., Orientation::Pointy);
+        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 0, false, false);
+        assert_eq!(neighbours.shape(), &[1, 0, 2]);
+        assert_ids_3d(&neighbours, &[]);
+    }
+
+    #[test]
+    fn direct_neighbours_depth_zero_with_self() {
+        // No neighbours in case depth is set to 0
+        let grid = HexGrid::new(3., Orientation::Pointy);
+        let neighbours = grid.direct_neighbours(&array![[0i64, -1i64]].view(), 0, true, true);
+        assert_eq!(neighbours.shape(), &[1, 1, 2]);
+        assert_ids_3d(&neighbours, &[0, -1]);
+    }
+
+    #[test]
+    fn direct_neighbours_depth_zero_with_self_relative() {
+        // No neighbours in case depth is set to 0
+        let grid = HexGrid::new(3., Orientation::Pointy);
+        let neighbours = grid.direct_neighbours(&array![[0i64, -1i64]].view(), 0, true, false);
+        assert_eq!(neighbours.shape(), &[1, 1, 2]);
+        assert_ids_3d(&neighbours, &[0, 0]);
+    }
+
+    #[test]
     fn direct_neighbours_depth_one() {
-        // The doctest of `HexGrid.relative_neighbours`: the 6 neighbours of a
-        // pointy cell (0, 0).
         let grid = HexGrid::new(3., Orientation::Pointy);
         let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
         assert_eq!(neighbours.shape(), &[1, 6, 2]);
@@ -890,13 +906,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "'depth' cannot be lower than 1")]
-    fn depth_below_one_is_rejected() {
-        let grid = HexGrid::new(1., Orientation::Pointy);
-        grid.direct_neighbours(&array![[0i64, 0i64]].view(), 0, false, false);
-    }
-
-    #[test]
     fn neighbours_are_reachable_through_the_grid_enum() {
         // `all_neighbours`/`direct_neighbours` are `GridTraits` methods, so
         // `enum_delegate` has to forward them for `Grid` to be usable with them.
@@ -1013,7 +1022,7 @@ mod tests {
                         let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
                         let candidates = sub_grid.all_neighbours(
                             &array![[start[0], start[1]]].view(),
-                            factor as i64 + 1,
+                            factor + 1,
                             true,
                             true,
                         );

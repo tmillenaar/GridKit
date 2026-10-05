@@ -1028,7 +1028,7 @@ impl PyO3TriGrid {
         &self,
         py: Python<'py>,
         index: PyReadonlyArray2<'py, i64>,
-        depth: i64,
+        depth: u64,
         connect_corners: bool,
         include_selected: bool,
     ) -> &'py PyArray3<i64> {
@@ -1048,7 +1048,7 @@ impl PyO3TriGrid {
         &self,
         py: Python<'py>,
         index: PyReadonlyArray2<'py, i64>,
-        depth: i64,
+        depth: u64,
         connect_corners: bool,
         include_selected: bool,
     ) -> &'py PyArray3<i64> {
