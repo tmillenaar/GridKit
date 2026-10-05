@@ -127,7 +127,7 @@ impl<
         let dx = (bounds.2 - bounds.0) / nx as f64;
         let dy = (bounds.3 - bounds.1) / ny as f64;
         let mut grid = RectGrid::new(dx, dy);
-        let start_cell_centroid = [bounds.0 + dx/2., bounds.1+dy/2.];
+        let start_cell_centroid = [bounds.0 + dx / 2., bounds.1 + dy / 2.];
         grid.anchor_inplace(&start_cell_centroid, CellElement::Centroid);
         let start_id = grid.cell_at_point(&start_cell_centroid);
         let tile = Tile {

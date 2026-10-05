@@ -1,6 +1,7 @@
 use crate::hex_grid::*;
 use crate::rect_grid::*;
 use crate::tri_grid::*;
+use crate::utils::{isclose, NUMERIC_ATOL, NUMERIC_RTOL};
 use enum_delegate;
 use ndarray::*;
 
@@ -162,18 +163,11 @@ pub trait GridTraits {
         add_cell_id: bool,
     ) -> Array3<i64>;
 
-    /// Check whether this grid is aligned with `other` and, if it is not, why.
+    /// Check whether this grid is aligned with `other`.
     ///
     /// Grids are considered aligned when they are the same type of grid and
-    /// their CRS, cellsize, offset and rotation are the same.
-    ///
-    /// Returns a tuple containing a boolean and a string. The boolean indicates
-    /// whether or not the grids are aligned, the string contains the reason for
-    /// the misalignment and is empty when the grids are aligned.
-    ///
-    /// Mirrors `BaseGrid.is_aligned_with` in `gridkit/base_grid.py`. Note that
-    /// the CRS is not part of the Rust grid, so the CRS is not compared here.
-    fn is_aligned_with(&self, other: &Grid) -> (bool, String);
+    /// their cellsize/dx-dy, offset and rotation are the same.
+    fn is_aligned_with(&self, other: &Grid) -> bool;
 
     /// Create a new grid that is `factor` times finer than this grid and that
     /// aligns perfectly with it.
@@ -181,23 +175,9 @@ pub trait GridTraits {
     /// The number of cells grows quadratically with `factor`: a `factor` of 2
     /// results in 4 cells that fit in the original, a `factor` of 3 in 9.
     ///
-    /// `factor` is unsigned, so there are no negative factors. A `factor` of 0
-    /// would divide the cellsize by zero, so it yields an unchanged copy of this
-    /// grid rather than a grid with infinitely small cells. Note that Python's
-    /// `RectGrid.subdivide` raises a `ValueError` for a `factor` below 1, so this
-    /// is a deliberate divergence.
-    ///
-    /// Mirrors `RectGrid.subdivide` in `gridkit/rect_grid.py`.
-    fn subdivide(&self, factor: u64) -> Self
-    where
-        Self: Sized;
-    // fn linear_interpolation(
-    //     &self,
-    //     sample_points: &ArrayView2<f64>,
-    //     nearby_value_locations: &ArrayView3<f64>,
-    //     nearby_values: &ArrayView2<f64>,
-    //     nodata_value: f64,
-    // ) -> Array1<f64>;
+    /// A `factor` of 0 would divide the cellsize by zero, so it yields an unchanged
+    /// copy of this grid rather than a grid with infinitely small cells.
+    fn subdivide(&self, factor: u64) -> Grid;
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
@@ -217,6 +197,27 @@ pub fn grid_type_name(grid: &Grid) -> &'static str {
         Grid::TriGrid(_) => "TriGrid",
         Grid::RectGrid(_) => "RectGrid",
         Grid::HexGrid(_) => "HexGrid",
+    }
+}
+
+/// The `cellsize` of a grid.
+///
+/// `RectGrid` is included for exhaustiveness, even though it compares `dx`/`dy`
+/// in its own `is_aligned_with`.
+fn cellsize_of(grid: &Grid) -> f64 {
+    match grid {
+        Grid::TriGrid(grid) => grid.cellsize,
+        Grid::RectGrid(grid) => grid.dx(),
+        Grid::HexGrid(grid) => grid.cellsize,
+    }
+}
+
+/// The `orientation` of a grid, or `None` for a `RectGrid`.
+fn orientation_of(grid: &Grid) -> Option<&Orientation> {
+    match grid {
+        Grid::TriGrid(grid) => Some(&grid.orientation),
+        Grid::RectGrid(_) => None,
+        Grid::HexGrid(grid) => Some(&grid.orientation),
     }
 }
 

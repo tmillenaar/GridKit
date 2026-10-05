@@ -17,11 +17,11 @@ pub struct RectGrid {
 impl PartialEq for RectGrid {
     // Needs manual implementation, derive PartialEq does not work on floats because of NaN etc.
     fn eq(&self, other: &Self) -> bool {
-        self._dx.to_bits() == other._dx.to_bits() &&
-        self._dy.to_bits() == other._dy.to_bits() &&
-        self.offset[0].to_bits() == other.offset[0].to_bits() &&
-        self.offset[1].to_bits() == other.offset[1].to_bits() &&
-        self._rotation.to_bits() == other._rotation.to_bits()
+        self._dx.to_bits() == other._dx.to_bits()
+            && self._dy.to_bits() == other._dy.to_bits()
+            && self.offset[0].to_bits() == other.offset[0].to_bits()
+            && self.offset[1].to_bits() == other.offset[1].to_bits()
+            && self._rotation.to_bits() == other._rotation.to_bits()
     }
 }
 
@@ -119,6 +119,8 @@ impl GridTraits for RectGrid {
         let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
         for cell_id in 0..points.shape()[0] {
             let point = points.slice(s![cell_id, ..]);
+            // FIXME: Rotation causes slowdown even when 0.
+            //        Consider a separate version of the function that does not do rotation
             let point = self._rotation_matrix_inv.dot(&point);
             let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
             let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
@@ -246,52 +248,30 @@ impl GridTraits for RectGrid {
         self._neighbours(index, depth, include_selected, add_cell_id, true)
     }
 
-    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
-        if !matches!(other, Grid::RectGrid(_)) {
-            return (
-                false,
-                format!(
-                    "Grid type is not the same. This is a RectGrid, the other is a {}",
-                    grid_type_name(other)
-                ),
-            );
+    fn is_aligned_with(&self, other: &Grid) -> bool {
+        if let Grid::RectGrid(other) = other {
+            if !isclose(self.dx(), other.dx())
+                || !isclose(self.dy(), other.dy())
+            {
+                return false;
+            }
+            if !(isclose(self.offset()[0], other.offset()[0])
+                && isclose(self.offset()[1], other.offset()[1]))
+            {
+                return false;
+            }
+            if self.rotation() != other.rotation() {
+                return false;
+            }
+            true
+        } else {
+            false
         }
-
-        let mut reasons: Vec<&str> = Vec::new();
-
-        // Python compares `size` when both grids have one and falls back to
-        // `dx`/`dy` otherwise. `size` is set exactly when `dx` and `dy` are
-        // equal, so comparing `dx` and `dy` covers both branches.
-        if !isclose(self.dx(), other.dx(), NUMERIC_RTOL, NUMERIC_ATOL)
-            || !isclose(self.dy(), other.dy(), NUMERIC_RTOL, NUMERIC_ATOL)
-        {
-            reasons.push("cellsize");
-        }
-
-        // FIXME: the 1e-7 tolerance is a bandaid, taken from Python. The offset
-        //        seems to depend slightly on the bounds after resampling.
-        if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
-            && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
-        {
-            reasons.push("offset");
-        }
-
-        if self.rotation() != other.rotation() {
-            reasons.push("rotation");
-        }
-
-        if reasons.is_empty() {
-            return (true, String::new());
-        }
-        (
-            false,
-            format!("The following attributes are not the same: {reasons:?}"),
-        )
     }
 
-    fn subdivide(&self, factor: u64) -> Self {
+    fn subdivide(&self, factor: u64) -> Grid {
         if factor == 0 {
-            return self.clone();
+            return Grid::RectGrid(self.clone());
         }
         let factor = factor as f64;
 
@@ -310,7 +290,7 @@ impl GridTraits for RectGrid {
         let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
         sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
 
-        sub_grid
+        Grid::RectGrid(sub_grid)
     }
 }
 
@@ -1163,6 +1143,10 @@ mod tests {
 
         for factor in [1u64, 2, 3, 9] {
             let sub_grid = grid.subdivide(factor);
+            let sub_grid = match sub_grid {
+                Grid::RectGrid(g) => g,
+                _ => panic!("subdivide on RectGrid should return RectGrid"),
+            };
             assert_close(sub_grid.dx(), 1. / factor as f64, TOL);
             assert_close(sub_grid.dy(), 0.7 / factor as f64, TOL);
         }
@@ -1178,14 +1162,18 @@ mod tests {
 
                 for factor in [2u64, 9] {
                     let sub_grid = grid.subdivide(factor);
+                    let sub_grid_ref = match &sub_grid {
+                        Grid::RectGrid(g) => g.clone(),
+                        _ => panic!("subdivide on RectGrid should return RectGrid"),
+                    };
 
                     // Take the last corner of a cell and check that it coincides
                     // with one of the corners of the sub cell containing it.
                     let corners = grid.cell_corners(&array![[-4i64, 23i64]].view());
                     let corner = [corners[[0, 3, 0]], corners[[0, 3, 1]]];
 
-                    let id = sub_grid.cell_at_point(&corner);
-                    let sub_corners = sub_grid.cell_corners(&array![[id[0], id[1]]].view());
+                    let id = sub_grid_ref.cell_at_point(&corner);
+                    let sub_corners = sub_grid_ref.cell_corners(&array![[id[0], id[1]]].view());
                     let on_corner = (0..4).any(|i| {
                         let dx = sub_corners[[0, i, 0]] - corner[0];
                         let dy = sub_corners[[0, i, 1]] - corner[1];
@@ -1211,20 +1199,24 @@ mod tests {
                     grid.set_offset(offset);
 
                     let sub_grid = grid.subdivide(factor);
+                    let sub_grid_ref = match &sub_grid {
+                        Grid::RectGrid(g) => g.clone(),
+                        _ => panic!("subdivide on RectGrid should return RectGrid"),
+                    };
 
                     // The sub cells that could possibly be inside the parent cell
                     // (3, -2) are the (2 * factor + 1)^2 sub cells around the one
                     // holding the parent centroid.
                     let target = grid.centroid(&array![[3i64, -2i64]].view());
-                    let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
-                    let candidates = sub_grid.all_neighbours(
+                    let start = sub_grid_ref.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
+                    let candidates = sub_grid_ref.all_neighbours(
                         &array![[start[0], start[1]]].view(),
                         factor as i64,
                         true,
                         true,
                     );
 
-                    let sub_centroids = sub_grid.centroid(&candidates.slice(s![0, .., ..]));
+                    let sub_centroids = sub_grid_ref.centroid(&candidates.slice(s![0, .., ..]));
                     let in_cell = grid.cell_at_points(&sub_centroids.view());
                     let nr_in_cell = (0..in_cell.shape()[0])
                         .filter(|i| in_cell[[*i, 0]] == 3 && in_cell[[*i, 1]] == -2)
@@ -1246,7 +1238,7 @@ mod tests {
         grid.set_rotation(15.5);
         grid.set_offset([0.1, 0.2]);
 
-        assert_eq!(grid.subdivide(1), grid);
+        assert_eq!(grid.subdivide(1), Grid::RectGrid(grid.clone()));
     }
 
     #[test]
@@ -1259,7 +1251,7 @@ mod tests {
         grid.set_rotation(15.5);
         grid.set_offset([0.1, 0.2]);
 
-        assert_eq!(grid.subdivide(0), grid);
+        assert_eq!(grid.subdivide(0), Grid::RectGrid(grid));
     }
 
     // ---------------------------------------------------------------------
@@ -1274,9 +1266,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
         let other = RectGrid::new(1.2, 1.2);
 
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(aligned);
-        assert_eq!(reason, "");
+        assert!(grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1284,9 +1274,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
 
         for other in [RectGrid::new(1.2, 1.3), RectGrid::new(1.3, 1.2)] {
-            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("cellsize"), "{reason}");
+            assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
         }
     }
 
@@ -1297,9 +1285,7 @@ mod tests {
         for offset in [[0., 1.], [1., 0.]] {
             let mut other = RectGrid::new(1.2, 1.2);
             other.set_offset(offset);
-            let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("offset"), "{reason}");
+            assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
         }
     }
 
@@ -1308,10 +1294,7 @@ mod tests {
         let grid = RectGrid::new(1.2, 1.2);
         let mut other = RectGrid::new(1.2, 1.2);
         other.set_rotation(15.5);
-
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("rotation"), "{reason}");
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1323,26 +1306,16 @@ mod tests {
             Grid::TriGrid(TriGrid::new(1., Orientation::Flat)),
         ];
         for other in others {
-            let (aligned, reason) = grid.is_aligned_with(&other);
-            assert!(!aligned);
-            assert!(reason.contains("Grid type is not the same"), "{reason}");
-            assert!(reason.contains("RectGrid"), "{reason}");
-            assert!(reason.contains(grid_type_name(&other)), "{reason}");
+            assert!(!grid.is_aligned_with(&other));
         }
     }
 
     #[test]
     fn is_aligned_with_reports_multiple_reasons() {
-        // The cellsize and offset case of `test_is_aligned_with`. The CRS is
-        // left out because the Rust grid has none.
         let grid = RectGrid::new(1.2, 1.2);
         let mut other = RectGrid::new(1.2, 1.1);
         other.set_offset([1., 1.]);
-
-        let (aligned, reason) = grid.is_aligned_with(&Grid::RectGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("cellsize"), "{reason}");
-        assert!(reason.contains("offset"), "{reason}");
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other)));
     }
 
     #[test]
@@ -1355,8 +1328,8 @@ mod tests {
         let before_grid = (grid.dx(), grid.dy(), grid.offset(), grid.rotation());
         let before_other = (other.dx(), other.dy(), other.offset(), other.rotation());
 
-        assert!(!grid.is_aligned_with(&Grid::RectGrid(other.clone())).0);
-        assert!(!other.is_aligned_with(&Grid::RectGrid(grid.clone())).0);
+        assert!(!grid.is_aligned_with(&Grid::RectGrid(other.clone())));
+        assert!(!other.is_aligned_with(&Grid::RectGrid(grid.clone())));
 
         assert_eq!(
             before_grid,
@@ -1379,7 +1352,7 @@ mod tests {
             grid.is_aligned_with(&other),
             RectGrid::new(1.2, 1.2).is_aligned_with(&other)
         );
-        assert!(!grid.is_aligned_with(&other).0);
+        assert!(!grid.is_aligned_with(&other));
     }
 
     #[test]
