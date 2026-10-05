@@ -417,10 +417,12 @@ impl GridTraits for TriGrid {
     fn all_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
+        let depth = depth as i64;
+
         let add_cell_id = add_cell_id as i64;
         let mut total_nr_neighbours = include_selected as usize;
         let nr_neighbours_factor: usize;
@@ -493,10 +495,11 @@ impl GridTraits for TriGrid {
     fn direct_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
+        let depth = depth as i64;
         let add_cell_id = add_cell_id as i64;
         let mut total_nr_neighbours: usize = include_selected as usize;
 
@@ -861,10 +864,10 @@ mod tests {
         let grid = TriGrid::new(0.7, Orientation::Flat);
         let index = array![[0i64, 0i64]];
 
-        for depth in 1..=6i64 {
+        for depth in 1..=6u64 {
             for connect_corners in [false, true] {
                 let factor = if connect_corners { 4i64 } else { 1i64 };
-                let expected = ((0..depth).map(|i| factor * 3 * (i + 1)).sum::<i64>() + 1) as usize;
+                let expected = ((0..depth).map(|i| factor as i64 * 3 * (i as i64 + 1)).sum::<i64>() + 1) as usize;
 
                 let with = if connect_corners {
                     grid.all_neighbours(&index.view(), depth, true, false)
@@ -897,7 +900,7 @@ mod tests {
             array![[-6i64, 3i64], [4i64, -1i64], [5i64, 4i64], [-5i64, -4i64]],
             array![[-5i64, 3i64], [3i64, -3i64], [4i64, 4i64], [-6i64, -6i64]],
         ] {
-            for depth in 1..=6i64 {
+            for depth in 1..=6u64 {
                 for connect_corners in [false, true] {
                     let max_radius = if connect_corners {
                         1 + 2 * depth
@@ -922,7 +925,7 @@ mod tests {
 
                         for id in &ids {
                             assert!(
-                                (id[0] + id[1]).abs() <= max_radius,
+                                (id[0] + id[1]).abs() <= max_radius as i64,
                                 "cell {id:?} is further than {max_radius} steps away"
                             );
                         }
@@ -937,7 +940,7 @@ mod tests {
         let grid = TriGrid::new(0.7, Orientation::Flat);
         let index = array![[-6i64, 3i64], [4i64, -1i64]];
 
-        for depth in 1..=6i64 {
+        for depth in 1..=6u64 {
             for connect_corners in [false, true] {
                 let with = if connect_corners {
                     grid.all_neighbours(&index.view(), depth, true, false)
@@ -968,7 +971,7 @@ mod tests {
         let grid = TriGrid::new(0.7, Orientation::Flat);
         let index = array![[-6i64, 3i64], [4i64, -1i64], [5i64, 4i64]];
 
-        for depth in 1..=6i64 {
+        for depth in 1..=6u64 {
             for include_selected in [false, true] {
                 let many = grid.all_neighbours(&index.view(), depth, include_selected, true);
 
@@ -1074,7 +1077,7 @@ mod tests {
                     let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
                     let candidates = sub_grid.all_neighbours(
                         &array![[start[0], start[1]]].view(),
-                        factor as i64 + 1,
+                        factor + 1,
                         true,
                         true,
                     );

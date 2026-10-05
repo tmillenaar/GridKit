@@ -231,7 +231,7 @@ impl GridTraits for RectGrid {
     fn all_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
@@ -241,7 +241,7 @@ impl GridTraits for RectGrid {
     fn direct_neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
     ) -> Array3<i64> {
@@ -343,13 +343,14 @@ impl RectGrid {
     fn _neighbours(
         &self,
         index: &ArrayView2<i64>,
-        depth: i64,
+        depth: u64,
         include_selected: bool,
         add_cell_id: bool,
         direct_only: bool,
     ) -> Array3<i64> {
         // Python raises `ValueError("'depth' cannot be lower than 1")`.
         assert!(depth >= 1, "'depth' cannot be lower than 1");
+        let depth = depth as i64;
         let add_cell_id = add_cell_id as i64;
 
         // Python builds the full `(2 * depth + 1)^2` window by raveling a meshgrid in
@@ -951,12 +952,12 @@ mod tests {
 
                 assert_eq!(
                     diamond,
-                    expected_neighbour_count(depth, false, include_selected),
+                    expected_neighbour_count(depth as i64, false, include_selected),
                     "diamond, depth {depth}, include_selected {include_selected}"
                 );
                 assert_eq!(
                     square,
-                    expected_neighbour_count(depth, true, include_selected),
+                    expected_neighbour_count(depth as i64, true, include_selected),
                     "square, depth {depth}, include_selected {include_selected}"
                 );
 
@@ -1211,7 +1212,7 @@ mod tests {
                     let start = sub_grid_ref.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
                     let candidates = sub_grid_ref.all_neighbours(
                         &array![[start[0], start[1]]].view(),
-                        factor as i64,
+                        factor,
                         true,
                         true,
                     );
