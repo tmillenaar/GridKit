@@ -115,7 +115,36 @@ pub trait GridTraits {
     fn cell_height(&self) -> f64;
     fn cell_width(&self) -> f64;
     fn centroid_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2];
-    fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64>;
+
+    /// Coordinates at the center of the cell(s) specified by `index`.
+    ///
+    /// `index` may have any shape as long as its last axis is of length 2 and
+    /// holds the `(x, y)` cell ids. The result has the same shape as `index`.
+    /// This is the Rust equivalent of the numpy `ravel` + `reshape` dance in
+    /// the Python implementation.
+    fn centroid<D>(&self, index: &ArrayView<i64, D>) -> Array<f64, D>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs(index, |index| {
+            let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
+            for cell_id in 0..centroids.shape()[0] {
+                let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                centroids[Ix2(cell_id, 0)] = point[0];
+                centroids[Ix2(cell_id, 1)] = point[1];
+            }
+            if self.rotation() != 0. {
+                let rotation_matrix = self.rotation_matrix();
+                for cell_id in 0..centroids.shape()[0] {
+                    let centroid = centroids.slice(s![cell_id, ..]).to_owned();
+                    let cent_rot = rotation_matrix.dot(&centroid);
+                    centroids.slice_mut(s![cell_id, ..]).assign(&cent_rot);
+                }
+            }
+            centroids
+        })
+    }
+
     fn cell_at_point(&self, point: &[f64; 2]) -> [i64; 2] {
         // Note: convenience function when dealing with a single point. This function
         // moves the point back and forth between the stack and heap so if you have multiple
@@ -124,9 +153,32 @@ pub trait GridTraits {
         let result = self.cell_at_points(&point);
         [result[Ix2(0, 0)], result[Ix2(0, 1)]]
     }
-    fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64>;
-    fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64>;
-    fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64>;
+
+    /// The id of the cell each point falls in.
+    ///
+    /// `points` may have any shape as long as its last axis is of length 2 and
+    /// holds the `(x, y)` coordinates. The result has the same shape as `points`.
+    fn cell_at_points<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D>
+    where
+        D: Dimension;
+
+    /// Coordinates of the corners of the cell(s) specified by `index`.
+    ///
+    /// `index` may have any shape as long as its last axis is of length 2 and
+    /// holds the `(x, y)` cell ids. The result has one dimension more than
+    /// `index`: its leading axes match `index`, followed by `(corner, xy)`.
+    fn cell_corners<D>(&self, index: &ArrayView<i64, D>) -> Array<f64, D::Larger>
+    where
+        D: Dimension;
+
+    /// The cells nearest to the point(s), often used for interpolation.
+    ///
+    /// `points` may have any shape as long as its last axis is of length 2.
+    /// The result has one dimension more than `points`: its leading axes match,
+    /// followed by `(nearby_cell, xy)`.
+    fn cells_near_point<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D::Larger>
+    where
+        D: Dimension;
 
     /// All cells within `depth` steps of `index`, as the full window of cells
     /// around it that stepping along both axes can reach.
@@ -140,13 +192,15 @@ pub trait GridTraits {
     /// `BaseGrid.relative_neighbours(connect_corners=True)` in Python. The shape
     /// of the window is grid specific: a square for `RectGrid`, a hexagon for
     /// `TriGrid`.
-    fn all_neighbours(
+    fn all_neighbours<D>(
         &self,
-        index: &ArrayView2<i64>,
+        index: &ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64>;
+    ) -> Array<i64, D::Larger>
+    where
+        D: Dimension;
 
     /// The cells within `depth` steps of `index` that are also within `depth` steps
     /// measured in the sense of the two axes of this grid type, so the diamond (for
@@ -155,13 +209,15 @@ pub trait GridTraits {
     /// The arguments are the same as for [`GridTraits::all_neighbours`]. Mirrors
     /// `BaseGrid.neighbours(connect_corners=False)` and
     /// `BaseGrid.relative_neighbours(connect_corners=False)` in Python.
-    fn direct_neighbours(
+    fn direct_neighbours<D>(
         &self,
-        index: &ArrayView2<i64>,
+        index: &ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64>;
+    ) -> Array<i64, D::Larger>
+    where
+        D: Dimension;
 
     /// Check whether this grid is aligned with `other`.
     ///

@@ -81,21 +81,33 @@ pub trait TileTraits {
         self.get_tile().combined_tile(other)
     }
 
-    fn grid_id_to_tile_id(&self, grid_ids: &ArrayView2<i64>, oob_value: i64) -> Array2<i64> {
-        let mut tile_ids = Array2::<i64>::zeros((grid_ids.shape()[0], 2));
-        for cell_id in 0..grid_ids.shape()[0] {
-            match self.grid_id_to_tile_id_xy(grid_ids[Ix2(cell_id, 0)], grid_ids[Ix2(cell_id, 1)]) {
-                Ok((col, row)) => {
-                    tile_ids[Ix2(cell_id, 0)] = col;
-                    tile_ids[Ix2(cell_id, 1)] = row;
-                }
-                Err(_e) => {
-                    tile_ids[Ix2(cell_id, 0)] = oob_value;
-                    tile_ids[Ix2(cell_id, 1)] = oob_value;
+    /// Convert grid ids to tile ids.
+    ///
+    /// `grid_ids` may have any shape as long as its last axis is of length 2 and
+    /// holds the `(x, y)` grid ids. The result has the same shape; ids outside
+    /// the tile are set to `oob_value`.
+    fn grid_id_to_tile_id<D>(&self, grid_ids: &ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs(grid_ids, |grid_ids| {
+            let mut tile_ids = Array2::<i64>::zeros((grid_ids.shape()[0], 2));
+            for cell_id in 0..grid_ids.shape()[0] {
+                match self
+                    .grid_id_to_tile_id_xy(grid_ids[Ix2(cell_id, 0)], grid_ids[Ix2(cell_id, 1)])
+                {
+                    Ok((col, row)) => {
+                        tile_ids[Ix2(cell_id, 0)] = col;
+                        tile_ids[Ix2(cell_id, 1)] = row;
+                    }
+                    Err(_e) => {
+                        tile_ids[Ix2(cell_id, 0)] = oob_value;
+                        tile_ids[Ix2(cell_id, 1)] = oob_value;
+                    }
                 }
             }
-        }
-        tile_ids
+            tile_ids
+        })
     }
 
     fn grid_id_to_tile_id_xy(&self, id_x: i64, id_y: i64) -> Result<(i64, i64), String> {
@@ -121,21 +133,33 @@ pub trait TileTraits {
         return Ok((tile_id_y, tile_id_x));
     }
 
-    fn tile_id_to_grid_id(&self, tile_ids: &ArrayView2<i64>, oob_value: i64) -> Array2<i64> {
-        let mut grid_ids = Array2::<i64>::zeros((tile_ids.shape()[0], 2));
-        for cell_id in 0..grid_ids.shape()[0] {
-            match self.tile_id_to_grid_id_xy(tile_ids[Ix2(cell_id, 0)], tile_ids[Ix2(cell_id, 1)]) {
-                Ok((x, y)) => {
-                    grid_ids[Ix2(cell_id, 0)] = x;
-                    grid_ids[Ix2(cell_id, 1)] = y;
-                }
-                Err(_e) => {
-                    grid_ids[Ix2(cell_id, 0)] = oob_value;
-                    grid_ids[Ix2(cell_id, 1)] = oob_value;
+    /// Convert tile ids to grid ids.
+    ///
+    /// `tile_ids` may have any shape as long as its last axis is of length 2 and
+    /// holds the `(row, col)` tile ids. The result has the same shape; ids
+    /// outside the tile are set to `oob_value`.
+    fn tile_id_to_grid_id<D>(&self, tile_ids: &ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs(tile_ids, |tile_ids| {
+            let mut grid_ids = Array2::<i64>::zeros((tile_ids.shape()[0], 2));
+            for cell_id in 0..grid_ids.shape()[0] {
+                match self
+                    .tile_id_to_grid_id_xy(tile_ids[Ix2(cell_id, 0)], tile_ids[Ix2(cell_id, 1)])
+                {
+                    Ok((x, y)) => {
+                        grid_ids[Ix2(cell_id, 0)] = x;
+                        grid_ids[Ix2(cell_id, 1)] = y;
+                    }
+                    Err(_e) => {
+                        grid_ids[Ix2(cell_id, 0)] = oob_value;
+                        grid_ids[Ix2(cell_id, 1)] = oob_value;
+                    }
                 }
             }
-        }
-        grid_ids
+            grid_ids
+        })
     }
 
     fn tile_id_to_grid_id_xy(&self, id_col: i64, id_row: i64) -> Result<(i64, i64), String> {
@@ -587,5 +611,59 @@ pub fn average_data_tiles<
         tile: summed.tile.clone(),
         data: result,
         nodata_value: f64::NAN,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::rect_grid::RectGrid;
+    use ndarray::array;
+
+    #[test]
+    fn grid_queries_accept_the_3d_indices_directly() {
+        let grid = Grid::RectGrid(RectGrid::new(5., 2.));
+        let tile = Tile {
+            grid,
+            start_id: (0, 0),
+            nx: 3,
+            ny: 2,
+        };
+
+        // `indices()` is (ny, nx, 2); the grid queries accept it as-is and
+        // return arrays with the same leading axes.
+        let indices = tile.indices();
+        assert_eq!(indices.shape(), &[2, 3, 2]);
+
+        let centroids = tile.get_grid().centroid(&indices.view());
+        assert_eq!(centroids.shape(), &[2, 3, 2]);
+
+        let corners = tile.get_grid().cell_corners(&indices.view());
+        assert_eq!(corners.shape(), &[2, 3, 4, 2]);
+
+        let near = tile.get_grid().cells_near_point(&centroids.view());
+        assert_eq!(near.shape(), &[2, 3, 4, 2]);
+
+        let tile_ids = tile.grid_id_to_tile_id(&indices.view(), i64::MAX);
+        assert_eq!(tile_ids.shape(), &[2, 3, 2]);
+    }
+
+    #[test]
+    fn data_tile_values_accept_the_3d_indices_directly() {
+        let grid = Grid::RectGrid(RectGrid::new(5., 2.));
+        let data = array![[1, 2, 3], [4, 5, 6]];
+        let data_tile = DataTile::new(grid, (0, 0), 3, 2, data, -1);
+
+        let indices = data_tile.indices();
+        let values = data_tile.values(&indices.view(), -1);
+        assert_eq!(values.shape(), &[2, 3]);
+
+        // Flattened access agrees with the 3D access.
+        let flat = indices.clone().into_shape((6, 2)).unwrap();
+        let expected = data_tile
+            .values(&flat.view(), -1)
+            .into_shape((2, 3))
+            .unwrap();
+        assert_eq!(values, expected);
     }
 }

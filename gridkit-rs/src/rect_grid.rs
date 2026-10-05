@@ -87,25 +87,6 @@ impl GridTraits for RectGrid {
         let centroid_y = y as f64 * self.dy() + (self.dy() / 2.) + self.offset[1];
         [centroid_x, centroid_y]
     }
-    fn centroid(&self, index: &ArrayView2<i64>) -> Array2<f64> {
-        let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
-
-        for cell_id in 0..centroids.shape()[0] {
-            let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-            centroids[Ix2(cell_id, 0)] = point[0];
-            centroids[Ix2(cell_id, 1)] = point[1];
-        }
-
-        if self.rotation() != 0. {
-            for cell_id in 0..centroids.shape()[0] {
-                let mut centroid = centroids.slice_mut(s![cell_id, ..]);
-                let cent_rot = self._rotation_matrix.dot(&centroid);
-                centroid.assign(&cent_rot);
-            }
-        }
-        centroids
-    }
-
     fn cell_height(&self) -> f64 {
         self._dy
     }
@@ -114,138 +95,163 @@ impl GridTraits for RectGrid {
         self._dx
     }
 
-    fn cell_at_points(&self, points: &ArrayView2<f64>) -> Array2<i64> {
-        let shape = points.shape();
-        let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
-        for cell_id in 0..points.shape()[0] {
-            let point = points.slice(s![cell_id, ..]);
-            // FIXME: Rotation causes slowdown even when 0.
-            //        Consider a separate version of the function that does not do rotation
-            let point = self._rotation_matrix_inv.dot(&point);
-            let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
-            let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
-            index[Ix2(cell_id, 0)] = id_x;
-            index[Ix2(cell_id, 1)] = id_y;
-        }
-        index
-    }
-
-    fn cell_corners(&self, index: &ArrayView2<i64>) -> Array3<f64> {
-        let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
-        for cell_id in 0..index.shape()[0] {
-            let id_x = index[Ix2(cell_id, 0)];
-            let id_y = index[Ix2(cell_id, 1)];
-            let [centroid_x, centroid_y] = self.centroid_xy_no_rot(id_x, id_y);
-            corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
-            corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
-            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
-            corners[Ix3(cell_id, 1, 1)] = centroid_y - self.dy() / 2.;
-            corners[Ix3(cell_id, 2, 0)] = centroid_x + self.dx() / 2.;
-            corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
-            corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
-            corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
-        }
-
-        if self.rotation() != 0. {
-            for cell_id in 0..corners.shape()[0] {
-                for corner_id in 0..corners.shape()[1] {
-                    let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                    let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                    corner_xy.assign(&rotated_corner_xy);
-                }
-            }
-        }
-        corners
-    }
-
-    fn cells_near_point(&self, points: &ArrayView2<f64>) -> Array3<i64> {
-        let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
-        let index = self.cell_at_points(points);
-
-        // FIXME: Find a way to not clone points in the case of no rotation
-        //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
-        let mut points = points.to_owned();
-        if self.rotation() != 0. {
+    fn cell_at_points<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs(points, |points| {
+            let shape = points.shape();
+            let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
             for cell_id in 0..points.shape()[0] {
-                let mut point = points.slice_mut(s![cell_id, ..]);
-                let point_rot = self._rotation_matrix_inv.dot(&point);
-                point.assign(&point_rot);
+                let point = points.slice(s![cell_id, ..]);
+                // FIXME: Rotation causes slowdown even when 0.
+                //        Consider a separate version of the function that does not do rotation
+                let point = self._rotation_matrix_inv.dot(&point);
+                let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
+                let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
+                index[Ix2(cell_id, 0)] = id_x;
+                index[Ix2(cell_id, 1)] = id_y;
             }
-        }
-
-        for cell_id in 0..points.shape()[0] {
-            let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
-            let rel_loc_y: f64 = modulus(points[Ix2(cell_id, 1)] - self.offset[1], self.dy());
-            let id_x = index[Ix2(cell_id, 0)];
-            let id_y = index[Ix2(cell_id, 1)];
-            match (rel_loc_x, rel_loc_y) {
-                // Top-left quadrant
-                (x, y) if x <= self.dx() / 2. && y >= self.dy() / 2. => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
-                }
-                // Top-right quadrant
-                (x, y) if x >= self.dx() / 2. && y >= self.dy() / 2. => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
-                }
-                // Bottom-left quadrant
-                (x, y) if x <= self.dx() / 2. && y <= self.dy() / 2. => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
-                }
-                // Bottom-right quadrant
-                _ => {
-                    nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
-                    nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
-                    nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
-                    nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
-                    nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
-                    nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
-                }
-            }
-        }
-        nearby_cells
+            index
+        })
     }
 
-    fn all_neighbours(
+    fn cell_corners<D>(&self, index: &ArrayView<i64, D>) -> Array<f64, D::Larger>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs_fanout(index, |index| {
+            let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
+            for cell_id in 0..index.shape()[0] {
+                let id_x = index[Ix2(cell_id, 0)];
+                let id_y = index[Ix2(cell_id, 1)];
+                let [centroid_x, centroid_y] = self.centroid_xy_no_rot(id_x, id_y);
+                corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
+                corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
+                corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
+                corners[Ix3(cell_id, 1, 1)] = centroid_y - self.dy() / 2.;
+                corners[Ix3(cell_id, 2, 0)] = centroid_x + self.dx() / 2.;
+                corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
+                corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
+                corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
+            }
+
+            if self.rotation() != 0. {
+                for cell_id in 0..corners.shape()[0] {
+                    for corner_id in 0..corners.shape()[1] {
+                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
+                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
+                        corner_xy.assign(&rotated_corner_xy);
+                    }
+                }
+            }
+            corners
+        })
+    }
+
+    fn cells_near_point<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D::Larger>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs_fanout(points, |points| {
+            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
+            let index = self.cell_at_points(points);
+
+            // FIXME: Find a way to not clone points in the case of no rotation
+            //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
+            let mut points = points.to_owned();
+            if self.rotation() != 0. {
+                for cell_id in 0..points.shape()[0] {
+                    let mut point = points.slice_mut(s![cell_id, ..]);
+                    let point_rot = self._rotation_matrix_inv.dot(&point);
+                    point.assign(&point_rot);
+                }
+            }
+
+            for cell_id in 0..points.shape()[0] {
+                let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
+                let rel_loc_y: f64 = modulus(points[Ix2(cell_id, 1)] - self.offset[1], self.dy());
+                let id_x = index[Ix2(cell_id, 0)];
+                let id_y = index[Ix2(cell_id, 1)];
+                match (rel_loc_x, rel_loc_y) {
+                    // Top-left quadrant
+                    (x, y) if x <= self.dx() / 2. && y >= self.dy() / 2. => {
+                        nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
+                        nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
+                        nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
+                        nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
+                        nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
+                    }
+                    // Top-right quadrant
+                    (x, y) if x >= self.dx() / 2. && y >= self.dy() / 2. => {
+                        nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 0, 1)] = 1 + id_y;
+                        nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
+                        nearby_cells[Ix3(cell_id, 1, 1)] = 1 + id_y;
+                        nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 2, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
+                        nearby_cells[Ix3(cell_id, 3, 1)] = 0 + id_y;
+                    }
+                    // Bottom-left quadrant
+                    (x, y) if x <= self.dx() / 2. && y <= self.dy() / 2. => {
+                        nearby_cells[Ix3(cell_id, 0, 0)] = -1 + id_x;
+                        nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 1, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 2, 0)] = -1 + id_x;
+                        nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
+                        nearby_cells[Ix3(cell_id, 3, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
+                    }
+                    // Bottom-right quadrant
+                    _ => {
+                        nearby_cells[Ix3(cell_id, 0, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 0, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 1, 0)] = 1 + id_x;
+                        nearby_cells[Ix3(cell_id, 1, 1)] = 0 + id_y;
+                        nearby_cells[Ix3(cell_id, 2, 0)] = 0 + id_x;
+                        nearby_cells[Ix3(cell_id, 2, 1)] = -1 + id_y;
+                        nearby_cells[Ix3(cell_id, 3, 0)] = 1 + id_x;
+                        nearby_cells[Ix3(cell_id, 3, 1)] = -1 + id_y;
+                    }
+                }
+            }
+            nearby_cells
+        })
+    }
+
+    fn all_neighbours<D>(
         &self,
-        index: &ArrayView2<i64>,
+        index: &ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64> {
-        self._neighbours(index, depth, include_selected, add_cell_id, false)
+    ) -> Array<i64, D::Larger>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs_fanout(index, |index| {
+            self._neighbours(index, depth, include_selected, add_cell_id, false)
+        })
     }
 
-    fn direct_neighbours(
+    fn direct_neighbours<D>(
         &self,
-        index: &ArrayView2<i64>,
+        index: &ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64> {
-        self._neighbours(index, depth, include_selected, add_cell_id, true)
+    ) -> Array<i64, D::Larger>
+    where
+        D: Dimension,
+    {
+        crate::utils::map_point_pairs_fanout(index, |index| {
+            self._neighbours(index, depth, include_selected, add_cell_id, true)
+        })
     }
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
@@ -520,6 +526,95 @@ mod tests {
         let index = array![[-1, 1], [1, -4]];
         let centroids = grid.centroid(&index.view());
         assert_xy_close(&centroids, &[-2.5, 3., 7.5, -7.], TOL);
+    }
+
+    // ---------------------------------------------------------------------
+    // shape-agnostic (..., 2) handling
+    // ---------------------------------------------------------------------
+
+    #[test]
+    fn centroid_is_shape_agnostic() {
+        let grid = RectGrid::new(5., 2.);
+        let index = array![[[0, 0], [1, 0]], [[0, 1], [1, 1]]];
+        let centroids = grid.centroid(&index.view());
+        assert_eq!(centroids.shape(), &[2, 2, 2]);
+
+        // Ravel, apply the 2D version, reshape back: must be identical.
+        let flat = index.clone().into_shape((4, 2)).unwrap();
+        let expected = grid.centroid(&flat.view()).into_shape((2, 2, 2)).unwrap();
+        assert_eq!(centroids, expected);
+    }
+
+    #[test]
+    fn centroid_accepts_non_contiguous_input() {
+        let grid = RectGrid::new(5., 2.);
+        let wide = array![[9, 0, 0, 9], [9, 1, 0, 9]];
+        let view = wide.slice(s![.., 1..3]);
+        assert!(!view.is_standard_layout());
+
+        let centroids = grid.centroid(&view);
+        let expected = grid.centroid(&array![[0, 0], [1, 0]].view());
+        assert_eq!(centroids, expected);
+    }
+
+    #[test]
+    fn cell_at_points_is_shape_agnostic() {
+        let grid = RectGrid::new(5., 2.);
+        let points = array![[[14., 3.], [-8., 1.]], [[340., -14.2], [0., 0.]]];
+        let ids = grid.cell_at_points(&points.view());
+        assert_eq!(ids.shape(), &[2, 2, 2]);
+
+        let flat = points.clone().into_shape((4, 2)).unwrap();
+        let expected = grid
+            .cell_at_points(&flat.view())
+            .into_shape((2, 2, 2))
+            .unwrap();
+        assert_eq!(ids, expected);
+    }
+
+    #[test]
+    fn cell_corners_is_shape_agnostic() {
+        let grid = RectGrid::new(1.5, 1.5);
+        let index = array![[[0, 0], [1, 0]], [[0, 1], [1, 1]]];
+        let corners = grid.cell_corners(&index.view());
+        assert_eq!(corners.shape(), &[2, 2, 4, 2]);
+
+        let flat = index.clone().into_shape((4, 2)).unwrap();
+        let expected = grid
+            .cell_corners(&flat.view())
+            .into_shape((2, 2, 4, 2))
+            .unwrap();
+        assert_eq!(corners, expected);
+    }
+
+    #[test]
+    fn all_neighbours_is_shape_agnostic() {
+        let grid = RectGrid::new(5., 2.);
+        let index = array![[[0, 0], [1, 0]], [[0, 1], [1, 1]]];
+        let neighbours = grid.all_neighbours(&index.view(), 1, true, true);
+        assert_eq!(neighbours.shape()[0], 2);
+        assert_eq!(neighbours.shape()[1], 2);
+        assert_eq!(neighbours.shape()[3], 2);
+
+        let flat = index.clone().into_shape((4, 2)).unwrap();
+        let expected = grid
+            .all_neighbours(&flat.view(), 1, true, true)
+            .into_shape((2, 2, neighbours.shape()[2], 2))
+            .unwrap();
+        assert_eq!(neighbours, expected);
+    }
+
+    #[test]
+    fn shape_agnostic_methods_are_delegated_through_the_grid_enum() {
+        let index = array![[[0, 0], [1, 0]], [[0, 1], [1, 1]]];
+
+        let via_enum = Grid::RectGrid(RectGrid::new(5., 2.)).centroid(&index.view());
+        let via_concrete = RectGrid::new(5., 2.).centroid(&index.view());
+        assert_eq!(via_enum, via_concrete);
+        assert_eq!(via_enum.shape(), &[2, 2, 2]);
+
+        let corners = Grid::RectGrid(RectGrid::new(1.5, 1.5)).cell_corners(&index.view());
+        assert_eq!(corners.shape(), &[2, 2, 4, 2]);
     }
 
     // ---------------------------------------------------------------------
