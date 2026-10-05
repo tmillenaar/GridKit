@@ -426,16 +426,6 @@ impl GridTraits for HexGrid {
         self._neighbours(index, depth, include_selected, add_cell_id)
     }
 
-    fn is_aligned_with(&self, other: &Grid) -> (bool, String) {
-        crate::grid::is_aligned_with(
-            &self.get_grid(),
-            other,
-            self.cellsize,
-            self.offset(),
-            &self.orientation,
-        )
-    }
-
     fn subdivide(&self, factor: u64) -> Grid {
         // A hexagon cannot be tiled by smaller hexagons, so Python returns a
         // *TriGrid* from `HexGrid.subdivide` to keep the alignment exact. The
@@ -464,6 +454,28 @@ impl GridTraits for HexGrid {
         sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
 
         Grid::TriGrid(sub_grid)
+    }
+
+    fn is_aligned_with(&self, other: &Grid) -> bool {
+        if let Grid::HexGrid(other) = other {
+            if !isclose(self.cellsize, other.cellsize, NUMERIC_RTOL, NUMERIC_ATOL) {
+                return false;
+            }
+            if !(isclose(self.offset()[0], other.offset()[0], NUMERIC_RTOL, 1e-7)
+                && isclose(self.offset()[1], other.offset()[1], NUMERIC_RTOL, 1e-7))
+            {
+                return false;
+            }
+            if self.orientation != other.orientation {
+                return false;
+            }
+            if self.rotation() != other.rotation() {
+                return false;
+            }
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -1054,7 +1066,6 @@ mod tests {
 #[cfg(test)]
 mod is_aligned_with_tests {
     use super::*;
-    use crate::grid::grid_type_name;
     use crate::rect_grid::RectGrid;
     use crate::tri_grid::TriGrid;
 
@@ -1067,17 +1078,12 @@ mod is_aligned_with_tests {
 
     #[test]
     fn an_identical_grid_is_aligned() {
-        let (aligned, reason) = pointy().is_aligned_with(&Grid::HexGrid(pointy()));
-        assert!(aligned);
-        assert_eq!(reason, "");
+        assert!(pointy().is_aligned_with(&Grid::HexGrid(pointy())));
     }
 
     #[test]
     fn a_differing_cellsize_is_reported() {
-        let (aligned, reason) =
-            pointy().is_aligned_with(&Grid::HexGrid(HexGrid::new(1.3, Orientation::Pointy)));
-        assert!(!aligned);
-        assert!(reason.contains("cellsize"), "{reason}");
+        assert!(!pointy().is_aligned_with(&Grid::HexGrid(HexGrid::new(1.3, Orientation::Pointy))));
     }
 
     #[test]
@@ -1085,28 +1091,20 @@ mod is_aligned_with_tests {
         for offset in [[0., 1.], [1., 0.]] {
             let mut other = HexGrid::new(1.2, Orientation::Pointy);
             other.set_offset(offset);
-            let (aligned, reason) = pointy().is_aligned_with(&Grid::HexGrid(other));
-            assert!(!aligned);
-            assert!(reason.contains("offset"), "{reason}");
+            assert!(!pointy().is_aligned_with(&Grid::HexGrid(other)));
         }
     }
 
     #[test]
     fn a_differing_orientation_is_reported() {
-        let (aligned, reason) =
-            pointy().is_aligned_with(&Grid::HexGrid(HexGrid::new(1.2, Orientation::Flat)));
-        assert!(!aligned);
-        assert!(reason.contains("orientation"), "{reason}");
+        assert!(!pointy().is_aligned_with(&Grid::HexGrid(HexGrid::new(1.2, Orientation::Flat))));
     }
 
     #[test]
     fn a_differing_rotation_is_reported() {
         let mut other = pointy();
         other.set_rotation(15.5);
-
-        let (aligned, reason) = pointy().is_aligned_with(&Grid::HexGrid(other));
-        assert!(!aligned);
-        assert!(reason.contains("rotation"), "{reason}");
+        assert!(!pointy().is_aligned_with(&Grid::HexGrid(other)));
     }
 
     #[test]
@@ -1115,19 +1113,11 @@ mod is_aligned_with_tests {
 
         let others = vec![
             Grid::RectGrid(RectGrid::new(1.2, 1.2)),
-            Grid::TriGrid(TriGrid::new(1.2, Orientation::Flat)),
+            Grid::TriGrid(TriGrid::new(1.2, Orientation::Pointy)),
         ];
         for other in others {
-            let (aligned, reason) = grid.is_aligned_with(&other);
-            assert!(!aligned);
-            assert!(reason.contains("Grid type is not the same"), "{reason}");
-            assert!(reason.contains("HexGrid"), "{reason}");
-            assert!(reason.contains(grid_type_name(&other)), "{reason}");
-
-            // A type mismatch is reported on its own: Python returns early
-            // instead of accumulating the other reasons.
-            assert!(!reason.contains("cellsize"), "{reason}");
-            assert!(!reason.contains("offset"), "{reason}");
+            assert!(!grid.is_aligned_with(&other));
+            assert!(!other.is_aligned_with(&Grid::HexGrid(pointy())));
         }
     }
 
@@ -1135,12 +1125,7 @@ mod is_aligned_with_tests {
     fn multiple_reasons_are_reported_together() {
         let mut other = HexGrid::new(1.1, Orientation::Flat);
         other.set_offset([1., 1.]);
-
-        let (aligned, reason) = pointy().is_aligned_with(&Grid::HexGrid(other));
-        assert!(!aligned);
-        for attribute in ["cellsize", "offset", "orientation"] {
-            assert!(reason.contains(attribute), "{reason}");
-        }
+        assert!(!pointy().is_aligned_with(&Grid::HexGrid(other)));
     }
 
     #[test]
@@ -1155,8 +1140,8 @@ mod is_aligned_with_tests {
         let before_grid = snapshot(&grid);
         let before_other = snapshot(&other);
 
-        assert!(!grid.is_aligned_with(&Grid::HexGrid(other.clone())).0);
-        assert!(!other.is_aligned_with(&Grid::HexGrid(grid.clone())).0);
+        assert!(!grid.is_aligned_with(&Grid::HexGrid(other.clone())));
+        assert!(!other.is_aligned_with(&Grid::HexGrid(grid.clone())));
 
         assert_eq!(before_grid, snapshot(&grid));
         assert_eq!(before_other, snapshot(&other));
@@ -1169,7 +1154,7 @@ mod is_aligned_with_tests {
         let grid = Grid::HexGrid(pointy());
         let other = Grid::HexGrid(pointy());
 
-        assert_eq!(grid.is_aligned_with(&other), (true, String::new()));
+        assert!(grid.is_aligned_with(&other));
 
         let mismatched = Grid::HexGrid(HexGrid::new(1.3, Orientation::Pointy));
         assert_eq!(
