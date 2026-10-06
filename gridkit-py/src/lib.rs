@@ -68,7 +68,7 @@ macro_rules! impl_pydata_tile {
                 py: Python<'py>,
             ) -> &'py PyArrayDyn<bool> {
                 self._data_tile
-                    .is_nodata_array(&values.as_array())
+                    .is_nodata_array(values.as_array())
                     .into_pyarray(py)
             }
 
@@ -135,7 +135,7 @@ macro_rules! impl_pydata_tile {
                 sample_point: PyReadonlyArray2<'py, f64>,
             ) -> &'py PyArray1<f64> {
                 self._data_tile
-                    .linear_interpolation(&sample_point.as_array())
+                    .linear_interpolation(sample_point.as_array())
                     .into_pyarray(py)
             }
 
@@ -146,7 +146,7 @@ macro_rules! impl_pydata_tile {
                 decay_constant: f64,
             ) -> &'py PyArray1<f64> {
                 self._data_tile
-                    .inverse_distance_interpolation(&sample_point.as_array(), decay_constant)
+                    .inverse_distance_interpolation(sample_point.as_array(), decay_constant)
                     .into_pyarray(py)
             }
 
@@ -366,7 +366,7 @@ macro_rules! impl_pydata_tile {
                 nodata_value: $type,
             ) -> &'py PyArray1<$type> {
                 self._data_tile
-                    .values(&index.as_array(), nodata_value)
+                    .values(index.as_array(), nodata_value)
                     .into_pyarray(py)
             }
 
@@ -866,7 +866,7 @@ impl PyO3Tile {
     ) -> &'py PyArray2<i64> {
         let index = tile_ids.as_array();
         self._tile
-            .tile_id_to_grid_id(&index, oob_value)
+            .tile_id_to_grid_id(index, oob_value)
             .into_pyarray(py)
     }
 
@@ -878,7 +878,7 @@ impl PyO3Tile {
     ) -> &'py PyArray2<i64> {
         let index = grid_ids.as_array();
         self._tile
-            .grid_id_to_tile_id(&index, oob_value)
+            .grid_id_to_tile_id(index, oob_value)
             .into_pyarray(py)
     }
 
@@ -948,11 +948,11 @@ impl PyO3TriGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().clone().into_pyarray(py)
+        &self._grid.rotation_matrix().to_owned().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().to_owned().into_pyarray(py)
     }
 
     fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3TriGrid {
@@ -995,7 +995,7 @@ impl PyO3TriGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray2<f64> {
         let index = index.as_array();
-        self._grid.centroid(&index).into_pyarray(py)
+        self._grid.centroid(index).into_pyarray(py)
     }
 
     fn cell_corners<'py>(
@@ -1004,7 +1004,7 @@ impl PyO3TriGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray3<f64> {
         let index = index.as_array();
-        self._grid.cell_corners(&index).into_pyarray(py)
+        self._grid.cell_corners(index).into_pyarray(py)
     }
 
     fn cell_at_points<'py>(
@@ -1013,7 +1013,7 @@ impl PyO3TriGrid {
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_points(&points).into_pyarray(py)
+        self._grid.cell_at_points(points).into_pyarray(py)
     }
 
     fn cells_in_bounds<'py>(
@@ -1036,11 +1036,11 @@ impl PyO3TriGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, false)
+                .all_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, false)
+                .direct_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         }
     }
@@ -1056,11 +1056,11 @@ impl PyO3TriGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, true)
+                .all_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, true)
+                .direct_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         }
     }
@@ -1071,7 +1071,7 @@ impl PyO3TriGrid {
         point: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray3<i64> {
         self._grid
-            .cells_near_point(&point.as_array())
+            .cells_near_point(point.as_array())
             .into_pyarray(py)
     }
 
@@ -1081,7 +1081,7 @@ impl PyO3TriGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray1<bool> {
         self._grid
-            .is_cell_upright(&index.as_array())
+            .is_cell_upright(index.as_array())
             .into_pyarray(py)
     }
 
@@ -1094,9 +1094,9 @@ impl PyO3TriGrid {
     ) -> &'py PyArray1<f64> {
         self._grid
             .linear_interpolation(
-                &sample_point.as_array(),
-                &nearby_value_locations.as_array(),
-                &nearby_values.as_array(),
+                sample_point.as_array(),
+                nearby_value_locations.as_array(),
+                nearby_values.as_array(),
             )
             .into_pyarray(py)
     }
@@ -1147,11 +1147,11 @@ impl PyO3RectGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().clone().into_pyarray(py)
+        &self._grid.rotation_matrix().to_owned().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().to_owned().into_pyarray(py)
     }
 
     fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3RectGrid {
@@ -1194,7 +1194,7 @@ impl PyO3RectGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray2<f64> {
         let index = index.as_array();
-        self._grid.centroid(&index).into_pyarray(py)
+        self._grid.centroid(index).into_pyarray(py)
     }
 
     fn cell_at_points<'py>(
@@ -1203,7 +1203,7 @@ impl PyO3RectGrid {
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_points(&points).into_pyarray(py)
+        self._grid.cell_at_points(points).into_pyarray(py)
     }
 
     fn relative_neighbours<'py>(
@@ -1217,11 +1217,11 @@ impl PyO3RectGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, false)
+                .all_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, false)
+                .direct_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         }
     }
@@ -1237,11 +1237,11 @@ impl PyO3RectGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, true)
+                .all_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, true)
+                .direct_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         }
     }
@@ -1252,7 +1252,7 @@ impl PyO3RectGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray3<f64> {
         let index = index.as_array();
-        self._grid.cell_corners(&index).into_pyarray(py)
+        self._grid.cell_corners(index).into_pyarray(py)
     }
 
     fn cells_near_point<'py>(
@@ -1261,7 +1261,7 @@ impl PyO3RectGrid {
         point: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray3<i64> {
         self._grid
-            .cells_near_point(&point.as_array())
+            .cells_near_point(point.as_array())
             .into_pyarray(py)
     }
 
@@ -1341,11 +1341,11 @@ impl PyO3HexGrid {
     }
 
     fn rotation_matrix<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix().clone().into_pyarray(py)
+        &self._grid.rotation_matrix().to_owned().into_pyarray(py)
     }
 
     fn rotation_matrix_inv<'py>(&self, py: Python<'py>) -> &'py PyArray2<f64> {
-        &self._grid.rotation_matrix_inv().clone().into_pyarray(py)
+        &self._grid.rotation_matrix_inv().to_owned().into_pyarray(py)
     }
 
     fn subdivide<'py>(&self, _py: Python<'py>, factor: u64) -> PyO3TriGrid {
@@ -1387,7 +1387,7 @@ impl PyO3HexGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray2<f64> {
         let index = index.as_array();
-        self._grid.centroid(&index).into_pyarray(py)
+        self._grid.centroid(index).into_pyarray(py)
     }
 
     fn cell_at_points<'py>(
@@ -1396,7 +1396,7 @@ impl PyO3HexGrid {
         points: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray2<i64> {
         let points = points.as_array();
-        self._grid.cell_at_points(&points).into_pyarray(py)
+        self._grid.cell_at_points(points).into_pyarray(py)
     }
 
     fn relative_neighbours<'py>(
@@ -1410,11 +1410,11 @@ impl PyO3HexGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, false)
+                .all_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, false)
+                .direct_neighbours(index, depth, include_selected, false)
                 .into_pyarray(py)
         }
     }
@@ -1430,11 +1430,11 @@ impl PyO3HexGrid {
         let index = index.as_array();
         if connect_corners {
             self._grid
-                .all_neighbours(&index, depth, include_selected, true)
+                .all_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         } else {
             self._grid
-                .direct_neighbours(&index, depth, include_selected, true)
+                .direct_neighbours(index, depth, include_selected, true)
                 .into_pyarray(py)
         }
     }
@@ -1445,7 +1445,7 @@ impl PyO3HexGrid {
         index: PyReadonlyArray2<'py, i64>,
     ) -> &'py PyArray3<f64> {
         let index = index.as_array();
-        self._grid.cell_corners(&index).into_pyarray(py)
+        self._grid.cell_corners(index).into_pyarray(py)
     }
 
     fn cells_near_point<'py>(
@@ -1454,7 +1454,7 @@ impl PyO3HexGrid {
         point: PyReadonlyArray2<'py, f64>,
     ) -> &'py PyArray3<i64> {
         self._grid
-            .cells_near_point(&point.as_array())
+            .cells_near_point(point.as_array())
             .into_pyarray(py)
     }
 
@@ -1470,8 +1470,8 @@ fn linear_interp_weights_triangles<'py>(
     nearby_value_locations: PyReadonlyArray3<'py, f64>,
 ) -> &'py PyArray2<f64> {
     let weights = interpolate::linear_interp_weights_triangles(
-        &sample_point.as_array(),
-        &nearby_value_locations.as_array(),
+        sample_point.as_array(),
+        nearby_value_locations.as_array(),
     );
     return weights.into_pyarray(py);
 }
@@ -1484,7 +1484,7 @@ fn interp(_py: Python, module: &PyModule) -> PyResult<()> {
 
 #[pyfunction]
 fn multipolygon_wkb<'py>(py: Python<'py>, coords: PyReadonlyArray3<'py, f64>) -> &'py PyByteArray {
-    let geom_wkb = vector_shapes::coords_to_multipolygon_wkb(&coords.as_array());
+    let geom_wkb = vector_shapes::coords_to_multipolygon_wkb(coords.as_array());
     PyByteArray::new(py, &geom_wkb)
 }
 
