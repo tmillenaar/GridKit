@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:24.220** total execution time for 18 files **from all galleries**:
+**00:24.300** total execution time for 18 files **from all galleries**:
 
 .. container::
 
@@ -33,56 +33,56 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_vector_synergy_intersect_geometries.py` (``../../examples/vector_synergy/intersect_geometries.py``)
-     - 00:04.926
+     - 00:05.013
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_ndvi.py` (``../../examples/raster_operations/ndvi.py``)
-     - 00:03.716
+     - 00:03.695
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_rotation_animation.py` (``../../examples/grid_definitions/rotation_animation.py``)
-     - 00:03.338
+     - 00:03.301
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_2d_diff_hex_anim.py` (``../../examples/cell_centric_operations/2d_diff_hex_anim.py``)
-     - 00:03.270
+     - 00:03.290
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_elevation_distribution_per_land_cover.py` (``../../examples/raster_operations/elevation_distribution_per_land_cover.py``)
-     - 00:02.271
+     - 00:02.295
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_downslope_path.py` (``../../examples/cell_centric_operations/downslope_path.py``)
-     - 00:01.151
+     - 00:01.136
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_parial_overlap.py` (``../../examples/raster_operations/parial_overlap.py``)
-     - 00:00.685
+     - 00:00.696
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_rotated_grids.py` (``../../examples/grid_definitions/rotated_grids.py``)
-     - 00:00.605
+     - 00:00.606
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_resampling.py` (``../../examples/raster_operations/resampling.py``)
-     - 00:00.585
+     - 00:00.599
      - 0.0
    * - :ref:`sphx_glr_example_gallery_vector_synergy_interpolate_from_points.py` (``../../examples/vector_synergy/interpolate_from_points.py``)
-     - 00:00.521
+     - 00:00.525
      - 0.0
    * - :ref:`sphx_glr_example_gallery_raster_operations_coordinate_transformations.py` (``../../examples/raster_operations/coordinate_transformations.py``)
-     - 00:00.504
-     - 0.0
-   * - :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py` (``../../examples/grid_definitions/triangles_in_hexes.py``)
-     - 00:00.488
+     - 00:00.521
      - 0.0
    * - :ref:`sphx_glr_example_gallery_cell_centric_operations_selecting_cells.py` (``../../examples/cell_centric_operations/selecting_cells.py``)
-     - 00:00.478
+     - 00:00.485
+     - 0.0
+   * - :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py` (``../../examples/grid_definitions/triangles_in_hexes.py``)
+     - 00:00.481
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``../../examples/grid_definitions/hex_grids.py``)
-     - 00:00.393
+     - 00:00.386
      - 0.0
    * - :ref:`sphx_glr_example_gallery_patterns_flower_of_life.py` (``../../examples/patterns/flower_of_life.py``)
-     - 00:00.361
+     - 00:00.358
      - 0.0
    * - :ref:`sphx_glr_example_gallery_vector_synergy_aggregate_dask.py` (``../../examples/vector_synergy/aggregate_dask.py``)
-     - 00:00.348
+     - 00:00.353
      - 0.0
    * - :ref:`sphx_glr_example_gallery_vector_synergy_aggregate.py` (``../../examples/vector_synergy/aggregate.py``)
-     - 00:00.317
+     - 00:00.307
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_tiles.py` (``../../examples/grid_definitions/tiles.py``)
-     - 00:00.261
+     - 00:00.256
      - 0.0
