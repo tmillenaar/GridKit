@@ -2,7 +2,7 @@ use bresenham::Bresenham;
 use gridkit::*;
 use ndarray::*;
 
-fn draw_hexagon(canvas: &mut Vec<Vec<char>>, points: &Array3<f64>) {
+fn draw_hexagon(canvas: &mut Vec<Vec<char>>, points: Array3<f64>) {
     for cell_id in 0..points.shape()[0] {
         for vertex_id in 0..points.shape()[1] {
             // Add canvas width so we can center around 0,0, or add acnchor to rust version
@@ -34,17 +34,17 @@ fn main() {
 
     let point = [42., 25.];
     let cell_id = grid.cell_at_point(&point); // Fixme consider a cell_at_point_xy
-    // direct_neighbours expects a 2D array view, so wrap the single id as (1, 2).
+                                              // direct_neighbours expects a 2D array view, so wrap the single id as (1, 2).
     let center_cell = array![[cell_id[0], cell_id[1]]];
-    let neighbours = grid.direct_neighbours(&center_cell.view(), 3, false, true);
+    let neighbours = grid.direct_neighbours(center_cell.view(), 3, false, true);
     let neighbour_shape = neighbours.shape();
     let raveled_neighbours = neighbours
         .clone() // FIXME
         .into_shape((neighbour_shape[0] * neighbour_shape[1], 2))
         .expect("Unable to ravel neighbours"); // Ravel cells
-    let corners = grid.cell_corners(&raveled_neighbours.view());
+    let corners = grid.cell_corners(raveled_neighbours.view());
 
     let mut canvas = vec![vec![' '; 100]; 50];
-    draw_hexagon(&mut canvas, &corners);
+    draw_hexagon(&mut canvas, corners);
     print_canvas(&canvas);
 }

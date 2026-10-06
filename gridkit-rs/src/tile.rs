@@ -86,7 +86,7 @@ pub trait TileTraits {
     /// `grid_ids` may have any shape as long as its last axis is of length 2 and
     /// holds the `(x, y)` grid ids. The result has the same shape; ids outside
     /// the tile are set to `oob_value`.
-    fn grid_id_to_tile_id<D>(&self, grid_ids: &ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
+    fn grid_id_to_tile_id<D>(&self, grid_ids: ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
     where
         D: Dimension,
     {
@@ -138,7 +138,7 @@ pub trait TileTraits {
     /// `tile_ids` may have any shape as long as its last axis is of length 2 and
     /// holds the `(row, col)` tile ids. The result has the same shape; ids
     /// outside the tile are set to `oob_value`.
-    fn tile_id_to_grid_id<D>(&self, tile_ids: &ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
+    fn tile_id_to_grid_id<D>(&self, tile_ids: ArrayView<i64, D>, oob_value: i64) -> Array<i64, D>
     where
         D: Dimension,
     {
@@ -635,16 +635,16 @@ mod tests {
         let indices = tile.indices();
         assert_eq!(indices.shape(), &[2, 3, 2]);
 
-        let centroids = tile.get_grid().centroid(&indices.view());
+        let centroids = tile.get_grid().centroid(indices.view());
         assert_eq!(centroids.shape(), &[2, 3, 2]);
 
-        let corners = tile.get_grid().cell_corners(&indices.view());
+        let corners = tile.get_grid().cell_corners(indices.view());
         assert_eq!(corners.shape(), &[2, 3, 4, 2]);
 
-        let near = tile.get_grid().cells_near_point(&centroids.view());
+        let near = tile.get_grid().cells_near_point(centroids.view());
         assert_eq!(near.shape(), &[2, 3, 4, 2]);
 
-        let tile_ids = tile.grid_id_to_tile_id(&indices.view(), i64::MAX);
+        let tile_ids = tile.grid_id_to_tile_id(indices.view(), i64::MAX);
         assert_eq!(tile_ids.shape(), &[2, 3, 2]);
     }
 
@@ -655,13 +655,13 @@ mod tests {
         let data_tile = DataTile::new(grid, (0, 0), 3, 2, data, -1);
 
         let indices = data_tile.indices();
-        let values = data_tile.values(&indices.view(), -1);
+        let values = data_tile.values(indices.view(), -1);
         assert_eq!(values.shape(), &[2, 3]);
 
         // Flattened access agrees with the 3D access.
         let flat = indices.clone().into_shape((6, 2)).unwrap();
         let expected = data_tile
-            .values(&flat.view(), -1)
+            .values(flat.view(), -1)
             .into_shape((2, 3))
             .unwrap();
         assert_eq!(values, expected);

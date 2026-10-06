@@ -57,11 +57,11 @@ pub fn rotation_matrix_from_angle(angle_deg: f64) -> Array2<f64> {
 ///
 /// Non-contiguous inputs are handled: they are copied into a contiguous layout
 /// before being reshaped.
-pub fn map_point_pairs<D, A, B, F>(index: &ArrayView<A, D>, f: F) -> Array<B, D>
+pub fn map_point_pairs<D, A, B, F>(index: ArrayView<A, D>, f: F) -> Array<B, D>
 where
     D: Dimension,
     A: Clone,
-    F: FnOnce(&ArrayView2<A>) -> Array2<B>,
+    F: FnOnce(ArrayView2<A>) -> Array2<B>,
 {
     let dim = index.raw_dim();
     assert_eq!(
@@ -72,7 +72,7 @@ where
     );
     let pattern = dim.clone().into_pattern();
     let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
-    let result = f(&raveled.view());
+    let result = f(raveled.view());
     result
         .into_shape(pattern)
         .expect("output of `f` is not compatible with the input shape")
@@ -84,11 +84,11 @@ where
 /// The output shape is the leading axes of the input followed by `(K, 2)`,
 /// which is one dimension more than the input. `K` is read from the output of
 /// `f` so the same helper works for e.g. cell corners and near-point lookups.
-pub fn map_point_pairs_fanout<D, A, B, F>(index: &ArrayView<A, D>, f: F) -> Array<B, D::Larger>
+pub fn map_point_pairs_fanout<D, A, B, F>(index: ArrayView<A, D>, f: F) -> Array<B, D::Larger>
 where
     D: Dimension,
     A: Clone,
-    F: FnOnce(&ArrayView2<A>) -> Array3<B>,
+    F: FnOnce(ArrayView2<A>) -> Array3<B>,
 {
     let dim = index.raw_dim();
     assert_eq!(
@@ -98,7 +98,7 @@ where
         2
     );
     let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
-    let result = f(&raveled.view());
+    let result = f(raveled.view());
     let mut new_dims = dim.slice()[..dim.ndim() - 1].to_vec();
     new_dims.push(result.shape()[1]);
     new_dims.push(2);
@@ -113,11 +113,11 @@ where
 /// `(x, y)` pair to a single value, e.g. `(N, 2) -> (N,)`.
 ///
 /// The output shape is the input shape with the last axis removed.
-pub fn map_point_pairs_reduce<D, A, B, F>(index: &ArrayView<A, D>, f: F) -> Array<B, D::Smaller>
+pub fn map_point_pairs_reduce<D, A, B, F>(index: ArrayView<A, D>, f: F) -> Array<B, D::Smaller>
 where
     D: Dimension + RemoveAxis,
     A: Clone,
-    F: FnOnce(&ArrayView2<A>) -> Array1<B>,
+    F: FnOnce(ArrayView2<A>) -> Array1<B>,
 {
     let dim = index.raw_dim();
     assert_eq!(
@@ -128,7 +128,7 @@ where
     );
     let smaller = dim.clone().remove_axis(Axis(dim.ndim() - 1));
     let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
-    let result = f(&raveled.view());
+    let result = f(raveled.view());
     result
         .into_shape(smaller.into_pattern())
         .expect("output of `f` is not compatible with the reduced input shape")

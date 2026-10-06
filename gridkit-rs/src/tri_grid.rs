@@ -78,11 +78,11 @@ impl GridTraits for TriGrid {
         self._rotation_matrix = rotation_matrix_from_angle(rotation);
         self._rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
     }
-    fn rotation_matrix(&self) -> &Array2<f64> {
-        &self._rotation_matrix
+    fn rotation_matrix(&self) -> ArrayView2<f64> {
+        self._rotation_matrix.view()
     }
-    fn rotation_matrix_inv(&self) -> &Array2<f64> {
-        &self._rotation_matrix_inv
+    fn rotation_matrix_inv(&self) -> ArrayView2<f64> {
+        self._rotation_matrix_inv.view()
     }
 
     fn radius(&self) -> f64 {
@@ -135,7 +135,7 @@ impl GridTraits for TriGrid {
 
         [centroid_x, centroid_y]
     }
-    fn cell_at_points<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D>
+    fn cell_at_points<D>(&self, points: ArrayView<f64, D>) -> Array<i64, D>
     where
         D: Dimension,
     {
@@ -172,7 +172,7 @@ impl GridTraits for TriGrid {
                     - 1 * (!iseven(index[Ix2(cell_id, id_y_axis)]) as i64);
 
                 // TODO: Fix this 3rd dimension of cell_id=0. I.e. fix cell_corners needing to take multiple ids at once
-                let cell_origin = self.cell_corners(&index.slice(s![cell_id..cell_id + 1, ..]));
+                let cell_origin = self.cell_corners(index.slice(s![cell_id..cell_id + 1, ..]));
                 let cell_origin = cell_origin.slice(s![0, 2, ..]);
 
                 let cell_origin: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> =
@@ -205,7 +205,7 @@ impl GridTraits for TriGrid {
         })
     }
 
-    fn cell_corners<D>(&self, index: &ArrayView<i64, D>) -> Array<f64, D::Larger>
+    fn cell_corners<D>(&self, index: ArrayView<i64, D>) -> Array<f64, D::Larger>
     where
         D: Dimension,
     {
@@ -282,7 +282,7 @@ impl GridTraits for TriGrid {
         })
     }
 
-    fn cells_near_point<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D::Larger>
+    fn cells_near_point<D>(&self, points: ArrayView<f64, D>) -> Array<i64, D::Larger>
     where
         D: Dimension,
     {
@@ -291,7 +291,7 @@ impl GridTraits for TriGrid {
             // TODO:
             // Condense this into a single loop
             let cell_ids = self.cell_at_points(points);
-            let corners = self.cell_corners(&cell_ids.view());
+            let corners = self.cell_corners(cell_ids.view());
 
             // Define arguments to be used when determining the minimum distance
             let mut min_dist: f64 = 0.;
@@ -442,7 +442,7 @@ impl GridTraits for TriGrid {
 
     fn all_neighbours<D>(
         &self,
-        index: &ArrayView<i64, D>,
+        index: ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
@@ -528,7 +528,7 @@ impl GridTraits for TriGrid {
 
     fn direct_neighbours<D>(
         &self,
-        index: &ArrayView<i64, D>,
+        index: ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
@@ -663,7 +663,7 @@ impl GridTraits for TriGrid {
         // Anchor the sub grid to the top corner of the parent's cell (0, 0), as
         // Python's `TriGrid.subdivide` does. The corner is taken from the *parent*,
         // so it is unaffected by the cellsize change above.
-        let corners = self.cell_corners(&array![[0i64, 0i64]].view());
+        let corners = self.cell_corners(array![[0i64, 0i64]].view());
         let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
         sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
 
@@ -731,8 +731,8 @@ impl TriGrid {
             array![[bounds.2 - self.cell_width() / 4., bounds.3 - self.dy() / 4.]];
 
         // translate the coordinates of the corner cells into indices
-        let left_bottom_id = self.cell_at_points(&left_bottom.view());
-        let right_top_id = self.cell_at_points(&right_top.view());
+        let left_bottom_id = self.cell_at_points(left_bottom.view());
+        let right_top_id = self.cell_at_points(right_top.view());
 
         // use the cells at the corners to determine
         // the ids in x an y direction as separate 1d arrays
@@ -776,7 +776,7 @@ impl TriGrid {
         // }
     }
 
-    pub fn is_cell_upright<D>(&self, index: &ArrayView<i64, D>) -> Array<bool, D::Smaller>
+    pub fn is_cell_upright<D>(&self, index: ArrayView<i64, D>) -> Array<bool, D::Smaller>
     where
         D: Dimension + RemoveAxis,
     {
@@ -792,9 +792,9 @@ impl TriGrid {
 
     pub fn linear_interpolation(
         &self,
-        sample_points: &ArrayView2<f64>,
-        nearby_value_locations: &ArrayView3<f64>,
-        nearby_values: &ArrayView2<f64>,
+        sample_points: ArrayView2<f64>,
+        nearby_value_locations: ArrayView3<f64>,
+        nearby_values: ArrayView2<f64>,
     ) -> Array1<f64> {
         let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
         Zip::from(&mut values)
@@ -809,7 +809,7 @@ impl TriGrid {
                 let mut near_dist_1: f64 = f64::MAX;
                 let mut near_dist_2: f64 = f64::MAX;
                 for (i, vec) in point_to_centroid_vecs.axis_iter(Axis(0)).enumerate() {
-                    let dist = crate::interpolate::vec_norm_1d(&vec);
+                    let dist = crate::interpolate::vec_norm_1d(vec);
                     if (dist <= near_dist_1) {
                         near_dist_2 = near_dist_1;
                         near_dist_1 = dist;
@@ -834,8 +834,8 @@ impl TriGrid {
                     mean_val,
                 ];
                 let weights = crate::interpolate::linear_interp_weights_single_triangle(
-                    &point,
-                    &near_pnt_locs.view(),
+                    point,
+                    near_pnt_locs.view(),
                 );
                 *new_val = (&weights * &near_pnt_vals).sum();
             });
@@ -857,7 +857,7 @@ mod tests {
         );
     }
 
-    fn assert_ids_3d(result: &Array3<i64>, expected: &[i64]) {
+    fn assert_ids_3d(result: Array3<i64>, expected: &[i64]) {
         assert_eq!(result.shape()[2], 2);
         assert_eq!(result.len(), expected.len());
         let mut flat = Vec::with_capacity(result.len());
@@ -881,9 +881,9 @@ mod tests {
     fn direct_neighbours_depth_one() {
         // A cell has 3 side-sharing neighbours when corners do not count.
         let grid = TriGrid::new(0.7, Orientation::Flat);
-        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        let neighbours = grid.direct_neighbours(array![[0i64, 0i64]].view(), 1, false, false);
         assert_eq!(neighbours.shape(), &[1, 3, 2]);
-        assert_ids_3d(&neighbours, &[-1, 0, 1, 0, 0, -1]);
+        assert_ids_3d(neighbours, &[-1, 0, 1, 0, 0, -1]);
     }
 
     #[test]
@@ -891,10 +891,10 @@ mod tests {
         // With corners connected, the window holds 12 cells: the 6 surrounding
         // each of the 3 neighbours, plus the neighbours themselves.
         let grid = TriGrid::new(0.7, Orientation::Flat);
-        let neighbours = grid.all_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        let neighbours = grid.all_neighbours(array![[0i64, 0i64]].view(), 1, false, false);
         assert_eq!(neighbours.shape(), &[1, 12, 2]);
         assert_ids_3d(
-            &neighbours,
+            neighbours,
             &[
                 -1, -1, 0, -1, 1, -1, //
                 -2, 0, -1, 0, 1, 0, 2, 0, //
@@ -920,14 +920,14 @@ mod tests {
                     + 1) as usize;
 
                 let with = if connect_corners {
-                    grid.all_neighbours(&index.view(), depth, true, false)
+                    grid.all_neighbours(index.view(), depth, true, false)
                 } else {
-                    grid.direct_neighbours(&index.view(), depth, true, false)
+                    grid.direct_neighbours(index.view(), depth, true, false)
                 };
                 let without = if connect_corners {
-                    grid.all_neighbours(&index.view(), depth, false, false)
+                    grid.all_neighbours(index.view(), depth, false, false)
                 } else {
-                    grid.direct_neighbours(&index.view(), depth, false, false)
+                    grid.direct_neighbours(index.view(), depth, false, false)
                 };
 
                 assert_eq!(with.shape()[1], expected);
@@ -959,9 +959,9 @@ mod tests {
                     };
 
                     let neighbours = if connect_corners {
-                        grid.all_neighbours(&index.view(), depth, false, false)
+                        grid.all_neighbours(index.view(), depth, false, false)
                     } else {
-                        grid.direct_neighbours(&index.view(), depth, false, false)
+                        grid.direct_neighbours(index.view(), depth, false, false)
                     };
 
                     for cell_id in 0..neighbours.shape()[0] {
@@ -993,14 +993,14 @@ mod tests {
         for depth in 1..=6u64 {
             for connect_corners in [false, true] {
                 let with = if connect_corners {
-                    grid.all_neighbours(&index.view(), depth, true, false)
+                    grid.all_neighbours(index.view(), depth, true, false)
                 } else {
-                    grid.direct_neighbours(&index.view(), depth, true, false)
+                    grid.direct_neighbours(index.view(), depth, true, false)
                 };
                 let without = if connect_corners {
-                    grid.all_neighbours(&index.view(), depth, false, false)
+                    grid.all_neighbours(index.view(), depth, false, false)
                 } else {
-                    grid.direct_neighbours(&index.view(), depth, false, false)
+                    grid.direct_neighbours(index.view(), depth, false, false)
                 };
 
                 assert_eq!(with.shape()[1], without.shape()[1] + 1);
@@ -1023,11 +1023,11 @@ mod tests {
 
         for depth in 1..=6u64 {
             for include_selected in [false, true] {
-                let many = grid.all_neighbours(&index.view(), depth, include_selected, true);
+                let many = grid.all_neighbours(index.view(), depth, include_selected, true);
 
                 for (row, expected) in [(-6i64, 3i64), (4, -1), (5, 4)].iter().enumerate() {
                     let one = array![[expected.0, expected.1]];
-                    let single = grid.all_neighbours(&one.view(), depth, include_selected, true);
+                    let single = grid.all_neighbours(one.view(), depth, include_selected, true);
 
                     assert_eq!(single.shape(), &[1, many.shape()[1], 2]);
                     for i in 0..single.shape()[1] {
@@ -1089,11 +1089,11 @@ mod tests {
 
                     // Take a corner of a parent cell and check that it coincides
                     // with one of the corners of the sub cell containing it.
-                    let corners = grid.cell_corners(&array![[-4i64, 23i64]].view());
+                    let corners = grid.cell_corners(array![[-4i64, 23i64]].view());
                     let corner = [corners[[0, 2, 0]], corners[[0, 2, 1]]];
 
                     let id = sub_grid.cell_at_point(&corner);
-                    let sub_corners = sub_grid.cell_corners(&array![[id[0], id[1]]].view());
+                    let sub_corners = sub_grid.cell_corners(array![[id[0], id[1]]].view());
                     let on_corner = (0..3).any(|i| {
                         let dx = sub_corners[[0, i, 0]] - corner[0];
                         let dy = sub_corners[[0, i, 1]] - corner[1];
@@ -1123,17 +1123,17 @@ mod tests {
                     // The sub cells that could possibly be inside the parent cell
                     // (3, -2) are the ones around the sub cell holding the parent
                     // centroid. Python uses `depth=factor + 1`.
-                    let target = grid.centroid(&array![[3i64, -2i64]].view());
+                    let target = grid.centroid(array![[3i64, -2i64]].view());
                     let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
                     let candidates = sub_grid.all_neighbours(
-                        &array![[start[0], start[1]]].view(),
+                        array![[start[0], start[1]]].view(),
                         factor + 1,
                         true,
                         true,
                     );
 
-                    let sub_centroids = sub_grid.centroid(&candidates.slice(s![0, .., ..]));
-                    let in_cell = grid.cell_at_points(&sub_centroids.view());
+                    let sub_centroids = sub_grid.centroid(candidates.slice(s![0, .., ..]));
+                    let in_cell = grid.cell_at_points(sub_centroids.view());
                     let nr_in_cell = (0..in_cell.shape()[0])
                         .filter(|i| in_cell[[*i, 0]] == 3 && in_cell[[*i, 1]] == -2)
                         .count();

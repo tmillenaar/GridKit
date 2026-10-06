@@ -87,11 +87,11 @@ impl GridTraits for HexGrid {
         self._rotation_matrix_inv = rotation_matrix_from_angle(-rotation);
     }
 
-    fn rotation_matrix(&self) -> &Array2<f64> {
-        &self._rotation_matrix
+    fn rotation_matrix(&self) -> ArrayView2<f64> {
+        self._rotation_matrix.view()
     }
-    fn rotation_matrix_inv(&self) -> &Array2<f64> {
-        &self._rotation_matrix_inv
+    fn rotation_matrix_inv(&self) -> ArrayView2<f64> {
+        self._rotation_matrix_inv.view()
     }
 
     fn radius(&self) -> f64 {
@@ -131,7 +131,7 @@ impl GridTraits for HexGrid {
 
         [centroid_x, centroid_y]
     }
-    fn cell_at_points<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D>
+    fn cell_at_points<D>(&self, points: ArrayView<f64, D>) -> Array<i64, D>
     where
         D: Dimension,
     {
@@ -209,7 +209,7 @@ impl GridTraits for HexGrid {
         })
     }
 
-    fn cell_corners<D>(&self, index: &ArrayView<i64, D>) -> Array<f64, D::Larger>
+    fn cell_corners<D>(&self, index: ArrayView<i64, D>) -> Array<f64, D::Larger>
     where
         D: Dimension,
     {
@@ -245,7 +245,7 @@ impl GridTraits for HexGrid {
         })
     }
 
-    fn cells_near_point<D>(&self, points: &ArrayView<f64, D>) -> Array<i64, D::Larger>
+    fn cells_near_point<D>(&self, points: ArrayView<f64, D>) -> Array<i64, D::Larger>
     where
         D: Dimension,
     {
@@ -262,7 +262,7 @@ impl GridTraits for HexGrid {
             // rotating the points in this function.
             // Ideally we have a version cell_at_points that does not rotate, same
             // as we do with centroid_xy_no_rot.
-            let cell_ids = self.cell_at_points(&points);
+            let cell_ids = self.cell_at_points(points);
 
             // Rotate points only if nesecary
             // We only want to clone/copy the data in the points variable
@@ -403,7 +403,7 @@ impl GridTraits for HexGrid {
 
     fn all_neighbours<D>(
         &self,
-        index: &ArrayView<i64, D>,
+        index: ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
@@ -421,7 +421,7 @@ impl GridTraits for HexGrid {
 
     fn direct_neighbours<D>(
         &self,
-        index: &ArrayView<i64, D>,
+        index: ArrayView<i64, D>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
@@ -456,8 +456,8 @@ impl GridTraits for HexGrid {
 
         // Anchor the sub grid to the top corner of the parent's cell (0, 0). The corner
         // is taken from the *parent*, so it is unaffected by the cellsize change above.
-        let corners = self.cell_corners(&array![[0i64, 0i64]].view());
-        let anchor_loc = [corners[[0, 0, 0]], corners[[0, 0, 1]]];
+        let corners = self.cell_corners(array![0i64, 0i64].view());
+        let anchor_loc = [corners[[0, 0]], corners[[0, 1]]];
         sub_grid.anchor_inplace(&anchor_loc, CellElement::Corner);
 
         Grid::TriGrid(sub_grid)
@@ -490,7 +490,7 @@ impl HexGrid {
     /// Shared implementation of the `GridTraits` neighbour methods.
     fn _neighbours(
         &self,
-        index: &ArrayView2<i64>,
+        index: ArrayView2<i64>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
@@ -651,7 +651,7 @@ mod tests {
         );
     }
 
-    fn assert_ids_3d(result: &Array3<i64>, expected: &[i64]) {
+    fn assert_ids_3d(result: ArrayView3<i64>, expected: &[i64]) {
         assert_eq!(result.shape()[2], 2); // xy coordinates in last axis
         assert_eq!(result.len(), expected.len());
         let mut flat = Vec::with_capacity(result.len());
@@ -672,35 +672,38 @@ mod tests {
     fn direct_neighbours_depth_zero() {
         // No neighbours in case depth is set to 0
         let grid = HexGrid::new(3., Orientation::Pointy);
-        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 0, false, false);
+        let neighbours = grid.direct_neighbours(array![[0i64, 0i64]].view(), 0, false, false);
         assert_eq!(neighbours.shape(), &[1, 0, 2]);
-        assert_ids_3d(&neighbours, &[]);
+        assert_ids_3d(neighbours.view(), &[]);
     }
 
     #[test]
     fn direct_neighbours_depth_zero_with_self() {
         // No neighbours in case depth is set to 0
         let grid = HexGrid::new(3., Orientation::Pointy);
-        let neighbours = grid.direct_neighbours(&array![[0i64, -1i64]].view(), 0, true, true);
+        let neighbours = grid.direct_neighbours(array![[0i64, -1i64]].view(), 0, true, true);
         assert_eq!(neighbours.shape(), &[1, 1, 2]);
-        assert_ids_3d(&neighbours, &[0, -1]);
+        assert_ids_3d(neighbours.view(), &[0, -1]);
     }
 
     #[test]
     fn direct_neighbours_depth_zero_with_self_relative() {
         // No neighbours in case depth is set to 0
         let grid = HexGrid::new(3., Orientation::Pointy);
-        let neighbours = grid.direct_neighbours(&array![[0i64, -1i64]].view(), 0, true, false);
+        let neighbours = grid.direct_neighbours(array![[0i64, -1i64]].view(), 0, true, false);
         assert_eq!(neighbours.shape(), &[1, 1, 2]);
-        assert_ids_3d(&neighbours, &[0, 0]);
+        assert_ids_3d(neighbours.view(), &[0, 0]);
     }
 
     #[test]
     fn direct_neighbours_depth_one() {
         let grid = HexGrid::new(3., Orientation::Pointy);
-        let neighbours = grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false);
+        let neighbours = grid.direct_neighbours(array![[0i64, 0i64]].view(), 1, false, false);
         assert_eq!(neighbours.shape(), &[1, 6, 2]);
-        assert_ids_3d(&neighbours, &[-1, 1, 0, 1, -1, 0, 1, 0, 0, -1, -1, -1]);
+        assert_ids_3d(
+            neighbours.view(),
+            &[-1, 1, 0, 1, -1, 0, 1, 0, 0, -1, -1, -1],
+        );
     }
 
     #[test]
@@ -708,8 +711,8 @@ mod tests {
         // The second doctest of `HexGrid.relative_neighbours`: on an odd row the
         // flat ids shift by one, because odd rows are offset by half a cell.
         let grid = HexGrid::new(3., Orientation::Pointy);
-        let neighbours = grid.direct_neighbours(&array![[0i64, 1i64]].view(), 1, false, false);
-        assert_ids_3d(&neighbours, &[0, 1, 1, 1, -1, 0, 1, 0, 1, -1, 0, -1]);
+        let neighbours = grid.direct_neighbours(array![[0i64, 1i64]].view(), 1, false, false);
+        assert_ids_3d(neighbours.view(), &[0, 1, 1, 1, -1, 0, 1, 0, 1, -1, 0, -1]);
     }
 
     #[test]
@@ -721,11 +724,13 @@ mod tests {
         let expected = &[1, -1, 1, 0, 0, -1, 0, 1, -1, 0, -1, -1];
 
         assert_ids_3d(
-            &grid.direct_neighbours(&array![[0i64, 0i64]].view(), 1, false, false),
+            grid.direct_neighbours(array![[0i64, 0i64]].view(), 1, false, false)
+                .view(),
             expected,
         );
         assert_ids_3d(
-            &grid.direct_neighbours(&array![[0i64, 1i64]].view(), 1, false, false),
+            grid.direct_neighbours(array![[0i64, 1i64]].view(), 1, false, false)
+                .view(),
             expected,
         );
     }
@@ -742,8 +747,8 @@ mod tests {
                 for include_selected in [false, true] {
                     let index = array![[2i64, 1i64], [-3i64, 4i64]];
                     assert_eq!(
-                        grid.all_neighbours(&index.view(), depth, include_selected, true),
-                        grid.direct_neighbours(&index.view(), depth, include_selected, true)
+                        grid.all_neighbours(index.view(), depth, include_selected, true),
+                        grid.direct_neighbours(index.view(), depth, include_selected, true)
                     );
                 }
             }
@@ -761,8 +766,8 @@ mod tests {
         let index = array![[0i64, 0i64]];
 
         for depth in 1..=6 {
-            let without = grid.direct_neighbours(&index.view(), depth, false, false);
-            let with = grid.direct_neighbours(&index.view(), depth, true, false);
+            let without = grid.direct_neighbours(index.view(), depth, false, false);
+            let with = grid.direct_neighbours(index.view(), depth, true, false);
 
             assert_eq!(with.shape()[1], without.shape()[1] + 1);
             if (depth as usize) <= DOCUMENTED.len() {
@@ -781,8 +786,8 @@ mod tests {
 
         for depth in 1..=6 {
             let index = array![[7i64, -3i64]];
-            let with = grid.direct_neighbours(&index.view(), depth, true, true);
-            let without = grid.direct_neighbours(&index.view(), depth, false, true);
+            let with = grid.direct_neighbours(index.view(), depth, true, true);
+            let without = grid.direct_neighbours(index.view(), depth, false, true);
 
             let centre = with.shape()[1] / 2;
             assert_eq!([[with[[0, centre, 0]], with[[0, centre, 1]]]], [[7, -3]]);
@@ -807,7 +812,7 @@ mod tests {
         let index = array![[4i64, 4i64], [3i64, 5i64]];
 
         assert_ids_3d(
-            &grid.direct_neighbours(&index.view(), 1, false, true),
+            grid.direct_neighbours(index.view(), 1, false, true).view(),
             &[
                 3, 5, 4, 5, 3, 4, 5, 4, 4, 3, 3, 3, //
                 3, 6, 4, 6, 2, 5, 4, 5, 4, 4, 3, 4,
@@ -825,11 +830,11 @@ mod tests {
 
         for depth in 1..=6 {
             for include_selected in [false, true] {
-                let many = grid.direct_neighbours(&index.view(), depth, include_selected, true);
+                let many = grid.direct_neighbours(index.view(), depth, include_selected, true);
 
                 for (row, expected) in [(-1i64, 0i64), (2, 1), (-3, 2)].iter().enumerate() {
                     let one = array![[expected.0, expected.1]];
-                    let single = grid.direct_neighbours(&one.view(), depth, include_selected, true);
+                    let single = grid.direct_neighbours(one.view(), depth, include_selected, true);
 
                     assert_eq!(single.shape(), &[1, many.shape()[1], 2]);
                     for i in 0..single.shape()[1] {
@@ -841,7 +846,7 @@ mod tests {
 
                     // The relative ids plus the cell id are the absolute ids.
                     let relative =
-                        grid.direct_neighbours(&one.view(), depth, include_selected, false);
+                        grid.direct_neighbours(one.view(), depth, include_selected, false);
                     for i in 0..single.shape()[1] {
                         assert_eq!(
                             [[single[[0, i, 0]], single[[0, i, 1]]]],
@@ -866,10 +871,10 @@ mod tests {
 
             for depth in 1..=6 {
                 for index in [array![[2i64, 1i64]], array![[1i64, 2i64]]] {
-                    let neighbours = grid.direct_neighbours(&index.view(), depth, false, true);
+                    let neighbours = grid.direct_neighbours(index.view(), depth, false, true);
 
-                    let centroids = grid.centroid(&neighbours.slice(s![0, .., ..]));
-                    let center = grid.centroid(&index.view());
+                    let centroids = grid.centroid(neighbours.slice(s![0, .., ..]));
+                    let center = grid.centroid(index.view());
                     let offsets = centroids - &center;
 
                     // No cell is listed twice, and the selected cell is not
@@ -922,12 +927,12 @@ mod tests {
         let index = array![[3i64, -2i64]];
 
         assert_eq!(
-            grid.all_neighbours(&index.view(), 2, true, true),
-            concrete.all_neighbours(&index.view(), 2, true, true)
+            grid.all_neighbours(index.view(), 2, true, true),
+            concrete.all_neighbours(index.view(), 2, true, true)
         );
         assert_eq!(
-            grid.direct_neighbours(&index.view(), 2, false, false),
-            concrete.direct_neighbours(&index.view(), 2, false, false)
+            grid.direct_neighbours(index.view(), 2, false, false),
+            concrete.direct_neighbours(index.view(), 2, false, false)
         );
     }
 
@@ -986,11 +991,11 @@ mod tests {
 
                         // Take a corner of a parent cell and check that it coincides
                         // with one of the corners of the sub cell containing it.
-                        let corners = grid.cell_corners(&array![[-4i64, 23i64]].view());
+                        let corners = grid.cell_corners(array![[-4i64, 23i64]].view());
                         let corner = [corners[[0, 5, 0]], corners[[0, 5, 1]]];
 
                         let id = sub_grid.cell_at_point(&corner);
-                        let sub_corners = sub_grid.cell_corners(&array![[id[0], id[1]]].view());
+                        let sub_corners = sub_grid.cell_corners(array![[id[0], id[1]]].view());
                         let on_corner = (0..3).any(|i| {
                             let dx = sub_corners[[0, i, 0]] - corner[0];
                             let dy = sub_corners[[0, i, 1]] - corner[1];
@@ -1026,17 +1031,17 @@ mod tests {
                         // (3, -2) are the ones around the sub cell holding the parent
                         // centroid. Triangular windows reach further per step than the
                         // square ones, hence the generous depth.
-                        let target = grid.centroid(&array![[3i64, -2i64]].view());
+                        let target = grid.centroid(array![[3i64, -2i64]].view());
                         let start = sub_grid.cell_at_point(&[target[[0, 0]], target[[0, 1]]]);
                         let candidates = sub_grid.all_neighbours(
-                            &array![[start[0], start[1]]].view(),
+                            array![[start[0], start[1]]].view(),
                             factor + 1,
                             true,
                             true,
                         );
 
-                        let sub_centroids = sub_grid.centroid(&candidates.slice(s![0, .., ..]));
-                        let in_cell = grid.cell_at_points(&sub_centroids.view());
+                        let sub_centroids = sub_grid.centroid(candidates.slice(s![0, .., ..]));
+                        let in_cell = grid.cell_at_points(sub_centroids.view());
                         let nr_in_cell = (0..in_cell.shape()[0])
                             .filter(|i| in_cell[[*i, 0]] == 3 && in_cell[[*i, 1]] == -2)
                             .count();

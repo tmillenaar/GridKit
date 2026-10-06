@@ -174,7 +174,7 @@ impl<
         is_nodata_value(value, self.nodata_value)
     }
 
-    pub fn is_nodata_array(&self, value: &ArrayViewD<T>) -> ArrayD<bool> {
+    pub fn is_nodata_array(&self, value: ArrayViewD<T>) -> ArrayD<bool> {
         let mut result = Array::default(value.shape());
         for (idx, val) in value.indexed_iter() {
             result[idx] = self.is_nodata(&val);
@@ -185,7 +185,7 @@ impl<
     pub fn nodata_cells(&self) -> Array2<i64> {
         // Returns ids of cells with nodata value
 
-        let nodata_mask = self.is_nodata_array(&self.data.view().into_dyn());
+        let nodata_mask = self.is_nodata_array(self.data.view().into_dyn());
         // Note: nodata_mask.sum() returns a bool, which is not what we are after
         //       when summing a boolean array. So I'll do the sum myself.
         let mut nr_nodata: usize = 0;
@@ -305,7 +305,7 @@ impl<
     /// `index` may have any shape as long as its last axis is of length 2 and
     /// holds the `(x, y)` cell ids. The result has the input shape with the last
     /// axis removed.
-    pub fn values<D>(&self, index: &ArrayView<i64, D>, nodata_value: T) -> Array<T, D::Smaller>
+    pub fn values<D>(&self, index: ArrayView<i64, D>, nodata_value: T) -> Array<T, D::Smaller>
     where
         D: Dimension + RemoveAxis,
     {
@@ -326,7 +326,7 @@ impl<
     /// the last axis removed.
     pub fn linear_interpolation<D>(
         &self,
-        sample_points: &ArrayView<f64, D>,
+        sample_points: ArrayView<f64, D>,
     ) -> Array<f64, D::Smaller>
     where
         D: Dimension + RemoveAxis,
@@ -336,8 +336,8 @@ impl<
             let nearby_cells = grid.cells_near_point(sample_points);
 
             // Get values at nearby cells and the coordinates of those cells
-            let nearby_values = self.values(&nearby_cells.view(), self.nodata_value);
-            let nearby_centroids = grid.centroid(&nearby_cells.view());
+            let nearby_values = self.values(nearby_cells.view(), self.nodata_value);
+            let nearby_centroids = grid.centroid(nearby_cells.view());
 
             let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
             let nodata_value = self.nodata_value.to_f64().unwrap_or(f64::NAN);
@@ -368,7 +368,7 @@ impl<
                                 for (i, vec) in
                                     point_to_centroid_vecs.axis_iter(Axis(0)).enumerate()
                                 {
-                                    let dist = crate::interpolate::vec_norm_1d(&vec);
+                                    let dist = crate::interpolate::vec_norm_1d(vec);
                                     if (dist <= near_dist_1) {
                                         near_dist_2 = near_dist_1;
                                         near_dist_1 = dist;
@@ -397,8 +397,8 @@ impl<
 
                                 let weights =
                                     crate::interpolate::linear_interp_weights_single_triangle(
-                                        &point,
-                                        &near_pnt_locs.view(),
+                                        point,
+                                        near_pnt_locs.view(),
                                     );
                                 *new_val = (&weights * &near_pnt_vals).sum();
                             }
@@ -408,19 +408,19 @@ impl<
                     let mut nearby_cells = grid.cells_near_point(sample_points);
                     let mut sliced_ids = nearby_cells.slice_mut(s![.., 0, ..]);
 
-                    let tl_val = self.values(&sliced_ids.view(), self.nodata_value);
+                    let tl_val = self.values(sliced_ids.view(), self.nodata_value);
                     sliced_ids = nearby_cells.slice_mut(s![.., 1, ..]);
-                    let tr_val = self.values(&sliced_ids.view(), self.nodata_value);
+                    let tr_val = self.values(sliced_ids.view(), self.nodata_value);
                     sliced_ids = nearby_cells.slice_mut(s![.., 3, ..]);
-                    let br_val = self.values(&sliced_ids.view(), self.nodata_value);
+                    let br_val = self.values(sliced_ids.view(), self.nodata_value);
                     // Note: End with slice 2, which are the ids at bottom left.
                     //       These are used again so we take these as the last slice.
                     //       That way they don't get overwritten again.
                     sliced_ids = nearby_cells.slice_mut(s![.., 2, ..]);
-                    let bl_val = self.values(&sliced_ids.view(), self.nodata_value);
+                    let bl_val = self.values(sliced_ids.view(), self.nodata_value);
 
                     // Sliced_ids here should contain the bottom-left ids
-                    let mut abs_diff = sample_points - grid.centroid(&sliced_ids.view());
+                    let mut abs_diff = &sample_points - &grid.centroid(sliced_ids.view());
                     if grid.rotation() != 0. {
                         for i in 0..abs_diff.shape()[0] {
                             let mut diff = abs_diff.slice_mut(s![i, ..]);
@@ -457,14 +457,13 @@ impl<
                     let all_nearby_cells = grid.cells_near_point(sample_points); // (points, nearby_cells, xy)
 
                     // Get values at nearby cells and the coordinates of those cells
-                    let nearby_centroids = grid.centroid(&all_nearby_cells.view());
+                    let nearby_centroids = grid.centroid(all_nearby_cells.view());
                     let weights = crate::interpolate::linear_interp_weights_triangles(
-                        &sample_points,
-                        &nearby_centroids.view(),
+                        sample_points,
+                        nearby_centroids.view(),
                     );
 
-                    let all_nearby_values =
-                        self.values(&all_nearby_cells.view(), self.nodata_value);
+                    let all_nearby_values = self.values(all_nearby_cells.view(), self.nodata_value);
                     for i in 0..values.shape()[0] {
                         let nearby_values_slice = all_nearby_values.slice(s![i, ..]);
                         let mut is_nodata = false;
@@ -498,7 +497,7 @@ impl<
     /// the last axis removed.
     pub fn inverse_distance_interpolation<D>(
         &self,
-        sample_points: &ArrayView<f64, D>,
+        sample_points: ArrayView<f64, D>,
         decay_constant: f64,
     ) -> Array<f64, D::Smaller>
     where
@@ -511,8 +510,8 @@ impl<
             let all_nearby_cells = grid.cells_near_point(sample_points);
             for i in 0..sample_points.shape()[0] {
                 let nearby_cells = all_nearby_cells.slice(s![i, .., ..]);
-                let nearby_values = self.values(&nearby_cells, self.nodata_value);
-                let nearby_centroids = grid.centroid(&nearby_cells);
+                let nearby_values = self.values(nearby_cells, self.nodata_value);
+                let nearby_centroids = grid.centroid(nearby_cells);
                 let point_corner_vec = (nearby_centroids - sample_points.slice(s![i, ..]));
                 let distances = point_corner_vec.map_axis(Axis(1), |row| {
                     row.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
