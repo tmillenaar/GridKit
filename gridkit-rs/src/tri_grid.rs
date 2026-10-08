@@ -164,7 +164,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
+        crate::utils::map_point_pairs_batched(points, |points| {
             let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
 
             let dx = self.stepsize_consistent_axis();
@@ -324,7 +324,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
+        crate::utils::map_point_pairs_fanout_batched(points, |points| {
             let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 6, 2));
             // TODO:
             // Condense this into a single loop

@@ -1,5 +1,68 @@
 use ndarray::*;
 
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
+
+/// Minimum number of `(x, y)` pairs in a batched query before the parallel
+/// helpers hand the work to rayon. Below this the scheduling overhead tends to
+/// outweigh the win, and the per-point queries (`cell_at_point`, `Tile::corners`,
+/// small neighbour lookups) stay single-threaded.
+#[cfg(feature = "parallel")]
+const PARALLEL_MIN_POINTS: usize = 4096;
+
+/// Whether a batch of `n` `(x, y)` pairs should be spread over the rayon pool.
+///
+/// Nested parallelism is deliberately avoided: the batched queries call each
+/// other (e.g. `TriGrid::cells_near_point` calls `cell_at_points` and
+/// `cell_corners`), so once we are already executing on a rayon worker the
+/// outer query has claimed the pool and the inner one runs serially.
+#[cfg(feature = "parallel")]
+fn should_parallelize(n: usize) -> bool {
+    n >= PARALLEL_MIN_POINTS
+        && rayon::current_num_threads() > 1
+        && rayon::current_thread_index().is_none()
+}
+
+/// Run `f` over the row chunks of `raveled` in parallel. Called by the
+/// `*_parallel` helpers once [`should_parallelize`] has agreed the batch is
+/// worth it.
+#[cfg(feature = "parallel")]
+fn map_rows_2<A, B, F>(raveled: ArrayView2<A>, f: &F) -> Array2<B>
+where
+    A: Clone + Sync,
+    B: Send + Clone,
+    F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
+{
+    let chunk = raveled.nrows().div_ceil(rayon::current_num_threads());
+    let parts: Vec<Array2<B>> = raveled
+        .axis_chunks_iter(Axis(0), chunk)
+        .collect::<Vec<_>>()
+        .into_par_iter()
+        .map(|chunk| f(chunk))
+        .collect();
+    let views: Vec<ArrayView2<B>> = parts.iter().map(|part| part.view()).collect();
+    concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
+}
+
+/// `map_rows_2` for `(N, 2) -> (N, K, 2)` (i.e. the fanout helpers).
+#[cfg(feature = "parallel")]
+fn map_rows_3<A, B, F>(raveled: ArrayView2<A>, f: &F) -> Array3<B>
+where
+    A: Clone + Sync,
+    B: Send + Clone,
+    F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
+{
+    let chunk = raveled.nrows().div_ceil(rayon::current_num_threads());
+    let parts: Vec<Array3<B>> = raveled
+        .axis_chunks_iter(Axis(0), chunk)
+        .collect::<Vec<_>>()
+        .into_par_iter()
+        .map(|chunk| f(chunk))
+        .collect();
+    let views: Vec<ArrayView3<B>> = parts.iter().map(|part| part.view()).collect();
+    concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
+}
+
 pub fn iseven(val: i64) -> bool {
     val % 2 == 0
 }
@@ -78,6 +141,41 @@ where
         .expect("output of `f` is not compatible with the input shape")
 }
 
+/// Parallel counterpart of [`map_point_pairs`], only available with the
+/// `parallel` feature. The serial helper above is left untouched so callers that
+/// do not opt in (and call sites like `cell_corners` that depend on LLVM
+/// inlining the closure) keep exactly the same codegen.
+///
+/// The batch is split into one contiguous row chunk per rayon worker. Chunks are
+/// independent and concatenated in order, so the result is identical to the
+/// serial one.
+#[cfg(feature = "parallel")]
+pub fn map_point_pairs_parallel<D, A, B, F>(index: ArrayView<A, D>, f: F) -> Array<B, D>
+where
+    D: Dimension,
+    A: Clone + Sync,
+    B: Send + Clone,
+    F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let pattern = dim.clone().into_pattern();
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let result = if should_parallelize(raveled.nrows()) {
+        map_rows_2(raveled.view(), &f)
+    } else {
+        f(raveled.view())
+    };
+    result
+        .into_shape(pattern)
+        .expect("output of `f` is not compatible with the input shape")
+}
+
 /// Like [`map_point_pairs`], but for functions that add an axis before the
 /// trailing `(x, y)` axis, e.g. `(N, 2) -> (N, K, 2)`.
 ///
@@ -109,6 +207,55 @@ where
         .expect("output rank does not match the input rank plus one")
 }
 
+/// Parallel counterpart of [`map_point_pairs_fanout`]; see
+/// [`map_point_pairs_parallel`] for why the serial helper is kept separate.
+#[cfg(feature = "parallel")]
+pub fn map_point_pairs_fanout_parallel<D, A, B, F>(
+    index: ArrayView<A, D>,
+    f: F,
+) -> Array<B, D::Larger>
+where
+    D: Dimension,
+    A: Clone + Sync,
+    B: Send + Clone,
+    F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let result = if should_parallelize(raveled.nrows()) {
+        map_rows_3(raveled.view(), &f)
+    } else {
+        f(raveled.view())
+    };
+    let mut new_dims = dim.slice()[..dim.ndim() - 1].to_vec();
+    new_dims.push(result.shape()[1]);
+    new_dims.push(2);
+    result
+        .into_shape(IxDyn(&new_dims))
+        .expect("intermediate reshape failed")
+        .into_dimensionality::<D::Larger>()
+        .expect("output rank does not match the input rank plus one")
+}
+
+/// These aliases are what the hot batched queries call. Without the `parallel`
+/// feature they resolve to the untouched serial helpers (identical codegen);
+/// with it they resolve to the rayon-backed versions above.
+#[cfg(not(feature = "parallel"))]
+pub use map_point_pairs as map_point_pairs_batched;
+#[cfg(feature = "parallel")]
+pub use map_point_pairs_parallel as map_point_pairs_batched;
+
+#[cfg(not(feature = "parallel"))]
+pub use map_point_pairs_fanout as map_point_pairs_fanout_batched;
+#[cfg(feature = "parallel")]
+pub use map_point_pairs_fanout_parallel as map_point_pairs_fanout_batched;
+
 /// Like [`map_point_pairs`], but for functions that reduce the trailing
 /// `(x, y)` pair to a single value, e.g. `(N, 2) -> (N,)`.
 ///
@@ -132,4 +279,43 @@ where
     result
         .into_shape(smaller.into_pattern())
         .expect("output of `f` is not compatible with the reduced input shape")
+}
+
+#[cfg(all(test, feature = "parallel"))]
+mod parallel_tests {
+    use super::*;
+
+    /// Inputs well above [`PARALLEL_MIN_POINTS`] so the chunked path is taken
+    /// on a multi-core machine (the ordinary unit tests all use tiny batches and
+    /// only ever exercise the serial fallback).
+    #[test]
+    fn parallel_pairs_match_serial_above_the_threshold() {
+        let input = Array2::<f64>::from_shape_fn((PARALLEL_MIN_POINTS * 3 + 7, 2), |(i, axis)| {
+            ((i * 7 + axis * 13) % 997) as f64 - 500.
+        });
+        let work = |rows: ArrayView2<f64>| rows.mapv(|v| v * 0.5 - 1.);
+        let serial = map_point_pairs(input.view(), work);
+        let parallel = map_point_pairs_parallel(input.view(), work);
+        assert_eq!(serial, parallel);
+    }
+
+    #[test]
+    fn parallel_fanout_matches_serial_above_the_threshold() {
+        let input = Array2::<i64>::from_shape_fn((PARALLEL_MIN_POINTS * 2 + 1, 2), |(i, axis)| {
+            i as i64 * 3 + axis as i64
+        });
+        let work = |rows: ArrayView2<i64>| {
+            let mut out = Array3::<i64>::zeros((rows.shape()[0], 3, 2));
+            for r in 0..rows.shape()[0] {
+                for k in 0..3 {
+                    out[[r, k, 0]] = rows[[r, 0]] + k as i64;
+                    out[[r, k, 1]] = rows[[r, 1]] - k as i64;
+                }
+            }
+            out
+        };
+        let serial = map_point_pairs_fanout(input.view(), work);
+        let parallel = map_point_pairs_fanout_parallel(input.view(), work);
+        assert_eq!(serial, parallel);
+    }
 }

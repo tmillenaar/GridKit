@@ -135,7 +135,7 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
+        crate::utils::map_point_pairs_batched(points, |points| {
             // Inverse-rotate the points into the grid frame once, then reuse the
             // shared no-rotation id lookup. Batching the rotation avoids the
             // per-point allocation that `_rotation_matrix_inv.dot` used to make.
@@ -203,7 +203,7 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
+        crate::utils::map_point_pairs_fanout_batched(points, |points| {
             // There are 6 options for the nearby cells,
             // based on where in a cell the point is located.
             // Hence there are 6 sections within the cell,

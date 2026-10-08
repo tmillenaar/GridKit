@@ -99,7 +99,7 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
+        crate::utils::map_point_pairs_batched(points, |points| {
             // Inverse-rotate the points into the grid frame once, then reuse the
             // shared no-rotation id lookup. Batching the rotation avoids the
             // per-point allocation that `_rotation_matrix_inv.dot` used to make.
@@ -167,7 +167,7 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
+        crate::utils::map_point_pairs_fanout_batched(points, |points| {
             let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
 
             // Rotate the points into the grid frame exactly once. Both the id
