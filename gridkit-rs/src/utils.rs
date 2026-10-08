@@ -2,6 +2,12 @@ use ndarray::*;
 
 #[cfg(feature = "parallel")]
 use rayon::prelude::*;
+#[cfg(feature = "parallel")]
+use rayon::ThreadPool;
+#[cfg(feature = "parallel")]
+use std::sync::atomic::{AtomicUsize, Ordering};
+#[cfg(feature = "parallel")]
+use std::sync::OnceLock;
 
 /// Minimum number of `(x, y)` pairs in a batched query before the parallel
 /// helpers hand the work to rayon. Below this the scheduling overhead tends to
@@ -10,7 +16,136 @@ use rayon::prelude::*;
 #[cfg(feature = "parallel")]
 const PARALLEL_MIN_POINTS: usize = 4096;
 
-/// Whether a batch of `n` `(x, y)` pairs should be spread over the rayon pool.
+/// Worker count used when neither an explicit override, the environment, nor a
+/// detected core count is available.
+#[cfg(feature = "parallel")]
+const DEFAULT_PARALLEL_THREADS: usize = 4;
+
+/// Explicit override set by [`set_num_threads`]; `0` means "not set".
+#[cfg(feature = "parallel")]
+static NUM_THREADS: AtomicUsize = AtomicUsize::new(0);
+
+/// GridKit's own rayon pool, built lazily on the first parallel query.
+///
+/// Using a private pool (rather than rayon's global one) is what lets the
+/// default and the overrides below be honoured regardless of what the host
+/// process does with rayon.
+#[cfg(feature = "parallel")]
+static POOL: OnceLock<ThreadPool> = OnceLock::new();
+
+/// Thread count from `GRIDKIT_NUM_THREADS`, then `RAYON_NUM_THREADS`.
+#[cfg(feature = "parallel")]
+fn env_threads() -> Option<usize> {
+    ["GRIDKIT_NUM_THREADS", "RAYON_NUM_THREADS"]
+        .iter()
+        .find_map(|key| {
+            std::env::var(key)
+                .ok()
+                .and_then(|value| value.trim().parse::<usize>().ok())
+                .filter(|n| *n > 0)
+        })
+}
+
+/// The CPUs this process is allowed to run on, from `/proc/self/status`'s
+/// `Cpus_allowed_list` (Linux only).
+#[cfg(feature = "parallel")]
+fn allowed_cpus() -> Option<Vec<u32>> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let list = status
+        .lines()
+        .find_map(|line| line.strip_prefix("Cpus_allowed_list:"))?
+        .trim();
+    let mut cpus = Vec::new();
+    for part in list.split(',') {
+        let part = part.trim();
+        if part.is_empty() {
+            continue;
+        }
+        match part.split_once('-') {
+            Some((start, end)) => {
+                let start: u32 = start.trim().parse().ok()?;
+                let end: u32 = end.trim().parse().ok()?;
+                cpus.extend(start..=end);
+            }
+            None => cpus.push(part.parse().ok()?),
+        }
+    }
+    Some(cpus)
+}
+
+/// Best-effort physical core count, respecting the process's CPU affinity.
+///
+/// Counts distinct `(physical_package_id, core_id)` pairs among the allowed
+/// CPUs. Returns `None` when the topology is unavailable (e.g. non-Linux), so
+/// the caller can fall back to the logical count.
+#[cfg(feature = "parallel")]
+fn physical_core_count() -> Option<usize> {
+    let mut cores = std::collections::HashSet::new();
+    for cpu in allowed_cpus()? {
+        let base = format!("/sys/devices/system/cpu/cpu{cpu}/topology");
+        let (Ok(core), Ok(package)) = (
+            std::fs::read_to_string(format!("{base}/core_id")),
+            std::fs::read_to_string(format!("{base}/physical_package_id")),
+        ) else {
+            continue;
+        };
+        cores.insert((package.trim().to_string(), core.trim().to_string()));
+    }
+    (!cores.is_empty()).then_some(cores.len())
+}
+
+/// The number of rayon workers the batched queries will use.
+///
+/// Defaults to the number of physical cores: SMT siblings add little for this
+/// memory-bound work and oversubscribing them can hurt. Falls back to the
+/// logical core count, then to [`DEFAULT_PARALLEL_THREADS`], when the topology
+/// cannot be read (e.g. non-Linux or a restricted `/proc`).
+#[cfg(feature = "parallel")]
+pub fn num_threads() -> usize {
+    match NUM_THREADS.load(Ordering::Relaxed) {
+        0 => env_threads().unwrap_or_else(|| {
+            physical_core_count()
+                .or_else(|| std::thread::available_parallelism().ok().map(|n| n.get()))
+                .unwrap_or(DEFAULT_PARALLEL_THREADS)
+        }),
+        n => n,
+    }
+}
+
+/// Override the number of worker threads used by the parallel grid queries.
+///
+/// Pass `threads >= 1`, or `None` to fall back to the default (physical cores,
+/// then logical cores, then [`DEFAULT_PARALLEL_THREADS`]). The pool is built
+/// lazily on the first parallel query and cannot be resized afterwards, so this
+/// must be called before then; otherwise an error is returned.
+/// `GRIDKIT_NUM_THREADS` and `RAYON_NUM_THREADS` provide the same override from
+/// the environment.
+#[cfg(feature = "parallel")]
+pub fn set_num_threads(threads: Option<usize>) -> Result<(), String> {
+    if threads == Some(0) {
+        return Err("number of threads must be at least 1 (or None for the default)".to_string());
+    }
+    if POOL.get().is_some() {
+        return Err("the gridkit rayon pool is already initialized; \
+                    set_num_threads() must be called before the first parallel query"
+            .to_string());
+    }
+    NUM_THREADS.store(threads.unwrap_or(0), Ordering::Relaxed);
+    Ok(())
+}
+
+#[cfg(feature = "parallel")]
+fn pool() -> &'static ThreadPool {
+    POOL.get_or_init(|| {
+        rayon::ThreadPoolBuilder::new()
+            .num_threads(num_threads())
+            .thread_name(|i| format!("gridkit-{i}"))
+            .build()
+            .expect("failed to build the gridkit rayon thread pool")
+    })
+}
+
+/// Whether a batch of `n` `(x, y)` pairs should be spread over the pool.
 ///
 /// Nested parallelism is deliberately avoided: the batched queries call each
 /// other (e.g. `TriGrid::cells_near_point` calls `cell_at_points` and
@@ -18,9 +153,7 @@ const PARALLEL_MIN_POINTS: usize = 4096;
 /// outer query has claimed the pool and the inner one runs serially.
 #[cfg(feature = "parallel")]
 fn should_parallelize(n: usize) -> bool {
-    n >= PARALLEL_MIN_POINTS
-        && rayon::current_num_threads() > 1
-        && rayon::current_thread_index().is_none()
+    n >= PARALLEL_MIN_POINTS && num_threads() > 1 && rayon::current_thread_index().is_none()
 }
 
 /// Run `f` over the row chunks of `raveled` in parallel. Called by the
@@ -33,13 +166,15 @@ where
     B: Send + Clone,
     F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
 {
-    let chunk = raveled.nrows().div_ceil(rayon::current_num_threads());
-    let parts: Vec<Array2<B>> = raveled
-        .axis_chunks_iter(Axis(0), chunk)
-        .collect::<Vec<_>>()
-        .into_par_iter()
-        .map(|chunk| f(chunk))
-        .collect();
+    let chunk = raveled.nrows().div_ceil(num_threads());
+    let parts: Vec<Array2<B>> = pool().install(|| {
+        raveled
+            .axis_chunks_iter(Axis(0), chunk)
+            .collect::<Vec<_>>()
+            .into_par_iter()
+            .map(|chunk| f(chunk))
+            .collect()
+    });
     let views: Vec<ArrayView2<B>> = parts.iter().map(|part| part.view()).collect();
     concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
 }
@@ -52,13 +187,15 @@ where
     B: Send + Clone,
     F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
 {
-    let chunk = raveled.nrows().div_ceil(rayon::current_num_threads());
-    let parts: Vec<Array3<B>> = raveled
-        .axis_chunks_iter(Axis(0), chunk)
-        .collect::<Vec<_>>()
-        .into_par_iter()
-        .map(|chunk| f(chunk))
-        .collect();
+    let chunk = raveled.nrows().div_ceil(num_threads());
+    let parts: Vec<Array3<B>> = pool().install(|| {
+        raveled
+            .axis_chunks_iter(Axis(0), chunk)
+            .collect::<Vec<_>>()
+            .into_par_iter()
+            .map(|chunk| f(chunk))
+            .collect()
+    });
     let views: Vec<ArrayView3<B>> = parts.iter().map(|part| part.view()).collect();
     concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
 }
@@ -309,14 +446,16 @@ where
     let n = raveled.nrows();
     let mut out = Array3::<B>::from_elem((n, k, 2), B::default());
     if should_parallelize(n) {
-        let chunk = n.div_ceil(rayon::current_num_threads());
+        let chunk = n.div_ceil(num_threads());
         let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
         let destinations: Vec<ArrayViewMut3<B>> =
             out.axis_chunks_iter_mut(Axis(0), chunk).collect();
-        sources
-            .into_par_iter()
-            .zip(destinations.into_par_iter())
-            .for_each(|(source, destination)| fill(source, destination));
+        pool().install(|| {
+            sources
+                .into_par_iter()
+                .zip(destinations.into_par_iter())
+                .for_each(|(source, destination)| fill(source, destination));
+        });
     } else {
         fill(raveled.view(), out.view_mut());
     }
@@ -426,5 +565,28 @@ mod parallel_tests {
         let serial = map_point_pairs_fanout_fill(input.view(), 3, work);
         let parallel = map_point_pairs_fanout_fill_parallel(input.view(), 3, work);
         assert_eq!(serial, parallel);
+    }
+
+    #[test]
+    fn num_threads_is_at_least_one() {
+        assert!(num_threads() >= 1);
+    }
+
+    #[test]
+    fn physical_core_count_is_sane() {
+        // On Linux this should resolve; elsewhere it may be `None`.
+        if let Some(physical) = physical_core_count() {
+            let logical = std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(physical);
+            assert!(physical >= 1 && physical <= logical);
+        }
+    }
+
+    #[test]
+    fn zero_threads_is_rejected() {
+        // Rejected before any pool/state mutation, so this is safe even if the
+        // shared test pool has already been built by another test.
+        assert!(set_num_threads(Some(0)).is_err());
     }
 }
