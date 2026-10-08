@@ -1,5 +1,6 @@
 from gridkit._statistical_functions import count, mean, sum, total_bounds
 from gridkit.base_grid import BaseGrid
+from gridkit.gridkit_rs import num_threads, set_num_threads
 from gridkit.hex_grid import BoundedHexGrid, HexGrid
 from gridkit.index import GridIndex, validate_index
 from gridkit.io import raster_to_data_tile, read_raster, write_raster
