@@ -16,3 +16,8 @@ wkb = "0.7.1"
 
 [dev-dependencies]
 bresenham = "0.1.1" # Used in examples/rotating_grid
+criterion = "0.8.2"
+
+[[bench]]
+name = "rotation"
+harness = false

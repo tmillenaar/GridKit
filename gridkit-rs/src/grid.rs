@@ -138,10 +138,15 @@ pub trait GridTraits {
             }
             if self.rotation() != 0. {
                 let rotation_matrix = self.rotation_matrix();
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `rotation_matrix.dot(&centroid)` call would make per cell.
+                let cos = rotation_matrix[[0, 0]];
+                let sin = rotation_matrix[[1, 0]];
                 for cell_id in 0..centroids.shape()[0] {
-                    let centroid = centroids.slice(s![cell_id, ..]).to_owned();
-                    let cent_rot = rotation_matrix.dot(&centroid);
-                    centroids.slice_mut(s![cell_id, ..]).assign(&cent_rot);
+                    let x = centroids[Ix2(cell_id, 0)];
+                    let y = centroids[Ix2(cell_id, 1)];
+                    centroids[Ix2(cell_id, 0)] = cos * x - sin * y;
+                    centroids[Ix2(cell_id, 1)] = sin * x + cos * y;
                 }
             }
             centroids

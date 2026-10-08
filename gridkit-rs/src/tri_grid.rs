@@ -157,15 +157,27 @@ impl GridTraits for TriGrid {
                 Orientation::Pointy => self.cell_width(),
             };
 
+            // `rotate` is loop-invariant. Splitting this into one loop with rotation
+            // and one without, and replacing the ndarray `dot` below with hand-written
+            // scalar math, were both benchmarked and made no measurable difference.
+            // The branch is kept inline and the clearer `dot` is used.
+            let rotate = self.rotation() != 0.;
+
             for cell_id in 0..points.shape()[0] {
-                let point = points.slice(s![cell_id, ..]);
-                let point = self._rotation_matrix_inv.dot(&point);
+                let point_not_rotated = points.slice(s![cell_id, ..]);
+                let rotated;
+                let point = if rotate {
+                    rotated = self._rotation_matrix_inv.dot(&point_not_rotated);
+                    rotated.view()
+                } else {
+                    point_not_rotated
+                };
                 index[Ix2(cell_id, id_x_axis)] =
-                    (1. + (point[Ix1(id_x_axis)] - offset_x) / dx).floor() as i64;
+                    (1. + (point[id_x_axis] - offset_x) / dx).floor() as i64;
                 index[Ix2(cell_id, id_y_axis)] =
-                    ((point[Ix1(id_y_axis)] - offset_y) / cell_height).floor() as i64;
+                    ((point[id_y_axis] - offset_y) / cell_height).floor() as i64;
                 index[Ix2(cell_id, id_x_axis)] = 2
-                    * ((point[Ix1(id_x_axis)] - offset_x
+                    * ((point[id_x_axis] - offset_x
                         + dx * !iseven(index[Ix2(cell_id, id_y_axis)]) as i64 as f64)
                         / cell_width)
                         .floor() as i64
@@ -173,24 +185,24 @@ impl GridTraits for TriGrid {
 
                 // TODO: Fix this 3rd dimension of cell_id=0. I.e. fix cell_corners needing to take multiple ids at once
                 let cell_origin = self.cell_corners(index.slice(s![cell_id..cell_id + 1, ..]));
-                let cell_origin = cell_origin.slice(s![0, 2, ..]);
+                let cell_origin = cell_origin.slice(s![0usize, 2usize, ..]);
+                let origin_rotated;
+                let cell_origin = if rotate {
+                    origin_rotated = self._rotation_matrix_inv.dot(&cell_origin);
+                    origin_rotated.view()
+                } else {
+                    cell_origin
+                };
+                let rel_loc_x: f64 = point[id_x_axis] - cell_origin[id_x_axis];
+                let rel_loc_y: f64 = point[id_y_axis] - cell_origin[id_y_axis];
 
-                let cell_origin: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> =
-                    self._rotation_matrix_inv.dot(&cell_origin);
-                let cell_origin_x = cell_origin[Ix1(id_x_axis)];
-                let cell_origin_y = cell_origin[Ix1(id_y_axis)];
-                let rel_loc_x: f64 = point[Ix1(id_x_axis)] - cell_origin_x;
-                let rel_loc_y: f64 = point[Ix1(id_y_axis)] - cell_origin_y;
-
-                let y_threshold_left: f64;
-                let y_threshold_right: f64;
                 let slope = dy / dx;
                 // Descrtibes the equation that forms the left border of the triangle
                 let left_eq = |x: f64| -> f64 { slope * x };
                 // Descrtibes the equation that forms the right border of the triangle
                 let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
-                y_threshold_left = left_eq(rel_loc_x);
-                y_threshold_right = right_eq(rel_loc_x);
+                let y_threshold_left: f64 = left_eq(rel_loc_x);
+                let y_threshold_right: f64 = right_eq(rel_loc_x);
                 let id_shift = if rel_loc_y > y_threshold_left {
                     -1
                 } else if rel_loc_y > y_threshold_right {
@@ -270,11 +282,16 @@ impl GridTraits for TriGrid {
             }
 
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix.dot(&corner)` call would make per corner.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..corners.shape()[0] {
                     for corner_id in 0..corners.shape()[1] {
-                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                        corner_xy.assign(&rotated_corner_xy);
+                        let x = corners[Ix3(cell_id, corner_id, 0)];
+                        let y = corners[Ix3(cell_id, corner_id, 1)];
+                        corners[Ix3(cell_id, corner_id, 0)] = cos * x - sin * y;
+                        corners[Ix3(cell_id, corner_id, 1)] = sin * x + cos * y;
                     }
                 }
             }

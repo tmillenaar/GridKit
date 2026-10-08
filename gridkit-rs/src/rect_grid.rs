@@ -102,11 +102,20 @@ impl GridTraits for RectGrid {
         crate::utils::map_point_pairs(points, |points| {
             let shape = points.shape();
             let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
+            // `rotate` is loop-invariant. Splitting this into one loop with rotation
+            // and one without, and replacing the ndarray `dot` below with hand-written
+            // scalar math, were both benchmarked and made no measurable difference.
+            // The branch is kept inline and the clearer `dot` is used.
+            let rotate = self.rotation() != 0.;
             for cell_id in 0..points.shape()[0] {
-                let point = points.slice(s![cell_id, ..]);
-                // FIXME: Rotation causes slowdown even when 0.
-                //        Consider a separate version of the function that does not do rotation
-                let point = self._rotation_matrix_inv.dot(&point);
+                let point_not_rotated = points.slice(s![cell_id, ..]);
+                let rotated;
+                let point = if rotate {
+                    rotated = self._rotation_matrix_inv.dot(&point_not_rotated);
+                    rotated.view()
+                } else {
+                    point_not_rotated
+                };
                 let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
                 let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
                 index[Ix2(cell_id, 0)] = id_x;
@@ -137,11 +146,16 @@ impl GridTraits for RectGrid {
             }
 
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix.dot(&corner)` call would make per corner.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..corners.shape()[0] {
                     for corner_id in 0..corners.shape()[1] {
-                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                        corner_xy.assign(&rotated_corner_xy);
+                        let x = corners[Ix3(cell_id, corner_id, 0)];
+                        let y = corners[Ix3(cell_id, corner_id, 1)];
+                        corners[Ix3(cell_id, corner_id, 0)] = cos * x - sin * y;
+                        corners[Ix3(cell_id, corner_id, 1)] = sin * x + cos * y;
                     }
                 }
             }
@@ -161,10 +175,15 @@ impl GridTraits for RectGrid {
             //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
             let mut points = points.to_owned();
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix_inv.dot(&point)` call would make per point.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..points.shape()[0] {
-                    let mut point = points.slice_mut(s![cell_id, ..]);
-                    let point_rot = self._rotation_matrix_inv.dot(&point);
-                    point.assign(&point_rot);
+                    let x = points[Ix2(cell_id, 0)];
+                    let y = points[Ix2(cell_id, 1)];
+                    points[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    points[Ix2(cell_id, 1)] = -sin * x + cos * y;
                 }
             }
 
