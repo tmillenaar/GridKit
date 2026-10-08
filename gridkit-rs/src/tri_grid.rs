@@ -242,9 +242,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 3, 2));
-
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 3, |index, mut corners| {
             // These dimensions depend only on the cellsize and orientation, so
             // hoist them out of the per-cell loop.
             let radius = self.radius();
@@ -316,7 +314,6 @@ impl GridTraits for TriGrid {
                     }
                 }
             }
-            corners
         })
     }
 

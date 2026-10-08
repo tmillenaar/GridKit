@@ -243,6 +243,92 @@ where
         .expect("output rank does not match the input rank plus one")
 }
 
+/// Like [`map_point_pairs_fanout`], but the caller's closure fills a
+/// preallocated `(N, K, 2)` output in place instead of returning an owned array.
+///
+/// This is the building block for the parallel fanout queries: it lets each
+/// rayon worker write straight into its slice of the result, so there is no
+/// per-chunk allocation and no final `concatenate` copy. `K` is passed in
+/// because the output must be allocated before the closure runs.
+pub fn map_point_pairs_fanout_fill<D, A, B, F>(
+    index: ArrayView<A, D>,
+    k: usize,
+    fill: F,
+) -> Array<B, D::Larger>
+where
+    D: Dimension,
+    A: Clone,
+    B: Clone + Default,
+    F: FnOnce(ArrayView2<A>, ArrayViewMut3<B>),
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let mut out = Array3::<B>::from_elem((raveled.nrows(), k, 2), B::default());
+    fill(raveled.view(), out.view_mut());
+    let mut new_dims = dim.slice()[..dim.ndim() - 1].to_vec();
+    new_dims.push(k);
+    new_dims.push(2);
+    out.into_shape(IxDyn(&new_dims))
+        .expect("intermediate reshape failed")
+        .into_dimensionality::<D::Larger>()
+        .expect("output rank does not match the input rank plus one")
+}
+
+/// Parallel counterpart of [`map_point_pairs_fanout_fill`]; see
+/// [`map_point_pairs_parallel`] for why the serial helpers are kept separate.
+///
+/// Unlike [`map_point_pairs_fanout_parallel`] this does not allocate a result
+/// per chunk and concatenate them afterwards; the single output array is
+/// preallocated and each worker fills its own disjoint row chunk in place.
+#[cfg(feature = "parallel")]
+pub fn map_point_pairs_fanout_fill_parallel<D, A, B, F>(
+    index: ArrayView<A, D>,
+    k: usize,
+    fill: F,
+) -> Array<B, D::Larger>
+where
+    D: Dimension,
+    A: Clone + Sync,
+    B: Clone + Default + Send,
+    F: Fn(ArrayView2<A>, ArrayViewMut3<B>) + Sync,
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let n = raveled.nrows();
+    let mut out = Array3::<B>::from_elem((n, k, 2), B::default());
+    if should_parallelize(n) {
+        let chunk = n.div_ceil(rayon::current_num_threads());
+        let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
+        let destinations: Vec<ArrayViewMut3<B>> =
+            out.axis_chunks_iter_mut(Axis(0), chunk).collect();
+        sources
+            .into_par_iter()
+            .zip(destinations.into_par_iter())
+            .for_each(|(source, destination)| fill(source, destination));
+    } else {
+        fill(raveled.view(), out.view_mut());
+    }
+    let mut new_dims = dim.slice()[..dim.ndim() - 1].to_vec();
+    new_dims.push(k);
+    new_dims.push(2);
+    out.into_shape(IxDyn(&new_dims))
+        .expect("intermediate reshape failed")
+        .into_dimensionality::<D::Larger>()
+        .expect("output rank does not match the input rank plus one")
+}
+
 /// These aliases are what the hot batched queries call. Without the `parallel`
 /// feature they resolve to the untouched serial helpers (identical codegen);
 /// with it they resolve to the rayon-backed versions above.
@@ -255,6 +341,11 @@ pub use map_point_pairs_parallel as map_point_pairs_batched;
 pub use map_point_pairs_fanout as map_point_pairs_fanout_batched;
 #[cfg(feature = "parallel")]
 pub use map_point_pairs_fanout_parallel as map_point_pairs_fanout_batched;
+
+#[cfg(not(feature = "parallel"))]
+pub use map_point_pairs_fanout_fill as map_point_pairs_fanout_fill_batched;
+#[cfg(feature = "parallel")]
+pub use map_point_pairs_fanout_fill_parallel as map_point_pairs_fanout_fill_batched;
 
 /// Like [`map_point_pairs`], but for functions that reduce the trailing
 /// `(x, y)` pair to a single value, e.g. `(N, 2) -> (N,)`.
@@ -316,6 +407,24 @@ mod parallel_tests {
         };
         let serial = map_point_pairs_fanout(input.view(), work);
         let parallel = map_point_pairs_fanout_parallel(input.view(), work);
+        assert_eq!(serial, parallel);
+    }
+
+    #[test]
+    fn parallel_fanout_fill_matches_serial_above_the_threshold() {
+        let input = Array2::<i64>::from_shape_fn((PARALLEL_MIN_POINTS * 2 + 1, 2), |(i, axis)| {
+            i as i64 * 3 + axis as i64
+        });
+        let work = |rows: ArrayView2<i64>, mut out: ArrayViewMut3<i64>| {
+            for r in 0..rows.shape()[0] {
+                for k in 0..out.shape()[1] {
+                    out[[r, k, 0]] = rows[[r, 0]] + k as i64;
+                    out[[r, k, 1]] = rows[[r, 1]] - k as i64;
+                }
+            }
+        };
+        let serial = map_point_pairs_fanout_fill(input.view(), 3, work);
+        let parallel = map_point_pairs_fanout_fill_parallel(input.view(), 3, work);
         assert_eq!(serial, parallel);
     }
 }

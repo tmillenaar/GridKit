@@ -126,8 +126,7 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 4, |index, mut corners| {
             // Hoist the loop-invariant half-steps.
             let half_dx = self.dx() / 2.;
             let half_dy = self.dy() / 2.;
@@ -159,7 +158,6 @@ impl GridTraits for RectGrid {
                     }
                 }
             }
-            corners
         })
     }
 

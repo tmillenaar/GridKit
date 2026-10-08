@@ -162,22 +162,29 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 6, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 6, |index, mut corners| {
+            // The six corner offsets depend only on the radius and orientation,
+            // so compute them once per call instead of per corner per cell. This
+            // matters especially in the parallel path, where the closure cannot
+            // be relied on to be inlined and the per-corner trig was otherwise
+            // recomputed for every cell.
+            let radius = self.radius();
+            let mut offsets = [[0.0_f64; 2]; 6];
+            for corner_id in 0..6 {
+                let angle_deg = match self.orientation() {
+                    Orientation::Pointy => 60. * corner_id as f64 - 30.,
+                    Orientation::Flat => 60. * corner_id as f64,
+                };
+                let angle_rad = angle_deg * std::f64::consts::PI / 180.;
+                offsets[corner_id] = [radius * angle_rad.cos(), radius * angle_rad.sin()];
+            }
 
             for cell_id in 0..index.shape()[0] {
+                let centroid =
+                    self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
                 for corner_id in 0..6 {
-                    let angle_deg = match self.orientation() {
-                        Orientation::Pointy => 60. * corner_id as f64 - 30.,
-                        Orientation::Flat => 60. * corner_id as f64,
-                    };
-                    let angle_rad = angle_deg * std::f64::consts::PI / 180.;
-                    let centroid =
-                        self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                    corners[Ix3(cell_id, corner_id, 0)] =
-                        centroid[0] + self.radius() * angle_rad.cos();
-                    corners[Ix3(cell_id, corner_id, 1)] =
-                        centroid[1] + self.radius() * angle_rad.sin();
+                    corners[Ix3(cell_id, corner_id, 0)] = centroid[0] + offsets[corner_id][0];
+                    corners[Ix3(cell_id, corner_id, 1)] = centroid[1] + offsets[corner_id][1];
                 }
             }
 
@@ -195,7 +202,6 @@ impl GridTraits for HexGrid {
                     }
                 }
             }
-            corners
         })
     }
 
