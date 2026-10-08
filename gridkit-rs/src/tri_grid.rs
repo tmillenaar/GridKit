@@ -224,6 +224,14 @@ impl GridTraits for TriGrid {
         crate::utils::map_point_pairs_fanout(index, |index| {
             let mut corners = Array3::<f64>::zeros((index.shape()[0], 3, 2));
 
+            // These dimensions depend only on the cellsize and orientation, so
+            // hoist them out of the per-cell loop.
+            let radius = self.radius();
+            let dx = self.dx();
+            let dy = self.dy();
+            let cell_height = self.cell_height();
+            let cell_width = self.cell_width();
+
             for cell_id in 0..corners.shape()[0] {
                 let [centroid_x, centroid_y] =
                     self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
@@ -232,49 +240,41 @@ impl GridTraits for TriGrid {
                         if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                             // Cell with flat base at bottom and pointing up
                             corners[Ix3(cell_id, 0, 0)] = centroid_x; // top-x
-                            corners[Ix3(cell_id, 0, 1)] = centroid_y + self.radius(); // top-y
-                            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx(); // bottom-right-x
-                            corners[Ix3(cell_id, 1, 1)] =
-                                centroid_y - (self.cell_height() - self.radius()); // bottom-right-y
-                            corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx(); // bottom-left-x
-                            corners[Ix3(cell_id, 2, 1)] =
-                                centroid_y - (self.cell_height() - self.radius());
+                            corners[Ix3(cell_id, 0, 1)] = centroid_y + radius; // top-y
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + dx; // bottom-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y - (cell_height - radius); // bottom-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - dx; // bottom-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - (cell_height - radius);
                         //bottom-left-y
                         } else {
                             // Cell with flat base at top and pointing down
                             corners[Ix3(cell_id, 0, 0)] = centroid_x; // bottom-x
-                            corners[Ix3(cell_id, 0, 1)] = centroid_y - self.radius(); // bottom-y
-                            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx(); // top-right-x
-                            corners[Ix3(cell_id, 1, 1)] =
-                                centroid_y + (self.cell_height() - self.radius()); // top-right-y
-                            corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx(); // top-left-x
-                            corners[Ix3(cell_id, 2, 1)] =
-                                centroid_y + (self.cell_height() - self.radius());
+                            corners[Ix3(cell_id, 0, 1)] = centroid_y - radius; // bottom-y
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + dx; // top-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + (cell_height - radius); // top-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - dx; // top-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y + (cell_height - radius);
                             // top-left-y
                         }
                     }
                     Orientation::Pointy => {
                         if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                             // Cell with flat base on left side, pointing right
-                            corners[Ix3(cell_id, 0, 0)] = centroid_x + self.radius(); // right-x
+                            corners[Ix3(cell_id, 0, 0)] = centroid_x + radius; // right-x
                             corners[Ix3(cell_id, 0, 1)] = centroid_y; // right-y
-                            corners[Ix3(cell_id, 1, 0)] =
-                                centroid_x - (self.cell_width() - self.radius()); // top-left-x
-                            corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-left-y
-                            corners[Ix3(cell_id, 2, 0)] =
-                                centroid_x - (self.cell_width() - self.radius()); // bottom-left-x
-                            corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy();
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x - (cell_width - radius); // top-left-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + dy; // top-left-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - (cell_width - radius); // bottom-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - dy;
                         // bottom-left-y
                         } else {
                             // Cell with flat base on right side, pointing left
-                            corners[Ix3(cell_id, 0, 0)] = centroid_x - self.radius(); // left-x
+                            corners[Ix3(cell_id, 0, 0)] = centroid_x - radius; // left-x
                             corners[Ix3(cell_id, 0, 1)] = centroid_y; // left-y
-                            corners[Ix3(cell_id, 1, 0)] =
-                                centroid_x + (self.cell_width() - self.radius()); // top-right-x
-                            corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-right-y
-                            corners[Ix3(cell_id, 2, 0)] =
-                                centroid_x + (self.cell_width() - self.radius()); // bottom-right-x
-                            corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy();
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + (cell_width - radius); // top-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + dy; // top-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x + (cell_width - radius); // bottom-right-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - dy;
                             // bottom-right-y
                         }
                     }

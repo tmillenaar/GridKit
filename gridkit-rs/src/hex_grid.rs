@@ -95,7 +95,7 @@ impl GridTraits for HexGrid {
     }
 
     fn radius(&self) -> f64 {
-        self.cellsize / 3_f64.powf(0.5)
+        self.cellsize / 3_f64.sqrt()
     }
 
     fn cell_height(&self) -> f64 {
@@ -149,6 +149,15 @@ impl GridTraits for HexGrid {
             let offset_x = self.offset[id_x_axis];
             let offset_y = self.offset[id_y_axis];
 
+            // The radius and these derived constants do not depend on the point,
+            // so hoist them out of the loop instead of recomputing them (and the
+            // sqrt inside `radius()`) for every point.
+            let radius = self.radius();
+            let radius_quarter = radius / 4.;
+            let radius_1_25 = radius * 1.25;
+            let radius_5_4 = radius * 5. / 4.;
+            let dx_over_radius = dx / radius;
+
             // `rotate` is loop-invariant. Splitting this into one loop with rotation
             // and one without, and replacing the ndarray `dot` below with hand-written
             // scalar math, were both benchmarked and made no measurable difference.
@@ -169,7 +178,7 @@ impl GridTraits for HexGrid {
                 let y = point[Ix1(id_y_axis)];
 
                 // determine initial id_y
-                let mut id_y = ((y - offset_y - self.radius() / 4.) / dy).floor();
+                let mut id_y = ((y - offset_y - radius_quarter) / dy).floor();
                 let is_offset = modulus(id_y, 2.) != 0.;
                 let mut id_x: f64;
 
@@ -183,17 +192,17 @@ impl GridTraits for HexGrid {
 
                 // refine id_x and id_y
                 // Example: points at the top of the cell's bounding box can be in this cell or in the cell to the top right or top left
-                let rel_loc_y = modulus(y - offset_y - self.radius() / 4., dy) + self.radius() / 4.;
+                let rel_loc_y = modulus(y - offset_y - radius_quarter, dy) + radius_quarter;
                 let rel_loc_x = modulus(x - offset_x, dx);
 
                 let mut in_top_left: bool;
                 let mut in_top_right: bool;
                 if is_offset == true {
-                    in_top_left = (self.radius() * 1.25 - rel_loc_y)
-                        < ((rel_loc_x - 0.5 * dx) / (dx / self.radius()));
+                    in_top_left =
+                        (radius_1_25 - rel_loc_y) < ((rel_loc_x - 0.5 * dx) / dx_over_radius);
                     in_top_left = in_top_left && (rel_loc_x < (0.5 * dx));
-                    in_top_right = (rel_loc_x - 0.5 * dx) / (dx / self.radius())
-                        <= (rel_loc_y - self.radius() * 1.25);
+                    in_top_right =
+                        (rel_loc_x - 0.5 * dx) / dx_over_radius <= (rel_loc_y - radius_1_25);
                     in_top_right = in_top_right && rel_loc_x >= (0.5 * dx);
                     if in_top_left == true {
                         id_y = id_y + 1.;
@@ -202,10 +211,8 @@ impl GridTraits for HexGrid {
                         id_y = id_y + 1.;
                     }
                 } else {
-                    in_top_left =
-                        rel_loc_x / (dx / self.radius()) < (rel_loc_y - self.radius() * 5. / 4.);
-                    in_top_right = (self.radius() * 1.25 - rel_loc_y)
-                        <= (rel_loc_x - dx) / (dx / self.radius());
+                    in_top_left = rel_loc_x / dx_over_radius < (rel_loc_y - radius_5_4);
+                    in_top_right = (radius_1_25 - rel_loc_y) <= (rel_loc_x - dx) / dx_over_radius;
                     if in_top_left == true {
                         id_y = id_y + 1.;
                         id_x = id_x - 1.;

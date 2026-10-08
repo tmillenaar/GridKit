@@ -102,6 +102,10 @@ impl GridTraits for RectGrid {
         crate::utils::map_point_pairs(points, |points| {
             let shape = points.shape();
             let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
+            // Hoist the loop-invariant grid geometry.
+            let dx = self.dx();
+            let dy = self.dy();
+            let offset = self.offset;
             // `rotate` is loop-invariant. Splitting this into one loop with rotation
             // and one without, and replacing the ndarray `dot` below with hand-written
             // scalar math, were both benchmarked and made no measurable difference.
@@ -116,8 +120,8 @@ impl GridTraits for RectGrid {
                 } else {
                     point_not_rotated
                 };
-                let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
-                let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
+                let id_x = ((point[Ix1(0)] - offset[0]) / dx).floor() as i64;
+                let id_y = ((point[Ix1(1)] - offset[1]) / dy).floor() as i64;
                 index[Ix2(cell_id, 0)] = id_x;
                 index[Ix2(cell_id, 1)] = id_y;
             }
@@ -131,18 +135,21 @@ impl GridTraits for RectGrid {
     {
         crate::utils::map_point_pairs_fanout(index, |index| {
             let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
+            // Hoist the loop-invariant half-steps.
+            let half_dx = self.dx() / 2.;
+            let half_dy = self.dy() / 2.;
             for cell_id in 0..index.shape()[0] {
                 let id_x = index[Ix2(cell_id, 0)];
                 let id_y = index[Ix2(cell_id, 1)];
                 let [centroid_x, centroid_y] = self.centroid_xy_no_rot(id_x, id_y);
-                corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
-                corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
-                corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
-                corners[Ix3(cell_id, 1, 1)] = centroid_y - self.dy() / 2.;
-                corners[Ix3(cell_id, 2, 0)] = centroid_x + self.dx() / 2.;
-                corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
-                corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
-                corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
+                corners[Ix3(cell_id, 0, 0)] = centroid_x - half_dx;
+                corners[Ix3(cell_id, 0, 1)] = centroid_y - half_dy;
+                corners[Ix3(cell_id, 1, 0)] = centroid_x + half_dx;
+                corners[Ix3(cell_id, 1, 1)] = centroid_y - half_dy;
+                corners[Ix3(cell_id, 2, 0)] = centroid_x + half_dx;
+                corners[Ix3(cell_id, 2, 1)] = centroid_y + half_dy;
+                corners[Ix3(cell_id, 3, 0)] = centroid_x - half_dx;
+                corners[Ix3(cell_id, 3, 1)] = centroid_y + half_dy;
             }
 
             if self.rotation() != 0. {
