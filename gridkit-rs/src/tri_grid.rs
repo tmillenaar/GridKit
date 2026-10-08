@@ -41,6 +41,31 @@ impl Hash for TriGrid {
     }
 }
 
+/// Relative nearby-cell ids for [`TriGrid::cells_near_point`], indexed by the
+/// nearest corner of the containing cell (0..3) and the cell's orientation and
+/// parity. Kept as static tables so the hot loop does not heap-allocate a small
+/// `Array2` per point.
+const FLAT_NOT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1]],
+    [[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0]],
+    [[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0]],
+];
+const FLAT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0]],
+    [[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1]],
+    [[-2, 0], [-1, 0], [0, 0], [-2, -1], [-1, -1], [0, -1]],
+];
+const POINTY_NOT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]],
+    [[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2]],
+    [[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0]],
+];
+const POINTY_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1]],
+    [[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]],
+    [[0, -2], [0, -1], [0, 0], [-1, -2], [-1, -1], [-1, 0]],
+];
+
 impl GridTraits for TriGrid {
     fn get_grid(&self) -> crate::Grid {
         crate::Grid::TriGrid(self.to_owned())
@@ -183,16 +208,12 @@ impl GridTraits for TriGrid {
                         .floor() as i64
                     - 1 * (!iseven(index[Ix2(cell_id, id_y_axis)]) as i64);
 
-                // TODO: Fix this 3rd dimension of cell_id=0. I.e. fix cell_corners needing to take multiple ids at once
-                let cell_origin = self.cell_corners(index.slice(s![cell_id..cell_id + 1, ..]));
-                let cell_origin = cell_origin.slice(s![0usize, 2usize, ..]);
-                let origin_rotated;
-                let cell_origin = if rotate {
-                    origin_rotated = self._rotation_matrix_inv.dot(&cell_origin);
-                    origin_rotated.view()
-                } else {
-                    cell_origin
-                };
+                // Corner 2 of the containing cell, already in the grid frame.
+                // Computing it directly avoids allocating a (1, 3, 2) corner
+                // array and rotating it back for every single point. It is the
+                // same value `cell_corners(...)[0, 2, ..]` would give at rot=0.
+                let cell_origin =
+                    self.cell_origin_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
                 let rel_loc_x: f64 = point[id_x_axis] - cell_origin[id_x_axis];
                 let rel_loc_y: f64 = point[id_y_axis] - cell_origin[id_y_axis];
 
@@ -333,124 +354,34 @@ impl GridTraits for TriGrid {
                 // Define the relative ids of the nearby points with respect to the cell that contains the point
                 // The nearby cells will depend on which corner of the cell the point is located at, and
                 // whether the cell is pointing up or down.
-                let rel_nearby_cells: Array2<i64>;
-                match self.orientation() {
+                let upright =
+                    self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
+                let rel_nearby_cells: &[[i64; 2]; 6] = match self.orientation() {
                     Orientation::Flat => {
-                        if !self
-                            ._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
-                        {
-                            // Triangle points upright
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells = array![
-                                        [-1, 0],
-                                        [0, 0],
-                                        [1, 0],
-                                        [-1, -1],
-                                        [0, -1],
-                                        [1, -1],
-                                    ];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0],];
-                                }
-                                2 => {
-                                    rel_nearby_cells =
-                                        array![[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0],];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
+                        let table = if upright {
+                            &FLAT_UPRIGHT
                         } else {
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells =
-                                        array![[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0],];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1],];
-                                }
-                                2 => {
-                                    rel_nearby_cells = array![
-                                        [-2, 0],
-                                        [-1, 0],
-                                        [0, 0],
-                                        [-2, -1],
-                                        [-1, -1],
-                                        [0, -1],
-                                    ];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
-                        }
+                            &FLAT_NOT_UPRIGHT
+                        };
+                        &table[nearest_corner_id]
                     }
                     Orientation::Pointy => {
-                        if !self
-                            ._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
-                        {
-                            // Triangle points left
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells = array![
-                                        [0, -1],
-                                        [0, 0],
-                                        [0, 1],
-                                        [-1, -1],
-                                        [-1, 0],
-                                        [-1, 1],
-                                    ];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2],];
-                                }
-                                2 => {
-                                    rel_nearby_cells =
-                                        array![[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0],];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
+                        let table = if upright {
+                            &POINTY_UPRIGHT
                         } else {
-                            match nearest_corner_id {
-                                // Note: these indices are just like those of the Pointy version, but swapped xy.
-                                0 => {
-                                    rel_nearby_cells =
-                                        array![[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1],];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]];
-                                    // array![[1, 0], [2, 0], [2, -1], [1, -1], [0, -1], [0, 0],];
-                                }
-                                2 => {
-                                    rel_nearby_cells = array![
-                                        [0, -2],
-                                        [0, -1],
-                                        [0, 0],
-                                        [-1, -2],
-                                        [-1, -1],
-                                        [-1, 0],
-                                    ];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
-                        }
+                            &POINTY_NOT_UPRIGHT
+                        };
+                        &table[nearest_corner_id]
                     }
-                }
+                };
+
                 // Insert ids into return array for current cell_id
-                nearby_cells
-                    .slice_mut(s![cell_id, .., ..])
-                    .assign(&(rel_nearby_cells + cell_ids.slice(s![cell_id, ..])));
-                // Try inserting slice?
+                let base_x = cell_ids[Ix2(cell_id, 0)];
+                let base_y = cell_ids[Ix2(cell_id, 1)];
+                for k in 0..6 {
+                    nearby_cells[Ix3(cell_id, k, 0)] = rel_nearby_cells[k][0] + base_x;
+                    nearby_cells[Ix3(cell_id, k, 1)] = rel_nearby_cells[k][1] + base_y;
+                }
             }
 
             nearby_cells
@@ -807,6 +738,36 @@ impl TriGrid {
         })
     }
 
+    /// Coordinates of corner 2 of the cell at `(x, y)` in the grid frame (i.e.
+    /// without any rotation applied). This is the `corner_id == 2` branch of
+    /// [`GridTraits::cell_corners`], extracted so `cell_at_points` can compute
+    /// it per point without allocating a corner array.
+    fn cell_origin_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2] {
+        let [centroid_x, centroid_y] = self.centroid_xy_no_rot(x, y);
+        let radius = self.radius();
+        let same_parity = iseven(x) == iseven(y);
+        match self.orientation() {
+            Orientation::Flat => {
+                let offset = self.cell_height() - radius;
+                let origin_y = if same_parity {
+                    centroid_y - offset
+                } else {
+                    centroid_y + offset
+                };
+                [centroid_x - self.dx(), origin_y]
+            }
+            Orientation::Pointy => {
+                let offset = self.cell_width() - radius;
+                let origin_x = if same_parity {
+                    centroid_x - offset
+                } else {
+                    centroid_x + offset
+                };
+                [origin_x, centroid_y - self.dy()]
+            }
+        }
+    }
+
     pub fn linear_interpolation(
         &self,
         sample_points: ArrayView2<f64>,
@@ -885,6 +846,61 @@ mod tests {
             }
         }
         assert_eq!(flat, expected);
+    }
+
+    #[test]
+    fn cell_origin_matches_cell_corner_two_at_zero_rotation() {
+        // `cell_at_points` replaces its per-point `cell_corners` call with the
+        // scalar `cell_origin_xy_no_rot`. It must match corner 2 of
+        // `cell_corners` exactly on an unrotated grid.
+        for orientation in [Orientation::Pointy, Orientation::Flat] {
+            let grid = TriGrid::new(3.5, orientation);
+            for x in -2..=2 {
+                for y in -2..=2 {
+                    let origin = grid.cell_origin_xy_no_rot(x, y);
+                    let corners = grid.cell_corners(array![[x, y]].view());
+                    assert_close(origin[0], corners[[0, 2, 0]], TOL);
+                    assert_close(origin[1], corners[[0, 2, 1]], TOL);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn cells_near_point_includes_the_containing_cell_and_is_unique() {
+        // `cells_near_point` is used for interpolation. The six returned cells
+        // must include the cell that actually contains the point and must not
+        // repeat a cell. This guards the static relative-id tables that the
+        // hot loop now indexes into.
+        for orientation in [Orientation::Pointy, Orientation::Flat] {
+            let mut grid = TriGrid::new(1.3, orientation);
+            grid.set_rotation(17.);
+            let pts = array![
+                [0.1, 0.2],
+                [1.7, -0.9],
+                [-2.3, 3.1],
+                [4.4, 4.9],
+                [-0.6, -1.2]
+            ];
+            let containing = grid.cell_at_points(pts.view());
+            let nearby = grid.cells_near_point(pts.view());
+            for i in 0..pts.shape()[0] {
+                let mut ids: Vec<[i64; 2]> = (0..nearby.shape()[1])
+                    .map(|k| [nearby[[i, k, 0]], nearby[[i, k, 1]]])
+                    .collect();
+                assert!(
+                    ids.contains(&[containing[[i, 0]], containing[[i, 1]]]),
+                    "containing cell [{}, {}] not among nearby cells {:?}",
+                    containing[[i, 0]],
+                    containing[[i, 1]],
+                    ids
+                );
+                ids.sort_unstable();
+                let total = ids.len();
+                ids.dedup();
+                assert_eq!(ids.len(), total, "duplicate nearby cell for point {i}");
+            }
+        }
     }
 
     // ---------------------------------------------------------------------

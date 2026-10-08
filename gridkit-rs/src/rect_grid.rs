@@ -100,32 +100,25 @@ impl GridTraits for RectGrid {
         D: Dimension,
     {
         crate::utils::map_point_pairs(points, |points| {
-            let shape = points.shape();
-            let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
-            // Hoist the loop-invariant grid geometry.
-            let dx = self.dx();
-            let dy = self.dy();
-            let offset = self.offset;
-            // `rotate` is loop-invariant. Splitting this into one loop with rotation
-            // and one without, and replacing the ndarray `dot` below with hand-written
-            // scalar math, were both benchmarked and made no measurable difference.
-            // The branch is kept inline and the clearer `dot` is used.
-            let rotate = self.rotation() != 0.;
-            for cell_id in 0..points.shape()[0] {
-                let point_not_rotated = points.slice(s![cell_id, ..]);
-                let rotated;
-                let point = if rotate {
-                    rotated = self._rotation_matrix_inv.dot(&point_not_rotated);
-                    rotated.view()
-                } else {
-                    point_not_rotated
-                };
-                let id_x = ((point[Ix1(0)] - offset[0]) / dx).floor() as i64;
-                let id_y = ((point[Ix1(1)] - offset[1]) / dy).floor() as i64;
-                index[Ix2(cell_id, 0)] = id_x;
-                index[Ix2(cell_id, 1)] = id_y;
-            }
-            index
+            // Inverse-rotate the points into the grid frame once, then reuse the
+            // shared no-rotation id lookup. Batching the rotation avoids the
+            // per-point allocation that `_rotation_matrix_inv.dot` used to make.
+            let mut rotated: Array2<f64>;
+            let grid_points: ArrayView2<f64> = if self.rotation() != 0. {
+                rotated = points.to_owned();
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
+                for cell_id in 0..rotated.shape()[0] {
+                    let x = rotated[Ix2(cell_id, 0)];
+                    let y = rotated[Ix2(cell_id, 1)];
+                    rotated[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    rotated[Ix2(cell_id, 1)] = -sin * x + cos * y;
+                }
+                rotated.view()
+            } else {
+                points.view()
+            };
+            self.cell_at_points_no_rot(grid_points)
         })
     }
 
@@ -176,23 +169,27 @@ impl GridTraits for RectGrid {
     {
         crate::utils::map_point_pairs_fanout(points, |points| {
             let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
-            let index = self.cell_at_points(points);
 
-            // FIXME: Find a way to not clone points in the case of no rotation
-            //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
-            let mut points = points.to_owned();
-            if self.rotation() != 0. {
-                // Applying the rotation by hand avoids the temporary allocation
-                // that a `_rotation_matrix_inv.dot(&point)` call would make per point.
+            // Rotate the points into the grid frame exactly once. Both the id
+            // lookup and the relative-location test below work in that frame.
+            // At rot=0 the input view is reused, so no clone happens.
+            let mut rotated: Array2<f64>;
+            let points: ArrayView2<f64> = if self.rotation() != 0. {
+                rotated = points.to_owned();
                 let cos = self._rotation_matrix[[0, 0]];
                 let sin = self._rotation_matrix[[1, 0]];
-                for cell_id in 0..points.shape()[0] {
-                    let x = points[Ix2(cell_id, 0)];
-                    let y = points[Ix2(cell_id, 1)];
-                    points[Ix2(cell_id, 0)] = cos * x + sin * y;
-                    points[Ix2(cell_id, 1)] = -sin * x + cos * y;
+                for cell_id in 0..rotated.shape()[0] {
+                    let x = rotated[Ix2(cell_id, 0)];
+                    let y = rotated[Ix2(cell_id, 1)];
+                    rotated[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    rotated[Ix2(cell_id, 1)] = -sin * x + cos * y;
                 }
-            }
+                rotated.view()
+            } else {
+                points.view()
+            };
+
+            let index = self.cell_at_points_no_rot(points);
 
             for cell_id in 0..points.shape()[0] {
                 let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
@@ -338,6 +335,24 @@ impl RectGrid {
         }
     }
 
+    /// Cell ids for points that are already expressed in the grid frame (i.e.
+    /// inverse-rotated). Shared by `cell_at_points` and `cells_near_point` so
+    /// the points are only inverse-rotated once.
+    fn cell_at_points_no_rot(&self, points: ArrayView2<f64>) -> Array2<i64> {
+        let shape = points.shape();
+        let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
+        let dx = self.dx();
+        let dy = self.dy();
+        let offset = self.offset;
+        for cell_id in 0..points.shape()[0] {
+            let id_x = ((points[Ix2(cell_id, 0)] - offset[0]) / dx).floor() as i64;
+            let id_y = ((points[Ix2(cell_id, 1)] - offset[1]) / dy).floor() as i64;
+            index[Ix2(cell_id, 0)] = id_x;
+            index[Ix2(cell_id, 1)] = id_y;
+        }
+        index
+    }
+
     /// Set the cellsize in the x-direction.
     ///
     /// The cellsize must be larger than zero, mirroring the validation in
@@ -457,6 +472,19 @@ mod tests {
             assert_eq!(actual[[i, 0]], exp[0]);
             assert_eq!(actual[[i, 1]], exp[1]);
         }
+    }
+
+    #[test]
+    fn cell_at_points_no_rot_matches_cell_at_points_at_zero_rotation() {
+        // `cell_at_points` inverse-rotates once and delegates to this shared
+        // no-rotation lookup. At rot=0 the two must agree exactly.
+        let mut grid = RectGrid::new(2., 3.);
+        grid.set_offset([0.3, 0.4]);
+        let pts = array![[0.0, 0.0], [1.2, -2.3], [5.5, 4.4], [-0.1, 3.7]];
+        assert_eq!(
+            grid.cell_at_points(pts.view()),
+            grid.cell_at_points_no_rot(pts.view())
+        );
     }
 
     /// Compare an (n, m, 2) f64 array against a flat list of expected values.
