@@ -1641,9 +1641,9 @@ fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
 ///
 /// Pass an integer `>= 1`, or `None` to restore the default (the number of
 /// physical cores). Must be called before the first parallel query (e.g. a
-/// large `cell_at_points`, `cells_near_point` or `cell_corners` call); the
-/// thread pool is built lazily and cannot be resized afterwards, so a later
-/// call raises `ValueError`.
+/// large `cell_at_points`, `cells_near_point` or `cell_corners` call). If the
+/// pool has already been created, it is rebuilt with the new worker count;
+/// active queries finish on the old pool while new queries use the replacement.
 #[pyfunction]
 fn set_num_threads(threads: Option<usize>) -> PyResult<()> {
     #[cfg(feature = "parallel")]

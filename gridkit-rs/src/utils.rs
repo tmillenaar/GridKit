@@ -7,7 +7,7 @@ use rayon::ThreadPool;
 #[cfg(feature = "parallel")]
 use std::sync::atomic::{AtomicUsize, Ordering};
 #[cfg(feature = "parallel")]
-use std::sync::OnceLock;
+use std::sync::{Arc, RwLock};
 
 /// Minimum number of `(x, y)` pairs in a batched query before the parallel
 /// helpers hand the work to rayon. Below this the scheduling overhead tends to
@@ -29,9 +29,11 @@ static NUM_THREADS: AtomicUsize = AtomicUsize::new(0);
 ///
 /// Using a private pool (rather than rayon's global one) is what lets the
 /// default and the overrides below be honoured regardless of what the host
-/// process does with rayon.
+/// process does with rayon. The lock and reference counting allow the pool to
+/// be replaced safely after a thread-count change while active queries finish
+/// on the old pool.
 #[cfg(feature = "parallel")]
-static POOL: OnceLock<ThreadPool> = OnceLock::new();
+static POOL: RwLock<Option<Arc<ThreadPool>>> = RwLock::new(None);
 
 /// Thread count from `GRIDKIT_NUM_THREADS`, then `RAYON_NUM_THREADS`.
 #[cfg(feature = "parallel")]
@@ -116,8 +118,10 @@ pub fn get_num_threads() -> usize {
 ///
 /// Pass `threads >= 1`, or `None` to fall back to the default (physical cores,
 /// then logical cores, then [`DEFAULT_PARALLEL_THREADS`]). The pool is built
-/// lazily on the first parallel query and cannot be resized afterwards, so this
-/// must be called before then; otherwise an error is returned.
+/// lazily on the first parallel query. If it has already been built, it is
+/// replaced with a new pool using the requested number of workers. This waits
+/// for neither new nor active queries; active queries finish on the old pool
+/// while new queries use the replacement.
 /// `GRIDKIT_NUM_THREADS` and `RAYON_NUM_THREADS` provide the same override from
 /// the environment.
 #[cfg(feature = "parallel")]
@@ -125,24 +129,43 @@ pub fn set_num_threads(threads: Option<usize>) -> Result<(), String> {
     if threads == Some(0) {
         return Err("number of threads must be at least 1 (or None for the default)".to_string());
     }
-    if POOL.get().is_some() {
-        return Err("the gridkit rayon pool is already initialized; \
-                    set_num_threads() must be called before the first parallel query"
-            .to_string());
-    }
+    let mut pool = POOL
+        .write()
+        .map_err(|_| "the gridkit rayon pool lock is poisoned".to_string())?;
     NUM_THREADS.store(threads.unwrap_or(0), Ordering::Relaxed);
+    if pool.is_some() {
+        *pool = Some(Arc::new(build_pool()));
+    }
     Ok(())
 }
 
 #[cfg(feature = "parallel")]
-fn pool() -> &'static ThreadPool {
-    POOL.get_or_init(|| {
-        rayon::ThreadPoolBuilder::new()
-            .num_threads(get_num_threads())
-            .thread_name(|i| format!("gridkit-{i}"))
-            .build()
-            .expect("failed to build the gridkit rayon thread pool")
-    })
+fn build_pool() -> ThreadPool {
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(get_num_threads())
+        .thread_name(|i| format!("gridkit-{i}"))
+        .build()
+        .expect("failed to build the gridkit rayon thread pool")
+}
+
+#[cfg(feature = "parallel")]
+fn with_pool<F, R>(f: F) -> R
+where
+    F: FnOnce(&ThreadPool) -> R,
+{
+    {
+        let mut pool = POOL
+            .write()
+            .expect("the gridkit rayon pool lock is poisoned");
+        if pool.is_none() {
+            *pool = Some(Arc::new(build_pool()));
+        }
+    }
+    let pool = POOL
+        .read()
+        .expect("the gridkit rayon pool lock is poisoned");
+    let pool = Arc::clone(pool.as_ref().expect("gridkit rayon pool was not initialized"));
+    f(&pool)
 }
 
 /// Whether a batch of `n` `(x, y)` pairs should be spread over the pool.
@@ -167,14 +190,14 @@ where
     F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
 {
     let chunk = raveled.nrows().div_ceil(get_num_threads());
-    let parts: Vec<Array2<B>> = pool().install(|| {
+    let parts: Vec<Array2<B>> = with_pool(|pool| pool.install(|| {
         raveled
             .axis_chunks_iter(Axis(0), chunk)
             .collect::<Vec<_>>()
             .into_par_iter()
             .map(|chunk| f(chunk))
             .collect()
-    });
+    }));
     let views: Vec<ArrayView2<B>> = parts.iter().map(|part| part.view()).collect();
     concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
 }
@@ -188,14 +211,14 @@ where
     F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
 {
     let chunk = raveled.nrows().div_ceil(get_num_threads());
-    let parts: Vec<Array3<B>> = pool().install(|| {
+    let parts: Vec<Array3<B>> = with_pool(|pool| pool.install(|| {
         raveled
             .axis_chunks_iter(Axis(0), chunk)
             .collect::<Vec<_>>()
             .into_par_iter()
             .map(|chunk| f(chunk))
             .collect()
-    });
+    }));
     let views: Vec<ArrayView3<B>> = parts.iter().map(|part| part.view()).collect();
     concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
 }
@@ -450,12 +473,12 @@ where
         let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
         let destinations: Vec<ArrayViewMut3<B>> =
             out.axis_chunks_iter_mut(Axis(0), chunk).collect();
-        pool().install(|| {
+        with_pool(|pool| pool.install(|| {
             sources
                 .into_par_iter()
                 .zip(destinations.into_par_iter())
                 .for_each(|(source, destination)| fill(source, destination));
-        });
+        }));
     } else {
         fill(raveled.view(), out.view_mut());
     }

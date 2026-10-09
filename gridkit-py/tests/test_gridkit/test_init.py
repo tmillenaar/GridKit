@@ -26,10 +26,10 @@ def test_initialized_objects():
 
 
 def test_num_threads_api():
-    # Run in a fresh interpreter so the lazy thread pool has not been built yet,
-    # which is what makes set_num_threads() usable.
+    # Run in a fresh interpreter so this test owns the process-local pool.
     code = """
 import gridkit
+import numpy as np
 
 assert gridkit.get_num_threads() >= 1
 
@@ -40,6 +40,11 @@ except RuntimeError:
     assert gridkit.get_num_threads() == 1
 else:
     assert gridkit.get_num_threads() == 2
+    grid = gridkit.HexGrid(size=1.0)
+    ids = np.arange(8192, dtype=np.int64).reshape((-1, 2))
+    grid.cell_corners(ids)
+    gridkit.set_num_threads(4)
+    assert gridkit.get_num_threads() == 4
     gridkit.set_num_threads(None)
     assert gridkit.get_num_threads() >= 1
     try:
