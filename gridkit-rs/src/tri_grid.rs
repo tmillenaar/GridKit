@@ -321,8 +321,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout_batched(points, |points| {
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 6, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 6, |points, mut nearby_cells| {
             // TODO:
             // Condense this into a single loop
             let cell_ids = self.cell_at_points(points);
@@ -380,8 +379,6 @@ impl GridTraits for TriGrid {
                     nearby_cells[Ix3(cell_id, k, 1)] = rel_nearby_cells[k][1] + base_y;
                 }
             }
-
-            nearby_cells
         })
     }
 
@@ -395,80 +392,80 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let depth = depth as i64;
+        let depth = depth as i64;
 
-            let add_cell_id = add_cell_id as i64;
-            let mut total_nr_neighbours = include_selected as usize;
-            let nr_neighbours_factor: usize;
-            let max_nr_cols: i64;
-            let nr_rows: i64;
+        let add_cell_id = add_cell_id as i64;
+        let mut total_nr_neighbours = include_selected as usize;
+        let nr_neighbours_factor: usize;
+        let max_nr_cols: i64;
+        let nr_rows: i64;
 
-            nr_neighbours_factor = 4;
-            max_nr_cols = 1 + 4 * depth;
-            nr_rows = 1 + 2 * depth;
+        nr_neighbours_factor = 4;
+        max_nr_cols = 1 + 4 * depth;
+        nr_rows = 1 + 2 * depth;
 
-            for i in 0..depth {
-                total_nr_neighbours =
-                    total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
-            }
-            let mut relative_neighbours =
-                Array3::<i64>::zeros((index.shape()[0], total_nr_neighbours, 2));
+        for i in 0..depth {
+            total_nr_neighbours =
+                total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
+        }
 
-            let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
-            for row_id in 0..depth {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (depth - 1 - row_id);
-            }
-            for row_id in depth..(nr_rows) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (row_id - depth);
-            }
+        let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
+        for row_id in 0..depth {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (depth - 1 - row_id);
+        }
+        for row_id in depth..(nr_rows) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (row_id - depth);
+        }
 
-            let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
-            for i in 0..nr_rows {
-                let i = i as usize;
-                nr_cells_per_colum_downward[Ix1(i)] =
-                    nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
-            }
+        let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
+        for i in 0..nr_rows {
+            let i = i as usize;
+            nr_cells_per_colum_downward[Ix1(i)] =
+                nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
+        }
 
-            let mut counter: usize;
-            let mut nr_cells_per_colum: &Array1<i64>;
-            for cell_id in 0..relative_neighbours.shape()[0] {
-                counter = 0;
+        crate::utils::map_point_pairs_fanout_fill_batched(
+            index,
+            total_nr_neighbours,
+            |index, mut relative_neighbours| {
+                let mut counter: usize;
+                let mut nr_cells_per_colum: &Array1<i64>;
+                for cell_id in 0..relative_neighbours.shape()[0] {
+                    counter = 0;
 
-                let downward_cell =
-                    !self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                if downward_cell {
-                    nr_cells_per_colum = &nr_cells_per_colum_downward;
-                } else {
-                    nr_cells_per_colum = &nr_cells_per_colum_upward;
-                }
+                    let downward_cell =
+                        !self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                    if downward_cell {
+                        nr_cells_per_colum = &nr_cells_per_colum_downward;
+                    } else {
+                        nr_cells_per_colum = &nr_cells_per_colum_upward;
+                    }
 
-                let id_x_axis = self.consistent_axis();
-                let id_y_axis = self.inconsistent_axis();
+                    let id_x_axis = self.consistent_axis();
+                    let id_y_axis = self.inconsistent_axis();
 
-                for rel_row_id in (0..nr_rows).rev() {
-                    let nr_cells_in_colum = nr_cells_per_colum[Ix1(rel_row_id as usize)];
-                    for rel_col_id in 0..nr_cells_in_colum {
-                        relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = rel_col_id
-                            - ((nr_cells_in_colum as f64 / 2.).floor() as i64)
-                            + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
-                        relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
-                            depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
-                        counter = counter + 1;
-                        // Skip selected center cell if include_selected is false
-                        counter = counter
-                            - (!include_selected
-                                && (rel_row_id == depth)
-                                && (rel_col_id == (2 * depth)))
-                                as usize;
+                    for rel_row_id in (0..nr_rows).rev() {
+                        let nr_cells_in_colum = nr_cells_per_colum[Ix1(rel_row_id as usize)];
+                        for rel_col_id in 0..nr_cells_in_colum {
+                            relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = rel_col_id
+                                - ((nr_cells_in_colum as f64 / 2.).floor() as i64)
+                                + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                            relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
+                                depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
+                            counter = counter + 1;
+                            // Skip selected center cell if include_selected is false
+                            counter = counter
+                                - (!include_selected
+                                    && (rel_row_id == depth)
+                                    && (rel_col_id == (2 * depth)))
+                                    as usize;
+                        }
                     }
                 }
-            }
-
-            relative_neighbours
-        })
+            },
+        )
     }
 
     fn direct_neighbours<D>(
@@ -481,96 +478,102 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let depth = depth as i64;
-            let add_cell_id = add_cell_id as i64;
-            let mut total_nr_neighbours: usize = include_selected as usize;
+        let depth = depth as i64;
+        let add_cell_id = add_cell_id as i64;
+        let mut total_nr_neighbours: usize = include_selected as usize;
 
-            let max_nr_cols = 1 + 2 * depth;
-            let nr_rows = 1 + depth;
+        let max_nr_cols = 1 + 2 * depth;
+        let nr_rows = 1 + depth;
 
-            for i in 0..depth {
-                total_nr_neighbours = total_nr_neighbours + 3 * (i + 1) as usize;
-            }
-            let mut relative_neighbours =
-                Array3::<i64>::zeros((index.shape()[0], total_nr_neighbours, 2));
+        for i in 0..depth {
+            total_nr_neighbours = total_nr_neighbours + 3 * (i + 1) as usize;
+        }
 
-            let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
-            for row_id in 0..(depth / 2) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (depth / 2 - row_id);
-            }
-            for row_id in (depth / 2)..(nr_rows) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (row_id - depth / 2);
-            }
-            let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
-            for i in 0..nr_rows {
-                let i = i as usize;
-                nr_cells_per_colum_downward[Ix1(i)] =
-                    nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
-            }
+        let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
+        for row_id in 0..(depth / 2) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (depth / 2 - row_id);
+        }
+        for row_id in (depth / 2)..(nr_rows) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (row_id - depth / 2);
+        }
+        let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
+        for i in 0..nr_rows {
+            let i = i as usize;
+            nr_cells_per_colum_downward[Ix1(i)] =
+                nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
+        }
 
-            let id_x_axis = self.consistent_axis();
-            let id_y_axis = self.inconsistent_axis();
+        let id_x_axis = self.consistent_axis();
+        let id_y_axis = self.inconsistent_axis();
 
-            let mut counter: usize;
-            let mut y_offset: i64;
-            let mut skip_cell: bool;
-            for cell_id in 0..relative_neighbours.shape()[0] {
-                counter = 0;
-                let upright_cell =
-                    self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                let flip_vertically: i64;
-                if upright_cell {
-                    flip_vertically = 1;
-                } else {
-                    flip_vertically = -1;
-                }
-                for rel_row_id in (0..nr_rows) {
-                    let partial_row: i64;
-                    let nr_cells_in_colum: i64;
-                    if iseven(depth) {
-                        partial_row = 0;
-                        nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+        crate::utils::map_point_pairs_fanout_fill_batched(
+            index,
+            total_nr_neighbours,
+            |index, mut relative_neighbours| {
+                let mut counter: usize;
+                let mut y_offset: i64;
+                let mut skip_cell: bool;
+                for cell_id in 0..relative_neighbours.shape()[0] {
+                    counter = 0;
+                    let upright_cell =
+                        self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                    let flip_vertically: i64;
+                    if upright_cell {
+                        flip_vertically = 1;
                     } else {
-                        partial_row = nr_rows - 1;
-                        nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+                        flip_vertically = -1;
                     }
-
-                    for rel_col_id in 0..nr_cells_in_colum {
+                    for rel_row_id in (0..nr_rows) {
+                        let partial_row: i64;
+                        let nr_cells_in_colum: i64;
                         if iseven(depth) {
-                            skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            partial_row = 0;
+                            nr_cells_in_colum =
+                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         } else {
-                            skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
-                        }
-                        y_offset = ((depth as f64 / 2.).floor() as i64);
-                        if counter < relative_neighbours.shape()[1] {
-                            if !skip_cell {
-                                relative_neighbours[Ix3(cell_id, counter, id_x_axis)] =
-                                    flip_vertically
-                                        * (rel_col_id
-                                            - (nr_cells_in_colum as f64 / 2.).floor() as i64)
-                                        + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
-                                relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
-                                    flip_vertically
-                                        * (depth - rel_row_id - y_offset - !iseven(depth) as i64)
-                                        + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
-                                counter = counter + 1;
-                            }
+                            partial_row = nr_rows - 1;
+                            nr_cells_in_colum =
+                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         }
 
-                        // Skip selected center cell if include_selected is false
-                        counter = counter
-                            - (!include_selected
-                                && (nr_cells_in_colum == max_nr_cols)
-                                && (rel_col_id == depth)) as usize;
+                        for rel_col_id in 0..nr_cells_in_colum {
+                            if iseven(depth) {
+                                skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            } else {
+                                skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            }
+                            y_offset = ((depth as f64 / 2.).floor() as i64);
+                            if counter < relative_neighbours.shape()[1] {
+                                if !skip_cell {
+                                    relative_neighbours[Ix3(cell_id, counter, id_x_axis)] =
+                                        flip_vertically
+                                            * (rel_col_id
+                                                - (nr_cells_in_colum as f64 / 2.).floor() as i64)
+                                            + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                                    relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
+                                        flip_vertically
+                                            * (depth
+                                                - rel_row_id
+                                                - y_offset
+                                                - !iseven(depth) as i64)
+                                            + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
+                                    counter = counter + 1;
+                                }
+                            }
+
+                            // Skip selected center cell if include_selected is false
+                            counter = counter
+                                - (!include_selected
+                                    && (nr_cells_in_colum == max_nr_cols)
+                                    && (rel_col_id == depth))
+                                    as usize;
+                        }
                     }
                 }
-            }
-
-            relative_neighbours
-        })
+            },
+        )
     }
 
     fn is_aligned_with(&self, other: &Grid) -> bool {

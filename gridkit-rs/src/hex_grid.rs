@@ -209,14 +209,13 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout_batched(points, |points| {
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 3, |points, mut nearby_cells| {
             // There are 6 options for the nearby cells,
             // based on where in a cell the point is located.
             // Hence there are 6 sections within the cell,
             // each 60 degrees wide (360/6 = 60).
             // We divide the quadrants based on the angle between
             // the point and pure up, as measured from the centroid of the cell.
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
 
             // Rotate the points into the grid frame exactly once. Both the id
             // lookup and the azimuth below work in that frame, so the points
@@ -347,7 +346,6 @@ impl GridTraits for HexGrid {
                     nearby_cells[Ix3(cell_id, nearby_cell_id, 1)] += cell_ids[Ix2(cell_id, 1)];
                 }
             }
-            nearby_cells
         })
     }
 
@@ -364,8 +362,9 @@ impl GridTraits for HexGrid {
         // Python's `HexGrid.relative_neighbours` documents `connect_corners` as
         // "not relevant in hexagonal grids" and it indeed returns the same result
         // for both values, so both trait methods share one implementation.
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id)
+        let k = Self::neighbour_count(depth, include_selected);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, k, |index, out| {
+            self._neighbours_into(index, out, depth, include_selected, add_cell_id)
         })
     }
 
@@ -379,8 +378,9 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id)
+        let k = Self::neighbour_count(depth, include_selected);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, k, |index, out| {
+            self._neighbours_into(index, out, depth, include_selected, add_cell_id)
         })
     }
 
@@ -437,14 +437,27 @@ impl GridTraits for HexGrid {
 }
 
 impl HexGrid {
+    fn neighbour_count(depth: u64, include_selected: bool) -> usize {
+        // Python sizes the array as `sum(6 * arange(1, depth + 1)) + 1`, i.e.
+        // including the selected cell, and deletes it afterwards when needed.
+        // `6 * (1 + 2 + ... + depth)` is `3 * depth * (depth + 1)`.
+        let nr_neighbours = (3 * depth * (depth + 1) + 1) as usize;
+        if include_selected {
+            nr_neighbours
+        } else {
+            nr_neighbours - 1
+        }
+    }
+
     /// Shared implementation of the `GridTraits` neighbour methods.
-    fn _neighbours(
+    fn _neighbours_into(
         &self,
         index: ArrayView2<i64>,
+        mut neighbours: ArrayViewMut3<i64>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64> {
+    ) {
         let add_cell_id = add_cell_id as i64;
 
         // Python sizes the array as `sum(6 * arange(1, depth + 1)) + 1`, i.e.
@@ -462,12 +475,10 @@ impl HexGrid {
         // relative ids as a flat list first lets the same code serve both cases
         // without a second pass over the data.
         let nr_cells = index.shape()[0];
-        let mut relative = vec![[0i64; 2]; nr_cells * nr_neighbours];
+        let mut relative = vec![[0i64; 2]; nr_neighbours];
 
         for cell_id in 0..nr_cells {
             let is_odd_row = !iseven(index[Ix2(cell_id, pointy_axis)]);
-            let row_start = cell_id * nr_neighbours;
-            let cell_slice = &mut relative[row_start..row_start + nr_neighbours];
 
             // Python loops over `rows = range(depth, -1, -1)`, tracking the row
             // number `i` separately from the row *value*, which is `depth - i`.
@@ -489,8 +500,8 @@ impl HexGrid {
                 };
 
                 for flat_id in lo..hi {
-                    cell_slice[start_slice][flat_axis] = flat_id;
-                    cell_slice[start_slice][pointy_axis] = row as i64;
+                    relative[start_slice][flat_axis] = flat_id;
+                    relative[start_slice][pointy_axis] = row as i64;
                     start_slice += 1;
                 }
             }
@@ -501,8 +512,8 @@ impl HexGrid {
             let centre_row_start = start_slice - (2 * depth + 1) as usize;
             let mut mirrored = start_slice;
             for source in (0..centre_row_start).rev() {
-                cell_slice[mirrored] = cell_slice[source];
-                cell_slice[mirrored][pointy_axis] = -cell_slice[source][pointy_axis];
+                relative[mirrored] = relative[source];
+                relative[mirrored][pointy_axis] = -relative[source][pointy_axis];
                 mirrored += 1;
             }
             debug_assert_eq!(mirrored, nr_neighbours);
@@ -512,29 +523,24 @@ impl HexGrid {
             // remaining cells keep their order; the final slot is then unused.
             if !include_selected {
                 let centre = nr_neighbours / 2;
-                debug_assert_eq!((cell_slice[centre][0], cell_slice[centre][1]), (0, 0));
+                debug_assert_eq!((relative[centre][0], relative[centre][1]), (0, 0));
                 for i in centre..nr_neighbours - 1 {
-                    cell_slice[i] = cell_slice[i + 1];
+                    relative[i] = relative[i + 1];
                 }
             }
-        }
 
-        let kept = if include_selected {
-            nr_neighbours
-        } else {
-            nr_neighbours - 1
-        };
-        let mut neighbours = Array3::<i64>::zeros((nr_cells, kept, 2));
-        for cell_id in 0..nr_cells {
-            let row_start = cell_id * nr_neighbours;
+            let kept = if include_selected {
+                nr_neighbours
+            } else {
+                nr_neighbours - 1
+            };
             for cell in 0..kept {
                 neighbours[Ix3(cell_id, cell, 0)] =
-                    relative[row_start + cell][0] + add_cell_id * index[Ix2(cell_id, 0)];
+                    relative[cell][0] + add_cell_id * index[Ix2(cell_id, 0)];
                 neighbours[Ix3(cell_id, cell, 1)] =
-                    relative[row_start + cell][1] + add_cell_id * index[Ix2(cell_id, 1)];
+                    relative[cell][1] + add_cell_id * index[Ix2(cell_id, 1)];
             }
         }
-        neighbours
     }
 
     /// Cell ids for points that are already expressed in the grid frame (i.e.

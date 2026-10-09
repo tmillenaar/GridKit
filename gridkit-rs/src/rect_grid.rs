@@ -165,9 +165,7 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout_batched(points, |points| {
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
-
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 4, |points, mut nearby_cells| {
             // Rotate the points into the grid frame exactly once. Both the id
             // lookup and the relative-location test below work in that frame.
             // At rot=0 the input view is reused, so no clone happens.
@@ -241,7 +239,6 @@ impl GridTraits for RectGrid {
                     }
                 }
             }
-            nearby_cells
         })
     }
 
@@ -255,8 +252,9 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id, false)
+        let relative = Self::relative_neighbour_offsets(depth, include_selected, false);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, relative.len(), |index, out| {
+            self._neighbours_into(index, out, &relative, add_cell_id)
         })
     }
 
@@ -270,8 +268,9 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id, true)
+        let relative = Self::relative_neighbour_offsets(depth, include_selected, true);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, relative.len(), |index, out| {
+            self._neighbours_into(index, out, &relative, add_cell_id)
         })
     }
 
@@ -383,18 +382,14 @@ impl RectGrid {
     ///
     /// `direct_only` selects the diamond shaped window (`connect_corners=false`)
     /// over the full square one.
-    fn _neighbours(
-        &self,
-        index: ArrayView2<i64>,
+    fn relative_neighbour_offsets(
         depth: u64,
         include_selected: bool,
-        add_cell_id: bool,
         direct_only: bool,
-    ) -> Array3<i64> {
+    ) -> Vec<[i64; 2]> {
         // Python raises `ValueError("'depth' cannot be lower than 1")`.
         assert!(depth >= 1, "'depth' cannot be lower than 1");
         let depth = depth as i64;
-        let add_cell_id = add_cell_id as i64;
 
         // Python builds the full `(2 * depth + 1)^2` window by raveling a meshgrid in
         // C order, which means the rows run from y = +depth down to y = -depth and
@@ -417,8 +412,17 @@ impl RectGrid {
                 relative.push([x, y]);
             }
         }
+        relative
+    }
 
-        let mut neighbours = Array3::<i64>::zeros((index.shape()[0], relative.len(), 2));
+    fn _neighbours_into(
+        &self,
+        index: ArrayView2<i64>,
+        mut neighbours: ArrayViewMut3<i64>,
+        relative: &[[i64; 2]],
+        add_cell_id: bool,
+    ) {
+        let add_cell_id = add_cell_id as i64;
         for cell_id in 0..neighbours.shape()[0] {
             for (neighbour_id, [rel_x, rel_y]) in relative.iter().enumerate() {
                 neighbours[Ix3(cell_id, neighbour_id, 0)] =
@@ -427,7 +431,6 @@ impl RectGrid {
                     rel_y + add_cell_id * index[Ix2(cell_id, 1)];
             }
         }
-        neighbours
     }
 }
 

@@ -181,46 +181,57 @@ fn should_parallelize(n: usize) -> bool {
 
 /// Run `f` over the row chunks of `raveled` in parallel. Called by the
 /// `*_parallel` helpers once [`should_parallelize`] has agreed the batch is
-/// worth it.
+/// worth it. Each worker writes its chunk into a disjoint slice of one
+/// preallocated output array, avoiding a full-result concatenate.
 #[cfg(feature = "parallel")]
 fn map_rows_2<A, B, F>(raveled: ArrayView2<A>, f: &F) -> Array2<B>
 where
     A: Clone + Sync,
-    B: Send + Clone,
+    B: Default + Send + Clone,
     F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
 {
     let chunk = raveled.nrows().div_ceil(get_num_threads());
-    let parts: Vec<Array2<B>> = with_pool(|pool| pool.install(|| {
-        raveled
-            .axis_chunks_iter(Axis(0), chunk)
-            .collect::<Vec<_>>()
-            .into_par_iter()
-            .map(|chunk| f(chunk))
-            .collect()
-    }));
-    let views: Vec<ArrayView2<B>> = parts.iter().map(|part| part.view()).collect();
-    concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
+    let mut output = Array2::<B>::from_elem((raveled.nrows(), 2), B::default());
+    let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
+    let destinations: Vec<ArrayViewMut2<B>> =
+        output.axis_chunks_iter_mut(Axis(0), chunk).collect();
+    with_pool(|pool| {
+        pool.install(|| {
+            sources
+                .into_par_iter()
+                .zip(destinations.into_par_iter())
+                .for_each(|(source, mut destination)| destination.assign(&f(source)));
+        })
+    });
+    output
 }
 
-/// `map_rows_2` for `(N, 2) -> (N, K, 2)` (i.e. the fanout helpers).
+/// `map_rows_3` for `(N, 2) -> (N, K, 2)` (i.e. the fanout helpers). The
+/// output width is determined from one row, then all chunks fill disjoint
+/// slices of the preallocated result.
 #[cfg(feature = "parallel")]
 fn map_rows_3<A, B, F>(raveled: ArrayView2<A>, f: &F) -> Array3<B>
 where
     A: Clone + Sync,
-    B: Send + Clone,
+    B: Default + Send + Clone,
     F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
 {
     let chunk = raveled.nrows().div_ceil(get_num_threads());
-    let parts: Vec<Array3<B>> = with_pool(|pool| pool.install(|| {
-        raveled
-            .axis_chunks_iter(Axis(0), chunk)
-            .collect::<Vec<_>>()
-            .into_par_iter()
-            .map(|chunk| f(chunk))
-            .collect()
-    }));
-    let views: Vec<ArrayView3<B>> = parts.iter().map(|part| part.view()).collect();
-    concatenate(Axis(0), &views).expect("chunked rows concatenate along axis 0")
+    let sample = f(raveled.slice(s![0..1, ..]));
+    let k = sample.shape()[1];
+    let mut output = Array3::<B>::from_elem((raveled.nrows(), k, 2), B::default());
+    let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
+    let destinations: Vec<ArrayViewMut3<B>> =
+        output.axis_chunks_iter_mut(Axis(0), chunk).collect();
+    with_pool(|pool| {
+        pool.install(|| {
+            sources
+                .into_par_iter()
+                .zip(destinations.into_par_iter())
+                .for_each(|(source, mut destination)| destination.assign(&f(source)));
+        })
+    });
+    output
 }
 
 pub fn iseven(val: i64) -> bool {
@@ -307,14 +318,14 @@ where
 /// inlining the closure) keep exactly the same codegen.
 ///
 /// The batch is split into one contiguous row chunk per rayon worker. Chunks are
-/// independent and concatenated in order, so the result is identical to the
-/// serial one.
+/// independent and written to their corresponding output rows, so the result
+/// and its ordering are identical to the serial one.
 #[cfg(feature = "parallel")]
 pub fn map_point_pairs_parallel<D, A, B, F>(index: ArrayView<A, D>, f: F) -> Array<B, D>
 where
     D: Dimension,
     A: Clone + Sync,
-    B: Send + Clone,
+    B: Default + Send + Clone,
     F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
 {
     let dim = index.raw_dim();
@@ -377,7 +388,7 @@ pub fn map_point_pairs_fanout_parallel<D, A, B, F>(
 where
     D: Dimension,
     A: Clone + Sync,
-    B: Send + Clone,
+    B: Default + Send + Clone,
     F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
 {
     let dim = index.raw_dim();
