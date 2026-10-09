@@ -101,7 +101,7 @@ fn physical_core_count() -> Option<usize> {
 /// logical core count, then to [`DEFAULT_PARALLEL_THREADS`], when the topology
 /// cannot be read (e.g. non-Linux or a restricted `/proc`).
 #[cfg(feature = "parallel")]
-pub fn num_threads() -> usize {
+pub fn get_num_threads() -> usize {
     match NUM_THREADS.load(Ordering::Relaxed) {
         0 => env_threads().unwrap_or_else(|| {
             physical_core_count()
@@ -138,7 +138,7 @@ pub fn set_num_threads(threads: Option<usize>) -> Result<(), String> {
 fn pool() -> &'static ThreadPool {
     POOL.get_or_init(|| {
         rayon::ThreadPoolBuilder::new()
-            .num_threads(num_threads())
+            .num_threads(get_num_threads())
             .thread_name(|i| format!("gridkit-{i}"))
             .build()
             .expect("failed to build the gridkit rayon thread pool")
@@ -153,7 +153,7 @@ fn pool() -> &'static ThreadPool {
 /// outer query has claimed the pool and the inner one runs serially.
 #[cfg(feature = "parallel")]
 fn should_parallelize(n: usize) -> bool {
-    n >= PARALLEL_MIN_POINTS && num_threads() > 1 && rayon::current_thread_index().is_none()
+    n >= PARALLEL_MIN_POINTS && get_num_threads() > 1 && rayon::current_thread_index().is_none()
 }
 
 /// Run `f` over the row chunks of `raveled` in parallel. Called by the
@@ -166,7 +166,7 @@ where
     B: Send + Clone,
     F: Fn(ArrayView2<A>) -> Array2<B> + Sync,
 {
-    let chunk = raveled.nrows().div_ceil(num_threads());
+    let chunk = raveled.nrows().div_ceil(get_num_threads());
     let parts: Vec<Array2<B>> = pool().install(|| {
         raveled
             .axis_chunks_iter(Axis(0), chunk)
@@ -187,7 +187,7 @@ where
     B: Send + Clone,
     F: Fn(ArrayView2<A>) -> Array3<B> + Sync,
 {
-    let chunk = raveled.nrows().div_ceil(num_threads());
+    let chunk = raveled.nrows().div_ceil(get_num_threads());
     let parts: Vec<Array3<B>> = pool().install(|| {
         raveled
             .axis_chunks_iter(Axis(0), chunk)
@@ -446,7 +446,7 @@ where
     let n = raveled.nrows();
     let mut out = Array3::<B>::from_elem((n, k, 2), B::default());
     if should_parallelize(n) {
-        let chunk = n.div_ceil(num_threads());
+        let chunk = n.div_ceil(get_num_threads());
         let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
         let destinations: Vec<ArrayViewMut3<B>> =
             out.axis_chunks_iter_mut(Axis(0), chunk).collect();
@@ -569,7 +569,7 @@ mod parallel_tests {
 
     #[test]
     fn num_threads_is_at_least_one() {
-        assert!(num_threads() >= 1);
+        assert!(get_num_threads() >= 1);
     }
 
     #[test]

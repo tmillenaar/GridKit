@@ -18,4 +18,4 @@ pub use tri_grid::*;
 
 /// Thread-pool controls for the opt-in `parallel` feature.
 #[cfg(feature = "parallel")]
-pub use utils::{num_threads, set_num_threads};
+pub use utils::{get_num_threads, set_num_threads};

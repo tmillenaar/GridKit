@@ -1661,10 +1661,10 @@ fn set_num_threads(threads: Option<usize>) -> PyResult<()> {
 
 /// The number of worker threads the parallel grid queries will use.
 #[pyfunction]
-fn num_threads() -> usize {
+fn get_num_threads() -> usize {
     #[cfg(feature = "parallel")]
     {
-        gridkit::num_threads()
+        gridkit::get_num_threads()
     }
     #[cfg(not(feature = "parallel"))]
     {
@@ -1675,7 +1675,7 @@ fn num_threads() -> usize {
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
     module.add_function(wrap_pyfunction!(set_num_threads, module)?)?;
-    module.add_function(wrap_pyfunction!(num_threads, module)?)?;
+    module.add_function(wrap_pyfunction!(get_num_threads, module)?)?;
     module.add_class::<PyO3TriGrid>()?;
     module.add_class::<PyO3RectGrid>()?;
     module.add_class::<PyO3HexGrid>()?;
