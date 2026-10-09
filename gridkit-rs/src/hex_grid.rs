@@ -95,7 +95,7 @@ impl GridTraits for HexGrid {
     }
 
     fn radius(&self) -> f64 {
-        self.cellsize / 3_f64.powf(0.5)
+        self.cellsize / 3_f64.sqrt()
     }
 
     fn cell_height(&self) -> f64 {
@@ -135,77 +135,26 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
-            // For the sake of simplicity here I will define it all in terms of a pointy grid.
-            // dx, dy etc will be used but they will refer to the consistent/inconsistent axes
-            // so it also works for flat grids. While in the context of flat grids the meanings
-            // are flipped, it is easier to read in terms of x and y axes rather than (in)consistent axes.
-            let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
-
-            let dx = self.stepsize_consistent_axis();
-            let dy = self.stepsize_inconsistent_axis();
-            let id_x_axis = self.consistent_axis();
-            let id_y_axis = self.inconsistent_axis();
-            let offset_x = self.offset[id_x_axis];
-            let offset_y = self.offset[id_y_axis];
-
-            for cell_id in 0..points.shape()[0] {
-                let point = points.slice(s![cell_id, ..]);
-                let point = self._rotation_matrix_inv.dot(&point);
-
-                let x = point[Ix1(id_x_axis)];
-                let y = point[Ix1(id_y_axis)];
-
-                // determine initial id_y
-                let mut id_y = ((y - offset_y - self.radius() / 4.) / dy).floor();
-                let is_offset = modulus(id_y, 2.) != 0.;
-                let mut id_x: f64;
-
-                // determine initial id_x
-                if is_offset == true {
-                    id_x = (x - offset_x - dx / 2.) / dx;
-                } else {
-                    id_x = (x - offset_x) / dx;
+        crate::utils::map_point_pairs_batched(points, |points| {
+            // Inverse-rotate the points into the grid frame once, then reuse the
+            // shared no-rotation id lookup. Batching the rotation avoids the
+            // per-point allocation that `_rotation_matrix_inv.dot` used to make.
+            let mut rotated: Array2<f64>;
+            let grid_points: ArrayView2<f64> = if self.rotation() != 0. {
+                rotated = points.to_owned();
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
+                for cell_id in 0..rotated.shape()[0] {
+                    let x = rotated[Ix2(cell_id, 0)];
+                    let y = rotated[Ix2(cell_id, 1)];
+                    rotated[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    rotated[Ix2(cell_id, 1)] = -sin * x + cos * y;
                 }
-                id_x = id_x.floor();
-
-                // refine id_x and id_y
-                // Example: points at the top of the cell's bounding box can be in this cell or in the cell to the top right or top left
-                let rel_loc_y = modulus(y - offset_y - self.radius() / 4., dy) + self.radius() / 4.;
-                let rel_loc_x = modulus(x - offset_x, dx);
-
-                let mut in_top_left: bool;
-                let mut in_top_right: bool;
-                if is_offset == true {
-                    in_top_left = (self.radius() * 1.25 - rel_loc_y)
-                        < ((rel_loc_x - 0.5 * dx) / (dx / self.radius()));
-                    in_top_left = in_top_left && (rel_loc_x < (0.5 * dx));
-                    in_top_right = (rel_loc_x - 0.5 * dx) / (dx / self.radius())
-                        <= (rel_loc_y - self.radius() * 1.25);
-                    in_top_right = in_top_right && rel_loc_x >= (0.5 * dx);
-                    if in_top_left == true {
-                        id_y = id_y + 1.;
-                        id_x = id_x + 1.;
-                    } else if in_top_right == true {
-                        id_y = id_y + 1.;
-                    }
-                } else {
-                    in_top_left =
-                        rel_loc_x / (dx / self.radius()) < (rel_loc_y - self.radius() * 5. / 4.);
-                    in_top_right = (self.radius() * 1.25 - rel_loc_y)
-                        <= (rel_loc_x - dx) / (dx / self.radius());
-                    if in_top_left == true {
-                        id_y = id_y + 1.;
-                        id_x = id_x - 1.;
-                    } else if in_top_right == true {
-                        id_y = id_y + 1.;
-                    }
-                }
-
-                index[Ix2(cell_id, id_x_axis)] = id_x as i64;
-                index[Ix2(cell_id, id_y_axis)] = id_y as i64;
-            }
-            index
+                rotated.view()
+            } else {
+                points.view()
+            };
+            self.cell_at_points_no_rot(grid_points)
         })
     }
 
@@ -213,35 +162,46 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 6, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 6, |index, mut corners| {
+            // The six corner offsets depend only on the radius and orientation,
+            // so compute them once per call instead of per corner per cell. This
+            // matters especially in the parallel path, where the closure cannot
+            // be relied on to be inlined and the per-corner trig was otherwise
+            // recomputed for every cell.
+            let radius = self.radius();
+            let mut offsets = [[0.0_f64; 2]; 6];
+            for corner_id in 0..6 {
+                let angle_deg = match self.orientation() {
+                    Orientation::Pointy => 60. * corner_id as f64 - 30.,
+                    Orientation::Flat => 60. * corner_id as f64,
+                };
+                let angle_rad = angle_deg * std::f64::consts::PI / 180.;
+                offsets[corner_id] = [radius * angle_rad.cos(), radius * angle_rad.sin()];
+            }
 
             for cell_id in 0..index.shape()[0] {
+                let centroid =
+                    self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
                 for corner_id in 0..6 {
-                    let angle_deg = match self.orientation() {
-                        Orientation::Pointy => 60. * corner_id as f64 - 30.,
-                        Orientation::Flat => 60. * corner_id as f64,
-                    };
-                    let angle_rad = angle_deg * std::f64::consts::PI / 180.;
-                    let centroid =
-                        self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                    corners[Ix3(cell_id, corner_id, 0)] =
-                        centroid[0] + self.radius() * angle_rad.cos();
-                    corners[Ix3(cell_id, corner_id, 1)] =
-                        centroid[1] + self.radius() * angle_rad.sin();
+                    corners[Ix3(cell_id, corner_id, 0)] = centroid[0] + offsets[corner_id][0];
+                    corners[Ix3(cell_id, corner_id, 1)] = centroid[1] + offsets[corner_id][1];
                 }
             }
 
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix.dot(&corner)` call would make per corner.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..corners.shape()[0] {
                     for corner_id in 0..corners.shape()[1] {
-                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                        corner_xy.assign(&rotated_corner_xy);
+                        let x = corners[Ix3(cell_id, corner_id, 0)];
+                        let y = corners[Ix3(cell_id, corner_id, 1)];
+                        corners[Ix3(cell_id, corner_id, 0)] = cos * x - sin * y;
+                        corners[Ix3(cell_id, corner_id, 1)] = sin * x + cos * y;
                     }
                 }
             }
-            corners
         })
     }
 
@@ -249,46 +209,35 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 3, |points, mut nearby_cells| {
             // There are 6 options for the nearby cells,
             // based on where in a cell the point is located.
             // Hence there are 6 sections within the cell,
             // each 60 degrees wide (360/6 = 60).
             // We divide the quadrants based on the angle between
             // the point and pure up, as measured from the centroid of the cell.
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 3, 2));
 
-            // Since points are rotated in cell_at_points, perform this call before
-            // rotating the points in this function.
-            // Ideally we have a version cell_at_points that does not rotate, same
-            // as we do with centroid_xy_no_rot.
-            let cell_ids = self.cell_at_points(points);
-
-            // Rotate points only if nesecary
-            // We only want to clone/copy the data in the points variable
-            // if it needs rotating. This is hard for the Rust compiler
-            // because points cannot be either owned or a view depending on a condition.
-            // It needs to either always be owned or always be a view.
-            // Since we don't always want to own the data we make sure that
-            // the variable points is always a view.
-            // However, the rotated data does need to be stored in a different
-            // variable that lives at least as long as the view.
-            // To satisfy the compiler we declare points_ before the if-block and
-            // then return the view from the if-block which we use to shadow the original
-            // points variable.
+            // Rotate the points into the grid frame exactly once. Both the id
+            // lookup and the azimuth below work in that frame, so the points
+            // must not be inverse-rotated a second time (the old code did).
+            // At rot=0 the input view is reused, so no clone happens.
             let mut points_: Array2<f64>;
             let points: ArrayView2<f64> = if self.rotation() != 0. {
-                // Create an owned copy of `points` and apply rotation.
                 points_ = points.to_owned();
-                for cell_id in 0..points.shape()[0] {
-                    let mut point = points_.slice_mut(s![cell_id, ..]);
-                    let point_rot = self._rotation_matrix_inv.dot(&point);
-                    point.assign(&point_rot);
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
+                for cell_id in 0..points_.shape()[0] {
+                    let x = points_[Ix2(cell_id, 0)];
+                    let y = points_[Ix2(cell_id, 1)];
+                    points_[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    points_[Ix2(cell_id, 1)] = -sin * x + cos * y;
                 }
                 points_.view()
             } else {
                 points.view()
             };
+
+            let cell_ids = self.cell_at_points_no_rot(points);
 
             for cell_id in 0..points.shape()[0] {
                 // Determine the azimuth based on the direction vector from the cell centroid to the point
@@ -397,7 +346,6 @@ impl GridTraits for HexGrid {
                     nearby_cells[Ix3(cell_id, nearby_cell_id, 1)] += cell_ids[Ix2(cell_id, 1)];
                 }
             }
-            nearby_cells
         })
     }
 
@@ -414,8 +362,9 @@ impl GridTraits for HexGrid {
         // Python's `HexGrid.relative_neighbours` documents `connect_corners` as
         // "not relevant in hexagonal grids" and it indeed returns the same result
         // for both values, so both trait methods share one implementation.
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id)
+        let k = Self::neighbour_count(depth, include_selected);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, k, |index, out| {
+            self._neighbours_into(index, out, depth, include_selected, add_cell_id)
         })
     }
 
@@ -429,8 +378,9 @@ impl GridTraits for HexGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id)
+        let k = Self::neighbour_count(depth, include_selected);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, k, |index, out| {
+            self._neighbours_into(index, out, depth, include_selected, add_cell_id)
         })
     }
 
@@ -487,14 +437,27 @@ impl GridTraits for HexGrid {
 }
 
 impl HexGrid {
+    fn neighbour_count(depth: u64, include_selected: bool) -> usize {
+        // Python sizes the array as `sum(6 * arange(1, depth + 1)) + 1`, i.e.
+        // including the selected cell, and deletes it afterwards when needed.
+        // `6 * (1 + 2 + ... + depth)` is `3 * depth * (depth + 1)`.
+        let nr_neighbours = (3 * depth * (depth + 1) + 1) as usize;
+        if include_selected {
+            nr_neighbours
+        } else {
+            nr_neighbours - 1
+        }
+    }
+
     /// Shared implementation of the `GridTraits` neighbour methods.
-    fn _neighbours(
+    fn _neighbours_into(
         &self,
         index: ArrayView2<i64>,
+        mut neighbours: ArrayViewMut3<i64>,
         depth: u64,
         include_selected: bool,
         add_cell_id: bool,
-    ) -> Array3<i64> {
+    ) {
         let add_cell_id = add_cell_id as i64;
 
         // Python sizes the array as `sum(6 * arange(1, depth + 1)) + 1`, i.e.
@@ -512,12 +475,10 @@ impl HexGrid {
         // relative ids as a flat list first lets the same code serve both cases
         // without a second pass over the data.
         let nr_cells = index.shape()[0];
-        let mut relative = vec![[0i64; 2]; nr_cells * nr_neighbours];
+        let mut relative = vec![[0i64; 2]; nr_neighbours];
 
         for cell_id in 0..nr_cells {
             let is_odd_row = !iseven(index[Ix2(cell_id, pointy_axis)]);
-            let row_start = cell_id * nr_neighbours;
-            let cell_slice = &mut relative[row_start..row_start + nr_neighbours];
 
             // Python loops over `rows = range(depth, -1, -1)`, tracking the row
             // number `i` separately from the row *value*, which is `depth - i`.
@@ -539,8 +500,8 @@ impl HexGrid {
                 };
 
                 for flat_id in lo..hi {
-                    cell_slice[start_slice][flat_axis] = flat_id;
-                    cell_slice[start_slice][pointy_axis] = row as i64;
+                    relative[start_slice][flat_axis] = flat_id;
+                    relative[start_slice][pointy_axis] = row as i64;
                     start_slice += 1;
                 }
             }
@@ -551,8 +512,8 @@ impl HexGrid {
             let centre_row_start = start_slice - (2 * depth + 1) as usize;
             let mut mirrored = start_slice;
             for source in (0..centre_row_start).rev() {
-                cell_slice[mirrored] = cell_slice[source];
-                cell_slice[mirrored][pointy_axis] = -cell_slice[source][pointy_axis];
+                relative[mirrored] = relative[source];
+                relative[mirrored][pointy_axis] = -relative[source][pointy_axis];
                 mirrored += 1;
             }
             debug_assert_eq!(mirrored, nr_neighbours);
@@ -562,30 +523,104 @@ impl HexGrid {
             // remaining cells keep their order; the final slot is then unused.
             if !include_selected {
                 let centre = nr_neighbours / 2;
-                debug_assert_eq!((cell_slice[centre][0], cell_slice[centre][1]), (0, 0));
+                debug_assert_eq!((relative[centre][0], relative[centre][1]), (0, 0));
                 for i in centre..nr_neighbours - 1 {
-                    cell_slice[i] = cell_slice[i + 1];
+                    relative[i] = relative[i + 1];
                 }
             }
-        }
 
-        let kept = if include_selected {
-            nr_neighbours
-        } else {
-            nr_neighbours - 1
-        };
-        let mut neighbours = Array3::<i64>::zeros((nr_cells, kept, 2));
-        for cell_id in 0..nr_cells {
-            let row_start = cell_id * nr_neighbours;
+            let kept = if include_selected {
+                nr_neighbours
+            } else {
+                nr_neighbours - 1
+            };
             for cell in 0..kept {
                 neighbours[Ix3(cell_id, cell, 0)] =
-                    relative[row_start + cell][0] + add_cell_id * index[Ix2(cell_id, 0)];
+                    relative[cell][0] + add_cell_id * index[Ix2(cell_id, 0)];
                 neighbours[Ix3(cell_id, cell, 1)] =
-                    relative[row_start + cell][1] + add_cell_id * index[Ix2(cell_id, 1)];
+                    relative[cell][1] + add_cell_id * index[Ix2(cell_id, 1)];
             }
         }
-        neighbours
     }
+
+    /// Cell ids for points that are already expressed in the grid frame (i.e.
+    /// inverse-rotated). Shared by `cell_at_points` and `cells_near_point` so
+    /// the points are only inverse-rotated once.
+    fn cell_at_points_no_rot(&self, points: ArrayView2<f64>) -> Array2<i64> {
+        // For the sake of simplicity here I will define it all in terms of a pointy grid.
+        // dx, dy etc will be used but they will refer to the consistent/inconsistent axes
+        // so it also works for flat grids. While in the context of flat grids the meanings
+        // are flipped, it is easier to read in terms of x and y axes rather than (in)consistent axes.
+        let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
+
+        let dx = self.stepsize_consistent_axis();
+        let dy = self.stepsize_inconsistent_axis();
+        let id_x_axis = self.consistent_axis();
+        let id_y_axis = self.inconsistent_axis();
+        let offset_x = self.offset[id_x_axis];
+        let offset_y = self.offset[id_y_axis];
+
+        // The radius and these derived constants do not depend on the point,
+        // so hoist them out of the loop instead of recomputing them (and the
+        // sqrt inside `radius()`) for every point.
+        let radius = self.radius();
+        let radius_quarter = radius / 4.;
+        let radius_1_25 = radius * 1.25;
+        let radius_5_4 = radius * 5. / 4.;
+        let dx_over_radius = dx / radius;
+
+        for cell_id in 0..points.shape()[0] {
+            let x = points[Ix2(cell_id, id_x_axis)];
+            let y = points[Ix2(cell_id, id_y_axis)];
+
+            // determine initial id_y
+            let mut id_y = ((y - offset_y - radius_quarter) / dy).floor();
+            let is_offset = modulus(id_y, 2.) != 0.;
+            let mut id_x: f64;
+
+            // determine initial id_x
+            if is_offset == true {
+                id_x = (x - offset_x - dx / 2.) / dx;
+            } else {
+                id_x = (x - offset_x) / dx;
+            }
+            id_x = id_x.floor();
+
+            // refine id_x and id_y
+            // Example: points at the top of the cell's bounding box can be in this cell or in the cell to the top right or top left
+            let rel_loc_y = modulus(y - offset_y - radius_quarter, dy) + radius_quarter;
+            let rel_loc_x = modulus(x - offset_x, dx);
+
+            let mut in_top_left: bool;
+            let mut in_top_right: bool;
+            if is_offset == true {
+                in_top_left = (radius_1_25 - rel_loc_y) < ((rel_loc_x - 0.5 * dx) / dx_over_radius);
+                in_top_left = in_top_left && (rel_loc_x < (0.5 * dx));
+                in_top_right = (rel_loc_x - 0.5 * dx) / dx_over_radius <= (rel_loc_y - radius_1_25);
+                in_top_right = in_top_right && rel_loc_x >= (0.5 * dx);
+                if in_top_left == true {
+                    id_y = id_y + 1.;
+                    id_x = id_x + 1.;
+                } else if in_top_right == true {
+                    id_y = id_y + 1.;
+                }
+            } else {
+                in_top_left = rel_loc_x / dx_over_radius < (rel_loc_y - radius_5_4);
+                in_top_right = (radius_1_25 - rel_loc_y) <= (rel_loc_x - dx) / dx_over_radius;
+                if in_top_left == true {
+                    id_y = id_y + 1.;
+                    id_x = id_x - 1.;
+                } else if in_top_right == true {
+                    id_y = id_y + 1.;
+                }
+            }
+
+            index[Ix2(cell_id, id_x_axis)] = id_x as i64;
+            index[Ix2(cell_id, id_y_axis)] = id_y as i64;
+        }
+        index
+    }
+
     pub fn new(cellsize: f64, orientation: Orientation) -> Self {
         let _rotation_matrix = rotation_matrix_from_angle(0.);
         let _rotation_matrix_inv = rotation_matrix_from_angle(-0.);
@@ -662,6 +697,22 @@ mod tests {
             }
         }
         assert_eq!(flat, expected);
+    }
+
+    #[test]
+    fn cell_at_points_no_rot_matches_cell_at_points_at_zero_rotation() {
+        // `cell_at_points` inverse-rotates once and delegates to this shared
+        // no-rotation lookup. At rot=0 the two must agree exactly. This is
+        // also the path `cells_near_point` now uses.
+        let pts = array![[0.0, 0.0], [1.2, -2.3], [5.5, 4.4], [-0.1, 3.7]];
+        for orientation in [Orientation::Pointy, Orientation::Flat] {
+            let mut grid = HexGrid::new(2., orientation);
+            grid.set_offset([0.3, 0.4]);
+            assert_eq!(
+                grid.cell_at_points(pts.view()),
+                grid.cell_at_points_no_rot(pts.view())
+            );
+        }
     }
 
     // ---------------------------------------------------------------------

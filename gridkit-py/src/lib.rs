@@ -1637,8 +1637,45 @@ fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
     Ok(())
 }
 
+/// Set the number of worker threads used by the parallel grid queries.
+///
+/// Pass an integer `>= 1`, or `None` to restore the default (the number of
+/// physical cores). Must be called before the first parallel query (e.g. a
+/// large `cell_at_points`, `cells_near_point` or `cell_corners` call). If the
+/// pool has already been created, it is rebuilt with the new worker count;
+/// active queries finish on the old pool while new queries use the replacement.
+#[pyfunction]
+fn set_num_threads(threads: Option<usize>) -> PyResult<()> {
+    #[cfg(feature = "parallel")]
+    {
+        gridkit::set_num_threads(threads).map_err(PyValueError::new_err)
+    }
+    #[cfg(not(feature = "parallel"))]
+    {
+        let _ = threads;
+        Err(PyRuntimeError::new_err(
+            "gridkit was built without the `parallel` feature; thread-count control is unavailable",
+        ))
+    }
+}
+
+/// The number of worker threads the parallel grid queries will use.
+#[pyfunction]
+fn get_num_threads() -> usize {
+    #[cfg(feature = "parallel")]
+    {
+        gridkit::get_num_threads()
+    }
+    #[cfg(not(feature = "parallel"))]
+    {
+        1
+    }
+}
+
 #[pymodule]
 fn gridkit_rs(_py: Python, module: &PyModule) -> PyResult<()> {
+    module.add_function(wrap_pyfunction!(set_num_threads, module)?)?;
+    module.add_function(wrap_pyfunction!(get_num_threads, module)?)?;
     module.add_class::<PyO3TriGrid>()?;
     module.add_class::<PyO3RectGrid>()?;
     module.add_class::<PyO3HexGrid>()?;

@@ -8,6 +8,12 @@ edition = "2021"
 name = "gridkit_rs"
 crate-type = ["cdylib"]
 
+[features]
+default = []
+# GridKit's rayon-backed parallel queries, plus the set_num_threads/num_threads
+# Python API. Enabled for the built extension via [tool.maturin] in pyproject.toml.
+parallel = ["gridkit/parallel"]
+
 [dependencies]
 numpy = "0.21.0"
 pyo3 = "0.21.2"
