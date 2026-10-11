@@ -270,7 +270,7 @@ class HexGrid(BaseGrid):
 
     @validate_index
     def relative_neighbours(
-        self, index, depth=1, include_selected=False, connect_corners=False
+        self, index=None, depth=1, include_selected=False, connect_corners=False
     ) -> numpy.ndarray:
         """The relative indices of the neighbouring cells.
 

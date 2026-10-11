@@ -13,12 +13,18 @@ pub trait GridTraits {
     fn set_cellsize(&mut self, cellsize: f64);
     fn offset(&self) -> [f64; 2];
     fn set_offset(&mut self, offset: [f64; 2]);
-    fn anchor(&self, target_loc: &[f64; 2], cell_element: CellElement) -> Grid {
+    fn anchor(&self, target_loc: &[f64; 2], cell_element: CellElement) -> Grid
+    where
+        Self: Sync,
+    {
         let mut grid = self.get_grid();
         grid.anchor_inplace(target_loc, cell_element);
         grid
     }
-    fn anchor_inplace(&mut self, target_loc: &[f64; 2], cell_element: CellElement) {
+    fn anchor_inplace(&mut self, target_loc: &[f64; 2], cell_element: CellElement)
+    where
+        Self: Sync,
+    {
         let target_loc = ArrayView1::<f64>::from(target_loc);
         // Keep the internal single-point representation 2D. The public array
         // methods accept arbitrary shapes, but the anchoring logic below uses
@@ -128,8 +134,9 @@ pub trait GridTraits {
     fn centroid<D>(&self, index: ArrayView<i64, D>) -> Array<f64, D>
     where
         D: Dimension,
+        Self: Sync,
     {
-        crate::utils::map_point_pairs(index, |index| {
+        crate::utils::map_point_pairs_batched(index, |index| {
             let mut centroids = Array2::<f64>::zeros((index.shape()[0], 2));
             for cell_id in 0..centroids.shape()[0] {
                 let point = self.centroid_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
@@ -138,10 +145,15 @@ pub trait GridTraits {
             }
             if self.rotation() != 0. {
                 let rotation_matrix = self.rotation_matrix();
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `rotation_matrix.dot(&centroid)` call would make per cell.
+                let cos = rotation_matrix[[0, 0]];
+                let sin = rotation_matrix[[1, 0]];
                 for cell_id in 0..centroids.shape()[0] {
-                    let centroid = centroids.slice(s![cell_id, ..]).to_owned();
-                    let cent_rot = rotation_matrix.dot(&centroid);
-                    centroids.slice_mut(s![cell_id, ..]).assign(&cent_rot);
+                    let x = centroids[Ix2(cell_id, 0)];
+                    let y = centroids[Ix2(cell_id, 1)];
+                    centroids[Ix2(cell_id, 0)] = cos * x - sin * y;
+                    centroids[Ix2(cell_id, 1)] = sin * x + cos * y;
                 }
             }
             centroids
@@ -262,6 +274,104 @@ pub fn grid_type_name(grid: &Grid) -> &'static str {
 pub enum CellElement {
     Centroid,
     Corner,
+}
+
+#[cfg(all(test, feature = "parallel"))]
+mod parallel_batch_tests {
+    use super::*;
+    use std::time::Instant;
+
+    const POINTS: usize = 2_097_152;
+
+    fn assert_parallel_speed<T, F>(name: &str, call: F)
+    where
+        T: std::fmt::Debug + PartialEq,
+        F: Fn() -> T,
+    {
+        crate::utils::set_num_threads(Some(1)).unwrap();
+        let start = Instant::now();
+        let serial = call();
+        let serial_time = start.elapsed();
+
+        crate::utils::set_num_threads(Some(2)).unwrap();
+        // Exclude one-time Rayon worker startup from the measured query.
+        let _ = call();
+        let start = Instant::now();
+        let parallel = call();
+        let parallel_time = start.elapsed();
+
+        eprintln!(
+            "{name}: 1 thread = {:.3}s, 2 threads = {:.3}s, speedup = {:.2}x",
+            serial_time.as_secs_f64(),
+            parallel_time.as_secs_f64(),
+            serial_time.as_secs_f64() / parallel_time.as_secs_f64()
+        );
+        assert_eq!(serial, parallel, "{name} changed its result or ordering");
+        assert!(
+            serial_time >= parallel_time.mul_f32(1.5),
+            "{name} did not achieve the required 1.5x speedup"
+        );
+    }
+
+    fn test_grid_methods(
+        grid_name: &str,
+        mut grid: Grid,
+        indices: &Array2<i64>,
+        points: &Array2<f64>,
+    ) {
+        grid.set_rotation(31.);
+
+        assert_parallel_speed(&format!("{grid_name}/centroid"), || {
+            grid.centroid(indices.view()).into_dyn()
+        });
+        assert_parallel_speed(&format!("{grid_name}/cell_at_points"), || {
+            grid.cell_at_points(points.view()).into_dyn()
+        });
+        assert_parallel_speed(&format!("{grid_name}/cell_corners"), || {
+            grid.cell_corners(indices.view()).into_dyn()
+        });
+        assert_parallel_speed(&format!("{grid_name}/cells_near_point"), || {
+            grid.cells_near_point(points.view()).into_dyn()
+        });
+        assert_parallel_speed(&format!("{grid_name}/all_neighbours"), || {
+            grid.all_neighbours(indices.view(), 1, false, true).into_dyn()
+        });
+        assert_parallel_speed(&format!("{grid_name}/direct_neighbours"), || {
+            grid.direct_neighbours(indices.view(), 1, false, true).into_dyn()
+        });
+    }
+
+    #[test]
+    #[ignore = "performance test; run with --ignored --nocapture"]
+    fn batched_grid_methods_parallelize_without_reordering() {
+        let indices = Array2::from_shape_fn((POINTS, 2), |(row, axis)| {
+            if axis == 0 {
+                (row % 2048) as i64 - 1024
+            } else {
+                (row / 2048) as i64 - 128
+            }
+        });
+        let points = indices.mapv(|value| value as f64 + 0.37);
+
+        test_grid_methods(
+            "rect",
+            Grid::RectGrid(RectGrid::new(12.3, 8.7)),
+            &indices,
+            &points,
+        );
+        test_grid_methods(
+            "hex",
+            Grid::HexGrid(HexGrid::new(12.3, Orientation::Flat)),
+            &indices,
+            &points,
+        );
+        test_grid_methods(
+            "tri",
+            Grid::TriGrid(TriGrid::new(12.3, Orientation::Flat)),
+            &indices,
+            &points,
+        );
+    }
 }
 
 impl ToString for CellElement {

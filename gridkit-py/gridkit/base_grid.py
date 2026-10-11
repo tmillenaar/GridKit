@@ -228,7 +228,7 @@ class BaseGrid(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def relative_neighbours(
-        self, depth=1, connect_corners=False, include_selected=False
+        self, index=None, depth=1, connect_corners=False, include_selected=False
     ):
         pass
 

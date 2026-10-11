@@ -99,20 +99,26 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
-            let shape = points.shape();
-            let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
-            for cell_id in 0..points.shape()[0] {
-                let point = points.slice(s![cell_id, ..]);
-                // FIXME: Rotation causes slowdown even when 0.
-                //        Consider a separate version of the function that does not do rotation
-                let point = self._rotation_matrix_inv.dot(&point);
-                let id_x = ((point[Ix1(0)] - self.offset[0]) / self.dx()).floor() as i64;
-                let id_y = ((point[Ix1(1)] - self.offset[1]) / self.dy()).floor() as i64;
-                index[Ix2(cell_id, 0)] = id_x;
-                index[Ix2(cell_id, 1)] = id_y;
-            }
-            index
+        crate::utils::map_point_pairs_batched(points, |points| {
+            // Inverse-rotate the points into the grid frame once, then reuse the
+            // shared no-rotation id lookup. Batching the rotation avoids the
+            // per-point allocation that `_rotation_matrix_inv.dot` used to make.
+            let mut rotated: Array2<f64>;
+            let grid_points: ArrayView2<f64> = if self.rotation() != 0. {
+                rotated = points.to_owned();
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
+                for cell_id in 0..rotated.shape()[0] {
+                    let x = rotated[Ix2(cell_id, 0)];
+                    let y = rotated[Ix2(cell_id, 1)];
+                    rotated[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    rotated[Ix2(cell_id, 1)] = -sin * x + cos * y;
+                }
+                rotated.view()
+            } else {
+                points.view()
+            };
+            self.cell_at_points_no_rot(grid_points)
         })
     }
 
@@ -120,32 +126,38 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 4, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 4, |index, mut corners| {
+            // Hoist the loop-invariant half-steps.
+            let half_dx = self.dx() / 2.;
+            let half_dy = self.dy() / 2.;
             for cell_id in 0..index.shape()[0] {
                 let id_x = index[Ix2(cell_id, 0)];
                 let id_y = index[Ix2(cell_id, 1)];
                 let [centroid_x, centroid_y] = self.centroid_xy_no_rot(id_x, id_y);
-                corners[Ix3(cell_id, 0, 0)] = centroid_x - self.dx() / 2.;
-                corners[Ix3(cell_id, 0, 1)] = centroid_y - self.dy() / 2.;
-                corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx() / 2.;
-                corners[Ix3(cell_id, 1, 1)] = centroid_y - self.dy() / 2.;
-                corners[Ix3(cell_id, 2, 0)] = centroid_x + self.dx() / 2.;
-                corners[Ix3(cell_id, 2, 1)] = centroid_y + self.dy() / 2.;
-                corners[Ix3(cell_id, 3, 0)] = centroid_x - self.dx() / 2.;
-                corners[Ix3(cell_id, 3, 1)] = centroid_y + self.dy() / 2.;
+                corners[Ix3(cell_id, 0, 0)] = centroid_x - half_dx;
+                corners[Ix3(cell_id, 0, 1)] = centroid_y - half_dy;
+                corners[Ix3(cell_id, 1, 0)] = centroid_x + half_dx;
+                corners[Ix3(cell_id, 1, 1)] = centroid_y - half_dy;
+                corners[Ix3(cell_id, 2, 0)] = centroid_x + half_dx;
+                corners[Ix3(cell_id, 2, 1)] = centroid_y + half_dy;
+                corners[Ix3(cell_id, 3, 0)] = centroid_x - half_dx;
+                corners[Ix3(cell_id, 3, 1)] = centroid_y + half_dy;
             }
 
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix.dot(&corner)` call would make per corner.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..corners.shape()[0] {
                     for corner_id in 0..corners.shape()[1] {
-                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                        corner_xy.assign(&rotated_corner_xy);
+                        let x = corners[Ix3(cell_id, corner_id, 0)];
+                        let y = corners[Ix3(cell_id, corner_id, 1)];
+                        corners[Ix3(cell_id, corner_id, 0)] = cos * x - sin * y;
+                        corners[Ix3(cell_id, corner_id, 1)] = sin * x + cos * y;
                     }
                 }
             }
-            corners
         })
     }
 
@@ -153,20 +165,27 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 4, 2));
-            let index = self.cell_at_points(points);
-
-            // FIXME: Find a way to not clone points in the case of no rotation
-            //        If points is made mutable within the conditional, it is dropped from scope and nothing changed
-            let mut points = points.to_owned();
-            if self.rotation() != 0. {
-                for cell_id in 0..points.shape()[0] {
-                    let mut point = points.slice_mut(s![cell_id, ..]);
-                    let point_rot = self._rotation_matrix_inv.dot(&point);
-                    point.assign(&point_rot);
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 4, |points, mut nearby_cells| {
+            // Rotate the points into the grid frame exactly once. Both the id
+            // lookup and the relative-location test below work in that frame.
+            // At rot=0 the input view is reused, so no clone happens.
+            let mut rotated: Array2<f64>;
+            let points: ArrayView2<f64> = if self.rotation() != 0. {
+                rotated = points.to_owned();
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
+                for cell_id in 0..rotated.shape()[0] {
+                    let x = rotated[Ix2(cell_id, 0)];
+                    let y = rotated[Ix2(cell_id, 1)];
+                    rotated[Ix2(cell_id, 0)] = cos * x + sin * y;
+                    rotated[Ix2(cell_id, 1)] = -sin * x + cos * y;
                 }
-            }
+                rotated.view()
+            } else {
+                points.view()
+            };
+
+            let index = self.cell_at_points_no_rot(points);
 
             for cell_id in 0..points.shape()[0] {
                 let rel_loc_x: f64 = modulus(points[Ix2(cell_id, 0)] - self.offset[0], self.dx());
@@ -220,7 +239,6 @@ impl GridTraits for RectGrid {
                     }
                 }
             }
-            nearby_cells
         })
     }
 
@@ -234,8 +252,9 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id, false)
+        let relative = Self::relative_neighbour_offsets(depth, include_selected, false);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, relative.len(), |index, out| {
+            self._neighbours_into(index, out, &relative, add_cell_id)
         })
     }
 
@@ -249,8 +268,9 @@ impl GridTraits for RectGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            self._neighbours(index, depth, include_selected, add_cell_id, true)
+        let relative = Self::relative_neighbour_offsets(depth, include_selected, true);
+        crate::utils::map_point_pairs_fanout_fill_batched(index, relative.len(), |index, out| {
+            self._neighbours_into(index, out, &relative, add_cell_id)
         })
     }
 
@@ -312,6 +332,24 @@ impl RectGrid {
         }
     }
 
+    /// Cell ids for points that are already expressed in the grid frame (i.e.
+    /// inverse-rotated). Shared by `cell_at_points` and `cells_near_point` so
+    /// the points are only inverse-rotated once.
+    fn cell_at_points_no_rot(&self, points: ArrayView2<f64>) -> Array2<i64> {
+        let shape = points.shape();
+        let mut index = Array2::<i64>::zeros((shape[0], shape[1]));
+        let dx = self.dx();
+        let dy = self.dy();
+        let offset = self.offset;
+        for cell_id in 0..points.shape()[0] {
+            let id_x = ((points[Ix2(cell_id, 0)] - offset[0]) / dx).floor() as i64;
+            let id_y = ((points[Ix2(cell_id, 1)] - offset[1]) / dy).floor() as i64;
+            index[Ix2(cell_id, 0)] = id_x;
+            index[Ix2(cell_id, 1)] = id_y;
+        }
+        index
+    }
+
     /// Set the cellsize in the x-direction.
     ///
     /// The cellsize must be larger than zero, mirroring the validation in
@@ -344,18 +382,14 @@ impl RectGrid {
     ///
     /// `direct_only` selects the diamond shaped window (`connect_corners=false`)
     /// over the full square one.
-    fn _neighbours(
-        &self,
-        index: ArrayView2<i64>,
+    fn relative_neighbour_offsets(
         depth: u64,
         include_selected: bool,
-        add_cell_id: bool,
         direct_only: bool,
-    ) -> Array3<i64> {
+    ) -> Vec<[i64; 2]> {
         // Python raises `ValueError("'depth' cannot be lower than 1")`.
         assert!(depth >= 1, "'depth' cannot be lower than 1");
         let depth = depth as i64;
-        let add_cell_id = add_cell_id as i64;
 
         // Python builds the full `(2 * depth + 1)^2` window by raveling a meshgrid in
         // C order, which means the rows run from y = +depth down to y = -depth and
@@ -378,8 +412,17 @@ impl RectGrid {
                 relative.push([x, y]);
             }
         }
+        relative
+    }
 
-        let mut neighbours = Array3::<i64>::zeros((index.shape()[0], relative.len(), 2));
+    fn _neighbours_into(
+        &self,
+        index: ArrayView2<i64>,
+        mut neighbours: ArrayViewMut3<i64>,
+        relative: &[[i64; 2]],
+        add_cell_id: bool,
+    ) {
+        let add_cell_id = add_cell_id as i64;
         for cell_id in 0..neighbours.shape()[0] {
             for (neighbour_id, [rel_x, rel_y]) in relative.iter().enumerate() {
                 neighbours[Ix3(cell_id, neighbour_id, 0)] =
@@ -388,7 +431,6 @@ impl RectGrid {
                     rel_y + add_cell_id * index[Ix2(cell_id, 1)];
             }
         }
-        neighbours
     }
 }
 
@@ -431,6 +473,19 @@ mod tests {
             assert_eq!(actual[[i, 0]], exp[0]);
             assert_eq!(actual[[i, 1]], exp[1]);
         }
+    }
+
+    #[test]
+    fn cell_at_points_no_rot_matches_cell_at_points_at_zero_rotation() {
+        // `cell_at_points` inverse-rotates once and delegates to this shared
+        // no-rotation lookup. At rot=0 the two must agree exactly.
+        let mut grid = RectGrid::new(2., 3.);
+        grid.set_offset([0.3, 0.4]);
+        let pts = array![[0.0, 0.0], [1.2, -2.3], [5.5, 4.4], [-0.1, 3.7]];
+        assert_eq!(
+            grid.cell_at_points(pts.view()),
+            grid.cell_at_points_no_rot(pts.view())
+        );
     }
 
     /// Compare an (n, m, 2) f64 array against a flat list of expected values.
