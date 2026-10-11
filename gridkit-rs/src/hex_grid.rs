@@ -543,7 +543,7 @@ impl HexGrid {
         }
     }
 
-    /// Cell ids for points that are already expressed in the grid frame (i.e.
+    /// Assumed that cell ids for points that are already expressed in the grid frame (i.e.
     /// inverse-rotated). Shared by `cell_at_points` and `cells_near_point` so
     /// the points are only inverse-rotated once.
     fn cell_at_points_no_rot(&self, points: ArrayView2<f64>) -> Array2<i64> {

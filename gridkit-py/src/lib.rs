@@ -1640,10 +1640,9 @@ fn tile_utils(_py: Python, module: &PyModule) -> PyResult<()> {
 /// Set the number of worker threads used by the parallel grid queries.
 ///
 /// Pass an integer `>= 1`, or `None` to restore the default (the number of
-/// physical cores). Must be called before the first parallel query (e.g. a
-/// large `cell_at_points`, `cells_near_point` or `cell_corners` call). If the
-/// pool has already been created, it is rebuilt with the new worker count;
-/// active queries finish on the old pool while new queries use the replacement.
+/// physical cores). Must be called before the first parallel query. If the
+/// pool has already been created, it is rebuilt with the new worker count.
+/// Active queries finish on the old pool while new queries use the replacement.
 #[pyfunction]
 fn set_num_threads(threads: Option<usize>) -> PyResult<()> {
     #[cfg(feature = "parallel")]
