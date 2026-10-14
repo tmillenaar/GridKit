@@ -545,6 +545,181 @@ where
         .expect("output of `f` is not compatible with the reduced input shape")
 }
 
+/// Parallel counterpart of [`map_point_pairs_reduce`]. The input is split into
+/// disjoint row chunks and each worker writes its reduced values into the
+/// corresponding output slice, preserving the input order.
+#[cfg(feature = "parallel")]
+pub fn map_point_pairs_reduce_parallel<D, A, B, F>(
+    index: ArrayView<A, D>,
+    f: F,
+) -> Array<B, D::Smaller>
+where
+    D: Dimension + RemoveAxis,
+    A: Clone + Sync,
+    B: Send + Clone,
+    F: Fn(ArrayView2<A>) -> Array1<B> + Sync,
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let smaller = dim.clone().remove_axis(Axis(dim.ndim() - 1));
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let n = raveled.nrows();
+    let mut result = Array1::<Option<B>>::from_elem(n, None);
+
+    if should_parallelize(n) {
+        let chunk = n.div_ceil(get_num_threads());
+        let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
+        let destinations: Vec<ArrayViewMut1<Option<B>>> =
+            result.axis_chunks_iter_mut(Axis(0), chunk).collect();
+        with_pool(|pool| {
+            pool.install(|| {
+                sources
+                    .into_par_iter()
+                    .zip(destinations.into_par_iter())
+                    .for_each(|(source, mut destination)| {
+                        for (slot, value) in destination.iter_mut().zip(f(source)) {
+                            *slot = Some(value);
+                        }
+                    });
+            });
+        });
+    } else {
+        for (slot, value) in result.iter_mut().zip(f(raveled.view())) {
+            *slot = Some(value);
+        }
+    }
+
+    result
+        .into_iter()
+        .map(|value| value.expect("reduction output was not completely filled"))
+        .collect::<Array1<B>>()
+        .into_shape(smaller.into_pattern())
+        .expect("output of `f` is not compatible with the reduced input shape")
+}
+
+#[cfg(not(feature = "parallel"))]
+pub use map_point_pairs_reduce as map_point_pairs_reduce_batched;
+#[cfg(feature = "parallel")]
+pub use map_point_pairs_reduce_parallel as map_point_pairs_reduce_batched;
+
+/// Reduce point pairs into a preallocated output array by having `fill` write
+/// directly into the supplied destination slice.
+pub fn map_point_pairs_reduce_fill<D, A, B, F>(
+    index: ArrayView<A, D>,
+    fill: F,
+) -> Array<B, D::Smaller>
+where
+    D: Dimension + RemoveAxis,
+    A: Clone,
+    B: Default + Clone,
+    F: FnOnce(ArrayView2<A>, ArrayViewMut1<B>),
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let smaller = dim.clone().remove_axis(Axis(dim.ndim() - 1));
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let mut result = Array1::<B>::from_elem(raveled.nrows(), B::default());
+    fill(raveled.view(), result.view_mut());
+    result
+        .into_shape(smaller.into_pattern())
+        .expect("output of `fill` is not compatible with the reduced input shape")
+}
+
+/// Parallel counterpart of [`map_point_pairs_reduce_fill`]. Each worker gets
+/// a disjoint mutable slice of one preallocated output array and fills it
+/// directly, avoiding per-chunk result allocation and concatenation.
+#[cfg(feature = "parallel")]
+pub fn map_point_pairs_reduce_fill_parallel<D, A, B, F>(
+    index: ArrayView<A, D>,
+    fill: F,
+) -> Array<B, D::Smaller>
+where
+    D: Dimension + RemoveAxis,
+    A: Clone + Sync,
+    B: Default + Clone + Send,
+    F: Fn(ArrayView2<A>, ArrayViewMut1<B>) + Sync,
+{
+    let dim = index.raw_dim();
+    assert_eq!(
+        *dim.slice()
+            .last()
+            .expect("expected a last axis of length 2"),
+        2
+    );
+    let smaller = dim.clone().remove_axis(Axis(dim.ndim() - 1));
+    let raveled = index.to_shape((dim.size() / 2, 2)).unwrap();
+    let n = raveled.nrows();
+    let mut result = Array1::<B>::from_elem(n, B::default());
+
+    if should_parallelize(n) {
+        let chunk = n.div_ceil(get_num_threads());
+        let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
+        let destinations: Vec<ArrayViewMut1<B>> =
+            result.axis_chunks_iter_mut(Axis(0), chunk).collect();
+        with_pool(|pool| {
+            pool.install(|| {
+                sources
+                    .into_par_iter()
+                    .zip(destinations.into_par_iter())
+                    .for_each(|(source, destination)| fill(source, destination));
+            });
+        });
+    } else {
+        fill(raveled.view(), result.view_mut());
+    }
+
+    result
+        .into_shape(smaller.into_pattern())
+        .expect("output of `fill` is not compatible with the reduced input shape")
+}
+
+#[cfg(not(feature = "parallel"))]
+pub use map_point_pairs_reduce_fill as map_point_pairs_reduce_fill_batched;
+#[cfg(feature = "parallel")]
+pub use map_point_pairs_reduce_fill_parallel as map_point_pairs_reduce_fill_batched;
+
+#[cfg(test)]
+mod reduction_tests {
+    use super::*;
+
+    #[test]
+    fn reduction_preserves_the_input_shape_without_coordinate_axis() {
+        let input = Array3::<i64>::from_shape_fn((2, 3, 2), |(row, col, axis)| {
+            (row * 100 + col * 10 + axis) as i64
+        });
+        let result = map_point_pairs_reduce_batched(input.view(), |rows| {
+            rows.axis_iter(Axis(0))
+                .map(|row| row[0] + row[1])
+                .collect::<Array1<i64>>()
+        });
+
+        assert_eq!(result.shape(), &[2, 3]);
+        assert_eq!(result, array![[1, 21, 41], [201, 221, 241]]);
+    }
+
+    #[test]
+    fn reduction_fill_writes_into_the_preallocated_output() {
+        let input = array![[[1_i64, 2], [3, 4]]];
+        let result = map_point_pairs_reduce_fill_batched(input.view(), |rows, mut output| {
+            for (row, value) in rows.axis_iter(Axis(0)).zip(output.iter_mut()) {
+                *value = row[0] * 10 + row[1];
+            }
+        });
+
+        assert_eq!(result, array![[12_i64, 34]]);
+    }
+}
+
 #[cfg(all(test, feature = "parallel"))]
 mod parallel_tests {
     use super::*;
@@ -598,6 +773,40 @@ mod parallel_tests {
         };
         let serial = map_point_pairs_fanout_fill(input.view(), 3, work);
         let parallel = map_point_pairs_fanout_fill_parallel(input.view(), 3, work);
+        assert_eq!(serial, parallel);
+    }
+
+    #[test]
+    fn parallel_reduce_matches_serial_above_the_threshold() {
+        let input = Array2::<i64>::from_shape_fn(
+            (PARALLEL_MIN_POINTS * 3 + 7, 2),
+            |(i, axis)| i as i64 * 3 + axis as i64,
+        );
+        let work = |rows: ArrayView2<i64>| {
+            rows.axis_iter(Axis(0))
+                .map(|row| row[0] * 2 + row[1])
+                .collect::<Array1<i64>>()
+        };
+        let serial = map_point_pairs_reduce(input.view(), work);
+        let parallel = map_point_pairs_reduce_parallel(input.view(), work);
+
+        assert_eq!(serial, parallel);
+    }
+
+    #[test]
+    fn parallel_reduce_fill_matches_serial_above_the_threshold() {
+        let input = Array2::<i64>::from_shape_fn(
+            (PARALLEL_MIN_POINTS * 3 + 7, 2),
+            |(i, axis)| i as i64 * 3 + axis as i64,
+        );
+        let work = |rows: ArrayView2<i64>, mut output: ArrayViewMut1<i64>| {
+            for (row, value) in rows.axis_iter(Axis(0)).zip(output.iter_mut()) {
+                *value = row[0] * 2 + row[1];
+            }
+        };
+        let serial = map_point_pairs_reduce_fill(input.view(), work);
+        let parallel = map_point_pairs_reduce_fill_parallel(input.view(), work);
+
         assert_eq!(serial, parallel);
     }
 
