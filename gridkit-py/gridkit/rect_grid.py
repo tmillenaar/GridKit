@@ -211,8 +211,13 @@ class RectGrid(BaseGrid):
             crs=self.crs,
         )
 
+    @validate_index
     def relative_neighbours(
-        self, depth=1, connect_corners=False, include_selected=False, index=None
+        self,
+        index=None,
+        depth=1,
+        connect_corners=False,
+        include_selected=False,
     ):
         """The relative indices of the neighbouring cells.
 
