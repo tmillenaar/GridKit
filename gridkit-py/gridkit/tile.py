@@ -274,6 +274,23 @@ class Tile:
         _tile = self._tile.overlap(other._tile)
         return Tile.from_pyo3_tile(self.get_grid(), _tile)
 
+    def sample_nearest_from(self, tile_to_sample):
+        """Sample a data tile at this tile's cell centroids using nearest neighbours."""
+        result = self._tile.sample_nearest_from(tile_to_sample._data_tile)
+        return DataTile.from_pyo3_data_tile(self.get_grid(), result)
+
+    def sample_bilinear_from(self, tile_to_sample):
+        """Sample a data tile at this tile's cell centroids using bilinear interpolation."""
+        result = self._tile.sample_bilinear_from(tile_to_sample._data_tile)
+        return DataTile.from_pyo3_data_tile(self.get_grid(), result)
+
+    def sample_inverse_distance_from(self, tile_to_sample, decay_constant=1):
+        """Sample a data tile at this tile's cell centroids using inverse-distance interpolation."""
+        result = self._tile.sample_inverse_distance_from(
+            tile_to_sample._data_tile, decay_constant
+        )
+        return DataTile.from_pyo3_data_tile(self.get_grid(), result)
+
     @validate_index
     def to_shapely(self, index=None, as_multipolygon=None):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`

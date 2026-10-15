@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from gridkit import GridIndex, HexGrid, RectGrid, Tile, TriGrid
+from gridkit import DataTile, GridIndex, HexGrid, RectGrid, Tile, TriGrid
 
 
 @pytest.mark.parametrize("grid", [TriGrid(size=1), RectGrid(size=1), HexGrid(size=1)])
@@ -43,6 +43,40 @@ def test_init_errors():
     # Test grid dtype
     with pytest.raises(TypeError):
         Tile(grid._grid, (0, 0), 1, 1)
+
+
+def test_sample_nearest_from_uses_target_centroids_and_source_nodata():
+    grid = RectGrid(size=1)
+    source = DataTile(
+        Tile(grid, (0, 0), 2, 2),
+        numpy.array([[1, 2], [3, 4]], dtype=numpy.int32),
+        nodata_value=numpy.int32(-1),
+    )
+    target = Tile(grid, (-1, 0), 3, 2)
+
+    result = target.sample_nearest_from(source)
+
+    numpy.testing.assert_array_equal(result.to_numpy(), [[-1, 1, 2], [-1, 3, 4]])
+    assert result.nodata_value == -1
+    assert result.dtype == numpy.dtype("int32")
+
+
+def test_sample_interpolations_from_use_target_centroids():
+    source_grid = RectGrid(size=1)
+    source = DataTile(
+        Tile(source_grid, (0, 0), 2, 2),
+        numpy.array([[1.0, 2.0], [3.0, 4.0]]),
+    )
+    target_grid = source_grid.update(offset=(0.25, 0.25))
+    target = Tile(target_grid, (0, 0), 1, 1)
+
+    bilinear = target.sample_bilinear_from(source)
+    inverse_distance = target.sample_inverse_distance_from(source, decay_constant=1)
+
+    numpy.testing.assert_allclose(bilinear.to_numpy(), [[2.75]])
+    numpy.testing.assert_allclose(inverse_distance.to_numpy(), [[2.6224593312018545]])
+    assert bilinear.dtype == numpy.dtype("float64")
+    assert inverse_distance.dtype == numpy.dtype("float64")
 
 
 @pytest.mark.parametrize(

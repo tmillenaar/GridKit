@@ -882,6 +882,118 @@ impl PyO3Tile {
             .into_pyarray(py)
     }
 
+    fn sample_nearest_from<'py>(
+        &self,
+        py: Python<'py>,
+        tile_to_sample: PyO3DataTile,
+    ) -> PyResult<PyObject> {
+        let result = match tile_to_sample {
+            PyO3DataTile::F64(source) => Py::new(py, PyO3DataTileF64 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::F32(source) => Py::new(py, PyO3DataTileF32 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::I64(source) => Py::new(py, PyO3DataTileI64 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::I32(source) => Py::new(py, PyO3DataTileI32 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::I16(source) => Py::new(py, PyO3DataTileI16 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::I8(source) => Py::new(py, PyO3DataTileI8 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::U64(source) => Py::new(py, PyO3DataTileU64 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::U32(source) => Py::new(py, PyO3DataTileU32 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::U16(source) => Py::new(py, PyO3DataTileU16 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+            PyO3DataTile::U8(source) => Py::new(py, PyO3DataTileU8 {
+                _data_tile: self._tile.sample_nearest_from(&source._data_tile),
+                _tile: self.clone(),
+            })?.into_py(py),
+        };
+        Ok(result)
+    }
+
+    fn sample_bilinear_from(&self, tile_to_sample: PyO3DataTile) -> PyO3DataTileF64 {
+        let _data_tile = match tile_to_sample {
+            PyO3DataTile::F64(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::F32(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::I64(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::I32(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::I16(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::I8(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::U64(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::U32(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::U16(source) => self._tile.sample_bilinear_from(&source._data_tile),
+            PyO3DataTile::U8(source) => self._tile.sample_bilinear_from(&source._data_tile),
+        };
+        PyO3DataTileF64 {
+            _data_tile,
+            _tile: self.clone(),
+        }
+    }
+
+    fn sample_inverse_distance_from(
+        &self,
+        tile_to_sample: PyO3DataTile,
+        decay_constant: f64,
+    ) -> PyO3DataTileF64 {
+        let _data_tile = match tile_to_sample {
+            PyO3DataTile::F64(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::F32(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::I64(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::I32(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::I16(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::I8(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::U64(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::U32(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::U16(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+            PyO3DataTile::U8(source) => self
+                ._tile
+                .sample_inverse_distance_from(&source._data_tile, decay_constant),
+        };
+        PyO3DataTileF64 {
+            _data_tile,
+            _tile: self.clone(),
+        }
+    }
+
     fn __eq__<'py>(&self, py: Python<'py>, other: PyO3Tile) -> bool {
         self._tile == other._tile
     }
