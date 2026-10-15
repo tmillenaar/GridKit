@@ -126,7 +126,7 @@ def plot_polygons(
         vmin = kwargs.pop("vmin", numpy.nanmin(values))
         vmax = kwargs.pop("vmax", numpy.nanmax(values))
         values_normalized = values - vmin
-        values_normalized = values_normalized / numpy.nanmax(values_normalized)
+        values_normalized = values_normalized / (vmax - vmin)
         colors = cmap(
             values_normalized
         ).squeeze()  # squeeze to remove empty axes (when values is pandas series)
