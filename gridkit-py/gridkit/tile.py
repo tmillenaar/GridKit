@@ -291,6 +291,97 @@ class Tile:
         )
         return DataTile.from_pyo3_data_tile(self.get_grid(), result)
 
+    def _rescaled(self, nx, ny, factor):
+        """Rescale the associated grid and re-derive the start id.
+
+        ``factor`` scales the cell size: values above one make the cells larger
+        (downscaling the tile) and values below one make them smaller
+        (upscaling the tile). The tile keeps exactly the same bounds.
+        """
+        grid = self.get_grid()
+        start_corner = (
+            self.start_id[0] * grid.dx + grid.offset[0],
+            self.start_id[1] * grid.dy + grid.offset[1],
+        )
+        new_dx = grid.dx * factor
+        new_dy = grid.dy * factor
+
+        # Wrap the offset modulo the new cell size so the start corner lands on
+        # a cell corner. The offset is normalized here directly rather than kept
+        # as-is; the cell ids of a rescaled grid no longer refer to the same
+        # cells, so the start id is re-derived from the corner below.
+        raw_offset = (
+            start_corner[0] - self.start_id[0] * new_dx,
+            start_corner[1] - self.start_id[1] * new_dy,
+        )
+        offset = (raw_offset[0] % new_dx, raw_offset[1] % new_dy)
+
+        definition = grid.definition
+        if "size" in definition:
+            definition["size"] = definition["size"] * factor
+        else:
+            definition["dx"] = new_dx
+            definition["dy"] = new_dy
+        definition["offset"] = offset
+        new_grid = grid.parent_grid_class(**definition)
+
+        start_id = (
+            int(numpy.round((start_corner[0] - offset[0]) / new_dx)),
+            int(numpy.round((start_corner[1] - offset[1]) / new_dy)),
+        )
+        return Tile(new_grid, start_id, nx, ny)
+
+    def upscale(self, factor):
+        """Return a tile with ``factor`` times as many cells along both axes.
+
+        Each cell is subdivided into ``factor`` x ``factor`` smaller cells, so
+        the tile keeps exactly the same bounding box and rotation. A ``factor``
+        of 0 returns an unchanged copy; negative factors are not allowed.
+
+        Parameters
+        ----------
+        factor: `int`
+            The integer factor by which to subdivide each cell.
+
+        Returns
+        -------
+        :class:`.Tile`
+            A tile with the same bounds and an  ``factor`` times finer grid.
+        """
+        if not isinstance(factor, (int, numpy.integer)) or factor < 0:
+            raise ValueError(f"Expected a non-negative integer factor, got: {factor}")
+        if factor == 0:
+            return Tile(self.get_grid(), self.start_id, self.nx, self.ny)
+        return self._rescaled(self.nx * factor, self.ny * factor, 1 / factor)
+
+    def downscale(self, factor):
+        """Return a tile with ``factor`` times fewer cells along both axes.
+
+        The cells are merged into ``factor`` x ``factor`` larger cells, so the
+        tile keeps exactly the same bounding box and rotation. This is the
+        inverse of :meth:`.Tile.upscale`.
+
+        Parameters
+        ----------
+        factor: `int`
+            The integer factor by which to coarsen the tile. It must divide both
+            ``nx`` and ``ny`` so the coarser cells still fit the tile's bounds.
+
+        Returns
+        -------
+        :class:`.Tile`
+            A tile with the same bounds and a ``factor`` times coarser grid.
+        """
+        if not isinstance(factor, (int, numpy.integer)) or factor < 1:
+            raise ValueError(f"Expected a positive integer factor, got: {factor}")
+        if self.nx % factor != 0 or self.ny % factor != 0:
+            raise ValueError(
+                f"Cannot downscale a tile of {self.nx} x {self.ny} cells by a factor of "
+                f"{factor}: the factor must divide both 'nx' and 'ny' so the coarser "
+                "cells still fit the tile's bounds exactly."
+            )
+        return self._rescaled(self.nx // factor, self.ny // factor, factor)
+
     @validate_index
     def to_shapely(self, index=None, as_multipolygon=None):
         """Refer to parent method :meth:`.BaseGrid.to_shapely`
@@ -847,6 +938,46 @@ class DataTile(Tile):
     def get_tile(self):
         """A Tile object with the same properties as this DataTile, but without the data attached."""
         return Tile(self.get_grid(), self.start_id, self.nx, self.ny)
+
+    def upscale(self, factor):
+        """Not supported on a :class:`.DataTile`.
+
+        Changing the tile dimensions changes its grid, so the existing cell
+        values no longer correspond to the same cells and the data would have to
+        be re-interpreted. Resample the original data onto the new tile instead,
+        for example::
+
+            new_tile = data_tile.get_tile().upscale(factor)
+            resampled = new_tile.sample_nearest_from(data_tile)
+
+        This is equivalent to calling :meth:`.Tile.upscale` on
+        :meth:`.DataTile.get_tile` and then sampling the new tile with the
+        original data tile as input. The same pattern works with
+        :meth:`.Tile.sample_bilinear_from` and
+        :meth:`.Tile.sample_inverse_distance_from`.
+        """
+        raise RuntimeError(
+            "DataTile.upscale() is not supported because changing the tile dimensions "
+            "changes its grid: the existing cell values would have to be re-interpreted. "
+            "Resample the original data onto the new tile's grid instead, for example:\n"
+            "    new_tile = data_tile.get_tile().upscale(factor)\n"
+            "    resampled = new_tile.sample_nearest_from(data_tile)\n"
+            "(or sample_bilinear_from / sample_inverse_distance_from)."
+        )
+
+    def downscale(self, factor):
+        """Not supported on a :class:`.DataTile`.
+
+        See :meth:`.DataTile.upscale` for the suggested resampling workflow.
+        """
+        raise RuntimeError(
+            "DataTile.downscale() is not supported because changing the tile dimensions "
+            "changes its grid: the existing cell values would have to be re-interpreted. "
+            "Resample the original data onto the new tile's grid instead, for example:\n"
+            "    new_tile = data_tile.get_tile().downscale(factor)\n"
+            "    resampled = new_tile.sample_nearest_from(data_tile)\n"
+            "(or sample_bilinear_from / sample_inverse_distance_from)."
+        )
 
     def corner_ids(self):
         """The ids at the corners of the Tile

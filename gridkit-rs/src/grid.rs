@@ -334,10 +334,12 @@ mod parallel_batch_tests {
             grid.cells_near_point(points.view()).into_dyn()
         });
         assert_parallel_speed(&format!("{grid_name}/all_neighbours"), || {
-            grid.all_neighbours(indices.view(), 1, false, true).into_dyn()
+            grid.all_neighbours(indices.view(), 1, false, true)
+                .into_dyn()
         });
         assert_parallel_speed(&format!("{grid_name}/direct_neighbours"), || {
-            grid.direct_neighbours(indices.view(), 1, false, true).into_dyn()
+            grid.direct_neighbours(indices.view(), 1, false, true)
+                .into_dyn()
         });
     }
 

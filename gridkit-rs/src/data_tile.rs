@@ -62,6 +62,28 @@ fn is_nodata_value<
     val == nodata_value
 }
 
+/// Error thrown by the `DataTile` counterparts of the tile resizing methods.
+///
+/// Changing the dimensions of a data tile changes its grid, so the existing cell
+/// values no longer line up with the same cells. Rather than silently returning
+/// the reinterpreted values, point the user at resampling instead.
+fn data_reinterpret_error(method: &str, args: &str) -> String {
+    let call = if args.is_empty() {
+        format!("{method}()")
+    } else {
+        format!("{method}({args})")
+    };
+    format!(
+        "`DataTile::{call}` is not supported: changing the tile dimensions changes its grid, so \
+the existing cell values no longer correspond to the same cells and the data would have to be \
+re-interpreted. Resample the original data onto the new tile's grid instead, for example:\n\n    \
+let new_tile = self.get_tile().{call};\n    \
+let resampled = new_tile.sample_nearest_from(self); // or sample_bilinear_from / sample_inverse_distance_from\n\n\
+This is equivalent to calling `{method}` on `DataTile::get_tile()` and then sampling the new tile \
+with the original data tile as input."
+    )
+}
+
 impl<
         T: Num
             + Clone
@@ -114,6 +136,24 @@ impl<
             data,
             nodata_value,
         }
+    }
+
+    /// Not supported on a [`DataTile`] because the data would have to be
+    /// re-interpreted on a different grid.
+    ///
+    /// Call [`Tile::upscale`] on [`DataTile::get_tile`] and resample this data
+    /// tile onto the resulting tile instead: an error message with a concrete
+    /// example is returned.
+    pub fn upscale(&self, factor: u64) -> Result<DataTile<T>, String> {
+        Err(data_reinterpret_error("upscale", &factor.to_string()))
+    }
+
+    /// Not supported on a [`DataTile`] because the data would have to be
+    /// re-interpreted on a different grid.
+    ///
+    /// See [`DataTile::upscale`] for the suggested resampling workflow.
+    pub fn downscale(&self, factor: u64) -> Result<DataTile<T>, String> {
+        Err(data_reinterpret_error("downscale", &factor.to_string()))
     }
 
     pub fn from_bounds_as_rect(
