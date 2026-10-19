@@ -559,84 +559,124 @@ impl Tile {
             }
         };
 
-        // A hexagon's vertices do not coincide with the dx/dy envelope used by
-        // Tile::corners(). Use an actual corner of the original start cell as
-        // the anchor, choosing the one nearest the envelope's lower-left
-        // corner. This preserves the actual hex lattice phase.
-        let original_start_ids = array![[self.start_id.0, self.start_id.1]];
-        let original_corners = self.grid.cell_corners(original_start_ids.view());
-        let mut anchor = [original_corners[Ix3(0, 0, 0)], original_corners[Ix3(0, 0, 1)]];
-        let mut anchor_error = f64::INFINITY;
-        for corner_id in 0..original_corners.shape()[1] {
-            let x = original_corners[Ix3(0, corner_id, 0)];
-            let y = original_corners[Ix3(0, corner_id, 1)];
-            let error = (x - tile_corners[Ix2(3, 0)]).powi(2)
-                + (y - tile_corners[Ix2(3, 1)]).powi(2);
-            if error < anchor_error {
-                anchor_error = error;
-                anchor = [x, y];
-            }
-        }
-        let anchor_unrotated = [
-            rotation_matrix_inv[[0, 0]] * anchor[0] + rotation_matrix_inv[[0, 1]] * anchor[1],
-            rotation_matrix_inv[[1, 0]] * anchor[0] + rotation_matrix_inv[[1, 1]] * anchor[1],
-        ];
-        grid.anchor_inplace(&anchor_unrotated, CellElement::Corner);
-
         // Offset normalization can move the equivalent integer cell branch.
-        // Try equivalent offset representations as well: on a hex grid, adding
-        // a whole original-grid step can select the other staggered phase even
-        // though the normalized offset is unchanged. Choose the phase and cell
-        // branch whose rectangular tile envelope is closest to the original.
         let original_right = tile_left + self.nx as f64 * self.grid.dx();
         let original_top = tile_bottom + self.ny as f64 * self.grid.dy();
-        let mut best_grid = grid.clone();
-        let mut start_id = grid.cell_at_point(&[tile_left, tile_bottom]);
-        let mut best_corner_error = f64::INFINITY;
-        let mut best_error = f64::INFINITY;
-        for offset_x_step in -2..=2 {
-            for offset_y_step in -2..=2 {
-                let mut candidate_grid = grid.clone();
-                candidate_grid.set_offset([
-                    grid.offset()[0] + offset_x_step as f64 * self.grid.dx(),
-                    grid.offset()[1] + offset_y_step as f64 * self.grid.dy(),
-                ]);
-                let corner_cell = candidate_grid.cell_at_point(&anchor_unrotated);
-                let corner_ids = array![[corner_cell[0], corner_cell[1]]];
-                let corner_points = candidate_grid.cell_corners(corner_ids.view());
-                let corner_error = (0..corner_points.shape()[1])
-                    .map(|corner_id| {
-                        (corner_points[Ix3(0, corner_id, 0)] - anchor_unrotated[0]).powi(2)
-                            + (corner_points[Ix3(0, corner_id, 1)] - anchor_unrotated[1]).powi(2)
-                    })
-                    .fold(f64::INFINITY, f64::min);
-                let base_id = candidate_grid.cell_at_point(&anchor_unrotated);
-                for x in base_id[0] - 2..=base_id[0] + 2 {
-                    for y in base_id[1] - 2..=base_id[1] + 2 {
-                        let candidate_left = x as f64 * candidate_grid.dx()
-                            + candidate_grid.offset()[0];
-                        let candidate_bottom = y as f64 * candidate_grid.dy()
-                            + candidate_grid.offset()[1];
-                        let candidate_right = candidate_left + nx as f64 * candidate_grid.dx();
-                        let candidate_top = candidate_bottom + ny as f64 * candidate_grid.dy();
-                        let error = (candidate_left - tile_left).powi(2)
-                            + (candidate_bottom - tile_bottom).powi(2)
-                            + (candidate_right - original_right).powi(2)
-                            + (candidate_top - original_top).powi(2);
-                        let is_better = corner_error < best_corner_error - 1e-12
-                            || ((corner_error - best_corner_error).abs() <= 1e-12
-                                && error < best_error);
-                        if is_better {
-                            best_error = error;
-                            best_corner_error = corner_error;
-                            best_grid = candidate_grid.clone();
-                            start_id = [x, y];
+        let (mut grid, start_id) = match grid {
+            Grid::HexGrid(mut hex_grid) => {
+                // A hexagon's vertices do not coincide with the dx/dy envelope
+                // used by Tile::corners(). Anchor the rescaled lattice to the
+                // original start-cell corner nearest that envelope's lower-left
+                // corner so the actual hex phase is preserved.
+                let original_start_ids = array![[self.start_id.0, self.start_id.1]];
+                let original_corners = self.grid.cell_corners(original_start_ids.view());
+                let mut anchor = [
+                    original_corners[Ix3(0, 0, 0)],
+                    original_corners[Ix3(0, 0, 1)],
+                ];
+                let mut anchor_error = f64::INFINITY;
+                for corner_id in 0..original_corners.shape()[1] {
+                    let x = original_corners[Ix3(0, corner_id, 0)];
+                    let y = original_corners[Ix3(0, corner_id, 1)];
+                    let error = (x - tile_corners[Ix2(3, 0)]).powi(2)
+                        + (y - tile_corners[Ix2(3, 1)]).powi(2);
+                    if error < anchor_error {
+                        anchor_error = error;
+                        anchor = [x, y];
+                    }
+                }
+                let anchor_unrotated = [
+                    rotation_matrix_inv[[0, 0]] * anchor[0]
+                        + rotation_matrix_inv[[0, 1]] * anchor[1],
+                    rotation_matrix_inv[[1, 0]] * anchor[0]
+                        + rotation_matrix_inv[[1, 1]] * anchor[1],
+                ];
+                hex_grid.anchor_inplace(&anchor_unrotated, CellElement::Corner);
+                let inconsistent_axis = hex_grid.inconsistent_axis();
+
+                let grid = Grid::HexGrid(hex_grid);
+                let mut best_grid = grid.clone();
+                let mut best_start_id = [0, 0];
+                let mut best_corner_error = f64::INFINITY;
+                let mut best_error = f64::INFINITY;
+
+                // Hex phase is parity-based and depends only on the
+                // inconsistent axis. The small signed range accounts for the
+                // floor-before-normalization behavior; it is independent of
+                // the rescale factor.
+                for offset_step in -2..=2 {
+                    let mut candidate_grid = grid.clone();
+                    let mut candidate_offset = grid.offset();
+                    candidate_offset[inconsistent_axis] += offset_step as f64
+                        * if inconsistent_axis == 0 {
+                            self.grid.dx()
+                        } else {
+                            self.grid.dy()
+                        };
+                    candidate_grid.set_offset(candidate_offset);
+                    let corner_cell = candidate_grid.cell_at_point(&anchor_unrotated);
+                    let corner_ids = array![[corner_cell[0], corner_cell[1]]];
+                    let corner_points = candidate_grid.cell_corners(corner_ids.view());
+                    let corner_error = (0..corner_points.shape()[1])
+                        .map(|corner_id| {
+                            (corner_points[Ix3(0, corner_id, 0)] - anchor_unrotated[0]).powi(2)
+                                + (corner_points[Ix3(0, corner_id, 1)]
+                                    - anchor_unrotated[1])
+                                    .powi(2)
+                        })
+                        .fold(f64::INFINITY, f64::min);
+
+                    // The envelope alone does not identify the hex cell
+                    // containing the preserved corner, so inspect the small
+                    // neighboring integer branch around that anchor cell.
+                    let base_id = candidate_grid.cell_at_point(&anchor_unrotated);
+                    for x in base_id[0] - 2..=base_id[0] + 2 {
+                        for y in base_id[1] - 2..=base_id[1] + 2 {
+                            let candidate_left = x as f64 * candidate_grid.dx()
+                                + candidate_grid.offset()[0];
+                            let candidate_bottom = y as f64 * candidate_grid.dy()
+                                + candidate_grid.offset()[1];
+                            let candidate_right =
+                                candidate_left + nx as f64 * candidate_grid.dx();
+                            let candidate_top =
+                                candidate_bottom + ny as f64 * candidate_grid.dy();
+                            let error = (candidate_left - tile_left).powi(2)
+                                + (candidate_bottom - tile_bottom).powi(2)
+                                + (candidate_right - original_right).powi(2)
+                                + (candidate_top - original_top).powi(2);
+                            let is_better = corner_error < best_corner_error - 1e-12
+                                || ((corner_error - best_corner_error).abs() <= 1e-12
+                                    && error < best_error);
+                            if is_better {
+                                best_error = error;
+                                best_corner_error = corner_error;
+                                best_grid = candidate_grid.clone();
+                                best_start_id = [x, y];
+                            }
                         }
                     }
                 }
+                (best_grid, best_start_id)
             }
-        }
-        grid = best_grid;
+            Grid::RectGrid(mut rect_grid) => {
+                rect_grid.set_offset([tile_left, tile_bottom]);
+                let offset = rect_grid.offset();
+                let start_id = [
+                    ((tile_left - offset[0]) / rect_grid.dx()).round() as i64,
+                    ((tile_bottom - offset[1]) / rect_grid.dy()).round() as i64,
+                ];
+                (Grid::RectGrid(rect_grid), start_id)
+            }
+            Grid::TriGrid(mut tri_grid) => {
+                tri_grid.set_offset([tile_left, tile_bottom]);
+                let offset = tri_grid.offset();
+                let start_id = [
+                    ((tile_left - offset[0]) / tri_grid.dx()).round() as i64,
+                    ((tile_bottom - offset[1]) / tri_grid.dy()).round() as i64,
+                ];
+                (Grid::TriGrid(tri_grid), start_id)
+            }
+        };
 
         // Set back rotation, does not affect start_id
         grid.set_rotation(rotation);
