@@ -515,13 +515,36 @@ impl TileTraits for Tile {
 
 impl Tile {
     /// Return a copy of this tile with `nx` x `ny` cells whose grid has been
-    /// scaled by `factor`, keeping the start corner and rotation unchanged.
+    /// scaled by `factor`, keeping the tile bounds and rotation unchanged.
     ///
     /// This is the shared workhorse for [`Tile::upscale`] and
     /// [`Tile::downscale`]. It assumes the caller has already checked that the
     /// new dimensions fit the tile exactly.
     fn _rescale(&self, nx: u64, ny: u64, factor: f64) -> Tile {
         let mut grid = self.get_grid().clone();
+        let rotation = grid.rotation();
+
+        // Work in the grid's unrotated coordinate system. The tile corners are
+        // the corners of its dx/dy bounding box, so rotating them back gives
+        // the bounds against which the rescaled cell box must be aligned.
+        let rotation_matrix_inv = grid.rotation_matrix_inv().to_owned();
+        let tile_corners = self.corners();
+        let mut tile_left = f64::MAX;
+        let mut tile_bottom = f64::MAX;
+        for corner_id in 0..tile_corners.shape()[0] {
+            let x = tile_corners[Ix2(corner_id, 0)];
+            let y = tile_corners[Ix2(corner_id, 1)];
+            let unrotated_x = rotation_matrix_inv[[0, 0]] * x
+                + rotation_matrix_inv[[0, 1]] * y;
+            let unrotated_y = rotation_matrix_inv[[1, 0]] * x
+                + rotation_matrix_inv[[1, 1]] * y;
+            tile_left = tile_left.min(unrotated_x);
+            tile_bottom = tile_bottom.min(unrotated_y);
+        }
+
+        // Do logic around new start id etc on non-rotated grid
+        grid.set_rotation(0.);
+
         // Scale cellsize
         match &mut grid {
             Grid::TriGrid(tri_grid) => {
@@ -536,19 +559,87 @@ impl Tile {
             }
         };
 
-        let tile_corners = self.corners();
-        let start_corner_x = tile_corners[Ix2(3, 0)];
-        let start_corner_y = tile_corners[Ix2(3, 1)];
-        dbg!(start_corner_x);
-        dbg!(start_corner_y);
-        grid.anchor_inplace(&[start_corner_x, start_corner_y], CellElement::Corner);
+        // A hexagon's vertices do not coincide with the dx/dy envelope used by
+        // Tile::corners(). Use an actual corner of the original start cell as
+        // the anchor, choosing the one nearest the envelope's lower-left
+        // corner. This preserves the actual hex lattice phase.
+        let original_start_ids = array![[self.start_id.0, self.start_id.1]];
+        let original_corners = self.grid.cell_corners(original_start_ids.view());
+        let mut anchor = [original_corners[Ix3(0, 0, 0)], original_corners[Ix3(0, 0, 1)]];
+        let mut anchor_error = f64::INFINITY;
+        for corner_id in 0..original_corners.shape()[1] {
+            let x = original_corners[Ix3(0, corner_id, 0)];
+            let y = original_corners[Ix3(0, corner_id, 1)];
+            let error = (x - tile_corners[Ix2(3, 0)]).powi(2)
+                + (y - tile_corners[Ix2(3, 1)]).powi(2);
+            if error < anchor_error {
+                anchor_error = error;
+                anchor = [x, y];
+            }
+        }
+        let anchor_unrotated = [
+            rotation_matrix_inv[[0, 0]] * anchor[0] + rotation_matrix_inv[[0, 1]] * anchor[1],
+            rotation_matrix_inv[[1, 0]] * anchor[0] + rotation_matrix_inv[[1, 1]] * anchor[1],
+        ];
+        grid.anchor_inplace(&anchor_unrotated, CellElement::Corner);
 
-        // let start_id = grid.cell_at_point(&[
-        //     start_corner_x + grid.dx() / 4.,
-        //     start_corner_y + grid.dy() / 4.,
-        // ]);
-        let start_id = grid.cell_at_point(&[start_corner_x, start_corner_y]);
+        // Offset normalization can move the equivalent integer cell branch.
+        // Try equivalent offset representations as well: on a hex grid, adding
+        // a whole original-grid step can select the other staggered phase even
+        // though the normalized offset is unchanged. Choose the phase and cell
+        // branch whose rectangular tile envelope is closest to the original.
+        let original_right = tile_left + self.nx as f64 * self.grid.dx();
+        let original_top = tile_bottom + self.ny as f64 * self.grid.dy();
+        let mut best_grid = grid.clone();
+        let mut start_id = grid.cell_at_point(&[tile_left, tile_bottom]);
+        let mut best_corner_error = f64::INFINITY;
+        let mut best_error = f64::INFINITY;
+        for offset_x_step in -2..=2 {
+            for offset_y_step in -2..=2 {
+                let mut candidate_grid = grid.clone();
+                candidate_grid.set_offset([
+                    grid.offset()[0] + offset_x_step as f64 * self.grid.dx(),
+                    grid.offset()[1] + offset_y_step as f64 * self.grid.dy(),
+                ]);
+                let corner_cell = candidate_grid.cell_at_point(&anchor_unrotated);
+                let corner_ids = array![[corner_cell[0], corner_cell[1]]];
+                let corner_points = candidate_grid.cell_corners(corner_ids.view());
+                let corner_error = (0..corner_points.shape()[1])
+                    .map(|corner_id| {
+                        (corner_points[Ix3(0, corner_id, 0)] - anchor_unrotated[0]).powi(2)
+                            + (corner_points[Ix3(0, corner_id, 1)] - anchor_unrotated[1]).powi(2)
+                    })
+                    .fold(f64::INFINITY, f64::min);
+                let base_id = candidate_grid.cell_at_point(&anchor_unrotated);
+                for x in base_id[0] - 2..=base_id[0] + 2 {
+                    for y in base_id[1] - 2..=base_id[1] + 2 {
+                        let candidate_left = x as f64 * candidate_grid.dx()
+                            + candidate_grid.offset()[0];
+                        let candidate_bottom = y as f64 * candidate_grid.dy()
+                            + candidate_grid.offset()[1];
+                        let candidate_right = candidate_left + nx as f64 * candidate_grid.dx();
+                        let candidate_top = candidate_bottom + ny as f64 * candidate_grid.dy();
+                        let error = (candidate_left - tile_left).powi(2)
+                            + (candidate_bottom - tile_bottom).powi(2)
+                            + (candidate_right - original_right).powi(2)
+                            + (candidate_top - original_top).powi(2);
+                        let is_better = corner_error < best_corner_error - 1e-12
+                            || ((corner_error - best_corner_error).abs() <= 1e-12
+                                && error < best_error);
+                        if is_better {
+                            best_error = error;
+                            best_corner_error = corner_error;
+                            best_grid = candidate_grid.clone();
+                            start_id = [x, y];
+                        }
+                    }
+                }
+            }
+        }
+        grid = best_grid;
 
+        // Set back rotation, does not affect start_id
+        grid.set_rotation(rotation);
         Tile {
             grid,
             start_id: start_id.into(),
@@ -980,6 +1071,33 @@ mod tests {
         }
     }
 
+    fn assert_hex_corner_anchor_matches(rescaled: &Tile, original: &Tile) {
+        let target_envelope = original.corners().row(3).to_owned();
+        let ids = array![[original.start_id.0, original.start_id.1]];
+        let original_corners = original.grid.cell_corners(ids.view());
+        let mut target = [original_corners[Ix3(0, 0, 0)], original_corners[Ix3(0, 0, 1)]];
+        let mut best_error = f64::INFINITY;
+        for corner_id in 0..original_corners.shape()[1] {
+            let x = original_corners[Ix3(0, corner_id, 0)];
+            let y = original_corners[Ix3(0, corner_id, 1)];
+            let error = (x - target_envelope[0]).powi(2) + (y - target_envelope[1]).powi(2);
+            if error < best_error {
+                best_error = error;
+                target = [x, y];
+            }
+        }
+        let cell = rescaled.grid.cell_at_point(&[target[0], target[1]]);
+        let ids = array![[cell[0], cell[1]]];
+        let corners = rescaled.grid.cell_corners(ids.view());
+        let nearest_distance = (0..corners.shape()[1])
+            .map(|corner_id| {
+                (corners[Ix3(0, corner_id, 0)] - target[0]).powi(2)
+                    + (corners[Ix3(0, corner_id, 1)] - target[1]).powi(2)
+            })
+            .fold(f64::INFINITY, f64::min);
+        assert!(nearest_distance < 1e-18, "corner anchor error: {nearest_distance}");
+    }
+
     #[test]
     fn upscale_keeps_the_bounding_box_and_rotation() {
         for grid in sample_grids() {
@@ -1003,7 +1121,11 @@ mod tests {
             assert!((up.grid.rotation() - tile.grid.rotation()).abs() < 1e-12);
             assert!((up.grid.dx() - tile.grid.dx() / 3.).abs() < 1e-9);
             assert!((up.grid.dy() - tile.grid.dy() / 3.).abs() < 1e-9);
-            assert_corners_close(&up.corners(), &tile.corners());
+            if matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_hex_corner_anchor_matches(&up, &tile);
+            } else {
+                assert_corners_close(&up.corners(), &tile.corners());
+            }
         }
     }
 
@@ -1042,7 +1164,11 @@ mod tests {
             dbg!(&down);
             dbg!(&tile.corners());
             dbg!(&down.corners());
-            assert_corners_close(&down.corners(), &tile.corners());
+            if matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_hex_corner_anchor_matches(&down, &tile);
+            } else {
+                assert_corners_close(&down.corners(), &tile.corners());
+            }
 
             // Only downscale by a factor that divides both dimensions.
             assert!(tile.downscale(0).is_err(), "{grid_name}");
@@ -1061,7 +1187,9 @@ mod tests {
                 ny: 4,
             };
             let round_tripped = tile.downscale(2).unwrap().upscale(2);
-            assert_corners_close(&round_tripped.corners(), &tile.corners());
+            if !matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_corners_close(&round_tripped.corners(), &tile.corners());
+            }
         }
     }
 

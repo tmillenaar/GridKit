@@ -291,45 +291,24 @@ class Tile:
         )
         return DataTile.from_pyo3_data_tile(self.get_grid(), result)
 
-    def _rescaled(self, nx, ny, factor):
-        """Rescale the associated grid and re-derive the start id.
-
-        ``factor`` scales the cell size: values above one make the cells larger
-        (downscaling the tile) and values below one make them smaller
-        (upscaling the tile). The tile keeps exactly the same bounds.
-        """
+    def _from_rescaled_pyo3_tile(self, pyo3_tile):
         grid = self.get_grid()
-        start_corner = (
-            self.start_id[0] * grid.dx + grid.offset[0],
-            self.start_id[1] * grid.dy + grid.offset[1],
-        )
-        new_dx = grid.dx * factor
-        new_dy = grid.dy * factor
-
-        # Wrap the offset modulo the new cell size so the start corner lands on
-        # a cell corner. The offset is normalized here directly rather than kept
-        # as-is; the cell ids of a rescaled grid no longer refer to the same
-        # cells, so the start id is re-derived from the corner below.
-        raw_offset = (
-            start_corner[0] - self.start_id[0] * new_dx,
-            start_corner[1] - self.start_id[1] * new_dy,
-        )
-        offset = (raw_offset[0] % new_dx, raw_offset[1] % new_dy)
-
-        definition = grid.definition
-        if "size" in definition:
-            definition["size"] = definition["size"] * factor
+        grid_kwargs = {
+            "offset": pyo3_tile.offset(),
+            "rotation": pyo3_tile.rotation(),
+            "crs": grid.crs,
+        }
+        if isinstance(grid, RectGrid):
+            new_grid = RectGrid(dx=pyo3_tile.dx(), dy=pyo3_tile.dy(), **grid_kwargs)
         else:
-            definition["dx"] = new_dx
-            definition["dy"] = new_dy
-        definition["offset"] = offset
-        new_grid = grid.parent_grid_class(**definition)
-
-        start_id = (
-            int(numpy.round((start_corner[0] - offset[0]) / new_dx)),
-            int(numpy.round((start_corner[1] - offset[1]) / new_dy)),
+            grid_kwargs["orientation"] = grid.orientation
+            new_grid = grid.parent_grid_class(size=pyo3_tile.cellsize(), **grid_kwargs)
+        return Tile(
+            new_grid,
+            pyo3_tile.start_id,
+            pyo3_tile.nx,
+            pyo3_tile.ny,
         )
-        return Tile(new_grid, start_id, nx, ny)
 
     def upscale(self, factor):
         """Return a tile with ``factor`` times as many cells along both axes.
@@ -352,7 +331,7 @@ class Tile:
             raise ValueError(f"Expected a non-negative integer factor, got: {factor}")
         if factor == 0:
             return Tile(self.get_grid(), self.start_id, self.nx, self.ny)
-        return self._rescaled(self.nx * factor, self.ny * factor, 1 / factor)
+        return self._from_rescaled_pyo3_tile(self._tile.upscale(int(factor)))
 
     def downscale(self, factor):
         """Return a tile with ``factor`` times fewer cells along both axes.
@@ -380,7 +359,7 @@ class Tile:
                 f"{factor}: the factor must divide both 'nx' and 'ny' so the coarser "
                 "cells still fit the tile's bounds exactly."
             )
-        return self._rescaled(self.nx // factor, self.ny // factor, factor)
+        return self._from_rescaled_pyo3_tile(self._tile.downscale(int(factor)))
 
     @validate_index
     def to_shapely(self, index=None, as_multipolygon=None):
