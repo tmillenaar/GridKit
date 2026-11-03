@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:05.432** total execution time for 5 files **from example_gallery/grid_definitions**:
+**00:03.270** total execution time for 5 files **from example_gallery/grid_definitions**:
 
 .. container::
 
@@ -33,17 +33,17 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_example_gallery_grid_definitions_rotation_animation.py` (``rotation_animation.py``)
-     - 00:03.727
+     - 00:02.248
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_rotated_grids.py` (``rotated_grids.py``)
-     - 00:00.659
+     - 00:00.408
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_triangles_in_hexes.py` (``triangles_in_hexes.py``)
-     - 00:00.484
+     - 00:00.281
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_hex_grids.py` (``hex_grids.py``)
-     - 00:00.297
+     - 00:00.172
      - 0.0
    * - :ref:`sphx_glr_example_gallery_grid_definitions_tiles.py` (``tiles.py``)
-     - 00:00.265
+     - 00:00.161
      - 0.0

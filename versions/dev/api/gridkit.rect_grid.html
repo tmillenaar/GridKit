@@ -242,11 +242,16 @@ Default: numpy.nan</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="gridkit.rect_grid.RectGrid.relative_neighbours">
-<span class="sig-name descname"><span class="pre">relative_neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.relative_neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.relative_neighbours" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">relative_neighbours</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connect_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/rect_grid.html#RectGrid.relative_neighbours"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.rect_grid.RectGrid.relative_neighbours" title="Link to this definition"></a></dt>
 <dd><p>The relative indices of the neighbouring cells.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index is mostly relevant for hexagonal grids.
+For a square grid the relative neighbours are independent on the location on the grid.
+Here it is only used for the return length.
+If 10 cells are supplied to <cite>index</cite>, the relative neighbours are returned 10 times.
+This is to keep a consistent api between the grid types.</p></li>
 <li><p><strong>depth</strong> (<cite>int</cite>, 1) – Determines the number of neighbours that are returned.
 If <cite>depth=1</cite> the direct neighbours are returned.
 If <cite>depth=2</cite> the direct neighbours are returned, as well as the neighbours of these neighbours.
@@ -260,11 +265,6 @@ If <cite>connect_corners</cite> is True, the 4 cells directly touching the cell 
 If <cite>connect_corners</cite> is True, the 8 cells surrounding the cell are considered neighbours.
 This escalates in combination with <cite>depth</cite> where indices in a square shape around the cell are returned
 when <cite>connect_corners</cite> is True, and indices in a diamond shape around the cell are returned when <cite>connect_corners</cite> is False.</p></li>
-<li><p><strong>index</strong> (<cite>numpy.ndarray</cite>) – The index is mostly relevant for hexagonal grids.
-For a square grid the relative neighbours are independent on the location on the grid.
-Here it is only used for the return length.
-If 10 cells are supplied to <cite>index</cite>, the relative neighbours are returned 10 times.
-This is to keep a consistent api between the two classes.</p></li>
 </ul>
 </dd>
 </dl>
@@ -273,12 +273,12 @@ This is to keep a consistent api between the two classes.</p></li>
 For square grids, the number of returned neighbours depends on whether <cite>connect_corners</cite> is True or False:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">gridkit.rect_grid</span><span class="w"> </span><span class="kn">import</span> <span class="n">RectGrid</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dy</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
 <span class="go">       [ 1,  0],</span>
 <span class="go">       [ 0, -1]])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[-1,  1],</span>
 <span class="go">       [ 0,  1],</span>
 <span class="go">       [ 1,  1],</span>
@@ -293,14 +293,14 @@ For square grids, the number of returned neighbours depends on whether <cite>con
 The number of neighbours increases with depth by a factor of <cite>depth*4</cite> or <cite>depth*8</cite> depending on <cite>connect_corners</cite> being True or False.
 So the 3rd element in the list will be <cite>1*4 + 2*4 + 3*4 = 24</cite> if <cite>connect_corners</cite> is False.
 And it will be <cite>1*8 + 2*8 + 3*8 = 48</cite> if <cite>connect_corners</cite> is True.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
 <span class="go">[4, 12, 24, 36]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
 <span class="go">[8, 24, 48, 80]</span>
 </pre></div>
 </div>
 <p>The specified cell can be included if <cite>include_selected</cite> is set to True:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">(</span><span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">grid</span><span class="o">.</span><span class="n">relative_neighbours</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
 <span class="go">array([[ 0,  1],</span>
 <span class="go">       [-1,  0],</span>
 <span class="go">       [ 0,  0],</span>

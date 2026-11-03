@@ -314,13 +314,24 @@
 
 <div class="viewcode-block" id="RectGrid.relative_neighbours">
 <a class="viewcode-back" href="../../api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours">[docs]</a>
+    <span class="nd">@validate_index</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">relative_neighbours</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">,</span>
+        <span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">connect_corners</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_selected</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""The relative indices of the neighbouring cells.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        index: `numpy.ndarray`</span>
+<span class="sd">            The index is mostly relevant for hexagonal grids.</span>
+<span class="sd">            For a square grid the relative neighbours are independent on the location on the grid.</span>
+<span class="sd">            Here it is only used for the return length.</span>
+<span class="sd">            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.</span>
+<span class="sd">            This is to keep a consistent api between the grid types.</span>
 <span class="sd">        depth: `int`, 1</span>
 <span class="sd">            Determines the number of neighbours that are returned.</span>
 <span class="sd">            If `depth=1` the direct neighbours are returned.</span>
@@ -337,12 +348,6 @@
 <span class="sd">            If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.</span>
 <span class="sd">            This escalates in combination with `depth` where indices in a square shape around the cell are returned</span>
 <span class="sd">            when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.</span>
-<span class="sd">        index: `numpy.ndarray`</span>
-<span class="sd">            The index is mostly relevant for hexagonal grids.</span>
-<span class="sd">            For a square grid the relative neighbours are independent on the location on the grid.</span>
-<span class="sd">            Here it is only used for the return length.</span>
-<span class="sd">            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.</span>
-<span class="sd">            This is to keep a consistent api between the two classes.</span>
 
 
 <span class="sd">        Examples</span>
@@ -354,12 +359,12 @@
 
 <span class="sd">            &gt;&gt;&gt; from gridkit.rect_grid import RectGrid</span>
 <span class="sd">            &gt;&gt;&gt; grid = RectGrid(dx=2, dy=3)</span>
-<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours().index</span>
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours([0,0]).index</span>
 <span class="sd">            array([[ 0,  1],</span>
 <span class="sd">                   [-1,  0],</span>
 <span class="sd">                   [ 1,  0],</span>
 <span class="sd">                   [ 0, -1]])</span>
-<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours(connect_corners=True).index</span>
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours([0,0], connect_corners=True).index</span>
 <span class="sd">            array([[-1,  1],</span>
 <span class="sd">                   [ 0,  1],</span>
 <span class="sd">                   [ 1,  1],</span>
@@ -378,9 +383,9 @@
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours(depth=depth)) for depth in range(1,5)]</span>
+<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours([0,0], depth=depth)) for depth in range(1,5)]</span>
 <span class="sd">            [4, 12, 24, 36]</span>
-<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours(depth=depth, connect_corners=True)) for depth in range(1,5)]</span>
+<span class="sd">            &gt;&gt;&gt; [len(grid.relative_neighbours([0,0], depth=depth, connect_corners=True)) for depth in range(1,5)]</span>
 <span class="sd">            [8, 24, 48, 80]</span>
 
 <span class="sd">        ..</span>
@@ -389,7 +394,7 @@
 
 <span class="sd">        .. code-block:: python</span>
 
-<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours(include_selected=True).index</span>
+<span class="sd">            &gt;&gt;&gt; grid.relative_neighbours([0,0], include_selected=True).index</span>
 <span class="sd">            array([[ 0,  1],</span>
 <span class="sd">                   [-1,  0],</span>
 <span class="sd">                   [ 0,  0],</span>
@@ -404,9 +409,6 @@
 <span class="sd">        :py:meth:`.HexGrid.relative_neighbours`</span>
 <span class="sd">        :py:meth:`.TriGrid.relative_neighbours`</span>
 <span class="sd">        """</span>
-        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="n">GridIndex</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-
         <span class="n">index</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">index</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
         <span class="p">)</span>
