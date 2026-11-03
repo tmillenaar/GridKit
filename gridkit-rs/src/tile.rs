@@ -513,6 +513,98 @@ impl TileTraits for Tile {
     }
 }
 
+impl Tile {
+    /// Sample `tile_to_sample` at this tile's cell centroids using nearest-neighbour sampling.
+    pub fn sample_nearest_from<T>(&self, tile_to_sample: &DataTile<T>) -> DataTile<T>
+    where
+        T: Num
+            + Clone
+            + Copy
+            + PartialEq
+            + Bounded
+            + ToPrimitive
+            + FromPrimitive
+            + PartialOrd
+            + NumCast
+            + Default
+            + Send
+            + Sync,
+    {
+        let centroids = self.grid.centroid(self.indices().view());
+        let source_indices = tile_to_sample.tile.grid.cell_at_points(centroids.view());
+        let data = tile_to_sample.values(source_indices.view(), tile_to_sample.nodata_value);
+        DataTile::new(
+            self.grid.clone(),
+            self.start_id,
+            self.nx,
+            self.ny,
+            data,
+            tile_to_sample.nodata_value,
+        )
+    }
+
+    /// Sample `tile_to_sample` at this tile's cell centroids using bilinear interpolation.
+    pub fn sample_bilinear_from<T>(&self, tile_to_sample: &DataTile<T>) -> DataTile<f64>
+    where
+        T: Num
+            + Clone
+            + Copy
+            + PartialEq
+            + Bounded
+            + ToPrimitive
+            + FromPrimitive
+            + PartialOrd
+            + NumCast
+            + Default
+            + Send
+            + Sync,
+    {
+        let centroids = self.grid.centroid(self.indices().view());
+        let data = tile_to_sample.linear_interpolation(centroids.view());
+        DataTile::new(
+            self.grid.clone(),
+            self.start_id,
+            self.nx,
+            self.ny,
+            data,
+            tile_to_sample.nodata_value.to_f64().unwrap_or(f64::NAN),
+        )
+    }
+
+    /// Sample `tile_to_sample` at this tile's cell centroids using inverse-distance interpolation.
+    pub fn sample_inverse_distance_from<T>(
+        &self,
+        tile_to_sample: &DataTile<T>,
+        decay_constant: f64,
+    ) -> DataTile<f64>
+    where
+        T: Num
+            + Clone
+            + Copy
+            + PartialEq
+            + Bounded
+            + ToPrimitive
+            + FromPrimitive
+            + PartialOrd
+            + NumCast
+            + Default
+            + Send
+            + Sync,
+    {
+        let centroids = self.grid.centroid(self.indices().view());
+        let data = tile_to_sample
+            .inverse_distance_interpolation(centroids.view(), decay_constant);
+        DataTile::new(
+            self.grid.clone(),
+            self.start_id,
+            self.nx,
+            self.ny,
+            data,
+            tile_to_sample.nodata_value.to_f64().unwrap_or(f64::NAN),
+        )
+    }
+}
+
 pub fn combine_tiles<T: TileTraits>(tiles: &Vec<T>) -> Tile {
     let mut min_x: i64 = i64::MAX;
     let mut min_y: i64 = i64::MAX;
@@ -670,5 +762,82 @@ mod tests {
             .into_shape((2, 3))
             .unwrap();
         assert_eq!(values, expected);
+    }
+
+    #[test]
+    fn samples_nearest_at_target_centroids_and_fills_outside_with_nodata() {
+        let source_grid = Grid::RectGrid(RectGrid::new(1., 1.));
+        let source = DataTile::new(
+            source_grid.clone(),
+            (0, 0),
+            2,
+            2,
+            array![[1, 2], [3, 4]],
+            -1,
+        );
+        let target = Tile {
+            grid: source_grid,
+            start_id: (-1, 0),
+            nx: 3,
+            ny: 2,
+        };
+
+        let sampled = target.sample_nearest_from(&source);
+        assert_eq!(sampled.data, array![[-1, 1, 2], [-1, 3, 4]]);
+        assert_eq!(sampled.nodata_value, -1);
+    }
+
+    #[test]
+    fn samples_bilinear_and_inverse_distance_at_target_centroids() {
+        let source_grid = Grid::RectGrid(RectGrid::new(1., 1.));
+        let source = DataTile::new(
+            source_grid.clone(),
+            (0, 0),
+            2,
+            2,
+            array![[1., 2.], [3., 4.]],
+            f64::NAN,
+        );
+        let mut target_grid = source_grid;
+        target_grid.set_offset([0.25, 0.25]);
+        let target = Tile {
+            grid: target_grid,
+            start_id: (0, 0),
+            nx: 1,
+            ny: 1,
+        };
+
+        let bilinear = target.sample_bilinear_from(&source);
+        let inverse_distance = target.sample_inverse_distance_from(&source, 1.);
+        assert_eq!(bilinear.data.shape(), &[1, 1]);
+        assert_eq!(inverse_distance.data.shape(), &[1, 1]);
+        assert!(bilinear.data.iter().all(|value| !value.is_nan()));
+        assert!(inverse_distance.data.iter().all(|value| !value.is_nan()));
+        assert!((bilinear.data[[0, 0]] - 2.75).abs() < 1e-12);
+        assert!((inverse_distance.data[[0, 0]] - 2.6224593312018545).abs() < 1e-12);
+    }
+
+    #[test]
+    fn interpolated_samples_use_nodata_outside_source_tile() {
+        let source = DataTile::new(
+            Grid::RectGrid(RectGrid::new(1., 1.)),
+            (0, 0),
+            1,
+            1,
+            array![[7.]],
+            -99.,
+        );
+        let target = Tile {
+            grid: source.tile.grid.clone(),
+            start_id: (1, 0),
+            nx: 1,
+            ny: 1,
+        };
+
+        assert_eq!(target.sample_bilinear_from(&source).data[[0, 0]], -99.);
+        assert_eq!(
+            target.sample_inverse_distance_from(&source, 1.).data[[0, 0]],
+            -99.
+        );
     }
 }
