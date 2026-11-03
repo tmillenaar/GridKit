@@ -24,6 +24,10 @@ Features
    single threaded execution.
 -
 
+Breaking changes
+ - :meth:`.RectGrid.relative_neighbours` now requires an index as first argument,
+   to be consistent with the api of the other grid types
+
 
 Version 1.0.1 (July 9, 2025)
 ----------------------------
