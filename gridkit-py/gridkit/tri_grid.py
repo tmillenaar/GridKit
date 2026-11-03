@@ -273,7 +273,7 @@ class TriGrid(BaseGrid):
 
     @validate_index
     def relative_neighbours(
-        self, index=None, depth=1, connect_corners=False, include_selected=False
+        self, index, depth=1, connect_corners=False, include_selected=False
     ):
         """The relative indices of the neighbouring cells.
 

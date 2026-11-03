@@ -232,10 +232,15 @@ impl TileTraits for Tile {
         // Rotate if necessary
         if self.grid.rotation() != 0. {
             let rotation_matrix = self.grid.rotation_matrix();
+            // Applying the rotation by hand avoids the temporary allocation
+            // that a `rotation_matrix.dot(&corner)` call would make per corner.
+            let cos = rotation_matrix[[0, 0]];
+            let sin = rotation_matrix[[1, 0]];
             for cell_id in 0..corners.shape()[0] {
-                let mut corner = corners.slice_mut(s![cell_id, ..]);
-                let corner_rot = rotation_matrix.dot(&corner);
-                corner.assign(&corner_rot);
+                let x = corners[Ix2(cell_id, 0)];
+                let y = corners[Ix2(cell_id, 1)];
+                corners[Ix2(cell_id, 0)] = cos * x - sin * y;
+                corners[Ix2(cell_id, 1)] = sin * x + cos * y;
             }
         }
         corners

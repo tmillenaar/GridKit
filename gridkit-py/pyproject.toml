@@ -45,7 +45,7 @@ test = [
 ]
 
 [tool.maturin]
-features = ["pyo3/extension-module"]
+features = ["pyo3/extension-module", "parallel"]
 python-source = "./"
 module-name = "gridkit.gridkit_rs"
 

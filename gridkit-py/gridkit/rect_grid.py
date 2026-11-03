@@ -211,13 +211,24 @@ class RectGrid(BaseGrid):
             crs=self.crs,
         )
 
+    @validate_index
     def relative_neighbours(
-        self, depth=1, connect_corners=False, include_selected=False, index=None
+        self,
+        index,
+        depth=1,
+        connect_corners=False,
+        include_selected=False,
     ):
         """The relative indices of the neighbouring cells.
 
         Parameters
         ----------
+        index: `numpy.ndarray`
+            The index is mostly relevant for hexagonal grids.
+            For a square grid the relative neighbours are independent on the location on the grid.
+            Here it is only used for the return length.
+            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.
+            This is to keep a consistent api between the grid types.
         depth: `int`, 1
             Determines the number of neighbours that are returned.
             If `depth=1` the direct neighbours are returned.
@@ -234,12 +245,6 @@ class RectGrid(BaseGrid):
             If `connect_corners` is True, the 8 cells surrounding the cell are considered neighbours.
             This escalates in combination with `depth` where indices in a square shape around the cell are returned
             when `connect_corners` is True, and indices in a diamond shape around the cell are returned when `connect_corners` is False.
-        index: `numpy.ndarray`
-            The index is mostly relevant for hexagonal grids.
-            For a square grid the relative neighbours are independent on the location on the grid.
-            Here it is only used for the return length.
-            If 10 cells are supplied to `index`, the relative neighbours are returned 10 times.
-            This is to keep a consistent api between the two classes.
 
 
         Examples
@@ -251,12 +256,12 @@ class RectGrid(BaseGrid):
 
             >>> from gridkit.rect_grid import RectGrid
             >>> grid = RectGrid(dx=2, dy=3)
-            >>> grid.relative_neighbours().index
+            >>> grid.relative_neighbours([0,0]).index
             array([[ 0,  1],
                    [-1,  0],
                    [ 1,  0],
                    [ 0, -1]])
-            >>> grid.relative_neighbours(connect_corners=True).index
+            >>> grid.relative_neighbours([0,0], connect_corners=True).index
             array([[-1,  1],
                    [ 0,  1],
                    [ 1,  1],
@@ -275,9 +280,9 @@ class RectGrid(BaseGrid):
 
         .. code-block:: python
 
-            >>> [len(grid.relative_neighbours(depth=depth)) for depth in range(1,5)]
+            >>> [len(grid.relative_neighbours([0,0], depth=depth)) for depth in range(1,5)]
             [4, 12, 24, 36]
-            >>> [len(grid.relative_neighbours(depth=depth, connect_corners=True)) for depth in range(1,5)]
+            >>> [len(grid.relative_neighbours([0,0], depth=depth, connect_corners=True)) for depth in range(1,5)]
             [8, 24, 48, 80]
 
         ..
@@ -286,7 +291,7 @@ class RectGrid(BaseGrid):
 
         .. code-block:: python
 
-            >>> grid.relative_neighbours(include_selected=True).index
+            >>> grid.relative_neighbours([0,0], include_selected=True).index
             array([[ 0,  1],
                    [-1,  0],
                    [ 0,  0],
@@ -301,9 +306,6 @@ class RectGrid(BaseGrid):
         :py:meth:`.HexGrid.relative_neighbours`
         :py:meth:`.TriGrid.relative_neighbours`
         """
-        if index is None:
-            index = GridIndex([0, 0])
-
         index = (
             index.ravel().index[None] if index.index.ndim == 1 else index.ravel().index
         )

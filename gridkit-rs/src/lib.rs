@@ -15,3 +15,7 @@ pub use hex_grid::*;
 pub use rect_grid::*;
 pub use tile::*;
 pub use tri_grid::*;
+
+/// Thread-pool controls for the opt-in `parallel` feature.
+#[cfg(feature = "parallel")]
+pub use utils::{get_num_threads, set_num_threads};

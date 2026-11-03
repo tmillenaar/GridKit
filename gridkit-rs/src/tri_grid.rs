@@ -41,6 +41,31 @@ impl Hash for TriGrid {
     }
 }
 
+/// Relative nearby-cell ids for [`TriGrid::cells_near_point`], indexed by the
+/// nearest corner of the containing cell (0..3) and the cell's orientation and
+/// parity. Kept as static tables so the hot loop does not heap-allocate a small
+/// `Array2` per point.
+const FLAT_NOT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[-1, 0], [0, 0], [1, 0], [-1, -1], [0, -1], [1, -1]],
+    [[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0]],
+    [[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0]],
+];
+const FLAT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0]],
+    [[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1]],
+    [[-2, 0], [-1, 0], [0, 0], [-2, -1], [-1, -1], [0, -1]],
+];
+const POINTY_NOT_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[0, -1], [0, 0], [0, 1], [-1, -1], [-1, 0], [-1, 1]],
+    [[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2]],
+    [[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0]],
+];
+const POINTY_UPRIGHT: [[[i64; 2]; 6]; 3] = [
+    [[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1]],
+    [[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]],
+    [[0, -2], [0, -1], [0, 0], [-1, -2], [-1, -1], [-1, 0]],
+];
+
 impl GridTraits for TriGrid {
     fn get_grid(&self) -> crate::Grid {
         crate::Grid::TriGrid(self.to_owned())
@@ -139,7 +164,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs(points, |points| {
+        crate::utils::map_point_pairs_batched(points, |points| {
             let mut index = Array2::<i64>::zeros((points.shape()[0], 2));
 
             let dx = self.stepsize_consistent_axis();
@@ -157,40 +182,48 @@ impl GridTraits for TriGrid {
                 Orientation::Pointy => self.cell_width(),
             };
 
+            // `rotate` is loop-invariant. Splitting this into one loop with rotation
+            // and one without, and replacing the ndarray `dot` below with hand-written
+            // scalar math, were both benchmarked and made no measurable difference.
+            // The branch is kept inline and the clearer `dot` is used.
+            let rotate = self.rotation() != 0.;
+
             for cell_id in 0..points.shape()[0] {
-                let point = points.slice(s![cell_id, ..]);
-                let point = self._rotation_matrix_inv.dot(&point);
+                let point_not_rotated = points.slice(s![cell_id, ..]);
+                let rotated;
+                let point = if rotate {
+                    rotated = self._rotation_matrix_inv.dot(&point_not_rotated);
+                    rotated.view()
+                } else {
+                    point_not_rotated
+                };
                 index[Ix2(cell_id, id_x_axis)] =
-                    (1. + (point[Ix1(id_x_axis)] - offset_x) / dx).floor() as i64;
+                    (1. + (point[id_x_axis] - offset_x) / dx).floor() as i64;
                 index[Ix2(cell_id, id_y_axis)] =
-                    ((point[Ix1(id_y_axis)] - offset_y) / cell_height).floor() as i64;
+                    ((point[id_y_axis] - offset_y) / cell_height).floor() as i64;
                 index[Ix2(cell_id, id_x_axis)] = 2
-                    * ((point[Ix1(id_x_axis)] - offset_x
+                    * ((point[id_x_axis] - offset_x
                         + dx * !iseven(index[Ix2(cell_id, id_y_axis)]) as i64 as f64)
                         / cell_width)
                         .floor() as i64
                     - 1 * (!iseven(index[Ix2(cell_id, id_y_axis)]) as i64);
 
-                // TODO: Fix this 3rd dimension of cell_id=0. I.e. fix cell_corners needing to take multiple ids at once
-                let cell_origin = self.cell_corners(index.slice(s![cell_id..cell_id + 1, ..]));
-                let cell_origin = cell_origin.slice(s![0, 2, ..]);
+                // Corner 2 of the containing cell, already in the grid frame.
+                // Computing it directly avoids allocating a (1, 3, 2) corner
+                // array and rotating it back for every single point. It is the
+                // same value `cell_corners(...)[0, 2, ..]` would give at rot=0.
+                let cell_origin =
+                    self.cell_origin_xy_no_rot(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                let rel_loc_x: f64 = point[id_x_axis] - cell_origin[id_x_axis];
+                let rel_loc_y: f64 = point[id_y_axis] - cell_origin[id_y_axis];
 
-                let cell_origin: ArrayBase<OwnedRepr<f64>, Dim<[usize; 1]>> =
-                    self._rotation_matrix_inv.dot(&cell_origin);
-                let cell_origin_x = cell_origin[Ix1(id_x_axis)];
-                let cell_origin_y = cell_origin[Ix1(id_y_axis)];
-                let rel_loc_x: f64 = point[Ix1(id_x_axis)] - cell_origin_x;
-                let rel_loc_y: f64 = point[Ix1(id_y_axis)] - cell_origin_y;
-
-                let y_threshold_left: f64;
-                let y_threshold_right: f64;
                 let slope = dy / dx;
                 // Descrtibes the equation that forms the left border of the triangle
                 let left_eq = |x: f64| -> f64 { slope * x };
                 // Descrtibes the equation that forms the right border of the triangle
                 let right_eq = |x: f64| -> f64 { -slope * x + 2. * cell_height };
-                y_threshold_left = left_eq(rel_loc_x);
-                y_threshold_right = right_eq(rel_loc_x);
+                let y_threshold_left: f64 = left_eq(rel_loc_x);
+                let y_threshold_right: f64 = right_eq(rel_loc_x);
                 let id_shift = if rel_loc_y > y_threshold_left {
                     -1
                 } else if rel_loc_y > y_threshold_right {
@@ -209,8 +242,14 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let mut corners = Array3::<f64>::zeros((index.shape()[0], 3, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(index, 3, |index, mut corners| {
+            // These dimensions depend only on the cellsize and orientation, so
+            // hoist them out of the per-cell loop.
+            let radius = self.radius();
+            let dx = self.dx();
+            let dy = self.dy();
+            let cell_height = self.cell_height();
+            let cell_width = self.cell_width();
 
             for cell_id in 0..corners.shape()[0] {
                 let [centroid_x, centroid_y] =
@@ -220,49 +259,41 @@ impl GridTraits for TriGrid {
                         if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                             // Cell with flat base at bottom and pointing up
                             corners[Ix3(cell_id, 0, 0)] = centroid_x; // top-x
-                            corners[Ix3(cell_id, 0, 1)] = centroid_y + self.radius(); // top-y
-                            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx(); // bottom-right-x
-                            corners[Ix3(cell_id, 1, 1)] =
-                                centroid_y - (self.cell_height() - self.radius()); // bottom-right-y
-                            corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx(); // bottom-left-x
-                            corners[Ix3(cell_id, 2, 1)] =
-                                centroid_y - (self.cell_height() - self.radius());
+                            corners[Ix3(cell_id, 0, 1)] = centroid_y + radius; // top-y
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + dx; // bottom-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y - (cell_height - radius); // bottom-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - dx; // bottom-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - (cell_height - radius);
                         //bottom-left-y
                         } else {
                             // Cell with flat base at top and pointing down
                             corners[Ix3(cell_id, 0, 0)] = centroid_x; // bottom-x
-                            corners[Ix3(cell_id, 0, 1)] = centroid_y - self.radius(); // bottom-y
-                            corners[Ix3(cell_id, 1, 0)] = centroid_x + self.dx(); // top-right-x
-                            corners[Ix3(cell_id, 1, 1)] =
-                                centroid_y + (self.cell_height() - self.radius()); // top-right-y
-                            corners[Ix3(cell_id, 2, 0)] = centroid_x - self.dx(); // top-left-x
-                            corners[Ix3(cell_id, 2, 1)] =
-                                centroid_y + (self.cell_height() - self.radius());
+                            corners[Ix3(cell_id, 0, 1)] = centroid_y - radius; // bottom-y
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + dx; // top-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + (cell_height - radius); // top-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - dx; // top-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y + (cell_height - radius);
                             // top-left-y
                         }
                     }
                     Orientation::Pointy => {
                         if iseven(index[Ix2(cell_id, 0)]) == iseven(index[Ix2(cell_id, 1)]) {
                             // Cell with flat base on left side, pointing right
-                            corners[Ix3(cell_id, 0, 0)] = centroid_x + self.radius(); // right-x
+                            corners[Ix3(cell_id, 0, 0)] = centroid_x + radius; // right-x
                             corners[Ix3(cell_id, 0, 1)] = centroid_y; // right-y
-                            corners[Ix3(cell_id, 1, 0)] =
-                                centroid_x - (self.cell_width() - self.radius()); // top-left-x
-                            corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-left-y
-                            corners[Ix3(cell_id, 2, 0)] =
-                                centroid_x - (self.cell_width() - self.radius()); // bottom-left-x
-                            corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy();
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x - (cell_width - radius); // top-left-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + dy; // top-left-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x - (cell_width - radius); // bottom-left-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - dy;
                         // bottom-left-y
                         } else {
                             // Cell with flat base on right side, pointing left
-                            corners[Ix3(cell_id, 0, 0)] = centroid_x - self.radius(); // left-x
+                            corners[Ix3(cell_id, 0, 0)] = centroid_x - radius; // left-x
                             corners[Ix3(cell_id, 0, 1)] = centroid_y; // left-y
-                            corners[Ix3(cell_id, 1, 0)] =
-                                centroid_x + (self.cell_width() - self.radius()); // top-right-x
-                            corners[Ix3(cell_id, 1, 1)] = centroid_y + self.dy(); // top-right-y
-                            corners[Ix3(cell_id, 2, 0)] =
-                                centroid_x + (self.cell_width() - self.radius()); // bottom-right-x
-                            corners[Ix3(cell_id, 2, 1)] = centroid_y - self.dy();
+                            corners[Ix3(cell_id, 1, 0)] = centroid_x + (cell_width - radius); // top-right-x
+                            corners[Ix3(cell_id, 1, 1)] = centroid_y + dy; // top-right-y
+                            corners[Ix3(cell_id, 2, 0)] = centroid_x + (cell_width - radius); // bottom-right-x
+                            corners[Ix3(cell_id, 2, 1)] = centroid_y - dy;
                             // bottom-right-y
                         }
                     }
@@ -270,15 +301,19 @@ impl GridTraits for TriGrid {
             }
 
             if self.rotation() != 0. {
+                // Applying the rotation by hand avoids the temporary allocation
+                // that a `_rotation_matrix.dot(&corner)` call would make per corner.
+                let cos = self._rotation_matrix[[0, 0]];
+                let sin = self._rotation_matrix[[1, 0]];
                 for cell_id in 0..corners.shape()[0] {
                     for corner_id in 0..corners.shape()[1] {
-                        let mut corner_xy = corners.slice_mut(s![cell_id, corner_id, ..]);
-                        let rotated_corner_xy = self._rotation_matrix.dot(&corner_xy);
-                        corner_xy.assign(&rotated_corner_xy);
+                        let x = corners[Ix3(cell_id, corner_id, 0)];
+                        let y = corners[Ix3(cell_id, corner_id, 1)];
+                        corners[Ix3(cell_id, corner_id, 0)] = cos * x - sin * y;
+                        corners[Ix3(cell_id, corner_id, 1)] = sin * x + cos * y;
                     }
                 }
             }
-            corners
         })
     }
 
@@ -286,8 +321,7 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(points, |points| {
-            let mut nearby_cells = Array3::<i64>::zeros((points.shape()[0], 6, 2));
+        crate::utils::map_point_pairs_fanout_fill_batched(points, 6, |points, mut nearby_cells| {
             // TODO:
             // Condense this into a single loop
             let cell_ids = self.cell_at_points(points);
@@ -316,127 +350,35 @@ impl GridTraits for TriGrid {
                 // Define the relative ids of the nearby points with respect to the cell that contains the point
                 // The nearby cells will depend on which corner of the cell the point is located at, and
                 // whether the cell is pointing up or down.
-                let rel_nearby_cells: Array2<i64>;
-                match self.orientation() {
+                let upright =
+                    self._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)]);
+                let rel_nearby_cells: &[[i64; 2]; 6] = match self.orientation() {
                     Orientation::Flat => {
-                        if !self
-                            ._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
-                        {
-                            // Triangle points upright
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells = array![
-                                        [-1, 0],
-                                        [0, 0],
-                                        [1, 0],
-                                        [-1, -1],
-                                        [0, -1],
-                                        [1, -1],
-                                    ];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 1], [1, 1], [2, 1], [0, 0], [1, 0], [2, 0],];
-                                }
-                                2 => {
-                                    rel_nearby_cells =
-                                        array![[-2, 1], [-1, 1], [0, 1], [-2, 0], [-1, 0], [0, 0],];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
+                        let table = if upright {
+                            &FLAT_UPRIGHT
                         } else {
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells =
-                                        array![[-1, 1], [0, 1], [1, 1], [-1, 0], [0, 0], [1, 0],];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 0], [1, 0], [2, 0], [0, -1], [1, -1], [2, -1],];
-                                }
-                                2 => {
-                                    rel_nearby_cells = array![
-                                        [-2, 0],
-                                        [-1, 0],
-                                        [0, 0],
-                                        [-2, -1],
-                                        [-1, -1],
-                                        [0, -1],
-                                    ];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
-                        }
+                            &FLAT_NOT_UPRIGHT
+                        };
+                        &table[nearest_corner_id]
                     }
                     Orientation::Pointy => {
-                        if !self
-                            ._is_cell_upright(cell_ids[Ix2(cell_id, 0)], cell_ids[Ix2(cell_id, 1)])
-                        {
-                            // Triangle points left
-                            match nearest_corner_id {
-                                0 => {
-                                    rel_nearby_cells = array![
-                                        [0, -1],
-                                        [0, 0],
-                                        [0, 1],
-                                        [-1, -1],
-                                        [-1, 0],
-                                        [-1, 1],
-                                    ];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[1, 0], [1, 1], [1, 2], [0, 0], [0, 1], [0, 2],];
-                                }
-                                2 => {
-                                    rel_nearby_cells =
-                                        array![[1, -2], [1, -1], [1, 0], [0, -2], [0, -1], [0, 0],];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
+                        let table = if upright {
+                            &POINTY_UPRIGHT
                         } else {
-                            match nearest_corner_id {
-                                // Note: these indices are just like those of the Pointy version, but swapped xy.
-                                0 => {
-                                    rel_nearby_cells =
-                                        array![[1, -1], [1, 0], [1, 1], [0, -1], [0, 0], [0, 1],];
-                                }
-                                1 => {
-                                    rel_nearby_cells =
-                                        array![[0, 1], [0, 2], [-1, 2], [-1, 1], [-1, 0], [0, 0]];
-                                    // array![[1, 0], [2, 0], [2, -1], [1, -1], [0, -1], [0, 0],];
-                                }
-                                2 => {
-                                    rel_nearby_cells = array![
-                                        [0, -2],
-                                        [0, -1],
-                                        [0, 0],
-                                        [-1, -2],
-                                        [-1, -1],
-                                        [-1, 0],
-                                    ];
-                                }
-                                _ => {
-                                    panic!("Invalid nearest corner id: {}. Expected the corner triangle ID to be any of (0,1,2)", nearest_corner_id);
-                                }
-                            }
-                        }
+                            &POINTY_NOT_UPRIGHT
+                        };
+                        &table[nearest_corner_id]
                     }
-                }
-                // Insert ids into return array for current cell_id
-                nearby_cells
-                    .slice_mut(s![cell_id, .., ..])
-                    .assign(&(rel_nearby_cells + cell_ids.slice(s![cell_id, ..])));
-                // Try inserting slice?
-            }
+                };
 
-            nearby_cells
+                // Insert ids into return array for current cell_id
+                let base_x = cell_ids[Ix2(cell_id, 0)];
+                let base_y = cell_ids[Ix2(cell_id, 1)];
+                for k in 0..6 {
+                    nearby_cells[Ix3(cell_id, k, 0)] = rel_nearby_cells[k][0] + base_x;
+                    nearby_cells[Ix3(cell_id, k, 1)] = rel_nearby_cells[k][1] + base_y;
+                }
+            }
         })
     }
 
@@ -450,80 +392,80 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let depth = depth as i64;
+        let depth = depth as i64;
 
-            let add_cell_id = add_cell_id as i64;
-            let mut total_nr_neighbours = include_selected as usize;
-            let nr_neighbours_factor: usize;
-            let max_nr_cols: i64;
-            let nr_rows: i64;
+        let add_cell_id = add_cell_id as i64;
+        let mut total_nr_neighbours = include_selected as usize;
+        let nr_neighbours_factor: usize;
+        let max_nr_cols: i64;
+        let nr_rows: i64;
 
-            nr_neighbours_factor = 4;
-            max_nr_cols = 1 + 4 * depth;
-            nr_rows = 1 + 2 * depth;
+        nr_neighbours_factor = 4;
+        max_nr_cols = 1 + 4 * depth;
+        nr_rows = 1 + 2 * depth;
 
-            for i in 0..depth {
-                total_nr_neighbours =
-                    total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
-            }
-            let mut relative_neighbours =
-                Array3::<i64>::zeros((index.shape()[0], total_nr_neighbours, 2));
+        for i in 0..depth {
+            total_nr_neighbours =
+                total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
+        }
 
-            let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
-            for row_id in 0..depth {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (depth - 1 - row_id);
-            }
-            for row_id in depth..(nr_rows) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (row_id - depth);
-            }
+        let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
+        for row_id in 0..depth {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (depth - 1 - row_id);
+        }
+        for row_id in depth..(nr_rows) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (row_id - depth);
+        }
 
-            let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
-            for i in 0..nr_rows {
-                let i = i as usize;
-                nr_cells_per_colum_downward[Ix1(i)] =
-                    nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
-            }
+        let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
+        for i in 0..nr_rows {
+            let i = i as usize;
+            nr_cells_per_colum_downward[Ix1(i)] =
+                nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
+        }
 
-            let mut counter: usize;
-            let mut nr_cells_per_colum: &Array1<i64>;
-            for cell_id in 0..relative_neighbours.shape()[0] {
-                counter = 0;
+        crate::utils::map_point_pairs_fanout_fill_batched(
+            index,
+            total_nr_neighbours,
+            |index, mut relative_neighbours| {
+                let mut counter: usize;
+                let mut nr_cells_per_colum: &Array1<i64>;
+                for cell_id in 0..relative_neighbours.shape()[0] {
+                    counter = 0;
 
-                let downward_cell =
-                    !self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                if downward_cell {
-                    nr_cells_per_colum = &nr_cells_per_colum_downward;
-                } else {
-                    nr_cells_per_colum = &nr_cells_per_colum_upward;
-                }
+                    let downward_cell =
+                        !self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                    if downward_cell {
+                        nr_cells_per_colum = &nr_cells_per_colum_downward;
+                    } else {
+                        nr_cells_per_colum = &nr_cells_per_colum_upward;
+                    }
 
-                let id_x_axis = self.consistent_axis();
-                let id_y_axis = self.inconsistent_axis();
+                    let id_x_axis = self.consistent_axis();
+                    let id_y_axis = self.inconsistent_axis();
 
-                for rel_row_id in (0..nr_rows).rev() {
-                    let nr_cells_in_colum = nr_cells_per_colum[Ix1(rel_row_id as usize)];
-                    for rel_col_id in 0..nr_cells_in_colum {
-                        relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = rel_col_id
-                            - ((nr_cells_in_colum as f64 / 2.).floor() as i64)
-                            + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
-                        relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
-                            depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
-                        counter = counter + 1;
-                        // Skip selected center cell if include_selected is false
-                        counter = counter
-                            - (!include_selected
-                                && (rel_row_id == depth)
-                                && (rel_col_id == (2 * depth)))
-                                as usize;
+                    for rel_row_id in (0..nr_rows).rev() {
+                        let nr_cells_in_colum = nr_cells_per_colum[Ix1(rel_row_id as usize)];
+                        for rel_col_id in 0..nr_cells_in_colum {
+                            relative_neighbours[Ix3(cell_id, counter, id_x_axis)] = rel_col_id
+                                - ((nr_cells_in_colum as f64 / 2.).floor() as i64)
+                                + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                            relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
+                                depth - rel_row_id + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
+                            counter = counter + 1;
+                            // Skip selected center cell if include_selected is false
+                            counter = counter
+                                - (!include_selected
+                                    && (rel_row_id == depth)
+                                    && (rel_col_id == (2 * depth)))
+                                    as usize;
+                        }
                     }
                 }
-            }
-
-            relative_neighbours
-        })
+            },
+        )
     }
 
     fn direct_neighbours<D>(
@@ -536,96 +478,102 @@ impl GridTraits for TriGrid {
     where
         D: Dimension,
     {
-        crate::utils::map_point_pairs_fanout(index, |index| {
-            let depth = depth as i64;
-            let add_cell_id = add_cell_id as i64;
-            let mut total_nr_neighbours: usize = include_selected as usize;
+        let depth = depth as i64;
+        let add_cell_id = add_cell_id as i64;
+        let mut total_nr_neighbours: usize = include_selected as usize;
 
-            let max_nr_cols = 1 + 2 * depth;
-            let nr_rows = 1 + depth;
+        let max_nr_cols = 1 + 2 * depth;
+        let nr_rows = 1 + depth;
 
-            for i in 0..depth {
-                total_nr_neighbours = total_nr_neighbours + 3 * (i + 1) as usize;
-            }
-            let mut relative_neighbours =
-                Array3::<i64>::zeros((index.shape()[0], total_nr_neighbours, 2));
+        for i in 0..depth {
+            total_nr_neighbours = total_nr_neighbours + 3 * (i + 1) as usize;
+        }
 
-            let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
-            for row_id in 0..(depth / 2) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (depth / 2 - row_id);
-            }
-            for row_id in (depth / 2)..(nr_rows) {
-                nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                    max_nr_cols - 2 * (row_id - depth / 2);
-            }
-            let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
-            for i in 0..nr_rows {
-                let i = i as usize;
-                nr_cells_per_colum_downward[Ix1(i)] =
-                    nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
-            }
+        let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
+        for row_id in 0..(depth / 2) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (depth / 2 - row_id);
+        }
+        for row_id in (depth / 2)..(nr_rows) {
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
+                max_nr_cols - 2 * (row_id - depth / 2);
+        }
+        let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
+        for i in 0..nr_rows {
+            let i = i as usize;
+            nr_cells_per_colum_downward[Ix1(i)] =
+                nr_cells_per_colum_upward[Ix1(nr_rows as usize - 1 - i)];
+        }
 
-            let id_x_axis = self.consistent_axis();
-            let id_y_axis = self.inconsistent_axis();
+        let id_x_axis = self.consistent_axis();
+        let id_y_axis = self.inconsistent_axis();
 
-            let mut counter: usize;
-            let mut y_offset: i64;
-            let mut skip_cell: bool;
-            for cell_id in 0..relative_neighbours.shape()[0] {
-                counter = 0;
-                let upright_cell =
-                    self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
-                let flip_vertically: i64;
-                if upright_cell {
-                    flip_vertically = 1;
-                } else {
-                    flip_vertically = -1;
-                }
-                for rel_row_id in (0..nr_rows) {
-                    let partial_row: i64;
-                    let nr_cells_in_colum: i64;
-                    if iseven(depth) {
-                        partial_row = 0;
-                        nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+        crate::utils::map_point_pairs_fanout_fill_batched(
+            index,
+            total_nr_neighbours,
+            |index, mut relative_neighbours| {
+                let mut counter: usize;
+                let mut y_offset: i64;
+                let mut skip_cell: bool;
+                for cell_id in 0..relative_neighbours.shape()[0] {
+                    counter = 0;
+                    let upright_cell =
+                        self._is_cell_upright(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)]);
+                    let flip_vertically: i64;
+                    if upright_cell {
+                        flip_vertically = 1;
                     } else {
-                        partial_row = nr_rows - 1;
-                        nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+                        flip_vertically = -1;
                     }
-
-                    for rel_col_id in 0..nr_cells_in_colum {
+                    for rel_row_id in (0..nr_rows) {
+                        let partial_row: i64;
+                        let nr_cells_in_colum: i64;
                         if iseven(depth) {
-                            skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            partial_row = 0;
+                            nr_cells_in_colum =
+                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         } else {
-                            skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
-                        }
-                        y_offset = ((depth as f64 / 2.).floor() as i64);
-                        if counter < relative_neighbours.shape()[1] {
-                            if !skip_cell {
-                                relative_neighbours[Ix3(cell_id, counter, id_x_axis)] =
-                                    flip_vertically
-                                        * (rel_col_id
-                                            - (nr_cells_in_colum as f64 / 2.).floor() as i64)
-                                        + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
-                                relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
-                                    flip_vertically
-                                        * (depth - rel_row_id - y_offset - !iseven(depth) as i64)
-                                        + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
-                                counter = counter + 1;
-                            }
+                            partial_row = nr_rows - 1;
+                            nr_cells_in_colum =
+                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         }
 
-                        // Skip selected center cell if include_selected is false
-                        counter = counter
-                            - (!include_selected
-                                && (nr_cells_in_colum == max_nr_cols)
-                                && (rel_col_id == depth)) as usize;
+                        for rel_col_id in 0..nr_cells_in_colum {
+                            if iseven(depth) {
+                                skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            } else {
+                                skip_cell = rel_row_id == partial_row && !iseven(rel_col_id);
+                            }
+                            y_offset = ((depth as f64 / 2.).floor() as i64);
+                            if counter < relative_neighbours.shape()[1] {
+                                if !skip_cell {
+                                    relative_neighbours[Ix3(cell_id, counter, id_x_axis)] =
+                                        flip_vertically
+                                            * (rel_col_id
+                                                - (nr_cells_in_colum as f64 / 2.).floor() as i64)
+                                            + (add_cell_id * index[Ix2(cell_id, id_x_axis)]);
+                                    relative_neighbours[Ix3(cell_id, counter, id_y_axis)] =
+                                        flip_vertically
+                                            * (depth
+                                                - rel_row_id
+                                                - y_offset
+                                                - !iseven(depth) as i64)
+                                            + (add_cell_id * index[Ix2(cell_id, id_y_axis)]);
+                                    counter = counter + 1;
+                                }
+                            }
+
+                            // Skip selected center cell if include_selected is false
+                            counter = counter
+                                - (!include_selected
+                                    && (nr_cells_in_colum == max_nr_cols)
+                                    && (rel_col_id == depth))
+                                    as usize;
+                        }
                     }
                 }
-            }
-
-            relative_neighbours
-        })
+            },
+        )
     }
 
     fn is_aligned_with(&self, other: &Grid) -> bool {
@@ -790,6 +738,36 @@ impl TriGrid {
         })
     }
 
+    /// Coordinates of corner 2 of the cell at `(x, y)` in the grid frame (i.e.
+    /// without any rotation applied). This is the `corner_id == 2` branch of
+    /// [`GridTraits::cell_corners`], extracted so `cell_at_points` can compute
+    /// it per point without allocating a corner array.
+    fn cell_origin_xy_no_rot(&self, x: i64, y: i64) -> [f64; 2] {
+        let [centroid_x, centroid_y] = self.centroid_xy_no_rot(x, y);
+        let radius = self.radius();
+        let same_parity = iseven(x) == iseven(y);
+        match self.orientation() {
+            Orientation::Flat => {
+                let offset = self.cell_height() - radius;
+                let origin_y = if same_parity {
+                    centroid_y - offset
+                } else {
+                    centroid_y + offset
+                };
+                [centroid_x - self.dx(), origin_y]
+            }
+            Orientation::Pointy => {
+                let offset = self.cell_width() - radius;
+                let origin_x = if same_parity {
+                    centroid_x - offset
+                } else {
+                    centroid_x + offset
+                };
+                [origin_x, centroid_y - self.dy()]
+            }
+        }
+    }
+
     pub fn linear_interpolation(
         &self,
         sample_points: ArrayView2<f64>,
@@ -868,6 +846,61 @@ mod tests {
             }
         }
         assert_eq!(flat, expected);
+    }
+
+    #[test]
+    fn cell_origin_matches_cell_corner_two_at_zero_rotation() {
+        // `cell_at_points` replaces its per-point `cell_corners` call with the
+        // scalar `cell_origin_xy_no_rot`. It must match corner 2 of
+        // `cell_corners` exactly on an unrotated grid.
+        for orientation in [Orientation::Pointy, Orientation::Flat] {
+            let grid = TriGrid::new(3.5, orientation);
+            for x in -2..=2 {
+                for y in -2..=2 {
+                    let origin = grid.cell_origin_xy_no_rot(x, y);
+                    let corners = grid.cell_corners(array![[x, y]].view());
+                    assert_close(origin[0], corners[[0, 2, 0]], TOL);
+                    assert_close(origin[1], corners[[0, 2, 1]], TOL);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn cells_near_point_includes_the_containing_cell_and_is_unique() {
+        // `cells_near_point` is used for interpolation. The six returned cells
+        // must include the cell that actually contains the point and must not
+        // repeat a cell. This guards the static relative-id tables that the
+        // hot loop now indexes into.
+        for orientation in [Orientation::Pointy, Orientation::Flat] {
+            let mut grid = TriGrid::new(1.3, orientation);
+            grid.set_rotation(17.);
+            let pts = array![
+                [0.1, 0.2],
+                [1.7, -0.9],
+                [-2.3, 3.1],
+                [4.4, 4.9],
+                [-0.6, -1.2]
+            ];
+            let containing = grid.cell_at_points(pts.view());
+            let nearby = grid.cells_near_point(pts.view());
+            for i in 0..pts.shape()[0] {
+                let mut ids: Vec<[i64; 2]> = (0..nearby.shape()[1])
+                    .map(|k| [nearby[[i, k, 0]], nearby[[i, k, 1]]])
+                    .collect();
+                assert!(
+                    ids.contains(&[containing[[i, 0]], containing[[i, 1]]]),
+                    "containing cell [{}, {}] not among nearby cells {:?}",
+                    containing[[i, 0]],
+                    containing[[i, 1]],
+                    ids
+                );
+                ids.sort_unstable();
+                let total = ids.len();
+                ids.dedup();
+                assert_eq!(ids.len(), total, "duplicate nearby cell for point {i}");
+            }
+        }
     }
 
     // ---------------------------------------------------------------------
