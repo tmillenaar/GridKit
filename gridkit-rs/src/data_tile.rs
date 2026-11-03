@@ -286,6 +286,146 @@ impl<
         })
     }
 
+    /// Select target cells whose centroids cover the source tile bounds.
+    fn target_tile_for_grid(&self, alignment_grid: &Grid) -> Tile {
+        let corners = self.tile.corners();
+        let target_ids = alignment_grid.cell_at_points(corners.view());
+
+        let mut min_x = i64::MAX;
+        let mut min_y = i64::MAX;
+        let mut max_x = i64::MIN;
+        let mut max_y = i64::MIN;
+        for id in target_ids.axis_iter(Axis(0)) {
+            min_x = min_x.min(id[Ix1(0)]);
+            min_y = min_y.min(id[Ix1(1)]);
+            max_x = max_x.max(id[Ix1(0)]);
+            max_y = max_y.max(id[Ix1(1)]);
+        }
+
+        let total_min_x = corners
+            .column(0)
+            .iter()
+            .copied()
+            .fold(f64::INFINITY, f64::min);
+        let total_min_y = corners
+            .column(1)
+            .iter()
+            .copied()
+            .fold(f64::INFINITY, f64::min);
+        let total_max_x = corners
+            .column(0)
+            .iter()
+            .copied()
+            .fold(f64::NEG_INFINITY, f64::max);
+        let total_max_y = corners
+            .column(1)
+            .iter()
+            .copied()
+            .fold(f64::NEG_INFINITY, f64::max);
+
+        let lower_centroid = alignment_grid.centroid(array![[min_x, min_y]].view());
+        let upper_centroid = alignment_grid.centroid(array![[max_x, max_y]].view());
+        let left_new = lower_centroid[[0, 0]];
+        let bottom_new = lower_centroid[[0, 1]];
+        let right_new = upper_centroid[[0, 0]];
+        let top_new = upper_centroid[[0, 1]];
+
+        if left_new <= total_min_x {
+            min_x += ((total_min_x - left_new) / alignment_grid.dx()).ceil() as i64;
+        }
+        if bottom_new <= total_min_y {
+            min_y += ((total_min_y - bottom_new) / alignment_grid.dy()).ceil() as i64;
+        }
+        if right_new >= total_max_x {
+            max_x -= ((right_new - total_max_x) / alignment_grid.dx()).ceil() as i64;
+        }
+        if top_new >= total_max_y {
+            max_y -= ((top_new - total_max_y) / alignment_grid.dy()).ceil() as i64;
+        }
+
+        Tile {
+            grid: alignment_grid.clone(),
+            start_id: (min_x, min_y),
+            nx: (max_x - min_x + 1) as u64,
+            ny: (max_y - min_y + 1) as u64,
+        }
+    }
+
+    fn target_centroids(&self, target: &Tile) -> Array<f64, Ix3>
+    where
+        T: Default + Send + Sync,
+    {
+        let target_indices = target.indices();
+        target.grid.centroid(target_indices.view())
+    }
+
+    /// Resample this data tile onto `alignment_grid` using nearest-neighbour sampling.
+    ///
+    /// The source and target grids are interpreted in the same coordinate
+    /// system. Unlike [`DataTile::crop`], the target tile may use a different
+    /// grid because values are sampled at the target cell centroids.
+    pub fn resample_nearest(&self, alignment_grid: &Grid) -> DataTile<T>
+    where
+        T: Default + Send + Sync,
+    {
+        let target = self.target_tile_for_grid(alignment_grid);
+        let target_points = self.target_centroids(&target);
+        let source_indices = self.tile.grid.cell_at_points(target_points.view());
+        let data = self.values(source_indices.view(), self.nodata_value);
+        DataTile::new(
+            target.grid.clone(),
+            target.start_id,
+            target.nx,
+            target.ny,
+            data,
+            self.nodata_value,
+        )
+    }
+
+    /// Resample this data tile onto `alignment_grid` using grid-specific linear
+    /// interpolation. Interpolated values are returned as `f64`.
+    pub fn resample_linear(&self, alignment_grid: &Grid) -> DataTile<f64>
+    where
+        T: Default + Send + Sync,
+    {
+        let target = self.target_tile_for_grid(alignment_grid);
+        let target_points = self.target_centroids(&target);
+        let data = self.linear_interpolation(target_points.view());
+        let nodata_value = self.nodata_value.to_f64().unwrap_or(f64::NAN);
+        DataTile::new(
+            target.grid.clone(),
+            target.start_id,
+            target.nx,
+            target.ny,
+            data,
+            nodata_value,
+        )
+    }
+
+    /// Resample this data tile onto `alignment_grid` using inverse-distance
+    /// interpolation. Interpolated values are returned as `f64`.
+    pub fn resample_inverse_distance(
+        &self,
+        alignment_grid: &Grid,
+        decay_constant: f64,
+    ) -> DataTile<f64>
+    where
+        T: Default + Send + Sync,
+    {
+        let target = self.target_tile_for_grid(alignment_grid);
+        let target_points = self.target_centroids(&target);
+        let data = self.inverse_distance_interpolation(target_points.view(), decay_constant);
+        let nodata_value = self.nodata_value.to_f64().unwrap_or(f64::NAN);
+        DataTile::new(
+            target.grid.clone(),
+            target.start_id,
+            target.nx,
+            target.ny,
+            data,
+            nodata_value,
+        )
+    }
+
     pub fn value(&self, i_x: i64, i_y: i64, nodata_value: T) -> T {
         let id_result = self.grid_id_to_tile_id_xy(i_x, i_y);
         match id_result {
@@ -308,14 +448,13 @@ impl<
     pub fn values<D>(&self, index: ArrayView<i64, D>, nodata_value: T) -> Array<T, D::Smaller>
     where
         D: Dimension + RemoveAxis,
+        T: Default + Send + Sync,
     {
-        crate::utils::map_point_pairs_reduce(index, |index| {
-            let mut values = Array1::<T>::zeros(index.shape()[0]);
-            for cell_id in 0..values.shape()[0] {
+        crate::utils::map_point_pairs_reduce_fill_batched(index, |index, mut values| {
+            for cell_id in 0..values.len() {
                 values[Ix1(cell_id)] =
                     self.value(index[Ix2(cell_id, 0)], index[Ix2(cell_id, 1)], nodata_value);
             }
-            values
         })
     }
 
@@ -330,8 +469,11 @@ impl<
     ) -> Array<f64, D::Smaller>
     where
         D: Dimension + RemoveAxis,
+        T: Default + Send + Sync,
     {
-        crate::utils::map_point_pairs_reduce(sample_points, |sample_points| {
+        crate::utils::map_point_pairs_reduce_fill_batched(
+            sample_points,
+            |sample_points, mut values| {
             let grid = self.get_grid();
             let nearby_cells = grid.cells_near_point(sample_points);
 
@@ -339,7 +481,6 @@ impl<
             let nearby_values = self.values(nearby_cells.view(), self.nodata_value);
             let nearby_centroids = grid.centroid(nearby_cells.view());
 
-            let mut values = Array1::<f64>::zeros(sample_points.shape()[0]);
             let nodata_value = self.nodata_value.to_f64().unwrap_or(f64::NAN);
             match grid {
                 // FIXME: I think the interpolation logic should not live on the grid, but it is used by BoundedGrid implementation
@@ -486,8 +627,8 @@ impl<
                     }
                 }
             }
-            values
-        })
+            },
+        )
     }
 
     /// Inverse distance interpolation of the data at the sample points.
@@ -502,10 +643,12 @@ impl<
     ) -> Array<f64, D::Smaller>
     where
         D: Dimension + RemoveAxis,
+        T: Default + Send + Sync,
     {
-        crate::utils::map_point_pairs_reduce(sample_points, |sample_points| {
+        crate::utils::map_point_pairs_reduce_fill_batched(
+            sample_points,
+            |sample_points, mut result| {
             let grid = self.get_grid();
-            let mut result = Array1::<f64>::zeros(sample_points.shape()[0]);
             // Nearby_cells shape: (nr_sample_points, nearby_cells, xy)
             let all_nearby_cells = grid.cells_near_point(sample_points);
             for i in 0..sample_points.shape()[0] {
@@ -533,8 +676,8 @@ impl<
                 }
                 result[Ix1(i)] = result_val;
             }
-            result
-        })
+            },
+        )
     }
 
     pub fn _slice_tile_mut(&mut self, tile: &Tile) -> ArrayBase<ViewRepr<&mut T>, Dim<[usize; 2]>> {
@@ -1417,5 +1560,111 @@ impl<
 {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         &mut self.data[(index.0, index.1)]
+    }
+}
+
+#[cfg(test)]
+mod resampling_api_tests {
+    use super::*;
+    use crate::{HexGrid, TriGrid};
+
+    fn python_resample_grid(kind: usize) -> Grid {
+        let mut grid = match kind {
+            0 => Grid::TriGrid(TriGrid::new(1.0, crate::grid::Orientation::Pointy)),
+            1 => Grid::RectGrid(RectGrid::new(1.0, 1.0)),
+            2 => Grid::HexGrid(HexGrid::new(1.0, crate::grid::Orientation::Pointy)),
+            _ => panic!("unexpected grid kind"),
+        };
+        grid.set_rotation(13.0);
+        grid
+    }
+
+    #[test]
+    fn resample_matches_python_rotated_grid_scenarios() {
+        for kind in 0..3 {
+            let source_grid = python_resample_grid(kind);
+            let source_tile = Tile {
+                grid: source_grid.clone(),
+                start_id: (-2, -2),
+                nx: 5,
+                ny: 5,
+            };
+            let data = Array2::from_shape_fn((5, 5), |(y, x)| (y * 5 + x) as f64);
+            let source = DataTile::new(
+                source_grid.clone(),
+                source_tile.start_id,
+                source_tile.nx,
+                source_tile.ny,
+                data,
+                f64::NAN,
+            );
+
+            let mut target_grid = source_grid;
+            target_grid.set_rotation(-5.0);
+            target_grid.set_offset([-0.2, 0.3]);
+            for result in [
+                source.resample_nearest(&target_grid),
+                source.resample_linear(&target_grid),
+                source.resample_inverse_distance(&target_grid, 1.0),
+            ] {
+                assert_eq!(result.tile.grid, target_grid);
+                assert!(result.tile.nx > 0);
+                assert!(result.tile.ny > 0);
+                assert_eq!(result.data.shape(), &[result.tile.ny as usize, result.tile.nx as usize]);
+
+                let valid_values: Vec<f64> = result
+                    .data
+                    .iter()
+                    .copied()
+                    .filter(|value| !value.is_nan())
+                    .collect();
+                assert!(!valid_values.is_empty());
+                assert!(valid_values.iter().all(|value| (0.0..=24.0).contains(value)));
+                assert!(valid_values.first().unwrap() < valid_values.last().unwrap());
+            }
+        }
+    }
+
+    #[test]
+    fn resample_nearest_preserves_native_dtype_and_target_shape() {
+        let source_grid = Grid::RectGrid(RectGrid::new(1.0, 1.0));
+        let source = DataTile::new(
+            source_grid.clone(),
+            (0, 0),
+            4,
+            4,
+            Array2::from_shape_fn((4, 4), |(y, x)| (y * 4 + x) as i16),
+            -1_i16,
+        );
+        let mut target_grid = source_grid;
+        target_grid.set_offset([0.25, 0.25]);
+        let result = source.resample_nearest(&target_grid);
+
+        assert_eq!(result.tile.grid, target_grid);
+        assert!(!result.data.is_empty());
+        assert_eq!(result.nodata_value, -1);
+        assert_eq!(result.data.shape(), &[result.tile.ny as usize, result.tile.nx as usize]);
+    }
+
+    #[test]
+    fn resample_grid_methods_preserve_alignment_grid_metadata() {
+        let source_grid = Grid::RectGrid(RectGrid::new(1.0, 1.0));
+        let source = DataTile::new(
+            source_grid.clone(),
+            (0, 0),
+            2,
+            2,
+            arr2(&[[1.0, 2.0], [3.0, 4.0]]),
+            f64::NAN,
+        );
+        assert_eq!(source.resample_nearest(&source_grid).tile.grid, source_grid);
+        assert_eq!(source.resample_linear(&source_grid).tile.grid, source_grid);
+        assert_eq!(
+            source
+                .resample_inverse_distance(&source_grid, 1.0)
+                .tile
+                .grid,
+            source_grid
+        );
     }
 }
