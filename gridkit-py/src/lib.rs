@@ -882,6 +882,95 @@ impl PyO3Tile {
             .into_pyarray(py)
     }
 
+    fn dx(&self) -> f64 {
+        self._tile.grid.dx()
+    }
+
+    fn dy(&self) -> f64 {
+        self._tile.grid.dy()
+    }
+
+    fn cellsize(&self) -> PyResult<f64> {
+        match &self._tile.grid {
+            grid::Grid::TriGrid(grid) => Ok(grid.cellsize),
+            grid::Grid::HexGrid(grid) => Ok(grid.cellsize),
+            grid::Grid::RectGrid(_) => Err(PyTypeError::new_err(
+                "Rectangular grids do not have a cellsize property",
+            )),
+        }
+    }
+
+    fn offset(&self) -> (f64, f64) {
+        self._tile.grid.offset().into()
+    }
+
+    fn rotation(&self) -> f64 {
+        self._tile.grid.rotation()
+    }
+
+    fn upscale(&self, factor: u64) -> PyO3Tile {
+        let new_tile = self._tile.upscale(factor);
+        match &new_tile.grid {
+            grid::Grid::TriGrid(grid) => PyO3Tile::from_tri_grid(
+                PyO3TriGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            ),
+            grid::Grid::RectGrid(grid) => PyO3Tile::from_rect_grid(
+                PyO3RectGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            ),
+            grid::Grid::HexGrid(grid) => PyO3Tile::from_hex_grid(
+                PyO3HexGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            ),
+        }
+    }
+
+    fn downscale(&self, factor: u64) -> PyResult<PyO3Tile> {
+        let new_tile = self
+            ._tile
+            .downscale(factor)
+            .map_err(PyValueError::new_err)?;
+        match &new_tile.grid {
+            grid::Grid::TriGrid(grid) => Ok(PyO3Tile::from_tri_grid(
+                PyO3TriGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            )),
+            grid::Grid::RectGrid(grid) => Ok(PyO3Tile::from_rect_grid(
+                PyO3RectGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            )),
+            grid::Grid::HexGrid(grid) => Ok(PyO3Tile::from_hex_grid(
+                PyO3HexGrid {
+                    _grid: grid.clone(),
+                },
+                new_tile.start_id,
+                new_tile.nx,
+                new_tile.ny,
+            )),
+        }
+    }
+
     fn sample_nearest_from<'py>(
         &self,
         py: Python<'py>,

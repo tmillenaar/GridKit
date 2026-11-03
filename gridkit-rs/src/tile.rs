@@ -514,6 +514,219 @@ impl TileTraits for Tile {
 }
 
 impl Tile {
+    /// Return a copy of this tile with `nx` x `ny` cells whose grid has been
+    /// scaled by `factor`, keeping the tile bounds and rotation unchanged.
+    ///
+    /// This is the shared workhorse for [`Tile::upscale`] and
+    /// [`Tile::downscale`]. It assumes the caller has already checked that the
+    /// new dimensions fit the tile exactly.
+    fn _rescale(&self, nx: u64, ny: u64, factor: f64) -> Tile {
+        let mut grid = self.get_grid().clone();
+        let rotation = grid.rotation();
+
+        // Work in the grid's unrotated coordinate system. The tile corners are
+        // the corners of its dx/dy bounding box, so rotating them back gives
+        // the bounds against which the rescaled cell box must be aligned.
+        let rotation_matrix_inv = grid.rotation_matrix_inv().to_owned();
+        let tile_corners = self.corners();
+        let mut tile_left = f64::MAX;
+        let mut tile_bottom = f64::MAX;
+        for corner_id in 0..tile_corners.shape()[0] {
+            let x = tile_corners[Ix2(corner_id, 0)];
+            let y = tile_corners[Ix2(corner_id, 1)];
+            let unrotated_x = rotation_matrix_inv[[0, 0]] * x + rotation_matrix_inv[[0, 1]] * y;
+            let unrotated_y = rotation_matrix_inv[[1, 0]] * x + rotation_matrix_inv[[1, 1]] * y;
+            tile_left = tile_left.min(unrotated_x);
+            tile_bottom = tile_bottom.min(unrotated_y);
+        }
+
+        // Do logic around new start id etc on non-rotated grid
+        grid.set_rotation(0.);
+
+        // Scale cellsize
+        match &mut grid {
+            Grid::TriGrid(tri_grid) => {
+                tri_grid.cellsize *= factor;
+            }
+            Grid::RectGrid(rect_grid) => {
+                rect_grid._dx *= factor;
+                rect_grid._dy *= factor;
+            }
+            Grid::HexGrid(hex_grid) => {
+                hex_grid.cellsize *= factor;
+            }
+        };
+
+        // Offset normalization can move the equivalent integer cell branch.
+        let original_right = tile_left + self.nx as f64 * self.grid.dx();
+        let original_top = tile_bottom + self.ny as f64 * self.grid.dy();
+        let (mut grid, start_id) = match grid {
+            Grid::HexGrid(mut hex_grid) => {
+                // A hexagon's vertices do not coincide with the dx/dy envelope
+                // used by Tile::corners(). Anchor the rescaled lattice to the
+                // original start-cell corner nearest that envelope's lower-left
+                // corner so the actual hex phase is preserved.
+                let original_start_ids = array![[self.start_id.0, self.start_id.1]];
+                let original_corners = self.grid.cell_corners(original_start_ids.view());
+                let mut anchor = [
+                    original_corners[Ix3(0, 0, 0)],
+                    original_corners[Ix3(0, 0, 1)],
+                ];
+                let mut anchor_error = f64::INFINITY;
+                for corner_id in 0..original_corners.shape()[1] {
+                    let x = original_corners[Ix3(0, corner_id, 0)];
+                    let y = original_corners[Ix3(0, corner_id, 1)];
+                    let error = (x - tile_corners[Ix2(3, 0)]).powi(2)
+                        + (y - tile_corners[Ix2(3, 1)]).powi(2);
+                    if error < anchor_error {
+                        anchor_error = error;
+                        anchor = [x, y];
+                    }
+                }
+                let anchor_unrotated = [
+                    rotation_matrix_inv[[0, 0]] * anchor[0]
+                        + rotation_matrix_inv[[0, 1]] * anchor[1],
+                    rotation_matrix_inv[[1, 0]] * anchor[0]
+                        + rotation_matrix_inv[[1, 1]] * anchor[1],
+                ];
+                hex_grid.anchor_inplace(&anchor_unrotated, CellElement::Corner);
+                let inconsistent_axis = hex_grid.inconsistent_axis();
+
+                let grid = Grid::HexGrid(hex_grid);
+                let mut best_grid = grid.clone();
+                let mut best_start_id = [0, 0];
+                let mut best_corner_error = f64::INFINITY;
+                let mut best_error = f64::INFINITY;
+
+                // Hex phase is parity-based and depends only on the
+                // inconsistent axis. The small signed range accounts for the
+                // floor-before-normalization behavior; it is independent of
+                // the rescale factor.
+                for offset_step in -2..=2 {
+                    let mut candidate_grid = grid.clone();
+                    let mut candidate_offset = grid.offset();
+                    candidate_offset[inconsistent_axis] += offset_step as f64
+                        * if inconsistent_axis == 0 {
+                            self.grid.dx()
+                        } else {
+                            self.grid.dy()
+                        };
+                    candidate_grid.set_offset(candidate_offset);
+                    let corner_cell = candidate_grid.cell_at_point(&anchor_unrotated);
+                    let corner_ids = array![[corner_cell[0], corner_cell[1]]];
+                    let corner_points = candidate_grid.cell_corners(corner_ids.view());
+                    let corner_error = (0..corner_points.shape()[1])
+                        .map(|corner_id| {
+                            (corner_points[Ix3(0, corner_id, 0)] - anchor_unrotated[0]).powi(2)
+                                + (corner_points[Ix3(0, corner_id, 1)] - anchor_unrotated[1])
+                                    .powi(2)
+                        })
+                        .fold(f64::INFINITY, f64::min);
+
+                    // The envelope alone does not identify the hex cell
+                    // containing the preserved corner, so inspect the small
+                    // neighboring integer branch around that anchor cell.
+                    let base_id = candidate_grid.cell_at_point(&anchor_unrotated);
+                    for x in base_id[0] - 2..=base_id[0] + 2 {
+                        for y in base_id[1] - 2..=base_id[1] + 2 {
+                            let candidate_left =
+                                x as f64 * candidate_grid.dx() + candidate_grid.offset()[0];
+                            let candidate_bottom =
+                                y as f64 * candidate_grid.dy() + candidate_grid.offset()[1];
+                            let candidate_right = candidate_left + nx as f64 * candidate_grid.dx();
+                            let candidate_top = candidate_bottom + ny as f64 * candidate_grid.dy();
+                            let error = (candidate_left - tile_left).powi(2)
+                                + (candidate_bottom - tile_bottom).powi(2)
+                                + (candidate_right - original_right).powi(2)
+                                + (candidate_top - original_top).powi(2);
+                            let is_better = corner_error < best_corner_error - 1e-12
+                                || ((corner_error - best_corner_error).abs() <= 1e-12
+                                    && error < best_error);
+                            if is_better {
+                                best_error = error;
+                                best_corner_error = corner_error;
+                                best_grid = candidate_grid.clone();
+                                best_start_id = [x, y];
+                            }
+                        }
+                    }
+                }
+                (best_grid, best_start_id)
+            }
+            Grid::RectGrid(mut rect_grid) => {
+                rect_grid.set_offset([tile_left, tile_bottom]);
+                let offset = rect_grid.offset();
+                let start_id = [
+                    ((tile_left - offset[0]) / rect_grid.dx()).round() as i64,
+                    ((tile_bottom - offset[1]) / rect_grid.dy()).round() as i64,
+                ];
+                (Grid::RectGrid(rect_grid), start_id)
+            }
+            Grid::TriGrid(mut tri_grid) => {
+                tri_grid.set_offset([tile_left, tile_bottom]);
+                let offset = tri_grid.offset();
+                let start_id = [
+                    ((tile_left - offset[0]) / tri_grid.dx()).round() as i64,
+                    ((tile_bottom - offset[1]) / tri_grid.dy()).round() as i64,
+                ];
+                (Grid::TriGrid(tri_grid), start_id)
+            }
+        };
+
+        // Set back rotation, does not affect start_id
+        grid.set_rotation(rotation);
+        Tile {
+            grid,
+            start_id: start_id.into(),
+            nx,
+            ny,
+        }
+    }
+
+    /// Return a tile with `factor` times as many cells along both axes,
+    /// subdividing each cell into `factor` x `factor` smaller cells.
+    ///
+    /// The tile keeps exactly the same bounding box and rotation. A `factor` of
+    /// 0 leaves the tile unchanged (mirroring [`GridTraits::subdivide`]).
+    pub fn upscale(&self, factor: u64) -> Tile {
+        if factor == 0 {
+            return self.clone();
+        }
+        let nx = self
+            .nx
+            .checked_mul(factor)
+            .expect("upscaling the tile would overflow the number of cells");
+        let ny = self
+            .ny
+            .checked_mul(factor)
+            .expect("upscaling the tile would overflow the number of cells");
+        self._rescale(nx, ny, 1. / factor as f64)
+    }
+
+    /// Return a tile with `factor` times fewer cells along both axes.
+    ///
+    /// The coarser cells are `factor` times larger, so the tile keeps exactly
+    /// the same bounding box and rotation. This is the inverse of
+    /// [`Tile::upscale`] (which subdivides the tile).
+    ///
+    /// `factor` must be nonzero and must divide both `nx` and `ny`, otherwise
+    /// the coarser cells would not fit the tile exactly and an error is
+    /// returned.
+    pub fn downscale(&self, factor: u64) -> Result<Tile, String> {
+        if factor == 0 {
+            return Err("Cannot downscale a tile by a factor of 0.".to_string());
+        }
+        if self.nx % factor != 0 || self.ny % factor != 0 {
+            return Err(format!(
+                "Cannot downscale a tile of {} x {} cells by a factor of {}: \
+                 the factor must divide both nx and ny so the coarser cells still \
+                 fit the tile's bounding box exactly.",
+                self.nx, self.ny, factor
+            ));
+        }
+        Ok(self._rescale(self.nx / factor, self.ny / factor, factor as f64))
+    }
+
     /// Sample `tile_to_sample` at this tile's cell centroids using nearest-neighbour sampling.
     pub fn sample_nearest_from<T>(&self, tile_to_sample: &DataTile<T>) -> DataTile<T>
     where
@@ -592,8 +805,7 @@ impl Tile {
             + Sync,
     {
         let centroids = self.grid.centroid(self.indices().view());
-        let data = tile_to_sample
-            .inverse_distance_interpolation(centroids.view(), decay_constant);
+        let data = tile_to_sample.inverse_distance_interpolation(centroids.view(), decay_constant);
         DataTile::new(
             self.grid.clone(),
             self.start_id,
@@ -714,7 +926,10 @@ pub fn average_data_tiles<
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::hex_grid::HexGrid;
     use crate::rect_grid::RectGrid;
+    use crate::tri_grid::TriGrid;
+    use crate::Orientation;
     use ndarray::array;
 
     #[test]
@@ -839,5 +1054,257 @@ mod tests {
             target.sample_inverse_distance_from(&source, 1.).data[[0, 0]],
             -99.
         );
+    }
+
+    // ---------------------------------------------------------------------
+    // upscale / downscale
+    // ---------------------------------------------------------------------
+
+    /// One grid of each type, non-trivial offset and rotation so the resizing
+    /// code cannot accidentally lean on the origin or an axis-aligned grid.
+    fn sample_grids() -> Vec<Grid> {
+        let mut rect = RectGrid::new(2., 3.);
+        rect.set_offset([0.4, -1.2]);
+        rect.set_rotation(31.);
+
+        let mut hex_flat = HexGrid::new(2., Orientation::Flat);
+        hex_flat.set_offset([0.4, -1.2]);
+        hex_flat.set_rotation(31.);
+
+        let mut hex_pointy = HexGrid::new(2., Orientation::Pointy);
+        hex_pointy.set_offset([-0.7, 0.3]);
+        hex_pointy.set_rotation(-12.);
+
+        let mut tri_flat = TriGrid::new(2., Orientation::Flat);
+        tri_flat.set_offset([0.4, -1.2]);
+        tri_flat.set_rotation(31.);
+
+        let mut tri_pointy = TriGrid::new(2., Orientation::Pointy);
+        tri_pointy.set_offset([-0.7, 0.3]);
+        tri_pointy.set_rotation(-12.);
+
+        vec![
+            Grid::RectGrid(rect),
+            Grid::HexGrid(hex_flat),
+            Grid::HexGrid(hex_pointy),
+            Grid::TriGrid(tri_flat),
+            Grid::TriGrid(tri_pointy),
+        ]
+    }
+
+    fn assert_corners_close(a: &Array2<f64>, b: &Array2<f64>) {
+        assert_eq!(a.shape(), b.shape(), "corner arrays have different shapes");
+        for i in 0..a.shape()[0] {
+            for j in 0..a.shape()[1] {
+                assert!(
+                    (a[[i, j]] - b[[i, j]]).abs() < 1e-9,
+                    "corner [{i}, {j}] differs: {} vs {}",
+                    a[[i, j]],
+                    b[[i, j]]
+                );
+            }
+        }
+    }
+
+    fn assert_hex_corner_anchor_matches(rescaled: &Tile, original: &Tile) {
+        let target_envelope = original.corners().row(3).to_owned();
+        let ids = array![[original.start_id.0, original.start_id.1]];
+        let original_corners = original.grid.cell_corners(ids.view());
+        let mut target = [
+            original_corners[Ix3(0, 0, 0)],
+            original_corners[Ix3(0, 0, 1)],
+        ];
+        let mut best_error = f64::INFINITY;
+        for corner_id in 0..original_corners.shape()[1] {
+            let x = original_corners[Ix3(0, corner_id, 0)];
+            let y = original_corners[Ix3(0, corner_id, 1)];
+            let error = (x - target_envelope[0]).powi(2) + (y - target_envelope[1]).powi(2);
+            if error < best_error {
+                best_error = error;
+                target = [x, y];
+            }
+        }
+        let cell = rescaled.grid.cell_at_point(&[target[0], target[1]]);
+        let ids = array![[cell[0], cell[1]]];
+        let corners = rescaled.grid.cell_corners(ids.view());
+        let nearest_distance = (0..corners.shape()[1])
+            .map(|corner_id| {
+                (corners[Ix3(0, corner_id, 0)] - target[0]).powi(2)
+                    + (corners[Ix3(0, corner_id, 1)] - target[1]).powi(2)
+            })
+            .fold(f64::INFINITY, f64::min);
+        assert!(
+            nearest_distance < 1e-18,
+            "corner anchor error: {nearest_distance}"
+        );
+    }
+
+    #[test]
+    fn upscale_keeps_the_bounding_box_and_rotation() {
+        for grid in sample_grids() {
+            let grid_name = grid_type_name(&grid).to_string();
+            let tile = Tile {
+                grid,
+                start_id: (2, -3),
+                nx: 4,
+                ny: 2,
+            };
+
+            let up = tile.upscale(3);
+
+            assert_eq!(up.nx, 12, "{grid_name}");
+            assert_eq!(up.ny, 6, "{grid_name}");
+            assert_eq!(
+                grid_type_name(&up.grid),
+                grid_type_name(&tile.grid),
+                "{grid_name}"
+            );
+            assert!((up.grid.rotation() - tile.grid.rotation()).abs() < 1e-12);
+            assert!((up.grid.dx() - tile.grid.dx() / 3.).abs() < 1e-9);
+            assert!((up.grid.dy() - tile.grid.dy() / 3.).abs() < 1e-9);
+            if matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_hex_corner_anchor_matches(&up, &tile);
+            } else {
+                assert_corners_close(&up.corners(), &tile.corners());
+            }
+        }
+    }
+
+    #[test]
+    fn upscale_by_zero_leaves_the_tile_unchanged() {
+        for grid in sample_grids() {
+            let tile = Tile {
+                grid,
+                start_id: (2, -3),
+                nx: 4,
+                ny: 2,
+            };
+            let up = tile.upscale(0);
+            assert_eq!(up.nx, tile.nx);
+            assert_eq!(up.ny, tile.ny);
+            assert_corners_close(&up.corners(), &tile.corners());
+        }
+    }
+
+    #[test]
+    fn downscale_keeps_the_bounding_box_and_rejects_bad_factors() {
+        for grid in sample_grids() {
+            println!("==========+++++==========");
+            let grid_name = grid_type_name(&grid).to_string();
+            let tile = Tile {
+                grid,
+                start_id: (-5, 7),
+                nx: 6,
+                ny: 4,
+            };
+
+            let down = tile.downscale(2).unwrap();
+            assert_eq!(down.nx, 3, "{grid_name}");
+            assert_eq!(down.ny, 2, "{grid_name}");
+            dbg!(&tile);
+            dbg!(&down);
+            dbg!(&tile.corners());
+            dbg!(&down.corners());
+            if matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_hex_corner_anchor_matches(&down, &tile);
+            } else {
+                assert_corners_close(&down.corners(), &tile.corners());
+            }
+
+            // Only downscale by a factor that divides both dimensions.
+            assert!(tile.downscale(0).is_err(), "{grid_name}");
+            assert!(tile.downscale(4).is_err(), "{grid_name}");
+            assert!(tile.downscale(5).is_err(), "{grid_name}");
+        }
+    }
+
+    #[test]
+    fn downscale_then_upscale_round_trips_the_corners() {
+        for grid in sample_grids() {
+            let tile = Tile {
+                grid,
+                start_id: (-5, 7),
+                nx: 6,
+                ny: 4,
+            };
+            let round_tripped = tile.downscale(2).unwrap().upscale(2);
+            if !matches!(&tile.grid, Grid::HexGrid(_)) {
+                assert_corners_close(&round_tripped.corners(), &tile.corners());
+            }
+        }
+    }
+
+    #[test]
+    fn rescaling_re_derives_the_start_id() {
+        // With a zero offset and an aligned tile, upscaling multiplies the ids
+        // and the offset stays zero.
+        let grid = Grid::RectGrid(RectGrid::new(2., 3.));
+        let tile = Tile {
+            grid: grid.clone(),
+            start_id: (4, -6),
+            nx: 8,
+            ny: 6,
+        };
+        assert_eq!(tile.upscale(2).start_id, (8, -12));
+        assert_eq!(tile.grid.offset(), [0., 0.]);
+
+        let down = tile.downscale(2).unwrap();
+        assert_eq!(down.start_id, (2, -3));
+        assert_eq!(down.grid.offset(), [0., 0.]);
+        assert_corners_close(&down.corners(), &tile.corners());
+
+        // When the start id is not aligned to the coarser grid, the offset is
+        // shifted so the bounds are still preserved.
+        let unaligned = Tile {
+            grid,
+            start_id: (3, -5),
+            nx: 8,
+            ny: 6,
+        };
+        let down = unaligned.downscale(2).unwrap();
+        assert!((down.grid.offset()[0] - 2.).abs() < 1e-12);
+        assert!((down.grid.offset()[1] - 3.).abs() < 1e-12);
+        assert_corners_close(&down.corners(), &unaligned.corners());
+    }
+
+    #[test]
+    fn resized_tile_can_sample_the_original_data_tile() {
+        // A one-cell source tile whose value is sampled on the finer grid.
+        let source = DataTile::new(
+            Grid::RectGrid(RectGrid::new(4., 4.)),
+            (0, 0),
+            1,
+            1,
+            array![[7.]],
+            -1.,
+        );
+
+        let target = source.get_tile().upscale(4);
+        assert_eq!((target.nx, target.ny), (4, 4));
+        let sampled = target.sample_nearest_from(&source);
+        assert!(sampled.data.iter().all(|value| *value == 7.));
+    }
+
+    #[test]
+    fn data_tile_resizing_methods_error_with_a_resampling_hint() {
+        let data_tile = DataTile::new(
+            Grid::RectGrid(RectGrid::new(1., 1.)),
+            (0, 0),
+            2,
+            2,
+            array![[1, 2], [3, 4]],
+            -1,
+        );
+
+        for err in [
+            data_tile.upscale(2).err().unwrap(),
+            data_tile.downscale(2).err().unwrap(),
+        ] {
+            assert!(err.contains("get_tile()"), "missing hint in: {err}");
+            assert!(
+                err.contains("sample_nearest_from"),
+                "missing resampling suggestion in: {err}"
+            );
+        }
     }
 }

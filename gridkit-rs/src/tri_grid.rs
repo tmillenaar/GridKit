@@ -405,8 +405,7 @@ impl GridTraits for TriGrid {
         nr_rows = 1 + 2 * depth;
 
         for i in 0..depth {
-            total_nr_neighbours =
-                total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
+            total_nr_neighbours = total_nr_neighbours + nr_neighbours_factor * 3 * (i + 1) as usize;
         }
 
         let mut nr_cells_per_colum_upward = Array1::<i64>::zeros((nr_rows as usize,));
@@ -415,8 +414,7 @@ impl GridTraits for TriGrid {
                 max_nr_cols - 2 * (depth - 1 - row_id);
         }
         for row_id in depth..(nr_rows) {
-            nr_cells_per_colum_upward[Ix1(row_id as usize)] =
-                max_nr_cols - 2 * (row_id - depth);
+            nr_cells_per_colum_upward[Ix1(row_id as usize)] = max_nr_cols - 2 * (row_id - depth);
         }
 
         let mut nr_cells_per_colum_downward = Array1::<i64>::zeros((nr_rows as usize,));
@@ -530,12 +528,10 @@ impl GridTraits for TriGrid {
                         let nr_cells_in_colum: i64;
                         if iseven(depth) {
                             partial_row = 0;
-                            nr_cells_in_colum =
-                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+                            nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         } else {
                             partial_row = nr_rows - 1;
-                            nr_cells_in_colum =
-                                nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
+                            nr_cells_in_colum = nr_cells_per_colum_upward[Ix1(rel_row_id as usize)];
                         }
 
                         for rel_col_id in 0..nr_cells_in_colum {
