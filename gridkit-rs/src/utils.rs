@@ -164,7 +164,10 @@ where
     let pool = POOL
         .read()
         .expect("the gridkit rayon pool lock is poisoned");
-    let pool = Arc::clone(pool.as_ref().expect("gridkit rayon pool was not initialized"));
+    let pool = Arc::clone(
+        pool.as_ref()
+            .expect("gridkit rayon pool was not initialized"),
+    );
     f(&pool)
 }
 
@@ -193,8 +196,7 @@ where
     let chunk = raveled.nrows().div_ceil(get_num_threads());
     let mut output = Array2::<B>::from_elem((raveled.nrows(), 2), B::default());
     let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
-    let destinations: Vec<ArrayViewMut2<B>> =
-        output.axis_chunks_iter_mut(Axis(0), chunk).collect();
+    let destinations: Vec<ArrayViewMut2<B>> = output.axis_chunks_iter_mut(Axis(0), chunk).collect();
     with_pool(|pool| {
         pool.install(|| {
             sources
@@ -221,8 +223,7 @@ where
     let k = sample.shape()[1];
     let mut output = Array3::<B>::from_elem((raveled.nrows(), k, 2), B::default());
     let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
-    let destinations: Vec<ArrayViewMut3<B>> =
-        output.axis_chunks_iter_mut(Axis(0), chunk).collect();
+    let destinations: Vec<ArrayViewMut3<B>> = output.axis_chunks_iter_mut(Axis(0), chunk).collect();
     with_pool(|pool| {
         pool.install(|| {
             sources
@@ -484,12 +485,14 @@ where
         let sources: Vec<ArrayView2<A>> = raveled.axis_chunks_iter(Axis(0), chunk).collect();
         let destinations: Vec<ArrayViewMut3<B>> =
             out.axis_chunks_iter_mut(Axis(0), chunk).collect();
-        with_pool(|pool| pool.install(|| {
-            sources
-                .into_par_iter()
-                .zip(destinations.into_par_iter())
-                .for_each(|(source, destination)| fill(source, destination));
-        }));
+        with_pool(|pool| {
+            pool.install(|| {
+                sources
+                    .into_par_iter()
+                    .zip(destinations.into_par_iter())
+                    .for_each(|(source, destination)| fill(source, destination));
+            })
+        });
     } else {
         fill(raveled.view(), out.view_mut());
     }
@@ -778,10 +781,9 @@ mod parallel_tests {
 
     #[test]
     fn parallel_reduce_matches_serial_above_the_threshold() {
-        let input = Array2::<i64>::from_shape_fn(
-            (PARALLEL_MIN_POINTS * 3 + 7, 2),
-            |(i, axis)| i as i64 * 3 + axis as i64,
-        );
+        let input = Array2::<i64>::from_shape_fn((PARALLEL_MIN_POINTS * 3 + 7, 2), |(i, axis)| {
+            i as i64 * 3 + axis as i64
+        });
         let work = |rows: ArrayView2<i64>| {
             rows.axis_iter(Axis(0))
                 .map(|row| row[0] * 2 + row[1])
@@ -795,10 +797,9 @@ mod parallel_tests {
 
     #[test]
     fn parallel_reduce_fill_matches_serial_above_the_threshold() {
-        let input = Array2::<i64>::from_shape_fn(
-            (PARALLEL_MIN_POINTS * 3 + 7, 2),
-            |(i, axis)| i as i64 * 3 + axis as i64,
-        );
+        let input = Array2::<i64>::from_shape_fn((PARALLEL_MIN_POINTS * 3 + 7, 2), |(i, axis)| {
+            i as i64 * 3 + axis as i64
+        });
         let work = |rows: ArrayView2<i64>, mut output: ArrayViewMut1<i64>| {
             for (row, value) in rows.axis_iter(Axis(0)).zip(output.iter_mut()) {
                 *value = row[0] * 2 + row[1];

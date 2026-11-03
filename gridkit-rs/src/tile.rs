@@ -534,10 +534,8 @@ impl Tile {
         for corner_id in 0..tile_corners.shape()[0] {
             let x = tile_corners[Ix2(corner_id, 0)];
             let y = tile_corners[Ix2(corner_id, 1)];
-            let unrotated_x = rotation_matrix_inv[[0, 0]] * x
-                + rotation_matrix_inv[[0, 1]] * y;
-            let unrotated_y = rotation_matrix_inv[[1, 0]] * x
-                + rotation_matrix_inv[[1, 1]] * y;
+            let unrotated_x = rotation_matrix_inv[[0, 0]] * x + rotation_matrix_inv[[0, 1]] * y;
+            let unrotated_y = rotation_matrix_inv[[1, 0]] * x + rotation_matrix_inv[[1, 1]] * y;
             tile_left = tile_left.min(unrotated_x);
             tile_bottom = tile_bottom.min(unrotated_y);
         }
@@ -620,8 +618,7 @@ impl Tile {
                     let corner_error = (0..corner_points.shape()[1])
                         .map(|corner_id| {
                             (corner_points[Ix3(0, corner_id, 0)] - anchor_unrotated[0]).powi(2)
-                                + (corner_points[Ix3(0, corner_id, 1)]
-                                    - anchor_unrotated[1])
+                                + (corner_points[Ix3(0, corner_id, 1)] - anchor_unrotated[1])
                                     .powi(2)
                         })
                         .fold(f64::INFINITY, f64::min);
@@ -632,14 +629,12 @@ impl Tile {
                     let base_id = candidate_grid.cell_at_point(&anchor_unrotated);
                     for x in base_id[0] - 2..=base_id[0] + 2 {
                         for y in base_id[1] - 2..=base_id[1] + 2 {
-                            let candidate_left = x as f64 * candidate_grid.dx()
-                                + candidate_grid.offset()[0];
-                            let candidate_bottom = y as f64 * candidate_grid.dy()
-                                + candidate_grid.offset()[1];
-                            let candidate_right =
-                                candidate_left + nx as f64 * candidate_grid.dx();
-                            let candidate_top =
-                                candidate_bottom + ny as f64 * candidate_grid.dy();
+                            let candidate_left =
+                                x as f64 * candidate_grid.dx() + candidate_grid.offset()[0];
+                            let candidate_bottom =
+                                y as f64 * candidate_grid.dy() + candidate_grid.offset()[1];
+                            let candidate_right = candidate_left + nx as f64 * candidate_grid.dx();
+                            let candidate_top = candidate_bottom + ny as f64 * candidate_grid.dy();
                             let error = (candidate_left - tile_left).powi(2)
                                 + (candidate_bottom - tile_bottom).powi(2)
                                 + (candidate_right - original_right).powi(2)
@@ -1115,7 +1110,10 @@ mod tests {
         let target_envelope = original.corners().row(3).to_owned();
         let ids = array![[original.start_id.0, original.start_id.1]];
         let original_corners = original.grid.cell_corners(ids.view());
-        let mut target = [original_corners[Ix3(0, 0, 0)], original_corners[Ix3(0, 0, 1)]];
+        let mut target = [
+            original_corners[Ix3(0, 0, 0)],
+            original_corners[Ix3(0, 0, 1)],
+        ];
         let mut best_error = f64::INFINITY;
         for corner_id in 0..original_corners.shape()[1] {
             let x = original_corners[Ix3(0, corner_id, 0)];
@@ -1135,7 +1133,10 @@ mod tests {
                     + (corners[Ix3(0, corner_id, 1)] - target[1]).powi(2)
             })
             .fold(f64::INFINITY, f64::min);
-        assert!(nearest_distance < 1e-18, "corner anchor error: {nearest_distance}");
+        assert!(
+            nearest_distance < 1e-18,
+            "corner anchor error: {nearest_distance}"
+        );
     }
 
     #[test]
