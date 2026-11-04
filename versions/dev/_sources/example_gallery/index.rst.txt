@@ -373,23 +373,6 @@ These examples show how traditional raster data can be analysed and modified usi
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Sample data from an existing DataTile onto other tiles with different resolutions and cell shapes.">
-
-.. only:: html
-
-  .. image:: /example_gallery/raster_operations/images/thumb/sphx_glr_sample_data_tiles_thumb.png
-    :alt:
-
-  :doc:`/example_gallery/raster_operations/sample_data_tiles`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Sampling DataTiles with other tiles</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Transform a grid from one CRS to another">
 
 .. only:: html
@@ -451,7 +434,6 @@ These examples show how traditional raster data can be analysed and modified usi
 
    /example_gallery/raster_operations/ndvi
    /example_gallery/raster_operations/partial_overlap
-   /example_gallery/raster_operations/sample_data_tiles
    /example_gallery/raster_operations/coordinate_transformations
    /example_gallery/raster_operations/resampling
    /example_gallery/raster_operations/elevation_distribution_per_land_cover
