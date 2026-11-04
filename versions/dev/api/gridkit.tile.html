@@ -262,6 +262,24 @@ the corners of the Tile in order: top-left, top-right, bottom-right, bottom-left
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.sample_nearest_from">
+<span class="sig-name descname"><span class="pre">sample_nearest_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_to_sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.sample_nearest_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.sample_nearest_from" title="Link to this definition"></a></dt>
+<dd><p>Sample a data tile at this tile’s cell centroids using nearest neighbours.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.sample_bilinear_from">
+<span class="sig-name descname"><span class="pre">sample_bilinear_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_to_sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.sample_bilinear_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.sample_bilinear_from" title="Link to this definition"></a></dt>
+<dd><p>Sample a data tile at this tile’s cell centroids using bilinear interpolation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gridkit.tile.Tile.sample_inverse_distance_from">
+<span class="sig-name descname"><span class="pre">sample_inverse_distance_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tile_to_sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.sample_inverse_distance_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.sample_inverse_distance_from" title="Link to this definition"></a></dt>
+<dd><p>Sample a data tile at this tile’s cell centroids using inverse-distance interpolation.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="gridkit.tile.Tile.to_shapely">
 <span class="sig-name descname"><span class="pre">to_shapely</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_multipolygon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gridkit/tile.html#Tile.to_shapely"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gridkit.tile.Tile.to_shapely" title="Link to this definition"></a></dt>
 <dd><p>Refer to parent method <a class="reference internal" href="gridkit.base_grid.html#gridkit.base_grid.BaseGrid.to_shapely" title="gridkit.base_grid.BaseGrid.to_shapely"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseGrid.to_shapely()</span></code></a></p>

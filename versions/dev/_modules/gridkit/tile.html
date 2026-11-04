@@ -402,6 +402,32 @@
         <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_tile</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Tile.sample_nearest_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_nearest_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_nearest_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using nearest neighbours."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_nearest_from</span><span class="p">(</span><span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tile.sample_bilinear_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_bilinear_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_bilinear_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using bilinear interpolation."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_bilinear_from</span><span class="p">(</span><span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tile.sample_inverse_distance_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_inverse_distance_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_inverse_distance_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">,</span> <span class="n">decay_constant</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using inverse-distance interpolation."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_inverse_distance_from</span><span class="p">(</span>
+            <span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">,</span> <span class="n">decay_constant</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Tile.to_shapely">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.to_shapely">[docs]</a>
     <span class="nd">@validate_index</span>
