@@ -5,6 +5,30 @@ Release notes
 
 This is the changelog, showing the evolution of GridKit over time.
 
+
+Version 1.1.0 (Oktober 23, 2026)
+----------------------------
+Fixes
+ -
+
+Performance
+ - Skip rotation computations when rotation is 0
+ -
+
+Features
+ - Native parallelism with Rust's Rayon crate. This allows for faster processing of
+   operations involving large arrays of cells or points by splitting the work in
+   batches over multuple CPU cores. These threads are significantly lighter than
+   python processes and operates without the limitations of Python's GIL. The order
+   of the elements is preserved so there is no difference in output with respect to
+   single threaded execution.
+-
+
+Breaking changes
+ - :meth:`.RectGrid.relative_neighbours` now requires an index as first argument,
+   to be consistent with the api of the other grid types
+
+
 Version 1.0.1 (July 9, 2025)
 ----------------------------
 Fixes

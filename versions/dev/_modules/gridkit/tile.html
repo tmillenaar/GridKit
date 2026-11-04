@@ -402,6 +402,108 @@
         <span class="k">return</span> <span class="n">Tile</span><span class="o">.</span><span class="n">from_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">_tile</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Tile.sample_nearest_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_nearest_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_nearest_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using nearest neighbours."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_nearest_from</span><span class="p">(</span><span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tile.sample_bilinear_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_bilinear_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_bilinear_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using bilinear interpolation."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_bilinear_from</span><span class="p">(</span><span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tile.sample_inverse_distance_from">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.sample_inverse_distance_from">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_inverse_distance_from</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile_to_sample</span><span class="p">,</span> <span class="n">decay_constant</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sample a data tile at this tile's cell centroids using inverse-distance interpolation."""</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">sample_inverse_distance_from</span><span class="p">(</span>
+            <span class="n">tile_to_sample</span><span class="o">.</span><span class="n">_data_tile</span><span class="p">,</span> <span class="n">decay_constant</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">DataTile</span><span class="o">.</span><span class="n">from_pyo3_data_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="n">result</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_from_rescaled_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pyo3_tile</span><span class="p">):</span>
+        <span class="n">grid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">()</span>
+        <span class="n">grid_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"offset"</span><span class="p">:</span> <span class="n">pyo3_tile</span><span class="o">.</span><span class="n">offset</span><span class="p">(),</span>
+            <span class="s2">"rotation"</span><span class="p">:</span> <span class="n">pyo3_tile</span><span class="o">.</span><span class="n">rotation</span><span class="p">(),</span>
+            <span class="s2">"crs"</span><span class="p">:</span> <span class="n">grid</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">RectGrid</span><span class="p">):</span>
+            <span class="n">new_grid</span> <span class="o">=</span> <span class="n">RectGrid</span><span class="p">(</span><span class="n">dx</span><span class="o">=</span><span class="n">pyo3_tile</span><span class="o">.</span><span class="n">dx</span><span class="p">(),</span> <span class="n">dy</span><span class="o">=</span><span class="n">pyo3_tile</span><span class="o">.</span><span class="n">dy</span><span class="p">(),</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">grid_kwargs</span><span class="p">[</span><span class="s2">"orientation"</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">orientation</span>
+            <span class="n">new_grid</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">parent_grid_class</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">pyo3_tile</span><span class="o">.</span><span class="n">cellsize</span><span class="p">(),</span> <span class="o">**</span><span class="n">grid_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span>
+            <span class="n">new_grid</span><span class="p">,</span>
+            <span class="n">pyo3_tile</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span>
+            <span class="n">pyo3_tile</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span>
+            <span class="n">pyo3_tile</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="Tile.upscale">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.upscale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">upscale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return a tile with ``factor`` times as many cells along both axes.</span>
+
+<span class="sd">        Each cell is subdivided into ``factor`` x ``factor`` smaller cells, so</span>
+<span class="sd">        the tile keeps exactly the same bounding box and rotation. A ``factor``</span>
+<span class="sd">        of 0 returns an unchanged copy; negative factors are not allowed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor: `int`</span>
+<span class="sd">            The integer factor by which to subdivide each cell.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.Tile`</span>
+<span class="sd">            A tile with the same bounds and an  ``factor`` times finer grid.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">factor</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a non-negative integer factor, got: </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">factor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_rescaled_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">upscale</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">factor</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="Tile.downscale">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.downscale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">downscale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return a tile with ``factor`` times fewer cells along both axes.</span>
+
+<span class="sd">        The cells are merged into ``factor`` x ``factor`` larger cells, so the</span>
+<span class="sd">        tile keeps exactly the same bounding box and rotation. This is the</span>
+<span class="sd">        inverse of :meth:`.Tile.upscale`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor: `int`</span>
+<span class="sd">            The integer factor by which to coarsen the tile. It must divide both</span>
+<span class="sd">            ``nx`` and ``ny`` so the coarser cells still fit the tile's bounds.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`.Tile`</span>
+<span class="sd">            A tile with the same bounds and a ``factor`` times coarser grid.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">factor</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">integer</span><span class="p">))</span> <span class="ow">or</span> <span class="n">factor</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected a positive integer factor, got: </span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span> <span class="o">%</span> <span class="n">factor</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span> <span class="o">%</span> <span class="n">factor</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Cannot downscale a tile of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="si">}</span><span class="s2"> x </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="si">}</span><span class="s2"> cells by a factor of "</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">factor</span><span class="si">}</span><span class="s2">: the factor must divide both 'nx' and 'ny' so the coarser "</span>
+                <span class="s2">"cells still fit the tile's bounds exactly."</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_rescaled_pyo3_tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tile</span><span class="o">.</span><span class="n">downscale</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">factor</span><span class="p">)))</span></div>
+
+
 <div class="viewcode-block" id="Tile.to_shapely">
 <a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.Tile.to_shapely">[docs]</a>
     <span class="nd">@validate_index</span>
@@ -996,6 +1098,52 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">get_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""A Tile object with the same properties as this DataTile, but without the data attached."""</span>
         <span class="k">return</span> <span class="n">Tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_grid</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataTile.upscale">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.upscale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">upscale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Not supported on a :class:`.DataTile`.</span>
+
+<span class="sd">        Changing the tile dimensions changes its grid, so the existing cell</span>
+<span class="sd">        values no longer correspond to the same cells and the data would have to</span>
+<span class="sd">        be re-interpreted. Resample the original data onto the new tile instead,</span>
+<span class="sd">        for example::</span>
+
+<span class="sd">            new_tile = data_tile.get_tile().upscale(factor)</span>
+<span class="sd">            resampled = new_tile.sample_nearest_from(data_tile)</span>
+
+<span class="sd">        This is equivalent to calling :meth:`.Tile.upscale` on</span>
+<span class="sd">        :meth:`.DataTile.get_tile` and then sampling the new tile with the</span>
+<span class="sd">        original data tile as input. The same pattern works with</span>
+<span class="sd">        :meth:`.Tile.sample_bilinear_from` and</span>
+<span class="sd">        :meth:`.Tile.sample_inverse_distance_from`.</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">"DataTile.upscale() is not supported because changing the tile dimensions "</span>
+            <span class="s2">"changes its grid: the existing cell values would have to be re-interpreted. "</span>
+            <span class="s2">"Resample the original data onto the new tile's grid instead, for example:</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"    new_tile = data_tile.get_tile().upscale(factor)</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"    resampled = new_tile.sample_nearest_from(data_tile)</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"(or sample_bilinear_from / sample_inverse_distance_from)."</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataTile.downscale">
+<a class="viewcode-back" href="../../api/gridkit.tile.html#gridkit.tile.DataTile.downscale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">downscale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Not supported on a :class:`.DataTile`.</span>
+
+<span class="sd">        See :meth:`.DataTile.upscale` for the suggested resampling workflow.</span>
+<span class="sd">        """</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="s2">"DataTile.downscale() is not supported because changing the tile dimensions "</span>
+            <span class="s2">"changes its grid: the existing cell values would have to be re-interpreted. "</span>
+            <span class="s2">"Resample the original data onto the new tile's grid instead, for example:</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"    new_tile = data_tile.get_tile().downscale(factor)</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"    resampled = new_tile.sample_nearest_from(data_tile)</span><span class="se">\n</span><span class="s2">"</span>
+            <span class="s2">"(or sample_bilinear_from / sample_inverse_distance_from)."</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DataTile.corner_ids">

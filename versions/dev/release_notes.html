@@ -55,6 +55,7 @@
 <li class="toctree-l1"><a class="reference internal" href="roadmap.html">Roadmap</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-1-1-0-oktober-23-2026">Version 1.1.0 (Oktober 23, 2026)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0-1-july-9-2025">Version 1.0.1 (July 9, 2025)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-1-0-0-june-29-2025">Version 1.0.0 (June 29, 2025)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-0-14-1-december-25-2024">Version 0.14.1 (December 25, 2024)</a></li>
@@ -135,6 +136,39 @@
   <section id="release-notes">
 <span id="id1"></span><h1>Release notes<a class="headerlink" href="#release-notes" title="Link to this heading"></a></h1>
 <p>This is the changelog, showing the evolution of GridKit over time.</p>
+<section id="version-1-1-0-oktober-23-2026">
+<h2>Version 1.1.0 (Oktober 23, 2026)<a class="headerlink" href="#version-1-1-0-oktober-23-2026" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>Fixes</dt><dd><ul class="simple">
+<li></li>
+</ul>
+</dd>
+<dt>Performance</dt><dd><ul class="simple">
+<li><p>Skip rotation computations when rotation is 0</p></li>
+<li></li>
+</ul>
+</dd>
+<dt>Features</dt><dd><ul class="simple">
+<li><p>Native parallelism with Rust’s Rayon crate. This allows for faster processing of
+operations involving large arrays of cells or points by splitting the work in
+batches over multuple CPU cores. These threads are significantly lighter than
+python processes and operates without the limitations of Python’s GIL. The order
+of the elements is preserved so there is no difference in output with respect to
+single threaded execution.</p></li>
+</ul>
+</dd>
+</dl>
+<ul class="simple">
+<li></li>
+</ul>
+<dl class="simple">
+<dt>Breaking changes</dt><dd><ul class="simple">
+<li><p><a class="reference internal" href="api/gridkit.rect_grid.html#gridkit.rect_grid.RectGrid.relative_neighbours" title="gridkit.rect_grid.RectGrid.relative_neighbours"><code class="xref py py-meth docutils literal notranslate"><span class="pre">RectGrid.relative_neighbours()</span></code></a> now requires an index as first argument,
+to be consistent with the api of the other grid types</p></li>
+</ul>
+</dd>
+</dl>
+</section>
 <section id="version-1-0-1-july-9-2025">
 <h2>Version 1.0.1 (July 9, 2025)<a class="headerlink" href="#version-1-0-1-july-9-2025" title="Link to this heading"></a></h2>
 <dl class="simple">
